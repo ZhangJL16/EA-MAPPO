@@ -1,0 +1,1011 @@
+from math import e
+import matplotlib
+matplotlib.use("Agg")
+from matplotlib.style import available
+import csv
+import numpy as np
+import pandas as pd
+import os
+from agent import agent
+from common.rollout import RolloutWorker, CommRolloutWorker, SMAC_MAPS
+from common.parallel_smac_rollout import ParallelSMACEpisodeCollector
+from agent.agent import Agents, CommAgents
+from common.replay_buffer import ReplayBuffer
+from common.replay_buffer_RGMComm import Buffer
+import matplotlib.pyplot as plt
+import scipy.io as sio
+from tqdm import trange, tqdm 
+import torch
+from datetime import datetime
+
+
+UAV_COLLISION_MAPS = {"UAV3D", "UAVEncircle", "UAVencircle"}
+
+
+class Runner:
+    def __init__(self, env, args):
+        self.env = env
+        self.args = args
+        self.parallel_episode_collector = None
+
+        if (
+            args.alg.find("commnet") > -1 or args.alg.find("g2anet") > -1
+        ):  # communication agent
+            self.agents = CommAgents(args)
+            self.rolloutWorker = CommRolloutWorker(env, self.agents, args)
+        elif args.alg.lower().find("rgmcomm") > -1:
+            
+            self.args.obs_shape = [args.obs_shape for _ in range(args.n_agents)]
+            self.args.action_shape = [args.n_actions for _ in range(args.n_agents)]
+            self.noise = self.args.noise_rate
+            self.epsilon = self.args.epsilon
+
+            self.agents = self._init_agents()
+            self.buffer = Buffer(args)
+            self.rolloutWorker = RolloutWorker(env, self.agents, args)
+            
+        else:  # no communication agent
+            self.agents = Agents(args, env)
+            self.rolloutWorker = RolloutWorker(env, self.agents, args)
+        if (
+            args.map in SMAC_MAPS
+            and int(getattr(args, "smac_parallel_envs", 1)) > 1
+            and (args.alg.find("qmix") != -1 or args.alg.find("vdn") != -1)
+        ):
+            self.parallel_episode_collector = ParallelSMACEpisodeCollector(
+                args, self.agents
+            )
+        if (
+            not args.evaluate
+            and args.alg.find("coma") == -1
+            and args.alg.find("central_v") == -1
+            and args.alg.find("reinforce") == -1
+            and args.alg.find("mappo") == -1
+            and args.alg.find("macpo") == -1
+            and args.alg.lower().find("rgmcomm") == -1
+        ):  # these algorithms are on-policy
+            self.buffer = ReplayBuffer(args)
+        self.args = args
+        self.win_rates = []
+        self.episode_rewards = []
+
+        self.warning_signals = []
+
+        self.smac_summary = {
+            "win_rate": [],
+            "episode_reward": [],
+            "collision_count": [],
+            "obstacle_collision_count": [],
+            "agent_collision_count": [],
+            "step": [],
+            "agent_health": [],
+            "enemy_health": [],
+            "agent_alive": [],
+        }
+
+        self.maze_summary = {
+            "reward": [],
+            "bonus": [],
+            "trap": [],
+            "life": [],
+            "step": [],
+            "arrived": [],
+            "died": [],
+            "warning_signal": [],
+        }
+        for i in range(self.env.n_agents):
+            self.maze_summary.update({f"agent{i}_trap": [], f"agent{i}_life": []})
+
+        self.IoV_summary = {
+            "reward": [],
+            "latency": [],
+            "protection_level": [],
+            "atk_succ_rate": [],
+            "malicious_msg_nums": [],
+        }
+
+        self.stego_summary = {
+            "psnr": [],
+            "ssim": [],
+            "uiqi": [],
+            "accuracy": [],
+            "rsbpp": [],
+            "error": [],
+            "mse": [],
+            "density": [],
+            "latency": [],
+            "reward": [],
+        }
+
+        self.summary_agent = {f'{agent}': {} for agent in range(self.env.n_agents)}
+        self.add_metrics()
+
+        # 用来保存plt和pkl
+        # 统一保存路径: result/地图/算法/
+        self.save_path = self.args.result_dir + "/" + args.map + "/" + args.alg + "/"
+        if not os.path.exists(self.save_path):
+            os.makedirs(self.save_path)
+        self.log_path = self._init_csv_log()
+        self.train_episode_count = 0
+        self.eval_count = 0
+        self._last_saved_bucket = -1
+        if self.args.map == "UAV3D":
+            self.args.save_cycle = 50000
+
+    def close(self):
+        if self.parallel_episode_collector is not None:
+            self.parallel_episode_collector.close()
+            self.parallel_episode_collector = None
+
+    def _get_csv_log_path(self):
+        log_dir = os.path.join("train_logs", self.args.alg, self.args.map)
+        os.makedirs(log_dir, exist_ok=True)
+        log_idx = 0
+        while True:
+            log_path = os.path.join(log_dir, f"{self.args.map}_log_{log_idx}.csv")
+            if not os.path.exists(log_path):
+                return log_path
+            log_idx += 1
+
+    def _init_csv_log(self):
+        log_path = self._get_csv_log_path()
+        with open(log_path, "w", newline="", encoding="utf-8") as csv_file:
+            writer = csv.writer(csv_file)
+            writer.writerow(
+                [
+                    "event",
+                    "episode",
+                    "timestep",
+                    "train_step",
+                    "progress",
+                    "episode_idx",
+                    "episode_reward",
+                    "episode_steps",
+                    "epsilon",
+                    "win_rate",
+                    "collision_count",
+                    "obstacle_collision_count",
+                    "agent_collision_count",
+                    "safety_loss",
+                    "agent_health",
+                    "enemy_health",
+                    "agent_alive",
+                    "eval_step",
+                    "timestamp",
+                ]
+            )
+        return log_path
+
+    def _append_log_row(self, row):
+        with open(self.log_path, "a", newline="", encoding="utf-8") as csv_file:
+            writer = csv.writer(csv_file)
+            writer.writerow(row)
+
+    def _log_eval_summary(self, summary, time_steps=None, train_steps=None):
+        progress = ""
+        if time_steps is not None and getattr(self.args, "n_steps", 0):
+            progress = f"{100.0 * min(time_steps, self.args.n_steps) / self.args.n_steps:.2f}%"
+        self.eval_count += 1
+        self._append_log_row(
+            [
+                "EVAL",
+                self.eval_count,
+                time_steps if time_steps is not None else "",
+                train_steps if train_steps is not None else "",
+                progress,
+                "",
+                float(summary.get("episode_reward", 0.0)),
+                "",
+                "",
+                float(summary.get("win_rate", 0.0)),
+                float(summary.get("collision_count", 0.0)),
+                float(summary.get("obstacle_collision_count", 0.0)),
+                float(summary.get("agent_collision_count", 0.0)),
+                "",
+                float(summary.get("agent_health", 0.0)),
+                float(summary.get("enemy_health", 0.0)),
+                float(summary.get("agent_alive", 0.0)),
+                float(summary.get("step", 0.0)),
+                datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            ]
+        )
+
+    def _init_agents(self): # for RGMComm
+        agents = []
+        for i in range(self.args.n_agents):
+            agent = Agents(self.args, self.env, i)
+            agents.append(agent)
+        return agents
+
+    def _save_policy_if_needed(self, time_steps, force=False):
+        if not hasattr(self.agents, "policy"):
+            return
+        saver = None
+        if hasattr(self.agents, "save_model"):
+            saver = self.agents.save_model
+        elif hasattr(self.agents.policy, "save_model"):
+            saver = self.agents.policy.save_model
+        if saver is None:
+            return
+        if time_steps is None:
+            return
+
+        save_cycle = getattr(self.args, "save_cycle", 0)
+        current_bucket = (
+            time_steps // save_cycle if save_cycle and time_steps > 0 else -1
+        )
+        should_save = force
+        if not should_save:
+            should_save = (
+                save_cycle > 0
+                and current_bucket > 0
+                and current_bucket > self._last_saved_bucket
+            )
+
+        if not should_save:
+            return
+
+        saver(time_steps)
+        if current_bucket >= 0:
+            self._last_saved_bucket = current_bucket
+
+    def run(self, num):
+        time_steps, train_steps, evaluate_steps = 0, 0, -1
+        self._save_policy_if_needed(time_steps, force=True)
+        try:
+            with tqdm(
+                total=self.args.n_steps,
+                dynamic_ncols=True,
+                ascii=True,
+            ) as progress_bar:
+                while time_steps < self.args.n_steps:
+                    if time_steps // self.args.evaluate_cycle > evaluate_steps:
+                        self._eval(num, time_steps=time_steps, train_steps=train_steps)
+                        evaluate_steps += 1
+                    episodes = []
+                    pending_train_rows = []
+                    if self.parallel_episode_collector is not None:
+                        collected = self.parallel_episode_collector.collect_episodes(
+                            self.args.n_episodes
+                        )
+                        rollout_epsilon = float(self.parallel_episode_collector.epsilon)
+                        for episode_idx, result in enumerate(collected):
+                            episode = result["episode"]
+                            episode_reward = result["episode_reward"]
+                            episode_summary = result["summary"]
+                            steps = int(result["steps"])
+                            episodes.append(episode)
+                            time_steps += steps
+                            progress_bar.update(
+                                min(steps, max(self.args.n_steps - progress_bar.n, 0))
+                            )
+                            self.train_episode_count += 1
+                            progress = (
+                                f"{100.0 * min(time_steps, self.args.n_steps) / self.args.n_steps:.2f}%"
+                                if getattr(self.args, "n_steps", 0)
+                                else ""
+                            )
+                            pending_train_rows.append(
+                                [
+                                    "TRAIN",
+                                    self.train_episode_count,
+                                    time_steps,
+                                    train_steps,
+                                    progress,
+                                    episode_idx,
+                                    float(episode_reward),
+                                    steps,
+                                    rollout_epsilon,
+                                    float(episode_summary.get("win_tag", 0.0))
+                                    if self.args.map in UAV_COLLISION_MAPS or self.args.map in SMAC_MAPS
+                                    else "",
+                                    float(episode_summary.get("collision_count", 0.0))
+                                    if self.args.map in UAV_COLLISION_MAPS
+                                    else "",
+                                    float(episode_summary.get("obstacle_collision_count", 0.0))
+                                    if self.args.map in UAV_COLLISION_MAPS
+                                    else "",
+                                    float(episode_summary.get("agent_collision_count", 0.0))
+                                    if self.args.map in UAV_COLLISION_MAPS
+                                    else "",
+                                    "",
+                                    "",
+                                    "",
+                                    "",
+                                    "",
+                                    datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                                ]
+                            )
+                            if time_steps >= self.args.n_steps:
+                                break
+                    else:
+                        for episode_idx in range(self.args.n_episodes):
+                            episode, episode_reward, episode_summary, steps, _ = self.rolloutWorker.generate_episode(  # type: ignore
+                                episode_idx
+                            )
+                            episodes.append(episode)
+                            time_steps += steps
+                            progress_bar.update(
+                                min(steps, max(self.args.n_steps - progress_bar.n, 0))
+                            )
+                            self.train_episode_count += 1
+                            progress = (
+                                f"{100.0 * min(time_steps, self.args.n_steps) / self.args.n_steps:.2f}%"
+                                if getattr(self.args, "n_steps", 0)
+                                else ""
+                            )
+                            pending_train_rows.append(
+                                [
+                                    "TRAIN",
+                                    self.train_episode_count,
+                                    time_steps,
+                                    train_steps,
+                                    progress,
+                                    episode_idx,
+                                    float(episode_reward),
+                                    steps,
+                                    float(self.rolloutWorker.epsilon),
+                                    float(episode_summary.get("win_tag", 0.0))
+                                    if self.args.map in UAV_COLLISION_MAPS or self.args.map in SMAC_MAPS
+                                    else "",
+                                    float(episode_summary.get("collision_count", 0.0))
+                                    if self.args.map in UAV_COLLISION_MAPS
+                                    else "",
+                                    float(episode_summary.get("obstacle_collision_count", 0.0))
+                                    if self.args.map in UAV_COLLISION_MAPS
+                                    else "",
+                                    float(episode_summary.get("agent_collision_count", 0.0))
+                                    if self.args.map in UAV_COLLISION_MAPS
+                                    else "",
+                                    "",
+                                    "",
+                                    "",
+                                    "",
+                                    "",
+                                    datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                                ]
+                            )
+                            if time_steps >= self.args.n_steps:
+                                break
+                    episode_batch = episodes[0]
+                    episodes.pop(0)
+                    for episode in episodes:
+                        for key in episode_batch.keys():
+                            episode_batch[key] = np.concatenate(
+                                (episode_batch[key], episode[key]), axis=0
+                            )
+                    if (
+                        self.args.alg.find("coma") > -1
+                        or self.args.alg.find("central_v") > -1
+                        or self.args.alg.find("reinforce") > -1
+                        or self.args.alg.find("mappo") > -1
+                        or self.args.alg.find("macpo") > -1
+                    ):
+                        train_metrics = self.agents.train(
+                            episode_batch, train_steps, self.rolloutWorker.epsilon
+                        )
+                        safety_loss = (
+                            train_metrics.get("safety_loss", "")
+                            if isinstance(train_metrics, dict)
+                            else ""
+                        )
+                        for row in pending_train_rows:
+                            row[13] = safety_loss
+                            self._append_log_row(row)
+                        train_steps += 1
+                        self._save_policy_if_needed(time_steps)
+                    else:
+                        for row in pending_train_rows:
+                            self._append_log_row(row)
+                        self.buffer.store_episode(episode_batch)
+                        for train_step in range(self.args.train_steps):
+                            mini_batch = self.buffer.sample(
+                                min(self.buffer.current_size, self.args.batch_size)
+                            )
+                            self.agents.train(mini_batch, train_steps)
+                            train_steps += 1
+                        self._save_policy_if_needed(time_steps)
+
+            self._eval(num, time_steps=time_steps, train_steps=train_steps)
+            self._save_policy_if_needed(time_steps, force=True)
+        finally:
+            self.close()
+
+
+    def _eval(self, num, time_steps=None, train_steps=None):
+        if self.args.map == "Basic2P":
+            summary, warning_signal = self.evaluate_maze()
+            self.warning_signals.append(warning_signal)
+            for key in summary.keys():
+                self.maze_summary[key].append(summary[key])
+            self.plt_maze()
+            self._log_eval_summary(summary, time_steps=time_steps, train_steps=train_steps)
+        elif self.args.map == "IoV":
+            summary = self.evaluate_IoV()
+            for key in summary.keys():
+                self.IoV_summary[key].append(summary[key])
+            self.plot_IoV()
+            self._log_eval_summary(summary, time_steps=time_steps, train_steps=train_steps)
+        elif self.args.map == "stego":
+            summary = self.evaluate_stego()
+            for metric in self.stego_summary.keys():
+                self.stego_summary[metric].append(summary[metric])
+                for agent in range(self.env.n_agents):
+                        self.summary_agent[f'{agent}'][metric].append(
+                            summary[f'{agent}'][metric]
+                        )
+            self.plot_stego()
+            self._log_eval_summary(summary, time_steps=time_steps, train_steps=train_steps)
+        else:  # smac
+            win_rate, episode_reward, summary = self.evaluate()
+            # print("win_rate is ", win_rate)
+            self.win_rates.append(win_rate)
+            self.episode_rewards.append(episode_reward)
+            for key in summary.keys():
+                self.smac_summary[key].append(summary[key])
+            self.plt(num)
+            self.plt_smac(num, self.args)
+            self._log_eval_summary(summary, time_steps=time_steps, train_steps=train_steps)
+
+    def add_metrics(self):
+        metrics = []
+        if self.args.map == "Basic2P":
+            metrics = self.maze_summary.keys()
+        elif self.args.map == "IoV":
+            metrics = self.IoV_summary.keys()
+        elif self.args.map == "stego":
+            metrics = self.stego_summary.keys()
+        else:
+            metrics = self.smac_summary.keys()
+        for agent in range(self.env.n_agents):
+            for metric in metrics:
+                self.summary_agent[f'{agent}'][metric] = []
+
+    def evaluate(self):
+        # win_number = 0
+        # episode_rewards = 0
+
+        summary = {
+            "episode_reward": 0,
+            "win_rate": 0,
+            "collision_count": 0,
+            "obstacle_collision_count": 0,
+            "agent_collision_count": 0,
+            "step": 0,
+            "agent_health": 0,
+            "enemy_health": 0,
+            "agent_alive": 0,
+        }
+
+        for epoch in range(self.args.evaluate_epoch):
+            # _, episode_reward, win_tag, _ = self.rolloutWorker.generate_episode(epoch, evaluate=True)
+            # episode_rewards += episode_reward
+            # if episode_summary['win_tag']:
+            # win_number += 1
+            _, episode_reward, episode_summary, _, _ = (
+                self.rolloutWorker.generate_episode(epoch, evaluate=True)
+            )
+
+            summary["episode_reward"] += episode_reward
+            summary["win_rate"] += episode_summary["win_tag"]
+            summary["collision_count"] += episode_summary.get("collision_count", 0.0)
+            summary["obstacle_collision_count"] += episode_summary.get(
+                "obstacle_collision_count", 0.0
+            )
+            summary["agent_collision_count"] += episode_summary.get(
+                "agent_collision_count", 0.0
+            )
+            summary["step"] += episode_summary["step"]
+            summary["agent_health"] += episode_summary["agent_health"]
+            summary["enemy_health"] += episode_summary["enemy_health"]
+            summary["agent_alive"] += episode_summary["agent_alive"]
+
+        for key in summary.keys():
+            summary[key] /= self.args.evaluate_epoch
+
+        return summary["win_rate"], summary["episode_reward"], summary
+
+        # return win_number / self.args.evaluate_epoch, episode_rewards / self.args.evaluate_epoch
+
+    def evaluate_maze(self):
+        episode = {
+            "reward": 0.0,
+            "trap": 0.0,
+            "bonus": 0.0,
+            "life": 0.0,
+            "step": 0.0,
+            "arrived": 0.0,
+            "died": 0.0,
+            "warning_signal": 0.0,
+        }
+        for i in range(self.env.n_agents):
+            episode.update({f"agent{i}_trap": 0.0, f"agent{i}_life": 0.0})
+
+        for epoch in range(self.args.evaluate_epoch):
+            _, episode_reward, episode_summary, _, warning_signal = (
+                self.rolloutWorker.generate_episode(epoch, evaluate=True)
+            )
+            episode["reward"] += episode_reward
+            episode["trap"] += episode_summary["trap"]
+            episode["bonus"] += episode_summary["bonus"]
+            episode["life"] += episode_summary["life"]
+            episode["step"] += episode_summary["step"]
+            episode["arrived"] += episode_summary["arrived"]
+            episode["died"] += episode_summary["died"]
+            episode["warning_signal"] += sum(warning_signal)
+            for i in range(self.env.n_agents):
+                episode[f"agent{i}_trap"] += episode_summary[f"agent{i}_trap"]
+                episode[f"agent{i}_life"] += episode_summary[f"agent{i}_life"]
+
+        for key in episode.keys():
+            episode[key] = float(episode[key]) / self.args.evaluate_epoch
+
+        return episode, episode["warning_signal"]
+
+    def evaluate_IoV(self):
+        episode = {
+            "reward": 0.0,
+            "latency": 0.0,
+            "protection_level": 0.0,
+            "atk_succ_rate": 0.0,
+            "malicious_msg_nums": 0.0,
+        }
+        for epoch in range(self.args.evaluate_epoch):
+            _, episode_reward, episode_summary, _, warning_signal = (
+                self.rolloutWorker.generate_episode(epoch, evaluate=True)
+            )
+            episode["reward"] += episode_reward
+            episode["latency"] += episode_summary["latency"]
+            episode["protection_level"] += episode_summary["protection_level"]
+            episode["atk_succ_rate"] += episode_summary["atk_succ_rate"]
+            episode["malicious_msg_nums"] += episode_summary["malicious_msg_nums"]
+        for key in episode.keys():
+            episode[key] /= self.args.evaluate_epoch
+        return episode
+
+    def evaluate_stego(self):
+        episode = {metric: 0.0 for metric in self.stego_summary.keys()}
+        episode_agents = {}
+        for agent in range(self.env.n_agents):
+            episode_agents[f'{agent}'] = {}
+            for metric in episode.keys():
+                episode_agents[f'{agent}'][metric] = 0.0
+
+        for epoch in range(self.args.evaluate_epoch):
+            _, _, episode_summary, _, _ = self.rolloutWorker.generate_episode(
+                epoch, evaluate=True
+            )
+            for key in episode.keys():
+                episode[key] += episode_summary[key]
+            for agent in range(self.env.n_agents):
+                for metric in episode.keys():
+                    episode_agents[f'{agent}'][metric] += episode_summary[f'{agent}'][metric]
+        
+        for key in episode.keys():
+            episode[key] /= self.args.evaluate_epoch
+            for agent in range(self.env.n_agents):
+                for metric in episode.keys():
+                    episode_agents[f'{agent}'][metric] /= self.args.evaluate_epoch
+        episode.update(episode_agents)
+        return episode
+
+    def plt(self, num):
+        plt.figure()
+        plt.ylim([0, 105])
+        plt.cla()
+        plt.subplot(2, 1, 1)
+        plt.plot(range(len(self.win_rates)), self.win_rates)
+        # plt.xlabel('step*{}'.format(self.args.evaluate_cycle))
+        plt.ylabel("win_rates")
+
+        plt.subplot(2, 1, 2)
+        plt.plot(range(len(self.episode_rewards)), self.episode_rewards)
+        plt.xlabel("{} time steps".format(self.args.evaluate_cycle))
+        plt.ylabel("episode_rewards")
+
+        # plt.savefig(self.save_path + "/plt_{}.png".format(num), format="png")
+        # np.save(self.save_path + "/win_rates_{}".format(num), self.win_rates)
+        # np.save(
+        #     self.save_path + "/episode_rewards_{}".format(num), self.episode_rewards
+        # )
+        plt.close()
+
+    def plt_smac(self, num, args):
+        plt.style.use("ggplot")
+        fontsize = 12
+
+        metrics = list(self.smac_summary.keys())
+        n_metrics = len(metrics)
+        n_cols = 3
+        n_rows = int(np.ceil(n_metrics / n_cols))
+
+        fig, axes = plt.subplots(n_rows, n_cols)
+        fig.suptitle(f"{self.args.alg.upper()}")
+        axes = np.atleast_1d(axes).reshape(-1)
+
+        for i, key in enumerate(metrics):
+            axes[i].plot(self.smac_summary[key][1:])
+            if i >= n_metrics - n_cols:
+                axes[i].set_xlabel(
+                    "{} time steps".format(self.args.evaluate_cycle), fontsize=fontsize
+                )
+            axes[i].set_title(key.title(), fontsize=fontsize)
+            # np.save(self.save_path + "/{}_{}".format(key, num), self.smac_summary[key])
+
+        for i in range(n_metrics, len(axes)):
+            axes[i].axis("off")
+
+        plt.tight_layout()
+        # plt.savefig(
+        #     self.save_path + "/plt_plus_{}.png".format(num), format="png", dpi=300
+        # )
+        plt.close()
+
+        alg_ = (
+            self.args.alg
+            if self.args.alg not in ["gmix_reshape_Comm", "gmix_Comm_reshape"]
+            else "ours"
+        )
+
+        sio.savemat(
+            self.save_path + f"{self.args.map}_{alg_}_{self.args.now}.mat",
+            self.smac_summary,
+        )
+
+    def plt_maze(
+        self,
+    ):
+        alg = self.args.alg
+        sio.savemat(
+            self.save_path + f"maze_{alg}_{self.args.now}.mat", self.maze_summary
+        )
+        self.agents.policy.save_model(self.args.n_steps // self.args.evaluate_cycle)
+        # plt.style.use('bmh')
+        # # 定义要删除的键列表
+        # keys_to_remove = []
+        # for key in range(self.env.n_agents):
+        #     keys_to_remove.append(f'agent{key}_trap')
+        #     keys_to_remove.append(f'agent{key}_life')
+
+        # agent_single_perf = {key: value for key, value in self.maze_summary.items() if key in keys_to_remove}
+
+        # # # analysis of every agent
+        # # fig, axes = plt.subplots(1, 2, figsize=(10, 5))
+        # # fig.suptitle(f'{self.args.alg.upper()}')
+        # # axes = axes.reshape(-1)
+        # # for i, key in enumerate(['trap', 'life']):
+        # #     for agent in range(self.env.n_agents):
+        # #         axes[i].plot(agent_single_perf[f'agent{agent}_{key}'])
+        # #     axes[i].set_title(key.title(), fontsize=12)
+        # # plt.savefig(self.save_path + '/sole_{}.png'.format(num), format='png', dpi=300)
+        # # plt.close()
+
+        # fontsize = 12
+        # subfig_num = len(self.maze_summary.keys()) - 4
+        # row, col = 0, 0
+        # for row in [2, 3, 5, 1]:
+        #     if subfig_num % row == 0:
+        #         col = subfig_num // row
+        #         break
+        # fig, axes = plt.subplots(row, col)
+        # fig.suptitle(f'{self.args.alg.upper()}')
+        # axes = axes.reshape(-1)
+
+        # for i, key in enumerate(self.maze_summary.keys() - agent_single_perf.keys()):
+        #     axes[i].plot(self.maze_summary[key])
+        #     if i == 4:
+        #         axes[i].set_xlabel('{} time steps'.format(self.args.evaluate_cycle), fontsize=fontsize)
+        #     axes[i].set_title(key.title(), fontsize=fontsize)
+        #     np.save(self.save_path + '/{}_{}'.format(key, num), self.maze_summary[key])
+
+        # plt.savefig(self.save_path + '/plt_{}.png'.format(num), format='png', dpi=300)
+        # plt.close()
+
+    def plot_IoV(self):
+        fig, axes = plt.subplots(2, 3)
+        fig.suptitle(f"{self.args.alg.upper()}")
+        axes = axes.reshape(-1)
+        titles = [
+            "Reward",
+            "Latency (ms)",
+            "Protection level",
+            "Attack success rate (%)",
+            "Malicious messages",
+        ]
+
+        for i, (key, title) in enumerate(
+            zip(
+                self.IoV_summary.keys(),
+                titles,
+            )
+        ):
+            axes[i].plot(self.IoV_summary[key][1:])
+            if i == 4:
+                axes[i].set_xlabel("{} time steps".format(self.args.evaluate_cycle))
+            axes[i].set_title(title)
+
+        sio.savemat(
+            self.save_path + f"IoV_{self.args.alg}_{self.args.now}.mat", self.IoV_summary
+        )
+        plt.savefig(self.save_path + f"/IoV_{self.args.alg}.png", format="png", dpi=500)
+        plt.close()
+
+    def plot_stego(self):
+        sio.savemat(
+            self.save_path + f"stego_{self.args.alg}_{self.args.now}.mat",
+            self.stego_summary,
+        )
+        for agent in range(self.env.n_agents):
+            sio.savemat(
+                self.save_path + f"stego_agent{agent}_{self.args.alg}_{self.args.now}.mat",
+                self.summary_agent[f'{agent}'],
+            )
+
+    def runRGM(self):
+        returns = []
+        sample_dic = {}
+        self.args.n_players = self.args.n_agents
+        for i in range(self.args.n_agents):
+            sample_dic[i] = []
+        
+        # 根据环境类型初始化结果字典
+        result = {}
+        result_episode = {}
+        if self.args.map == "Basic2P":
+            result = {
+                'reward': [],
+                'arrived': [],
+                'died': [],
+                'bonus': [],
+                'trap': [],
+                'life': [],
+                'step': [],
+                'warning_signal': []
+            }
+            result_episode = {
+                'reward': [],
+                'arrived': 0,
+                'died': 0,
+                'bonus': 0,
+                'trap': 0,
+                'life': 0,
+                'step': 0,
+                'warning_signal': 0
+            }
+        else:  # SMAC
+            result = {
+                'reward': [],
+                'win_rate': []
+            }
+            result_episode = {
+                'reward': [],
+                'episode_won': False  # 记录本 episode 是否获胜
+            }
+        done = False
+        last_start = 0
+        episode_count = 0  # 记录 episode 数量
+        win_history = []  # 记录最近 N 个 episode 的胜负历史
+        episode_count = 0  # 记录 episode 数量
+        win_history = []  # 记录最近 N 个 episode 的胜负历史
+        for time_step in tqdm(range(self.args.time_steps)):
+            # reset the environment
+            if time_step % self.args.max_episode_len == 0 or done:
+                # 先记录上一个 episode 的结果（如果不是第一次）
+                if time_step > 0:
+                    if self.args.map == "Basic2P":
+                        result['reward'].append(sum(result_episode['reward']))
+                        result['arrived'].append(result_episode['arrived'])
+                        result['died'].append(result_episode['died'])
+                        result['bonus'].append(result_episode['bonus'])
+                        result['trap'].append(result_episode['trap'])
+                        result['life'].append(result_episode['life'])
+                        result['step'].append(result_episode['step'])
+                        result['warning_signal'].append(result_episode['warning_signal'])
+                    else:  # SMAC
+                        result['reward'].append(sum(result_episode['reward']))
+                        # 记录本 episode 是否获胜（0 或 1）
+                        episode_won = 1 if result_episode['episode_won'] else 0
+                        win_history.append(episode_won)
+                        episode_count += 1
+                        
+                        # 计算滑动窗口平均 win rate（最近 100 个 episode）
+                        window_size = min(100, episode_count)
+                        recent_wins = win_history[-window_size:]
+                        avg_win_rate = sum(recent_wins) / len(recent_wins)
+                        result['win_rate'].append(avg_win_rate)
+                
+                # 重置环境和 episode 记录
+                self.env.reset()
+                s = self.env.get_obs()
+                # 更新结果，最终记录的是一个 episode 的
+                if self.args.map == "Basic2P":
+                    result_episode = {
+                        'reward': [],
+                        'arrived': 0,
+                        'died': 0,
+                        'bonus': 0,
+                        'trap': 0,
+                        'life': 0,
+                        'step': 0,
+                        'warning_signal': 0
+                    }
+                else:  # SMAC
+                    result_episode = {
+                        'reward': [],
+                        'episode_won': False
+                    }
+                last_start = time_step
+            u = []
+            actions = []
+            with torch.no_grad():
+                for agent_id, agent in enumerate(self.agents):
+                    # import pdb; pdb.set_trace()
+                    action = agent.select_action(s[agent_id], self.noise, self.epsilon)
+                    u.append(action)
+                    actions.append(action)
+            for i in range(self.args.n_agents, self.args.n_players):
+                actions.append([0, np.random.rand() * 2 - 1, 0, np.random.rand() * 2 - 1, 0])
+
+            # action_index = []
+            # for agent_id, action in enumerate(actions):
+            #     available_actions = self.env.get_avail_agent_actions(agent_id)
+            #     available_ids = []
+            #     for i, a_action in enumerate(available_actions):
+            #         if a_action == 1:
+            #             available_ids.append(i)
+            #     max_val_action = np.max(action[available_ids])
+            #     action_i = action.tolist().index(max_val_action)
+            #     action_index.append(action_i)
+
+            action_index = []
+            for agent_id, action in enumerate(actions):
+                # 1. 获取当前智能体的可用动作
+                available_actions = self.env.get_avail_agent_actions(agent_id)
+                available_ids = np.where(np.array(available_actions) == 1)[0]  # 可用动作的索引
+                
+                # 2. 检查是否有可用动作
+                if len(available_ids) == 0:
+                    action_index.append(8)  # 默认动作（如无操作）
+                    continue
+                
+                # 3. 在可用动作中选择概率最大的动作
+                available_action_probs = action[available_ids]  # 仅保留可用动作的概率
+                max_prob = np.max(available_action_probs)      # 最大概率值
+                # 可能有多个动作具有相同最大概率，随机选一个
+                candidate_actions = available_ids[available_action_probs == max_prob]
+                chosen_action = np.random.choice(candidate_actions)  # 随机选一个
+                action_index.append(chosen_action)
+
+            # import pdb; pdb.set_trace()
+            # s_next, r, done, info = self.env.step(actions)
+            r, done, info = self.env.step(action_index)
+
+            # 针对环境修正 reward 标准化
+            if self.args.map == "Basic2P":
+                r *= 0.005
+
+            result_episode['reward'].append(r)
+            if self.args.map == "Basic2P":
+                result_episode['arrived'] = info.get('arrived', 0)  # 最终状态，用 = 覆盖
+                result_episode['died'] = info.get('died', 0)  # 最终状态，用 = 覆盖
+                result_episode['bonus'] += sum(info.get('bonus', [0]))  # 累计值，用 +=
+                result_episode['trap'] = sum(info.get('traps', [0]))  # 每步覆盖为当前值（最后一步是总数）
+                result_episode['life'] = sum(info.get('life', [0]))  # 最终状态，用 = 覆盖（记录当前生命值）
+                result_episode['step'] += 1  # 增加 step 计数
+                result_episode['warning_signal'] += np.sum(info.get('warning_signal', 0))  # 累计值，用 +=
+            else:  # SMAC
+                # 只要本 episode 中任意一步 battle_won 为 True，就记为获胜
+                if info.get('battle_won', False):
+                    result_episode['episode_won'] = True
+            
+            rewards = [r for _ in range(self.args.n_agents)]
+            s_next = []
+            if hasattr(self.env, "get_obs"):
+                s_next = self.env.get_obs()
+            else:
+                for agent_id in range(self.args.n_agents):
+                    s_next.append(self.env.get_obs_agent(agent_id))
+            # import pdb; pdb.set_trace()
+            self.buffer.store_episode(s[:self.args.n_agents], action_index[:self.args.n_agents], rewards[:self.args.n_agents], s_next[:self.args.n_agents])
+            s = s_next
+            if self.buffer.current_size >= self.args.batch_size:
+                transitions = self.buffer.sample(self.args.batch_size)
+                for agent_idx, agent in enumerate(self.agents):
+                    other_agents = self.agents[:agent_idx] + self.agents[agent_idx+1:]
+                    agent.learn(transitions, other_agents)
+
+            if time_step > 0 and time_step % self.args.evaluate_rate == 0:
+                returns.append(self.evaluateRGM())
+
+            if time_step >= self.args.sample_start and time_step % self.args.sample_rate == 0:
+                transitions = self.buffer.sample(self.args.batch_size)
+                for agent in self.agents:
+                    sample_dic[agent.agent_id].extend(agent.learnit(transitions))
+            self.noise = max(0.05, self.noise - 0.0000005)
+            self.epsilon = max(0.05, self.noise - 0.0000005)
+        
+        # 训练结束后保存结果
+        sio.savemat(
+            self.save_path + f"{self.args.map}_rgmcomm_{self.args.now}.mat",
+            result,
+        )
+        
+        # 保存评估曲线
+        if len(returns) > 0:
+            plt.figure()
+            plt.plot(range(len(returns)), returns)
+            plt.xlabel('Evaluation episodes')
+            plt.ylabel('Average returns')
+            plt.savefig(self.save_path + '/plt.png', format='png', dpi=300)
+            plt.close()
+        # np.save(self.save_path + '/returns.pkl', returns)
+        # for agent_id in sample_dic.keys():
+        #     pd.DataFrame(sample_dic[agent_id]).to_csv(self.args.save_dir + '/' + self.args.scenario_name + '/QTableStage1/tag_6_{}_{}_{}.csv'.format(self.args.sample_start, self.args.time_steps, agent_id))
+
+    def evaluateRGM(self):
+        returns = []
+        for episode in range(self.args.evaluate_episodes):
+            # reset the environment
+            self.env.reset()
+            s = self.env.get_obs()
+            rewards = 0
+            for time_step in range(self.args.evaluate_episode_len):
+                if hasattr(self.env, "render"):
+                    try:
+                        self.env.render()
+                    except NotImplementedError:
+                        pass
+                actions = []
+                with torch.no_grad():
+                    for agent_id, agent in enumerate(self.agents):
+                        action = agent.select_action(s[agent_id], 0, 0)
+                        actions.append(action)
+
+                action_index = []
+                for agent_id, action in enumerate(actions):
+                    # 1. 获取当前智能体的可用动作
+                    available_actions = self.env.get_avail_agent_actions(agent_id)
+                    available_ids = np.where(np.array(available_actions) == 1)[0]  # 可用动作的索引
+
+                    # 2. 检查是否有可用动作
+                    if len(available_ids) == 0:
+                        action_index.append(8)  # 默认动作（如无操作）
+                        continue
+
+                    # 3. 在可用动作中选择概率最大的动作
+                    available_action_probs = action[available_ids]  # 仅保留可用动作的概率
+                    max_prob = np.max(available_action_probs)  # 最大概率值
+                    # 可能有多个动作具有相同最大概率，随机选一个
+                    candidate_actions = available_ids[available_action_probs == max_prob]
+                    chosen_action = np.random.choice(candidate_actions)  # 随机选一个
+                    action_index.append(chosen_action)
+
+                for i in range(self.args.n_agents, self.args.n_players):
+                    actions.append(
+                        [0, np.random.rand() * 2 - 1, 0, np.random.rand() * 2 - 1, 0]
+                    )
+                r, done, info = self.env.step(action_index)
+                
+                # 针对环境修正 reward 标准化
+                if self.args.map == "Basic2P":
+                    r *= 0.005
+                
+                if hasattr(self.env, "get_obs"):
+                    s_next = self.env.get_obs()
+                else:
+                    s_next = []
+                    for agent_id in range(self.args.n_agents):
+                        s_next.append(self.env.get_obs_agent(agent_id))
+                # self.buffer.store_episode(s[:self.args.n_agents], u, r[:self.args.n_agents], s_next[:self.args.n_agents])
+                s = s_next
+                # rewards += r[0]
+                rewards += r
+                s = s_next
+            returns.append(rewards)
+            print("Returns is", rewards)
+        # return sum(returns) / self.args.evaluate_episodes
+        return sum(returns) / self.args.n_episodes
+
+
+if __name__ == "__main__":
+    pass

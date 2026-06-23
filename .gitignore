@@ -1,0 +1,49 @@
+# Python/cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Local editor/runtime state
+.autodl/
+.agents
+.agents/
+.codex
+.codex/
+.vscode/
+.idea/
+*.out
+*.log
+
+# Training outputs and evaluation artifacts
+result/
+model/
+replay/
+train_logs/
+test_result/
+plots/
+log.txt
+
+# Model/checkpoint/data artifacts
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.pkl
+*.pickle
+*.npy
+*.npz
+*.mat
+*.csv
+*.SC2Replay
+
+# Environment datasets generated or downloaded locally
+envs/stego/dataset/
+envs/stego/steganalysis/
+!envs/stego/metric.py
+
+# Large external reference repositories are kept locally but not versioned here.
+ref_code/
