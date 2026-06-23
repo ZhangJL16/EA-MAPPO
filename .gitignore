@@ -45,5 +45,9 @@ envs/stego/dataset/
 envs/stego/steganalysis/
 !envs/stego/metric.py
 
-# Large external reference repositories are kept locally but not versioned here.
-ref_code/
+# External reference code. Keep only the compact HAC implementation in this repo.
+ref_code/*
+!ref_code/Hierarchical-Actor-Critic-HAC-PyTorch/
+!ref_code/Hierarchical-Actor-Critic-HAC-PyTorch/**
+ref_code/Hierarchical-Actor-Critic-HAC-PyTorch/preTrained/
+ref_code/Hierarchical-Actor-Critic-HAC-PyTorch/gif/
