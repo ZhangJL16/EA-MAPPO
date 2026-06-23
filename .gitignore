@@ -26,6 +26,9 @@ train_logs/
 test_result/
 plots/
 log.txt
+!train_logs/
+train_logs/*
+!train_logs/uav_delivery_experiments.csv
 
 # Model/checkpoint/data artifacts
 *.pt
@@ -38,6 +41,7 @@ log.txt
 *.npz
 *.mat
 *.csv
+!train_logs/uav_delivery_experiments.csv
 *.SC2Replay
 
 # Environment datasets generated or downloaded locally

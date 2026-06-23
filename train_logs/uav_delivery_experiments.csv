@@ -1,0 +1,2 @@
+device,rl_algorithm,map,timestamp,n_agents,configured_total_orders,max_active_orders,n_steps,final_timestep,train_step,eval_episode_reward,delivery_success_rate,orders_completed,total_orders,collision_count,obstacle_collision_count,agent_collision_count,eval_episode_steps
+dorm,mappo,UAVDelivery,2026-06-23 23:14:29,4,8,4,600000,600106,275,90.70084753399715,1.0,8.0,8,10.0,8.0,2.0,179.0
