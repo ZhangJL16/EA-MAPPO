@@ -1051,15 +1051,18 @@ class UAVEnv:
         picked_orders = sum(
             1 for order in self.orders if order.status == DeliveryOrder.PICKED
         )
+        healthy_agents = float(np.sum([not agent.collided for agent in self.agents]))
+        mean_goal_distance = float(np.mean(remaining)) if remaining else 0.0
+        completed_orders = float(self.completed_order_count)
         return {
             "step": float(self.current_step),
-            "agent_health": float(np.sum([not agent.collided for agent in self.agents])),
-            "enemy_health": float(np.mean(remaining)) if remaining else 0.0,
-            "agent_alive": float(self.completed_order_count),
+            "agent_health": healthy_agents,
+            "enemy_health": mean_goal_distance,
+            "agent_alive": completed_orders,
             "collision_count": float(self.collision_count),
             "obstacle_collision_count": float(self.obstacle_collision_count),
             "agent_collision_count": float(self.agent_collision_count),
-            "orders_completed": float(self.completed_order_count),
+            "orders_completed": completed_orders,
             "total_orders": float(self.total_orders),
             "active_orders": float(active_orders),
             "available_orders": float(available_orders),
@@ -1067,6 +1070,8 @@ class UAVEnv:
             "idle_agents": float(
                 np.sum([agent.assigned_order_id is None for agent in self.agents])
             ),
+            "healthy_agents": healthy_agents,
+            "mean_goal_distance": mean_goal_distance,
             "episode_reward": float(0.0),
             "win_tag": bool(self._all_orders_completed()),
         }

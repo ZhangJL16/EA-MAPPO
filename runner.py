@@ -28,6 +28,97 @@ UAV_COLLISION_MAPS = {
     "UAVDelivery3D",
 }
 
+UAV_DELIVERY_MAPS = {
+    "UAVDelivery",
+    "UAVDelivery2D",
+    "UAVDelivery3D",
+}
+
+DEFAULT_CSV_COLUMNS = [
+    "event",
+    "episode",
+    "timestep",
+    "train_step",
+    "progress",
+    "episode_idx",
+    "episode_reward",
+    "episode_steps",
+    "epsilon",
+    "win_rate",
+    "collision_count",
+    "obstacle_collision_count",
+    "agent_collision_count",
+    "safety_loss",
+    "agent_health",
+    "enemy_health",
+    "agent_alive",
+    "eval_step",
+    "timestamp",
+]
+
+UAV_DELIVERY_CSV_COLUMNS = [
+    "event",
+    "episode",
+    "timestep",
+    "train_step",
+    "progress",
+    "episode_idx",
+    "episode_reward",
+    "episode_steps",
+    "epsilon",
+    "delivery_success_rate",
+    "orders_completed",
+    "total_orders",
+    "active_orders",
+    "available_orders",
+    "picked_orders",
+    "idle_agents",
+    "mean_goal_distance",
+    "healthy_agents",
+    "collision_count",
+    "obstacle_collision_count",
+    "agent_collision_count",
+    "safety_loss",
+    "eval_episode_steps",
+    "timestamp",
+]
+
+UAV_DELIVERY_SUMMARY_KEYS = [
+    "orders_completed",
+    "total_orders",
+    "active_orders",
+    "available_orders",
+    "picked_orders",
+    "idle_agents",
+    "mean_goal_distance",
+    "healthy_agents",
+]
+
+UAV_DELIVERY_EXPERIMENT_LOG = os.path.join(
+    "train_logs", "uav_delivery_experiments.csv"
+)
+
+UAV_DELIVERY_EXPERIMENT_COLUMNS = [
+    "device",
+    "rl_algorithm",
+    "map",
+    "timestamp",
+    "n_agents",
+    "configured_total_orders",
+    "max_active_orders",
+    "n_steps",
+    "final_timestep",
+    "train_step",
+    "eval_episode_reward",
+    "delivery_success_rate",
+    "orders_completed",
+    "total_orders",
+    "collision_count",
+    "obstacle_collision_count",
+    "agent_collision_count",
+    "eval_episode_steps",
+]
+
 
 class Runner:
     def __init__(self, env, args):
@@ -89,6 +180,23 @@ class Runner:
             "enemy_health": [],
             "agent_alive": [],
         }
+        if args.map in UAV_DELIVERY_MAPS:
+            self.smac_summary = {
+                "win_rate": [],
+                "episode_reward": [],
+                "collision_count": [],
+                "obstacle_collision_count": [],
+                "agent_collision_count": [],
+                "step": [],
+                "orders_completed": [],
+                "total_orders": [],
+                "active_orders": [],
+                "available_orders": [],
+                "picked_orders": [],
+                "idle_agents": [],
+                "mean_goal_distance": [],
+                "healthy_agents": [],
+            }
 
         self.maze_summary = {
             "reward": [],
@@ -132,9 +240,17 @@ class Runner:
         self.save_path = self.args.result_dir + "/" + args.map + "/" + args.alg + "/"
         if not os.path.exists(self.save_path):
             os.makedirs(self.save_path)
+        self.csv_columns = (
+            UAV_DELIVERY_CSV_COLUMNS
+            if self.args.map in UAV_DELIVERY_MAPS
+            else DEFAULT_CSV_COLUMNS
+        )
         self.log_path = self._init_csv_log()
         self.train_episode_count = 0
         self.eval_count = 0
+        self.last_eval_summary = None
+        self.last_eval_time_steps = None
+        self.last_eval_train_steps = None
         self._last_saved_bucket = -1
         if self.args.map == "UAV3D":
             self.args.save_cycle = 50000
@@ -158,29 +274,7 @@ class Runner:
         log_path = self._get_csv_log_path()
         with open(log_path, "w", newline="", encoding="utf-8") as csv_file:
             writer = csv.writer(csv_file)
-            writer.writerow(
-                [
-                    "event",
-                    "episode",
-                    "timestep",
-                    "train_step",
-                    "progress",
-                    "episode_idx",
-                    "episode_reward",
-                    "episode_steps",
-                    "epsilon",
-                    "win_rate",
-                    "collision_count",
-                    "obstacle_collision_count",
-                    "agent_collision_count",
-                    "safety_loss",
-                    "agent_health",
-                    "enemy_health",
-                    "agent_alive",
-                    "eval_step",
-                    "timestamp",
-                ]
-            )
+            writer.writerow(self.csv_columns)
         return log_path
 
     def _append_log_row(self, row):
@@ -188,33 +282,218 @@ class Runner:
             writer = csv.writer(csv_file)
             writer.writerow(row)
 
+    def _append_uav_delivery_experiment_result(self, time_steps, train_steps):
+        if self.args.map not in UAV_DELIVERY_MAPS or self.last_eval_summary is None:
+            return
+
+        os.makedirs(os.path.dirname(UAV_DELIVERY_EXPERIMENT_LOG), exist_ok=True)
+        write_header = (
+            not os.path.exists(UAV_DELIVERY_EXPERIMENT_LOG)
+            or os.path.getsize(UAV_DELIVERY_EXPERIMENT_LOG) == 0
+        )
+        summary = self.last_eval_summary
+        row = [
+            getattr(self.args, "experiment_device", "dorm"),
+            self.args.alg,
+            self.args.map,
+            datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            int(getattr(self.args, "n_agents", 0)),
+            int(getattr(self.args, "uav_total_orders", 0)),
+            int(getattr(self.args, "uav_max_active_orders", 0)),
+            int(getattr(self.args, "n_steps", 0)),
+            int(time_steps if time_steps is not None else 0),
+            int(train_steps if train_steps is not None else 0),
+            float(summary.get("episode_reward", 0.0)),
+            float(summary.get("win_rate", 0.0)),
+            float(summary.get("orders_completed", 0.0)),
+            float(summary.get("total_orders", 0.0)),
+            float(summary.get("collision_count", 0.0)),
+            float(summary.get("obstacle_collision_count", 0.0)),
+            float(summary.get("agent_collision_count", 0.0)),
+            float(summary.get("step", 0.0)),
+        ]
+        with open(UAV_DELIVERY_EXPERIMENT_LOG, "a", newline="", encoding="utf-8") as csv_file:
+            writer = csv.writer(csv_file)
+            if write_header:
+                writer.writerow(UAV_DELIVERY_EXPERIMENT_COLUMNS)
+            writer.writerow(row)
+
+    def _set_log_row_value(self, row, column, value):
+        try:
+            row[self.csv_columns.index(column)] = value
+        except ValueError:
+            return
+
+    def _summary_float(self, summary, key, default=0.0):
+        return float(summary.get(key, default))
+
+    def _delivery_summary_float(self, summary, key):
+        fallback_keys = {
+            "orders_completed": "agent_alive",
+            "healthy_agents": "agent_health",
+            "mean_goal_distance": "enemy_health",
+        }
+        if key in summary:
+            return float(summary.get(key, 0.0))
+        fallback_key = fallback_keys.get(key)
+        if fallback_key is not None:
+            return float(summary.get(fallback_key, 0.0))
+        return 0.0
+
+    def _build_default_log_row(
+        self,
+        event,
+        episode,
+        timestep,
+        train_step,
+        progress,
+        episode_idx,
+        episode_reward,
+        episode_steps,
+        epsilon,
+        summary,
+        safety_loss="",
+        eval_step="",
+    ):
+        return [
+            event,
+            episode,
+            timestep if timestep is not None else "",
+            train_step if train_step is not None else "",
+            progress,
+            episode_idx,
+            float(episode_reward),
+            episode_steps,
+            epsilon,
+            float(summary.get("win_rate", summary.get("win_tag", 0.0)))
+            if self.args.map in UAV_COLLISION_MAPS or self.args.map in SMAC_MAPS
+            else "",
+            float(summary.get("collision_count", 0.0))
+            if self.args.map in UAV_COLLISION_MAPS
+            else "",
+            float(summary.get("obstacle_collision_count", 0.0))
+            if self.args.map in UAV_COLLISION_MAPS
+            else "",
+            float(summary.get("agent_collision_count", 0.0))
+            if self.args.map in UAV_COLLISION_MAPS
+            else "",
+            safety_loss,
+            self._summary_float(summary, "agent_health") if event == "EVAL" else "",
+            self._summary_float(summary, "enemy_health") if event == "EVAL" else "",
+            self._summary_float(summary, "agent_alive") if event == "EVAL" else "",
+            eval_step,
+            datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        ]
+
+    def _build_delivery_log_row(
+        self,
+        event,
+        episode,
+        timestep,
+        train_step,
+        progress,
+        episode_idx,
+        episode_reward,
+        episode_steps,
+        epsilon,
+        summary,
+        safety_loss="",
+        eval_episode_steps="",
+    ):
+        return [
+            event,
+            episode,
+            timestep if timestep is not None else "",
+            train_step if train_step is not None else "",
+            progress,
+            episode_idx,
+            float(episode_reward),
+            episode_steps,
+            epsilon,
+            float(summary.get("win_rate", summary.get("win_tag", 0.0))),
+            self._delivery_summary_float(summary, "orders_completed"),
+            self._delivery_summary_float(summary, "total_orders"),
+            self._delivery_summary_float(summary, "active_orders"),
+            self._delivery_summary_float(summary, "available_orders"),
+            self._delivery_summary_float(summary, "picked_orders"),
+            self._delivery_summary_float(summary, "idle_agents"),
+            self._delivery_summary_float(summary, "mean_goal_distance"),
+            self._delivery_summary_float(summary, "healthy_agents"),
+            self._summary_float(summary, "collision_count"),
+            self._summary_float(summary, "obstacle_collision_count"),
+            self._summary_float(summary, "agent_collision_count"),
+            safety_loss,
+            eval_episode_steps,
+            datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        ]
+
+    def _build_log_row(
+        self,
+        event,
+        episode,
+        timestep,
+        train_step,
+        progress,
+        episode_idx,
+        episode_reward,
+        episode_steps,
+        epsilon,
+        summary,
+        safety_loss="",
+        eval_step="",
+    ):
+        if self.args.map in UAV_DELIVERY_MAPS:
+            return self._build_delivery_log_row(
+                event,
+                episode,
+                timestep,
+                train_step,
+                progress,
+                episode_idx,
+                episode_reward,
+                episode_steps,
+                epsilon,
+                summary,
+                safety_loss=safety_loss,
+                eval_episode_steps=eval_step,
+            )
+        return self._build_default_log_row(
+            event,
+            episode,
+            timestep,
+            train_step,
+            progress,
+            episode_idx,
+            episode_reward,
+            episode_steps,
+            epsilon,
+            summary,
+            safety_loss=safety_loss,
+            eval_step=eval_step,
+        )
+
     def _log_eval_summary(self, summary, time_steps=None, train_steps=None):
         progress = ""
         if time_steps is not None and getattr(self.args, "n_steps", 0):
             progress = f"{100.0 * min(time_steps, self.args.n_steps) / self.args.n_steps:.2f}%"
         self.eval_count += 1
+        self.last_eval_summary = dict(summary)
+        self.last_eval_time_steps = time_steps
+        self.last_eval_train_steps = train_steps
         self._append_log_row(
-            [
+            self._build_log_row(
                 "EVAL",
                 self.eval_count,
-                time_steps if time_steps is not None else "",
-                train_steps if train_steps is not None else "",
+                time_steps,
+                train_steps,
                 progress,
                 "",
                 float(summary.get("episode_reward", 0.0)),
                 "",
                 "",
-                float(summary.get("win_rate", 0.0)),
-                float(summary.get("collision_count", 0.0)),
-                float(summary.get("obstacle_collision_count", 0.0)),
-                float(summary.get("agent_collision_count", 0.0)),
-                "",
-                float(summary.get("agent_health", 0.0)),
-                float(summary.get("enemy_health", 0.0)),
-                float(summary.get("agent_alive", 0.0)),
-                float(summary.get("step", 0.0)),
-                datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            ]
+                summary,
+                eval_step=float(summary.get("step", 0.0)),
+            )
         )
 
     def _init_agents(self): # for RGMComm
@@ -293,7 +572,7 @@ class Runner:
                                 else ""
                             )
                             pending_train_rows.append(
-                                [
+                                self._build_log_row(
                                     "TRAIN",
                                     self.train_episode_count,
                                     time_steps,
@@ -303,25 +582,8 @@ class Runner:
                                     float(episode_reward),
                                     steps,
                                     rollout_epsilon,
-                                    float(episode_summary.get("win_tag", 0.0))
-                                    if self.args.map in UAV_COLLISION_MAPS or self.args.map in SMAC_MAPS
-                                    else "",
-                                    float(episode_summary.get("collision_count", 0.0))
-                                    if self.args.map in UAV_COLLISION_MAPS
-                                    else "",
-                                    float(episode_summary.get("obstacle_collision_count", 0.0))
-                                    if self.args.map in UAV_COLLISION_MAPS
-                                    else "",
-                                    float(episode_summary.get("agent_collision_count", 0.0))
-                                    if self.args.map in UAV_COLLISION_MAPS
-                                    else "",
-                                    "",
-                                    "",
-                                    "",
-                                    "",
-                                    "",
-                                    datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                                ]
+                                    episode_summary,
+                                )
                             )
                             if time_steps >= self.args.n_steps:
                                 break
@@ -342,7 +604,7 @@ class Runner:
                                 else ""
                             )
                             pending_train_rows.append(
-                                [
+                                self._build_log_row(
                                     "TRAIN",
                                     self.train_episode_count,
                                     time_steps,
@@ -352,25 +614,8 @@ class Runner:
                                     float(episode_reward),
                                     steps,
                                     float(self.rolloutWorker.epsilon),
-                                    float(episode_summary.get("win_tag", 0.0))
-                                    if self.args.map in UAV_COLLISION_MAPS or self.args.map in SMAC_MAPS
-                                    else "",
-                                    float(episode_summary.get("collision_count", 0.0))
-                                    if self.args.map in UAV_COLLISION_MAPS
-                                    else "",
-                                    float(episode_summary.get("obstacle_collision_count", 0.0))
-                                    if self.args.map in UAV_COLLISION_MAPS
-                                    else "",
-                                    float(episode_summary.get("agent_collision_count", 0.0))
-                                    if self.args.map in UAV_COLLISION_MAPS
-                                    else "",
-                                    "",
-                                    "",
-                                    "",
-                                    "",
-                                    "",
-                                    datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                                ]
+                                    episode_summary,
+                                )
                             )
                             if time_steps >= self.args.n_steps:
                                 break
@@ -397,7 +642,7 @@ class Runner:
                             else ""
                         )
                         for row in pending_train_rows:
-                            row[13] = safety_loss
+                            self._set_log_row_value(row, "safety_loss", safety_loss)
                             self._append_log_row(row)
                         train_steps += 1
                         self._save_policy_if_needed(time_steps)
@@ -415,6 +660,7 @@ class Runner:
 
             self._eval(num, time_steps=time_steps, train_steps=train_steps)
             self._save_policy_if_needed(time_steps, force=True)
+            self._append_uav_delivery_experiment_result(time_steps, train_steps)
         finally:
             self.close()
 
@@ -449,7 +695,7 @@ class Runner:
             self.win_rates.append(win_rate)
             self.episode_rewards.append(episode_reward)
             for key in summary.keys():
-                self.smac_summary[key].append(summary[key])
+                self.smac_summary.setdefault(key, []).append(summary[key])
             self.plt(num)
             self.plt_smac(num, self.args)
             self._log_eval_summary(summary, time_steps=time_steps, train_steps=train_steps)
@@ -472,17 +718,29 @@ class Runner:
         # win_number = 0
         # episode_rewards = 0
 
-        summary = {
-            "episode_reward": 0,
-            "win_rate": 0,
-            "collision_count": 0,
-            "obstacle_collision_count": 0,
-            "agent_collision_count": 0,
-            "step": 0,
-            "agent_health": 0,
-            "enemy_health": 0,
-            "agent_alive": 0,
-        }
+        if self.args.map in UAV_DELIVERY_MAPS:
+            summary = {
+                "episode_reward": 0,
+                "win_rate": 0,
+                "collision_count": 0,
+                "obstacle_collision_count": 0,
+                "agent_collision_count": 0,
+                "step": 0,
+            }
+            for key in UAV_DELIVERY_SUMMARY_KEYS:
+                summary[key] = 0
+        else:
+            summary = {
+                "episode_reward": 0,
+                "win_rate": 0,
+                "collision_count": 0,
+                "obstacle_collision_count": 0,
+                "agent_collision_count": 0,
+                "step": 0,
+                "agent_health": 0,
+                "enemy_health": 0,
+                "agent_alive": 0,
+            }
 
         for epoch in range(self.args.evaluate_epoch):
             # _, episode_reward, win_tag, _ = self.rolloutWorker.generate_episode(epoch, evaluate=True)
@@ -503,9 +761,27 @@ class Runner:
                 "agent_collision_count", 0.0
             )
             summary["step"] += episode_summary["step"]
-            summary["agent_health"] += episode_summary["agent_health"]
-            summary["enemy_health"] += episode_summary["enemy_health"]
-            summary["agent_alive"] += episode_summary["agent_alive"]
+            if self.args.map in UAV_DELIVERY_MAPS:
+                summary["orders_completed"] += episode_summary.get(
+                    "orders_completed", episode_summary.get("agent_alive", 0.0)
+                )
+                summary["total_orders"] += episode_summary.get("total_orders", 0.0)
+                summary["active_orders"] += episode_summary.get("active_orders", 0.0)
+                summary["available_orders"] += episode_summary.get(
+                    "available_orders", 0.0
+                )
+                summary["picked_orders"] += episode_summary.get("picked_orders", 0.0)
+                summary["idle_agents"] += episode_summary.get("idle_agents", 0.0)
+                summary["mean_goal_distance"] += episode_summary.get(
+                    "mean_goal_distance", episode_summary.get("enemy_health", 0.0)
+                )
+                summary["healthy_agents"] += episode_summary.get(
+                    "healthy_agents", episode_summary.get("agent_health", 0.0)
+                )
+            else:
+                summary["agent_health"] += episode_summary["agent_health"]
+                summary["enemy_health"] += episode_summary["enemy_health"]
+                summary["agent_alive"] += episode_summary["agent_alive"]
 
         for key in summary.keys():
             summary[key] /= self.args.evaluate_epoch

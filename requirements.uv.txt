@@ -56,6 +56,10 @@ sk-video==1.1.10
 SMAC @ git+https://github.com/oxwhirl/smac.git@d6aab33f76abc3849c50463a8592a84f59a5ef84
 smmap==5.0.3
 sympy==1.14.0
+--extra-index-url https://download.pytorch.org/whl/cu128
+torch==2.7.1+cu128
+torchaudio==2.7.1+cu128
+torchvision==0.22.1+cu128
 tqdm==4.67.3
 typing_extensions==4.15.0
 tzdata==2025.3

@@ -1,4 +1,5 @@
 import argparse
+import os
 
 """
 Here are the param for the training
@@ -22,6 +23,13 @@ def get_common_args():
     parser.add_argument('--uav_max_active_orders', type=int, default=4, help='maximum simultaneously active delivery orders in UAVDelivery')
     parser.add_argument('--uav_pickup_reward', type=float, default=3.0, help='reward for reaching a UAVDelivery pickup point')
     parser.add_argument('--uav_delivery_reward', type=float, default=8.0, help='reward for reaching a UAVDelivery dropoff point')
+    parser.add_argument(
+        '--experiment_device',
+        type=str,
+        default=os.environ.get('MARL_EXPERIMENT_DEVICE', 'dorm'),
+        choices=['dorm', 'lab'],
+        help='device label written to the UAVDelivery experiment summary CSV',
+    )
 
     # The alternative algorithms are vdn, coma, central_v, qmix, qtran_base,
     # qtran_alt, reinforce, coma+commnet, central_v+commnet, reinforce+commnet，
