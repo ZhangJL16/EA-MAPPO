@@ -19,7 +19,14 @@ import torch
 from datetime import datetime
 
 
-UAV_COLLISION_MAPS = {"UAV3D", "UAVEncircle", "UAVencircle"}
+UAV_COLLISION_MAPS = {
+    "UAV3D",
+    "UAVEncircle",
+    "UAVencircle",
+    "UAVDelivery",
+    "UAVDelivery2D",
+    "UAVDelivery3D",
+}
 
 
 class Runner:

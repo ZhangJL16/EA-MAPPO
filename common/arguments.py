@@ -17,7 +17,11 @@ def get_common_args():
     parser.add_argument('--step_mul', type=int, default=8, help='how many steps to make an action')
     parser.add_argument('--replay_dir', type=str, default='./replay', help='absolute path to save the replay') # ./replay
     parser.add_argument('--debug', type=bool, default=False, help='smac show infos')
-    parser.add_argument('--uav_n_agents', type=int, default=4, help='number of UAV agents for UAV2D/UAV3D/UAVEncircle environments')
+    parser.add_argument('--uav_n_agents', type=int, default=4, help='number of UAV agents for UAV2D/UAV3D/UAVEncircle/UAVDelivery environments')
+    parser.add_argument('--uav_total_orders', type=int, default=8, help='total delivery orders per UAVDelivery episode')
+    parser.add_argument('--uav_max_active_orders', type=int, default=4, help='maximum simultaneously active delivery orders in UAVDelivery')
+    parser.add_argument('--uav_pickup_reward', type=float, default=3.0, help='reward for reaching a UAVDelivery pickup point')
+    parser.add_argument('--uav_delivery_reward', type=float, default=8.0, help='reward for reaching a UAVDelivery dropoff point')
 
     # The alternative algorithms are vdn, coma, central_v, qmix, qtran_base,
     # qtran_alt, reinforce, coma+commnet, central_v+commnet, reinforce+commnet，
