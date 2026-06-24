@@ -49,6 +49,7 @@ def get_common_args():
 
     # time slot = n_steps / evaluate_cycle
     parser.add_argument('--n_steps', type=int, default=600000, help='total time steps')  # 4000000
+    parser.add_argument('--time_steps', type=int, default=None, help='total time steps for RGMComm/MADDPG; defaults to n_steps')
     parser.add_argument('--n_episodes', type=int, default=1, help='the number of episodes before once training')
     # 需要大于一个 episode 的长度
     parser.add_argument('--evaluate_cycle', type=int, default=20, help='how often to evaluate the model') # 5000
@@ -307,7 +308,11 @@ def get_RGM_args(args):
     # 直接给 args 添加 RGM 相关的属性（动态扩展）
     args.scenario_name = getattr(args, 'scenario_name', 'simple_tag_6')  # 可以从外部传，或设默认值
     args.max_episode_len = getattr(args, 'max_episode_len', 100)
-    args.time_steps = getattr(args, 'time_steps', 200001)
+    args.time_steps = (
+        getattr(args, 'n_steps', 200001)
+        if getattr(args, 'time_steps', None) is None
+        else int(args.time_steps)
+    )
     args.num_adversaries = getattr(args, 'num_adversaries', 1)
     
     args.lr_actor = getattr(args, 'lr_actor', 1e-4)
