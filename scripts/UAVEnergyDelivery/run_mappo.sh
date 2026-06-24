@@ -15,8 +15,9 @@ Defaults added when omitted:
   --alg mappo
   --map UAVEnergyDelivery
   --uav_n_agents 4
-  --uav_total_orders 8
-  --uav_max_active_orders 4
+  --episode_limit 400
+  --uav_total_orders 16
+  --uav_max_active_orders 8
   --seed ${SEED:-123}
   --eval_seed ${EVAL_SEED:-$((SEED + 100000))}
   --evaluate_epoch ${EVALUATE_EPOCH:-20}
@@ -74,8 +75,9 @@ DEFAULT_ARGS=()
 has_arg --alg || DEFAULT_ARGS+=(--alg mappo)
 has_arg --map || DEFAULT_ARGS+=(--map UAVEnergyDelivery)
 has_arg --uav_n_agents || DEFAULT_ARGS+=(--uav_n_agents 4)
-has_arg --uav_total_orders || DEFAULT_ARGS+=(--uav_total_orders 8)
-has_arg --uav_max_active_orders || DEFAULT_ARGS+=(--uav_max_active_orders 4)
+has_arg --episode_limit || DEFAULT_ARGS+=(--episode_limit 400)
+has_arg --uav_total_orders || DEFAULT_ARGS+=(--uav_total_orders 16)
+has_arg --uav_max_active_orders || DEFAULT_ARGS+=(--uav_max_active_orders 8)
 has_arg --seed || DEFAULT_ARGS+=(--seed "$SEED")
 has_arg --eval_seed || DEFAULT_ARGS+=(--eval_seed "$EVAL_SEED")
 has_arg --evaluate_epoch || DEFAULT_ARGS+=(--evaluate_epoch "$EVALUATE_EPOCH")

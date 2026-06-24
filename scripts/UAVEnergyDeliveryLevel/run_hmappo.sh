@@ -15,8 +15,9 @@ Defaults added when omitted:
   --alg hmappo
   --map UAVEnergyDeliveryLevel
   --uav_n_agents 4
-  --uav_total_orders 8
-  --uav_max_active_orders 4
+  --episode_limit 400
+  --uav_total_orders 16
+  --uav_max_active_orders 8
   --hmappo_meta_period ${META_PERIOD:-5}
   --high_lr_actor ${HIGH_LR_ACTOR:-3e-4}
   --high_lr_critic ${HIGH_LR_CRITIC:-3e-4}
@@ -84,8 +85,9 @@ DEFAULT_ARGS=()
 has_arg --alg || DEFAULT_ARGS+=(--alg hmappo)
 has_arg --map || DEFAULT_ARGS+=(--map UAVEnergyDeliveryLevel)
 has_arg --uav_n_agents || DEFAULT_ARGS+=(--uav_n_agents 4)
-has_arg --uav_total_orders || DEFAULT_ARGS+=(--uav_total_orders 8)
-has_arg --uav_max_active_orders || DEFAULT_ARGS+=(--uav_max_active_orders 4)
+has_arg --episode_limit || DEFAULT_ARGS+=(--episode_limit 400)
+has_arg --uav_total_orders || DEFAULT_ARGS+=(--uav_total_orders 16)
+has_arg --uav_max_active_orders || DEFAULT_ARGS+=(--uav_max_active_orders 8)
 has_arg --hmappo_meta_period || DEFAULT_ARGS+=(--hmappo_meta_period "$META_PERIOD")
 has_arg --high_lr_actor || DEFAULT_ARGS+=(--high_lr_actor "$HIGH_LR_ACTOR")
 has_arg --high_lr_critic || DEFAULT_ARGS+=(--high_lr_critic "$HIGH_LR_CRITIC")

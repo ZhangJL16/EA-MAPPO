@@ -1,1 +1,0 @@
-.venv/bin/python main.py --alg rgmcomm --map UAVEnergyDelivery --uav_n_agents 4 --uav_total_orders 8 --uav_max_active_orders 4 --seed 123 --eval_seed 100123 --evaluate_epoch 20 --cuda True --gpu_id 0 --experiment_device lab 

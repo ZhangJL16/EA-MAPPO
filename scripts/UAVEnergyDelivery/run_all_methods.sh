@@ -38,8 +38,9 @@ Environment overrides:
 Defaults added when omitted:
   --map UAVEnergyDelivery
   --uav_n_agents 4
-  --uav_total_orders 8
-  --uav_max_active_orders 4
+  --episode_limit 400
+  --uav_total_orders 16
+  --uav_max_active_orders 8
   --seed ${SEED:-123}
   --eval_seed ${EVAL_SEED:-$((SEED + 100000))}
   --evaluate_epoch ${EVALUATE_EPOCH:-20}
@@ -190,8 +191,9 @@ arg_value() {
 COMMON_ARGS=()
 has_arg --map || COMMON_ARGS+=(--map UAVEnergyDelivery)
 has_arg --uav_n_agents || COMMON_ARGS+=(--uav_n_agents 4)
-has_arg --uav_total_orders || COMMON_ARGS+=(--uav_total_orders 8)
-has_arg --uav_max_active_orders || COMMON_ARGS+=(--uav_max_active_orders 4)
+has_arg --episode_limit || COMMON_ARGS+=(--episode_limit 400)
+has_arg --uav_total_orders || COMMON_ARGS+=(--uav_total_orders 16)
+has_arg --uav_max_active_orders || COMMON_ARGS+=(--uav_max_active_orders 8)
 has_arg --seed || COMMON_ARGS+=(--seed "$SEED")
 has_arg --eval_seed || COMMON_ARGS+=(--eval_seed "$EVAL_SEED")
 has_arg --evaluate_epoch || COMMON_ARGS+=(--evaluate_epoch "$EVALUATE_EPOCH")

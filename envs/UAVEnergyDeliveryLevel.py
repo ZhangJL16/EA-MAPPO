@@ -2160,13 +2160,18 @@ class UAVEnvDiscreteWrapper:
             else 0.0
         )
         battle_won = bool(self.env._all_orders_completed())
-        terminated = battle_won or self._episode_steps >= self.episode_limit
+        post_step_active_mask = self.get_active_agent_mask()
+        all_depleted = bool(np.sum(post_step_active_mask) <= 0.0)
+        time_limit_reached = self._episode_steps >= self.episode_limit
+        terminated = battle_won or all_depleted or time_limit_reached
         self._last_reward = reward
         self._last_info = {
             "battle_won": battle_won,
+            "all_depleted": all_depleted,
+            "time_limit_reached": time_limit_reached,
             "warning_signal": np.asarray(safe_value, dtype=np.float32).reshape(self.n_agents, 1),
             "per_agent_reward": np.asarray(rewards, dtype=np.float32).copy(),
-            "agent_active_mask": np.asarray(active_mask, dtype=np.float32).reshape(self.n_agents, 1),
+            "agent_active_mask": np.asarray(post_step_active_mask, dtype=np.float32).reshape(self.n_agents, 1),
             "agent_energy": np.asarray(
                 [agent.energy for agent in self.env.agents],
                 dtype=np.float32,
@@ -2414,7 +2419,9 @@ class UAVParallelEnv:
 
         success_terminated = bool(all(reached_flags))
         collision_terminated = bool(any(collision_flags))
-        terminated = success_terminated
+        post_step_active_mask = self.base_env.get_active_agent_mask()
+        all_depleted = bool(np.sum(post_step_active_mask) <= 0.0)
+        terminated = success_terminated or all_depleted
         truncated = bool(
             self.base_env.current_step >= self.max_cycles and not terminated
         )
@@ -2436,10 +2443,11 @@ class UAVParallelEnv:
                 "safe_value": float(safe_value[idx]),
                 "reached": bool(reached_flags[idx]),
                 "collided": bool(collision_flags[idx]),
-                "active": bool(active_mask[idx]),
+                "active": bool(post_step_active_mask[idx]),
                 "energy": float(self.base_env.agents[idx].energy),
                 "collision_terminated": collision_terminated,
                 "success_terminated": success_terminated,
+                "all_depleted": all_depleted,
                 **self.base_env.summary(),
             }
             for idx, agent_name in enumerate(self.possible_agents)
