@@ -4,15 +4,15 @@ set -uo pipefail
 usage() {
   cat <<'EOF'
 Usage:
-  ./run_all_uav_energy_delivery_methods.sh [main.py args...]
+  ./scripts/UAVEnergyDelivery/run_all_methods.sh [main.py args...]
 
 Examples:
-  ./run_all_uav_energy_delivery_methods.sh
-  ./run_all_uav_energy_delivery_methods.sh --n_steps 600000 --evaluate_cycle 20
-  ./run_all_uav_energy_delivery_methods.sh --algs "mappo rgmcomm macpo iql qmix"
-  ./run_all_uav_energy_delivery_methods.sh --parallel 3
-  DRY_RUN=1 ./run_all_uav_energy_delivery_methods.sh --n_steps 1000
-  EXPERIMENT_DEVICE=lab RUN_DIR=logs/my_energy_all ./run_all_uav_energy_delivery_methods.sh
+  ./scripts/UAVEnergyDelivery/run_all_methods.sh
+  ./scripts/UAVEnergyDelivery/run_all_methods.sh --n_steps 600000 --evaluate_cycle 20
+  ./scripts/UAVEnergyDelivery/run_all_methods.sh --algs "mappo rgmcomm macpo iql qmix"
+  ./scripts/UAVEnergyDelivery/run_all_methods.sh --parallel 3
+  DRY_RUN=1 ./scripts/UAVEnergyDelivery/run_all_methods.sh --n_steps 1000
+  EXPERIMENT_DEVICE=lab RUN_DIR=logs/my_energy_all ./scripts/UAVEnergyDelivery/run_all_methods.sh
 
 Script options:
   --algs "a b c"      Override the default algorithm list.
@@ -50,7 +50,8 @@ EOF
 }
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "$SCRIPT_DIR"
+REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+cd "$REPO_ROOT"
 
 if [[ -z "${PYTHON_BIN:-}" ]]; then
   if [[ -x ".venv/bin/python" ]]; then

@@ -64,7 +64,7 @@ python3 main.py --alg mappo_safe --map UAV2D --uav_n_agents 4
 
 ## 单独运行某个 UAVDelivery 方法
 
-如果只想上传一个脚本文件并逐个方法运行，上传仓库根目录下的 `run_uav_delivery_method.sh` 即可。脚本默认使用之前 `mappo` 的 UAVDelivery 参数：
+如果只想上传一个脚本文件并逐个方法运行，上传 `scripts/UAVDelivery/run_method.sh` 即可。脚本默认使用之前 `mappo` 的 UAVDelivery 参数：
 
 ```bash
 --map UAVDelivery
@@ -76,30 +76,30 @@ python3 main.py --alg mappo_safe --map UAV2D --uav_n_agents 4
 --evaluate_epoch 20
 --cuda True
 --gpu_id 0
---experiment_device lab
+--experiment_device ${EXPERIMENT_DEVICE:-${MARL_EXPERIMENT_DEVICE:-dorm}}
 ```
 
 运行某个方法时只需要把方法名写在脚本后面：
 
 ```bash
-./run_uav_delivery_method.sh mappo
-./run_uav_delivery_method.sh qmix
-./run_uav_delivery_method.sh vdn
-./run_uav_delivery_method.sh macpo
-./run_uav_delivery_method.sh rgmcomm
+./scripts/UAVDelivery/run_method.sh mappo
+./scripts/UAVDelivery/run_method.sh qmix
+./scripts/UAVDelivery/run_method.sh vdn
+./scripts/UAVDelivery/run_method.sh macpo
+./scripts/UAVDelivery/run_method.sh rgmcomm
 ```
 
 也可以显式使用 `--alg`：
 
 ```bash
-./run_uav_delivery_method.sh --alg mappo
+./scripts/UAVDelivery/run_method.sh --alg mappo
 ```
 
 需要临时覆盖参数时，把参数继续接在后面即可；没有覆盖的参数仍沿用上面的默认值：
 
 ```bash
-./run_uav_delivery_method.sh qmix --gpu_id 1 --n_steps 600000 --evaluate_cycle 20
-./run_uav_delivery_method.sh mappo_safe_Comm --n_steps 600000
+./scripts/UAVDelivery/run_method.sh qmix --gpu_id 1 --n_steps 600000 --evaluate_cycle 20
+./scripts/UAVDelivery/run_method.sh mappo_safe_Comm --n_steps 600000
 ```
 
 脚本默认使用 `.venv/bin/python3`，日志写到 `logs/uav_delivery_single_method/<timestamp>/<alg>.log`。
@@ -107,8 +107,8 @@ python3 main.py --alg mappo_safe --map UAV2D --uav_n_agents 4
 为了公平对比，脚本默认固定训练随机种子 `--seed 123`，并固定评估场景种子 `--eval_seed 100123`。评估默认用 `--evaluate_epoch 20` 个固定场景取平均；所有算法会用同一组评估场景。需要换一组可复现实验时，可以用环境变量覆盖：
 
 ```bash
-SEED=456 EVALUATE_EPOCH=20 ./run_uav_delivery_method.sh mappo
-SEED=456 EVALUATE_EPOCH=20 ./run_all_uav_delivery_methods.sh
+SEED=456 EVALUATE_EPOCH=20 ./scripts/UAVDelivery/run_method.sh mappo
+SEED=456 EVALUATE_EPOCH=20 ./scripts/UAVDelivery/run_all_methods.sh
 ```
 
 注意：`common/arguments.py` 里部分布尔参数使用 `type=bool`，命令行传 `--cuda False` 在 Python 中仍可能被解析成 `True`。如果只用 `mappo`，代码会在 CUDA 不可用时自动落到 CPU；如果其他算法在 CPU 机器上因为 CUDA 报错，需要把 `common/arguments.py` 中 `--cuda` 的默认值改成 `False`，或改成标准的 `store_true/store_false` 写法。

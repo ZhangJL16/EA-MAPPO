@@ -5,6 +5,10 @@ import subprocess
 import sys
 
 
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+REPO_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, "..", ".."))
+
+
 SWEEP_VALUES = {
     "warning_penalty_weight": [0.02, 0.05, 0.1, 0.2, 0.5],
     "safety_beta": [0.1, 0.2, 0.5, 0.8, 1.2],
@@ -119,6 +123,7 @@ def get_next_log_path(alg, map_name):
 
 
 def main():
+    os.chdir(REPO_ROOT)
     _enable_line_buffering()
     args = parse_args()
     sweep_values = SWEEP_VALUES[args.sweep_target]

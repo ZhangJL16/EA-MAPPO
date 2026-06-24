@@ -2,7 +2,8 @@
 set -uo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "$SCRIPT_DIR"
+REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+cd "$REPO_ROOT"
 
 PYTHON_BIN="${PYTHON_BIN:-.venv/bin/python3}"
 GPU_ID="${GPU_ID:-0}"
