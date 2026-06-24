@@ -4,16 +4,16 @@ set -uo pipefail
 usage() {
   cat <<'EOF'
 Usage:
-  ./run_uav_delivery_method.sh <alg> [main.py args...]
-  ./run_uav_delivery_method.sh --alg <alg> [main.py args...]
+  ./run_uav_energy_delivery_mappo.sh [main.py args...]
 
 Examples:
-  ./run_uav_delivery_method.sh mappo --n_steps 600000 --evaluate_cycle 20
-  ./run_uav_delivery_method.sh --alg qmix --gpu_id 1 --n_steps 200000
-  EXPERIMENT_DEVICE=lab RUN_DIR=logs/my_run ./run_uav_delivery_method.sh vdn_safe_Comm
+  ./run_uav_energy_delivery_mappo.sh
+  ./run_uav_energy_delivery_mappo.sh --gpu_id 1 --n_steps 600000
+  EXPERIMENT_DEVICE=lab RUN_DIR=logs/my_energy_run ./run_uav_energy_delivery_mappo.sh
 
 Defaults added when omitted:
-  --map UAVDelivery
+  --alg mappo
+  --map UAVEnergyDelivery
   --uav_n_agents 4
   --uav_total_orders 8
   --uav_max_active_orders 4
@@ -35,46 +35,22 @@ EXPERIMENT_DEVICE="${EXPERIMENT_DEVICE:-lab}"
 SEED="${SEED:-123}"
 EVAL_SEED="${EVAL_SEED:-$((SEED + 100000))}"
 EVALUATE_EPOCH="${EVALUATE_EPOCH:-20}"
-export MARL_EXPERIMENT_DEVICE="$EXPERIMENT_DEVICE"
-RUN_DIR="${RUN_DIR:-logs/uav_delivery_single_method/$(date +%Y%m%d_%H%M%S)}"
+RUN_DIR="${RUN_DIR:-logs/uav_energy_delivery_mappo/$(date +%Y%m%d_%H%M%S)}"
 SCRIPT_PATH="$SCRIPT_DIR/$(basename "${BASH_SOURCE[0]}")"
 
-ALG=""
 USER_ARGS=()
-
 while [[ $# -gt 0 ]]; do
   case "$1" in
     -h|--help)
       usage
       exit 0
       ;;
-    --alg)
-      if [[ $# -lt 2 ]]; then
-        echo "Missing value after --alg" >&2
-        exit 2
-      fi
-      ALG="$2"
-      shift 2
-      ;;
-    --alg=*)
-      ALG="${1#--alg=}"
-      shift
-      ;;
     *)
-      if [[ -z "$ALG" && "$1" != --* ]]; then
-        ALG="$1"
-      else
-        USER_ARGS+=("$1")
-      fi
+      USER_ARGS+=("$1")
       shift
       ;;
   esac
 done
-
-if [[ -z "$ALG" ]]; then
-  usage >&2
-  exit 2
-fi
 
 if [[ ! -x "$PYTHON_BIN" ]]; then
   echo "Python executable not found or not executable: $PYTHON_BIN" >&2
@@ -94,7 +70,8 @@ has_arg() {
 }
 
 DEFAULT_ARGS=()
-has_arg --map || DEFAULT_ARGS+=(--map UAVDelivery)
+has_arg --alg || DEFAULT_ARGS+=(--alg mappo)
+has_arg --map || DEFAULT_ARGS+=(--map UAVEnergyDelivery)
 has_arg --uav_n_agents || DEFAULT_ARGS+=(--uav_n_agents 4)
 has_arg --uav_total_orders || DEFAULT_ARGS+=(--uav_total_orders 8)
 has_arg --uav_max_active_orders || DEFAULT_ARGS+=(--uav_max_active_orders 4)
@@ -106,24 +83,29 @@ has_arg --gpu_id || DEFAULT_ARGS+=(--gpu_id "$GPU_ID")
 has_arg --experiment_device || DEFAULT_ARGS+=(--experiment_device "$EXPERIMENT_DEVICE")
 
 mkdir -p "$RUN_DIR"
-LOG_FILE="$RUN_DIR/${ALG}.log"
-CMD_FILE="$RUN_DIR/${ALG}.cmd"
+LOG_FILE="$RUN_DIR/mappo.log"
+CMD_FILE="$RUN_DIR/mappo.cmd"
 
 cmd=(
   "$PYTHON_BIN" main.py
-  --alg "$ALG"
   "${DEFAULT_ARGS[@]}"
   "${USER_ARGS[@]}"
 )
 
 RUN_COMMAND="$(printf "%q " "${cmd[@]}")"
 printf "%s\n" "$RUN_COMMAND" > "$CMD_FILE"
+
+export MARL_EXPERIMENT_DEVICE="$EXPERIMENT_DEVICE"
 export MARL_RUN_SCRIPT="$SCRIPT_PATH"
 export MARL_RUN_COMMAND="$RUN_COMMAND"
 
 echo "Run directory: $RUN_DIR"
-echo "Algorithm: $ALG"
+echo "Algorithm: mappo"
+echo "Map: UAVEnergyDelivery"
 echo "Experiment device: $EXPERIMENT_DEVICE"
+echo "Seed: $SEED"
+echo "Evaluation seed: $EVAL_SEED"
+echo "Evaluation episodes: $EVALUATE_EPOCH"
 echo "Log: $LOG_FILE"
 printf "Command: %s\n" "$RUN_COMMAND"
 

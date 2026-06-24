@@ -85,6 +85,11 @@ class CentralV:
         if self.args.cuda:
             u = u.cuda()
             mask = mask.cuda()
+        if "agent_active_mask" in batch:
+            active_mask = batch["agent_active_mask"].squeeze(-1)
+            if self.args.cuda:
+                active_mask = active_mask.cuda()
+            mask = mask * active_mask
 
         # 训练critic网络，并且得到每条经验的td_error, (episode_num, max_episode_len, 1)
         td_error = self._train_critic(batch, max_episode_len, train_step)
@@ -99,7 +104,7 @@ class CentralV:
         log_pi_taken = torch.log(pi_taken)
 
         # loss函数，(episode_num, max_episode_len, n_agents)
-        loss = - ((td_error.detach() * log_pi_taken) * mask).sum() / mask.sum()
+        loss = - ((td_error.detach() * log_pi_taken) * mask).sum() / mask.sum().clamp(min=1.0)
         self.rnn_optimizer.zero_grad()
         loss.backward()
         torch.nn.utils.clip_grad_norm_(self.rnn_parameters, self.args.grad_norm_clip)
@@ -188,6 +193,11 @@ class CentralV:
             mask = mask.cuda()
             r = r.cuda()
             terminated = terminated.cuda()
+        if "agent_active_mask" in batch:
+            active_mask = batch["agent_active_mask"].squeeze(-1)
+            if self.args.cuda:
+                active_mask = active_mask.cuda()
+            mask = mask * active_mask
         v_evals, v_next_target = self._get_v_values(batch, max_episode_len)
 
         targets = r + self.args.gamma * v_next_target * (1 - terminated)
@@ -195,7 +205,7 @@ class CentralV:
         masked_td_error = mask * td_error  # 抹掉填充的经验的td_error
 
         # 不能直接用mean，因为还有许多经验是没用的，所以要求和再比真实的经验数，才是真正的均值
-        loss = (masked_td_error ** 2).sum() / mask.sum()
+        loss = (masked_td_error ** 2).sum() / mask.sum().clamp(min=1.0)
         # print('Critic Loss is ', loss)
         self.critic_optimizer.zero_grad()
         loss.backward()

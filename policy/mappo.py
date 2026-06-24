@@ -126,7 +126,9 @@ class MAPPO:
 
         valid_advantages = advantages[mask > 0]
         if valid_advantages.numel() > 0:
-            advantages = (advantages - valid_advantages.mean()) / (valid_advantages.std() + 1e-8)
+            advantages = (advantages - valid_advantages.mean()) / (
+                valid_advantages.std(unbiased=False) + 1e-8
+            )
         return advantages, returns
 
     def learn(self, batch, max_episode_len, train_step, epsilon):
@@ -138,6 +140,14 @@ class MAPPO:
         avail_actions = batch["avail_u"]
         terminated = batch["terminated"].squeeze(-1)
         mask = 1 - batch["padded"].squeeze(-1)
+        active_mask = batch.get("agent_active_mask", None)
+        if active_mask is None:
+            active_mask = torch.ones(
+                (*mask.shape, self.n_agents, 1),
+                dtype=mask.dtype,
+                device=self.device,
+            )
+        active_mask = active_mask.squeeze(-1)
         guard_applied = batch.get("guard_applied", None)
         if guard_applied is not None:
             guard_applied = guard_applied.squeeze(-1)
@@ -156,6 +166,8 @@ class MAPPO:
             agent_actions = actions[:, :, agent_idx].reshape(-1)
             agent_avail = avail_actions[:, :, agent_idx, :].reshape(-1, self.n_actions)
             agent_rewards = rewards[:, :, agent_idx]
+            agent_mask = mask * active_mask[:, :, agent_idx]
+            flat_agent_mask = agent_mask.reshape(-1) > 0
 
             with torch.no_grad():
                 values = self.critics[agent_idx](states.reshape(-1, self.state_shape)).reshape(
@@ -165,25 +177,25 @@ class MAPPO:
                     next_states.reshape(-1, self.state_shape)
                 ).reshape(episode_num, time_len)
                 advantages, returns = self._compute_advantages(
-                    agent_rewards, values, next_values, terminated, mask
+                    agent_rewards, values, next_values, terminated, agent_mask
                 )
                 old_dist = self._masked_categorical(
                     self.actors[agent_idx](actor_states), agent_avail
                 )
                 old_log_probs = old_dist.log_prob(agent_actions)
 
-            valid_actor_states = actor_states[flat_mask]
-            valid_states = flat_states[flat_mask]
-            valid_actions = agent_actions[flat_mask]
-            valid_avail = agent_avail[flat_mask]
-            valid_advantages = advantages.reshape(-1)[flat_mask]
-            valid_returns = returns.reshape(-1)[flat_mask]
-            valid_old_log_probs = old_log_probs[flat_mask]
+            valid_actor_states = actor_states[flat_agent_mask]
+            valid_states = flat_states[flat_agent_mask]
+            valid_actions = agent_actions[flat_agent_mask]
+            valid_avail = agent_avail[flat_agent_mask]
+            valid_advantages = advantages.reshape(-1)[flat_agent_mask]
+            valid_returns = returns.reshape(-1)[flat_agent_mask]
+            valid_old_log_probs = old_log_probs[flat_agent_mask]
             if guard_applied is not None:
-                actor_mask = mask * (1 - guard_applied[:, :, agent_idx])
+                actor_mask = agent_mask * (1 - guard_applied[:, :, agent_idx])
                 flat_actor_mask = actor_mask.reshape(-1) > 0
             else:
-                flat_actor_mask = flat_mask
+                flat_actor_mask = flat_agent_mask
 
             valid_actor_states_pg = actor_states[flat_actor_mask]
             valid_actions_pg = agent_actions[flat_actor_mask]

@@ -132,6 +132,11 @@ class MACPO:
         u = batch["u"]
         avail_u = batch["avail_u"]
         mask = (1 - batch["padded"].float()).repeat(1, 1, self.n_agents)
+        active_mask = batch.get("agent_active_mask", None)
+        if active_mask is not None:
+            mask = mask * active_mask.squeeze(-1)
+        if mask.sum() <= 0:
+            return
 
         reward_advantages, reward_returns = self._compute_gae(
             batch=batch,
@@ -197,7 +202,7 @@ class MACPO:
 
             reward_values = self._get_values(batch, max_episode_len, critic_type="reward")
             reward_value_loss = F.mse_loss(
-                reward_values[mask == 1], reward_returns[mask == 1]
+                reward_values[mask > 0], reward_returns[mask > 0]
             )
             self.reward_critic_optimizer.zero_grad()
             reward_value_loss.backward()
@@ -208,7 +213,7 @@ class MACPO:
 
             cost_values = self._get_values(batch, max_episode_len, critic_type="cost")
             cost_value_loss = F.mse_loss(
-                cost_values[mask == 1], cost_returns[mask == 1]
+                cost_values[mask > 0], cost_returns[mask > 0]
             )
             self.cost_critic_optimizer.zero_grad()
             cost_value_loss.backward()
@@ -225,7 +230,6 @@ class MACPO:
             if signal.size(-1) == 1:
                 signal = signal.expand(-1, -1, self.n_agents)
             terminated = batch["terminated"].squeeze(-1)
-            mask_1d = mask[:, :, 0]
 
             advantages = torch.zeros_like(signal)
             returns = torch.zeros_like(signal)
@@ -238,7 +242,7 @@ class MACPO:
                     else values[:, t + 1, :]
                 )
                 not_done = (1 - terminated[:, t]).unsqueeze(-1)
-                step_mask = mask_1d[:, t].unsqueeze(-1)
+                step_mask = mask[:, t, :]
                 delta = (
                     signal[:, t, :]
                     + self.args.gamma * next_value * not_done
@@ -249,10 +253,10 @@ class MACPO:
                 advantages[:, t, :] = gae
                 returns[:, t, :] = (gae + values[:, t, :]) * step_mask
 
-        valid_advantages = advantages[mask == 1]
+        valid_advantages = advantages[mask > 0]
         if valid_advantages.numel() > 0:
             advantages = (advantages - valid_advantages.mean()) / (
-                valid_advantages.std() + 1e-8
+                valid_advantages.std(unbiased=False) + 1e-8
             )
 
         return advantages, returns

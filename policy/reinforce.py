@@ -82,13 +82,18 @@ class Reinforce:
 
         # 给mask转换出n_agents维度，用于每个agent的训练
         mask = mask.repeat(1, 1, self.n_agents)
+        if "agent_active_mask" in batch:
+            active_mask = batch["agent_active_mask"].squeeze(-1)
+            if self.args.cuda:
+                active_mask = active_mask.cuda()
+            mask = mask * active_mask
         # 每个agent的选择的动作对应的概率 (episode_num, max_episode_len， n_agents)
         pi_taken = torch.gather(action_prob, dim=3, index=u).squeeze(3)
         pi_taken[mask == 0] = 1.0  # 因为要取对数，对于那些填充的经验，所有概率都为0，取了log就是负无穷了，所以让它们变成1
         log_pi_taken = torch.log(pi_taken)
 
         # loss函数，(episode_num, max_episode_len, n_agents)
-        loss = - ((n_return * log_pi_taken) * mask).sum() / mask.sum()
+        loss = - ((n_return * log_pi_taken) * mask).sum() / mask.sum().clamp(min=1.0)
         self.rnn_optimizer.zero_grad()
         loss.backward()
         if self.args.alg == 'reinforce+g2anet':

@@ -91,6 +91,13 @@ class MAVEN:
                                                                 batch['avail_u'], batch['avail_u_next'],\
                                                                 batch['terminated'],   batch['z']
         mask = 1 - batch["padded"].float()  # 用来把那些填充的经验的TD-error置0，从而不让它们影响到学习
+        all_active_mask = None
+        if "agent_active_mask" in batch:
+            all_active_mask = batch["agent_active_mask"].squeeze(-1).min(
+                dim=2,
+                keepdim=True,
+            )[0]
+            mask = mask * all_active_mask
 
         # 得到每个agent对应的Q值，维度为(episode个数, max_episode_len， n_agents， n_actions)
         q_evals, q_targets = self.get_q_values(batch, max_episode_len)
@@ -104,6 +111,8 @@ class MAVEN:
             terminated = terminated.cuda()
             mask = mask.cuda()
             z = z.cuda()
+            if all_active_mask is not None:
+                all_active_mask = all_active_mask.cuda()
         # -------------------------------------------------RL Loss------------------------------------------------------
         z_prob = self.z_policy(s[:, 0, :])
         log_z_prob = torch.log(z_prob)
@@ -153,7 +162,7 @@ class MAVEN:
         td_error = (q_total_eval - targets.detach())
         masked_td_error = mask * td_error  # 抹掉填充的经验的td_error
 
-        ql_loss = (masked_td_error ** 2).sum() / mask.sum()
+        ql_loss = (masked_td_error ** 2).sum() / mask.sum().clamp(min=1.0)
         # -------------------------------------------------QL Loss------------------------------------------------------
 
         # loss = rl_loss + self.args.lambda_mi * mi_loss + self.args.lambda_ql * ql_loss

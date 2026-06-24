@@ -278,9 +278,18 @@ class QMIX:
         terminated = tensor_batch["terminated"]
         mask = 1 - tensor_batch["padded"].float()
         mask[:, 1:] = mask[:, 1:] * (1 - terminated[:, :-1])
+        agent_active_mask = tensor_batch.get("agent_active_mask", None)
+        if agent_active_mask is not None:
+            agent_active_mask = agent_active_mask.squeeze(-1)
+            transition_active_mask = (
+                agent_active_mask.sum(dim=2, keepdim=True) > 0
+            ).float()
+            mask = mask * transition_active_mask
 
         q_evals, q_targets, q_eval_next = self.get_q_values(tensor_batch, max_episode_len)
         chosen_action_qvals = torch.gather(q_evals, dim=3, index=u).squeeze(3)
+        if agent_active_mask is not None:
+            chosen_action_qvals = chosen_action_qvals * agent_active_mask
 
         q_targets[avail_u_next == 0.0] = -9999999
         if getattr(self.args, "double_q", True):
@@ -290,6 +299,8 @@ class QMIX:
             target_max_qvals = torch.gather(q_targets, 3, cur_max_actions).squeeze(3)
         else:
             target_max_qvals = q_targets.max(dim=3)[0]
+        if agent_active_mask is not None:
+            target_max_qvals = target_max_qvals * agent_active_mask
 
         q_total_eval = self.eval_qmix_net(chosen_action_qvals, s)
         q_total_target = self.target_qmix_net(target_max_qvals, s_next)

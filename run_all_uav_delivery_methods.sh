@@ -12,6 +12,7 @@ EVAL_SEED="${EVAL_SEED:-$((SEED + 100000))}"
 EVALUATE_EPOCH="${EVALUATE_EPOCH:-20}"
 export MARL_EXPERIMENT_DEVICE="$EXPERIMENT_DEVICE"
 RUN_DIR="${RUN_DIR:-logs/uav_delivery_all_methods/$(date +%Y%m%d_%H%M%S)}"
+SCRIPT_PATH="$SCRIPT_DIR/$(basename "${BASH_SOURCE[0]}")"
 
 if [[ -n "${ALGS:-}" ]]; then
   read -r -a ALG_LIST <<< "$ALGS"
@@ -105,13 +106,13 @@ for alg in "${ALG_LIST[@]}"; do
   )
 
   printf "\n[%s] START %s\n" "$(date '+%F %T')" "$alg"
-  printf "%q " "${cmd[@]}" > "$RUN_DIR/${alg}.cmd"
-  printf "\n" >> "$RUN_DIR/${alg}.cmd"
+  run_command="$(printf "%q " "${cmd[@]}")"
+  printf "%s\n" "$run_command" > "$RUN_DIR/${alg}.cmd"
+  export MARL_RUN_SCRIPT="$SCRIPT_PATH"
+  export MARL_RUN_COMMAND="$run_command"
 
   if [[ "${DRY_RUN:-0}" == "1" ]]; then
-    printf "[DRY_RUN] "
-    printf "%q " "${cmd[@]}"
-    printf "\n"
+    printf "[DRY_RUN] %s\n" "$run_command"
     printf "%s\t%s\t%s\t%s\n" "$alg" "dry_run" "0" "$log_file" >> "$SUMMARY_FILE"
     continue
   fi

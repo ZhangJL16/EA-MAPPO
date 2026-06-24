@@ -36,6 +36,7 @@ class ReplayBuffer:
             'padded': np.empty([self.size, self.episode_limit, 1], dtype=np.float32),
             'terminated': np.empty([self.size, self.episode_limit, 1], dtype=np.float32),
             'warning_signal': np.empty([self.size, self.episode_limit, self.n_agents, 1], dtype=np.float32),
+            'agent_active_mask': np.empty([self.size, self.episode_limit, self.n_agents, 1], dtype=np.float32),
         }
         if self.store_raw_obs:
             self.buffers['o_raw'] = np.empty(
@@ -69,6 +70,13 @@ class ReplayBuffer:
             self.buffers['padded'][idxs] = episode_batch['padded']
             self.buffers['terminated'][idxs] = episode_batch['terminated']
             self.buffers['warning_signal'][idxs] = episode_batch['warning_signal']
+            self.buffers['agent_active_mask'][idxs] = episode_batch.get(
+                'agent_active_mask',
+                np.ones(
+                    [batch_size, self.episode_limit, self.n_agents, 1],
+                    dtype=np.float32,
+                ),
+            )
             if self.store_raw_obs:
                 self.buffers['o_raw'][idxs] = episode_batch['o_raw']
                 self.buffers['o_next_raw'][idxs] = episode_batch['o_next_raw']

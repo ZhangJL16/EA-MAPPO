@@ -85,6 +85,8 @@ class QtranAlt:
                                                              batch['r'],  batch['avail_u'], batch['avail_u_next'],\
                                                              batch['terminated']
         mask = 1 - batch["padded"].float().repeat(1, 1, self.n_agents)  # 用来把那些填充的经验的TD-error置0，从而不让它们影响到学习
+        if "agent_active_mask" in batch:
+            mask = mask * batch["agent_active_mask"].squeeze(-1)
         if self.args.cuda:
             u = u.cuda()
             r = r.cuda()
@@ -122,7 +124,7 @@ class QtranAlt:
         # loss
         y_dqn = r.repeat(1, 1, self.n_agents) + self.args.gamma * joint_q_opt * (1 - terminated.repeat(1, 1, self.n_agents))
         td_error = joint_q_chosen - y_dqn.detach()
-        l_td = ((td_error * mask) ** 2).sum() / mask.sum()
+        l_td = ((td_error * mask) ** 2).sum() / mask.sum().clamp(min=1.0)
         # ---------------------------------------------L_td-------------------------------------------------------------
 
         # ---------------------------------------------L_opt------------------------------------------------------------
@@ -139,7 +141,7 @@ class QtranAlt:
         q_sum_opt = q_sum_opt.unsqueeze(-1).expand(-1, -1, self.n_agents)
         v = v.unsqueeze(-1).expand(-1, -1, self.n_agents)
         opt_error = q_sum_opt - joint_q_opt_evals.detach() + v  # 计算l_opt时需要将joint_q_opt_evals固定
-        l_opt = ((opt_error * mask) ** 2).sum() / mask.sum()
+        l_opt = ((opt_error * mask) ** 2).sum() / mask.sum().clamp(min=1.0)
 
         # ---------------------------------------------L_opt------------------------------------------------------------
 
@@ -166,7 +168,7 @@ class QtranAlt:
         v = v.unsqueeze(-1).expand(-1, -1, -1, self.n_actions)
         d = q_sum_nopt - joint_q_evals.detach() + v  # 计算l_nopt时需要将qtran_q_evals固定
         d = d.min(dim=-1)[0]
-        l_nopt = ((d * mask) ** 2).sum() / mask.sum()
+        l_nopt = ((d * mask) ** 2).sum() / mask.sum().clamp(min=1.0)
         # ---------------------------------------------L_nopt-----------------------------------------------------------
 
         # print('l_td is {}, l_opt is {}, l_nopt is {}'.format(l_td, l_opt, l_nopt))

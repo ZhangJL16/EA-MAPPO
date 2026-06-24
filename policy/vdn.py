@@ -96,15 +96,26 @@ class VDN:
         u, r, avail_u, avail_u_next, terminated = batch['u'], batch['r'],  batch['avail_u'], \
                                                   batch['avail_u_next'], batch['terminated']
         mask = 1 - batch["padded"].float()  # 用来把那些填充的经验的TD-error置0，从而不让它们影响到学习
+        agent_active_mask = batch.get("agent_active_mask", None)
+        if agent_active_mask is not None:
+            agent_active_mask = agent_active_mask.squeeze(-1)
+            transition_active_mask = (
+                agent_active_mask.sum(dim=2, keepdim=True) > 0
+            ).float()
+            mask = mask * transition_active_mask
         # 得到每个agent对应的Q值，维度为(episode个数, max_episode_len， n_agents，n_actions)
         q_evals, q_targets = self.get_q_values(batch, max_episode_len)
 
         # 取每个agent动作对应的Q值，并且把最后不需要的一维去掉，因为最后一维只有一个值了
         q_evals = torch.gather(q_evals, dim=3, index=u).squeeze(3)
+        if agent_active_mask is not None:
+            q_evals = q_evals * agent_active_mask
 
         # 得到target_q
         q_targets[avail_u_next == 0.0] = - 9999999
         q_targets = q_targets.max(dim=3)[0]
+        if agent_active_mask is not None:
+            q_targets = q_targets * agent_active_mask
 
         q_total_eval = self.eval_vdn_net(q_evals)
         q_total_target = self.target_vdn_net(q_targets)
@@ -116,7 +127,7 @@ class VDN:
 
         # loss = masked_td_error.pow(2).mean()
         # 不能直接用mean，因为还有许多经验是没用的，所以要求和再比真实的经验数，才是真正的均值
-        loss = (masked_td_error ** 2).sum() / mask.sum()
+        loss = (masked_td_error ** 2).sum() / mask.sum().clamp(min=1.0)
         # print('Loss is ', loss)
         self.optimizer.zero_grad()
         loss.backward()

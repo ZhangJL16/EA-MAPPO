@@ -27,6 +27,12 @@ def get_common_args():
     parser.add_argument('--uav_max_active_orders', type=int, default=4, help='maximum simultaneously active delivery orders in UAVDelivery')
     parser.add_argument('--uav_pickup_reward', type=float, default=3.0, help='reward for reaching a UAVDelivery pickup point')
     parser.add_argument('--uav_delivery_reward', type=float, default=8.0, help='reward for reaching a UAVDelivery dropoff point')
+    parser.add_argument('--uav_initial_energy', type=float, default=100.0, help='initial energy for UAVEnergyDelivery agents')
+    parser.add_argument('--uav_energy_decay', type=float, default=None, help='energy consumed per UAVEnergyDelivery step; defaults to depletion at half episode length')
+    parser.add_argument('--uav_energy_depletion_fraction', type=float, default=0.5, help='fraction of episode length when full energy should be depleted')
+    parser.add_argument('--uav_charging_capacity', type=int, default=2, help='maximum UAVs charging at the station in one step')
+    parser.add_argument('--uav_charging_radius', type=float, default=0.18, help='distance threshold for UAVEnergyDelivery charging station')
+    parser.add_argument('--uav_charging_rate', type=float, default=None, help='energy restored per charging step; defaults to energy decay per step')
     parser.add_argument(
         '--experiment_device',
         type=str,
@@ -84,6 +90,8 @@ def get_common_args():
     parser.add_argument('--safety_lr', type=float, default=None, help='override learning rate for the safety network')
     parser.add_argument('--safety_beta', type=float, default=None, help='override long-term risk weight in short+beta*long')
     parser.add_argument('--warning_penalty_weight', type=float, default=None, help='override warning-signal penalty weight used in reward shaping/logging')
+    parser.add_argument('--run_script', type=str, default=os.environ.get('MARL_RUN_SCRIPT', ''), help='training script path written to experiment summary CSV')
+    parser.add_argument('--run_command', type=str, default=os.environ.get('MARL_RUN_COMMAND', ''), help='training command written to experiment summary CSV')
     # timestamp
     parser.add_argument('--now', type=str, default='', help='timestamp for mat logging')
     args = parser.parse_args()

@@ -32,12 +32,18 @@ UAV_COLLISION_MAPS = {
     "UAVDelivery",
     "UAVDelivery2D",
     "UAVDelivery3D",
+    "UAVEnergyDelivery",
+    "UAVEnergyDelivery2D",
+    "UAVEnergyDelivery3D",
 }
 
 UAV_DELIVERY_MAPS = {
     "UAVDelivery",
     "UAVDelivery2D",
     "UAVDelivery3D",
+    "UAVEnergyDelivery",
+    "UAVEnergyDelivery2D",
+    "UAVEnergyDelivery3D",
 }
 
 DEFAULT_CSV_COLUMNS = [
@@ -123,6 +129,8 @@ UAV_DELIVERY_EXPERIMENT_COLUMNS = [
     "obstacle_collision_count",
     "agent_collision_count",
     "eval_episode_steps",
+    "run_script",
+    "run_command",
 ]
 
 
@@ -325,6 +333,8 @@ class Runner:
             float(summary.get("obstacle_collision_count", 0.0)),
             float(summary.get("agent_collision_count", 0.0)),
             float(summary.get("step", 0.0)),
+            getattr(self.args, "run_script", ""),
+            getattr(self.args, "run_command", ""),
         ]
         self._write_uav_delivery_experiment_row(row)
 
@@ -366,6 +376,8 @@ class Runner:
             float(summary.get("obstacle_collision_count", 0.0)),
             float(summary.get("agent_collision_count", 0.0)),
             float(summary.get("step", 0.0)),
+            getattr(self.args, "run_script", ""),
+            getattr(self.args, "run_command", ""),
         ]
         self._write_uav_delivery_experiment_row(row)
 

@@ -335,11 +335,15 @@ class Agents:
 
         return action
 
-    def prepare_comm_obs(self, observations, epsilon):
+    def prepare_comm_obs(self, observations, epsilon, active_agent_mask=None):
         raw_obs = [
             np.asarray(obs, dtype=np.float32).reshape(-1)
             for obs in np.asarray(observations, dtype=np.float32)
         ]
+        if active_agent_mask is None:
+            active_agent_mask = np.ones(self.n_agents, dtype=np.float32)
+        else:
+            active_agent_mask = np.asarray(active_agent_mask, dtype=np.float32).reshape(-1)
         sender_packets = []
         self.obs_ = {}
         self.state_ = []
@@ -353,6 +357,18 @@ class Agents:
                     np.array([self.prev_comm_lambda[sender_idx]], dtype=np.float32),
                 )
             ).astype(np.float32)
+            if active_agent_mask[sender_idx] <= 0.0:
+                sender_packets.append(
+                    {
+                        "obs": sender_input,
+                        "action": 0,
+                        "transmitted": np.zeros_like(sender_obs, dtype=np.float32),
+                        "share_ratio": 0.0,
+                        "sent": 0.0,
+                        "active": 0.0,
+                    }
+                )
+                continue
             decision = self.comm_policy.choose_action(
                 sender_input, evaluate=(epsilon == 0.0), return_info=True
             )
@@ -367,6 +383,7 @@ class Agents:
                     "transmitted": transmitted.astype(np.float32),
                     "share_ratio": float(tx_stats["share_ratio"]),
                     "sent": float(tx_stats["sent"]),
+                    "active": 1.0,
                 }
             )
 
@@ -405,6 +422,9 @@ class Agents:
             self.state_.append(final_obs.astype(np.float32))
 
         for sender_idx, packet in enumerate(sender_packets):
+            if packet.get("active", 1.0) <= 0.0:
+                self.prev_comm_lambda[sender_idx] = 0.0
+                continue
             self.comm_buffer["obs"].append(packet["obs"])
             self.comm_buffer["action"].append(packet["action"])
             self.comm_buffer["sender"].append(int(sender_idx))
@@ -637,9 +657,16 @@ class CommAgents:
         action = Categorical(prob).sample().long()
         return action
 
-    def get_action_weights(self, obs, last_action):
+    def get_action_weights(self, obs, last_action, active_agent_mask=None):
         obs = torch.tensor(obs, dtype=torch.float32)
         last_action = torch.tensor(last_action, dtype=torch.float32)
+        if active_agent_mask is None:
+            active_agent_mask = np.ones(self.n_agents, dtype=np.float32)
+        active_agent_mask = np.asarray(active_agent_mask, dtype=np.float32).reshape(-1)
+        active_indices = np.nonzero(active_agent_mask > 0.0)[0]
+        weights = torch.zeros((self.args.n_agents, self.args.n_actions), dtype=torch.float32)
+        if len(active_indices) == 0:
+            return weights
         inputs = list()
         inputs.append(obs)
         # 给obs添加上一个动作、agent编号
@@ -651,10 +678,27 @@ class CommAgents:
         if self.args.cuda:
             inputs = inputs.cuda()
             self.policy.eval_hidden = self.policy.eval_hidden.cuda()
-        weights, self.policy.eval_hidden = self.policy.eval_rnn(
-            inputs, self.policy.eval_hidden
+            weights = weights.cuda()
+        active_indices_tensor = torch.tensor(
+            active_indices,
+            dtype=torch.long,
+            device=inputs.device,
         )
-        weights = weights.reshape(self.args.n_agents, self.args.n_actions)
+        active_inputs = inputs.index_select(0, active_indices_tensor)
+        active_hidden = self.policy.eval_hidden.index_select(1, active_indices_tensor)
+        active_weights, active_hidden_next = self.policy.eval_rnn(
+            active_inputs,
+            active_hidden,
+        )
+        weights[active_indices_tensor] = active_weights.reshape(
+            len(active_indices),
+            self.args.n_actions,
+        )
+        self.policy.eval_hidden[:, active_indices_tensor, :] = active_hidden_next.view(
+            1,
+            len(active_indices),
+            self.args.rnn_hidden_dim,
+        )
         return weights.cpu()
 
     def _get_max_episode_len(self, batch):

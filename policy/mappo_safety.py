@@ -285,6 +285,9 @@ class MAPPOSafetyGuide:
         avail_actions_next = _to_tensor(batch["avail_u_next"], torch.float32)
         terminated = _to_tensor(batch["terminated"], torch.float32).squeeze(-1)
         mask = 1 - _to_tensor(batch["padded"], torch.float32).squeeze(-1)
+        active_mask = None
+        if "agent_active_mask" in batch:
+            active_mask = _to_tensor(batch["agent_active_mask"], torch.float32).squeeze(-1)
         warning = _to_tensor(batch["warning_signal"], torch.float32).squeeze(-1)
         losses = []
 
@@ -325,8 +328,11 @@ class MAPPOSafetyGuide:
                 # and is combined with the guide output only at action revision.
                 target = self.gamma * min_next * (1 - terminated)
 
-            td_error = (pred_taken - target) * mask
-            denom = mask.sum().clamp(min=1.0)
+            agent_mask = mask
+            if active_mask is not None:
+                agent_mask = agent_mask * active_mask[:, :, agent_idx]
+            td_error = (pred_taken - target) * agent_mask
+            denom = agent_mask.sum().clamp(min=1.0)
             loss = (td_error.pow(2)).sum() / denom
 
             self.optimizers[agent_idx].zero_grad()

@@ -100,6 +100,11 @@ class COMA:
         if self.args.cuda:
             u = u.cuda()
             mask = mask.cuda()
+        if "agent_active_mask" in batch:
+            active_mask = batch["agent_active_mask"].squeeze(-1)
+            if self.args.cuda:
+                active_mask = active_mask.cuda()
+            mask = mask * active_mask
         # 根据经验计算每个agent的Ｑ值,从而跟新Critic网络。然后计算各个动作执行的概率，从而计算advantage去更新Actor。
         q_values = self._train_critic(batch, max_episode_len, train_step)  # 训练critic网络，并且得到每个agent的所有动作的Ｑ值
         action_prob = self._get_action_prob(batch, max_episode_len, epsilon)  # 每个agent的所有动作的概率
@@ -113,7 +118,7 @@ class COMA:
         # 计算advantage
         baseline = (q_values * action_prob).sum(dim=3, keepdim=True).squeeze(3).detach()
         advantage = (q_taken - baseline).detach()
-        loss = - ((advantage * log_pi_taken) * mask).sum() / mask.sum()
+        loss = - ((advantage * log_pi_taken) * mask).sum() / mask.sum().clamp(min=1.0)
         self.rnn_optimizer.zero_grad()
         loss.backward()
         torch.nn.utils.clip_grad_norm_(self.rnn_parameters, self.args.grad_norm_clip)
@@ -276,6 +281,11 @@ class COMA:
             u = u.cuda()
             u_next = u_next.cuda()
             mask = mask.cuda()
+        if "agent_active_mask" in batch:
+            active_mask = batch["agent_active_mask"].squeeze(-1)
+            if self.args.cuda:
+                active_mask = active_mask.cuda()
+            mask = mask * active_mask
         # 得到每个agent对应的Q值，维度为(episode个数, max_episode_len， n_agents，n_actions)
         # q_next_target为下一个状态-动作对应的target网络输出的Q值，没有包括reward
         q_evals, q_next_target = self._get_q_values(batch, max_episode_len)
@@ -291,7 +301,7 @@ class COMA:
         masked_td_error = mask * td_error  # 抹掉填充的经验的td_error
 
         # 不能直接用mean，因为还有许多经验是没用的，所以要求和再比真实的经验数，才是真正的均值
-        loss = (masked_td_error ** 2).sum() / mask.sum()
+        loss = (masked_td_error ** 2).sum() / mask.sum().clamp(min=1.0)
         # print('Loss is ', loss)
         self.critic_optimizer.zero_grad()
         loss.backward()

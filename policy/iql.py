@@ -66,6 +66,8 @@ class IQL:
         u, r, avail_u, avail_u_next, terminated = batch['u'], batch['r'].repeat(1, 1, self.n_agents),  batch['avail_u'], \
                                                   batch['avail_u_next'], batch['terminated'].repeat(1, 1, self.n_agents)
         mask = (1 - batch["padded"].float()).repeat(1, 1, self.n_agents)  # 用来把那些填充的经验的TD-error置0，从而不让它们影响到学习
+        if "agent_active_mask" in batch:
+            mask = mask * batch["agent_active_mask"].squeeze(-1)
 
         # 得到每个agent对应的Q值，维度为(episode个数, max_episode_len， n_agents， n_actions)
         q_evals, q_targets = self.get_q_values(batch, max_episode_len)
@@ -87,7 +89,7 @@ class IQL:
         masked_td_error = mask * td_error  # 抹掉填充的经验的td_error
 
         # 不能直接用mean，因为还有许多经验是没用的，所以要求和再比真实的经验数，才是真正的均值
-        loss = (masked_td_error ** 2).sum() / mask.sum()
+        loss = (masked_td_error ** 2).sum() / mask.sum().clamp(min=1.0)
         # print('loss is ', loss)
         self.optimizer.zero_grad()
         loss.backward()

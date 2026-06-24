@@ -4,6 +4,8 @@ from contextlib import contextmanager
 
 import numpy as np
 
+os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
+
 try:
     import torch
 except ImportError:  # pragma: no cover - torch is a project dependency.

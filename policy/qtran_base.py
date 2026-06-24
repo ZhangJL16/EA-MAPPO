@@ -87,6 +87,9 @@ class QtranBase:
         u, r, avail_u, avail_u_next, terminated = batch['u'], batch['r'],  batch['avail_u'], \
                                                   batch['avail_u_next'], batch['terminated']
         mask = (1 - batch["padded"].float()).squeeze(-1)  # 用来把那些填充的经验的TD-error置0，从而不让它们影响到学习
+        if "agent_active_mask" in batch:
+            all_active_mask = batch["agent_active_mask"].squeeze(-1).min(dim=2)[0]
+            mask = mask * all_active_mask
         if self.args.cuda:
             u = u.cuda()
             r = r.cuda()
@@ -118,7 +121,7 @@ class QtranBase:
         # loss
         y_dqn = r.squeeze(-1) + self.args.gamma * joint_q_targets * (1 - terminated.squeeze(-1))
         td_error = joint_q_evals - y_dqn.detach()
-        l_td = ((td_error * mask) ** 2).sum() / mask.sum()
+        l_td = ((td_error * mask) ** 2).sum() / mask.sum().clamp(min=1.0)
         # ---------------------------------------------L_td-------------------------------------------------------------
 
         # ---------------------------------------------L_opt------------------------------------------------------------
@@ -130,7 +133,7 @@ class QtranBase:
         # (episode个数, max_episode_len)
         joint_q_hat_opt, _, _ = self.get_qtran(batch, hidden_evals, hidden_targets, opt_onehot_eval, hat=True)
         opt_error = q_sum_opt - joint_q_hat_opt.detach() + v  # 计算l_opt时需要将joint_q_hat_opt固定
-        l_opt = ((opt_error * mask) ** 2).sum() / mask.sum()
+        l_opt = ((opt_error * mask) ** 2).sum() / mask.sum().clamp(min=1.0)
         # ---------------------------------------------L_opt------------------------------------------------------------
 
         # ---------------------------------------------L_nopt-----------------------------------------------------------
@@ -140,7 +143,7 @@ class QtranBase:
 
         nopt_error = q_sum_nopt - joint_q_evals.detach() + v  # 计算l_nopt时需要将joint_q_evals固定
         nopt_error = nopt_error.clamp(max=0)
-        l_nopt = ((nopt_error * mask) ** 2).sum() / mask.sum()
+        l_nopt = ((nopt_error * mask) ** 2).sum() / mask.sum().clamp(min=1.0)
         # ---------------------------------------------L_nopt-----------------------------------------------------------
 
         # print('l_td is {}, l_opt is {}, l_nopt is {}'.format(l_td, l_opt, l_nopt))

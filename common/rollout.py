@@ -108,6 +108,20 @@ def _get_env_msg(env, args, n_agents):
     ]
 
 
+def _get_noop_action(env, n_actions):
+    if hasattr(env, "get_noop_action"):
+        return int(env.get_noop_action())
+    return min(int(n_actions) - 1, max(0, int(n_actions) // 2))
+
+
+def _get_active_agent_mask(env, n_agents):
+    if hasattr(env, "get_active_agent_mask"):
+        mask = np.asarray(env.get_active_agent_mask(), dtype=np.float32).reshape(-1)
+        if mask.size == n_agents:
+            return mask
+    return np.ones(n_agents, dtype=np.float32)
+
+
 def _build_env_summary(env, info, step, win_tag, n_agents):
     if hasattr(env, "summary"):
         summary = env.summary()
@@ -203,7 +217,8 @@ class RolloutWorker:
             self.args.replay_dir != "" and evaluate and episode_num == 0
         ):  # prepare for save replay of evaluation
             self.env.close()
-        o, o_raw, u, r, s, avail_u, u_onehot, terminate, padded, w_signal, c, guard_applied = (
+        o, o_raw, u, r, s, avail_u, u_onehot, terminate, padded, w_signal, c, guard_applied, active_masks = (
+            [],
             [],
             [],
             [],
@@ -269,6 +284,8 @@ class RolloutWorker:
             maven_z = list(maven_z.cpu())
 
         while not terminated and step < self.episode_limit:
+            active_agent_mask = _get_active_agent_mask(self.env, self.n_agents)
+            noop_action = _get_noop_action(self.env, self.n_actions)
             if apply_policy_arrival_penalty:
                 prev_positions = [player.pos for player in self.env.players]
                 prev_succeed = [player.succeed for player in self.env.players]
@@ -279,7 +296,11 @@ class RolloutWorker:
                 getattr(self.agents, "use_comm_plugin", False)
                 and self.args.alg.lower().find("rgmcomm") < 0
             ):
-                obs = self.agents.prepare_comm_obs(raw_obs, epsilon)
+                obs = self.agents.prepare_comm_obs(
+                    raw_obs,
+                    epsilon,
+                    active_agent_mask=active_agent_mask,
+                )
                 msg = None
             else:
                 msg = _get_env_msg(self.env, self.args, self.n_agents)
@@ -287,7 +308,9 @@ class RolloutWorker:
             actions, avail_actions, actions_onehot = [], [], []
             for agent_id in range(self.n_agents):
                 avail_action = self.env.get_avail_agent_actions(agent_id)
-                if self.args.alg == "maven":
+                if active_agent_mask[agent_id] <= 0.0:
+                    action = noop_action
+                elif self.args.alg == "maven":
                     action = self.agents.choose_action(
                         obs[agent_id],
                         last_action[agent_id],
@@ -326,6 +349,10 @@ class RolloutWorker:
                 )
                 if revised_actions is not None:
                     actions = [int(action) for action in revised_actions]
+                    actions = [
+                        action if active_agent_mask[agent_id] > 0.0 else noop_action
+                        for agent_id, action in enumerate(actions)
+                    ]
                     actions_onehot = []
                     for action in actions:
                         action_onehot = np.zeros(self.args.n_actions)
@@ -337,6 +364,7 @@ class RolloutWorker:
                 getattr(self.agents, "last_guard_applied", [0 for _ in range(self.n_agents)]),
                 dtype=np.float32,
             ).reshape(self.n_agents, 1)
+            guard_flags *= active_agent_mask.reshape(self.n_agents, 1)
 
             reward, terminated, info = self.env.step(actions)
             log_reward = float(np.asarray(reward, dtype=np.float32).mean())
@@ -362,6 +390,7 @@ class RolloutWorker:
                 utility = boost_task * np.asarray(
                     per_agent_reward, dtype=np.float32
                 ).reshape(self.n_agents)
+                utility *= active_agent_mask
                 if apply_warning_reshape:
                     warning_signal_weight = _get_warning_penalty_weight(self.args)
                     utility -= warning_signal_weight * np.asarray(
@@ -415,6 +444,7 @@ class RolloutWorker:
             u.append(np.reshape(actions, [self.n_agents, 1]))
             u_onehot.append(actions_onehot)
             avail_u.append(avail_actions)
+            active_masks.append(active_agent_mask.reshape(self.n_agents, 1).copy())
             reward_template = reward_for_batch.copy()
             r.append(reward_for_batch.copy())  # utility 用于学习，episode_reward 单独记录环境原始回报
             if use_constraint_cost:
@@ -473,6 +503,7 @@ class RolloutWorker:
             avail_u.append(np.zeros((self.n_agents, self.n_actions)))
             avail_u_next.append(np.zeros((self.n_agents, self.n_actions)))
             guard_applied.append(np.zeros((self.n_agents, 1), dtype=np.float32))
+            active_masks.append(np.zeros((self.n_agents, 1), dtype=np.float32))
             padded.append([1.0])
             terminate.append([1.0])
 
@@ -490,6 +521,7 @@ class RolloutWorker:
             avail_u_next=avail_u_next.copy(),
             u_onehot=u_onehot.copy(),
             guard_applied=guard_applied.copy(),
+            agent_active_mask=active_masks.copy(),
             padded=padded.copy(),
             terminated=terminate.copy(),
         )
@@ -573,7 +605,8 @@ class CommRolloutWorker:
             self.args.replay_dir != "" and evaluate and episode_num == 0
         ):  # prepare for save replay
             self.env.close()
-        o, u, r, s, avail_u, u_onehot, terminate, padded = (
+        o, u, r, s, avail_u, u_onehot, terminate, padded, active_masks = (
+            [],
             [],
             [],
             [],
@@ -596,19 +629,28 @@ class CommRolloutWorker:
                 epsilon - self.anneal_epsilon if epsilon > self.min_epsilon else epsilon
             )
         while not terminated and step < self.episode_limit:
+            active_agent_mask = _get_active_agent_mask(self.env, self.n_agents)
+            noop_action = _get_noop_action(self.env, self.n_actions)
             obs = self.env.get_obs()
             state = self.env.get_state()
             actions, avail_actions, actions_onehot = [], [], []
 
             # get the weights of all actions for all agents
-            weights = self.agents.get_action_weights(np.array(obs), last_action)
+            weights = self.agents.get_action_weights(
+                np.array(obs),
+                last_action,
+                active_agent_mask=active_agent_mask,
+            )
 
             # choose action for each agent
             for agent_id in range(self.n_agents):
                 avail_action = self.env.get_avail_agent_actions(agent_id)
-                action = self.agents.choose_action(
-                    weights[agent_id], avail_action, epsilon, step, self.args.n_steps
-                )
+                if active_agent_mask[agent_id] <= 0.0:
+                    action = noop_action
+                else:
+                    action = self.agents.choose_action(
+                        weights[agent_id], avail_action, epsilon, step, self.args.n_steps
+                    )
 
                 # generate onehot vector of th action
                 action_onehot = np.zeros(self.args.n_actions)
@@ -625,6 +667,7 @@ class CommRolloutWorker:
             u.append(np.reshape(actions, [self.n_agents, 1]))
             u_onehot.append(actions_onehot)
             avail_u.append(avail_actions)
+            active_masks.append(active_agent_mask.reshape(self.n_agents, 1).copy())
             r.append([reward])
             terminate.append([terminated])
             padded.append([0.0])
@@ -665,6 +708,7 @@ class CommRolloutWorker:
             u_onehot.append(np.zeros((self.n_agents, self.n_actions)))
             avail_u.append(np.zeros((self.n_agents, self.n_actions)))
             avail_u_next.append(np.zeros((self.n_agents, self.n_actions)))
+            active_masks.append(np.zeros((self.n_agents, 1), dtype=np.float32))
             padded.append([1.0])
             terminate.append([1.0])
 
@@ -678,6 +722,7 @@ class CommRolloutWorker:
             s_next=s_next.copy(),
             avail_u_next=avail_u_next.copy(),
             u_onehot=u_onehot.copy(),
+            agent_active_mask=active_masks.copy(),
             padded=padded.copy(),
             terminated=terminate.copy(),
         )

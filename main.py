@@ -143,6 +143,35 @@ def build_env(args, algs):
             delivery_reward=float(getattr(args, "uav_delivery_reward", 8.0)),
         )
 
+    if args.map in {
+        "UAVEnergyDelivery",
+        "UAVEnergyDelivery2D",
+        "UAVEnergyDelivery3D",
+    }:
+        try:
+            from envs.UAVEnergyDelivery import UAVEnvDiscreteWrapper
+        except ImportError as exc:
+            raise ImportError(
+                "Map 'UAVEnergyDelivery' requires local module envs.UAVEnergyDelivery."
+            ) from exc
+        dim_actions = 3 if args.map == "UAVEnergyDelivery3D" else 2
+        return UAVEnvDiscreteWrapper(
+            dim_actions=dim_actions,
+            num_hunters=int(getattr(args, "uav_n_agents", 4)),
+            total_orders=int(getattr(args, "uav_total_orders", 8)),
+            max_active_orders=int(getattr(args, "uav_max_active_orders", 4)),
+            pickup_reward=float(getattr(args, "uav_pickup_reward", 3.0)),
+            delivery_reward=float(getattr(args, "uav_delivery_reward", 8.0)),
+            initial_energy=float(getattr(args, "uav_initial_energy", 100.0)),
+            energy_decay_per_step=getattr(args, "uav_energy_decay", None),
+            energy_depletion_fraction=float(
+                getattr(args, "uav_energy_depletion_fraction", 0.5)
+            ),
+            charging_capacity=int(getattr(args, "uav_charging_capacity", 2)),
+            charging_radius=float(getattr(args, "uav_charging_radius", 0.18)),
+            charging_rate=getattr(args, "uav_charging_rate", None),
+        )
+
     if args.map in {"UAVEncircle", "UAVencircle"}:
         try:
             from envs.UAVEncircle import UAVEnvDiscreteWrapper
