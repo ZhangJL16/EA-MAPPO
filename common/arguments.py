@@ -56,6 +56,7 @@ def get_common_args():
     # time slot = n_steps / evaluate_cycle
     parser.add_argument('--n_steps', type=int, default=600000, help='total time steps')  # 4000000
     parser.add_argument('--time_steps', type=int, default=None, help='total time steps for RGMComm/MADDPG; defaults to n_steps')
+    parser.add_argument('--episode_limit', type=int, default=200, help='maximum steps per environment episode')
     parser.add_argument('--n_episodes', type=int, default=1, help='the number of episodes before once training')
     # 需要大于一个 episode 的长度
     parser.add_argument('--evaluate_cycle', type=int, default=20, help='how often to evaluate the model') # 5000
