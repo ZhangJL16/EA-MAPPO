@@ -69,8 +69,8 @@ COMMON_ARGS=(
   --map UAVDelivery
   --uav_n_agents 4
   --episode_limit 400
-  --uav_total_orders 8
-  --uav_max_active_orders 4
+  --uav_total_orders 16
+  --uav_max_active_orders 8
   --seed "$SEED"
   --eval_seed "$EVAL_SEED"
   --evaluate_epoch "$EVALUATE_EPOCH"
