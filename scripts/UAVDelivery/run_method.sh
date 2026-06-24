@@ -15,6 +15,7 @@ Examples:
 Defaults added when omitted:
   --map UAVDelivery
   --uav_n_agents 4
+  --episode_limit 400
   --uav_total_orders 8
   --uav_max_active_orders 4
   --seed ${SEED:-123}
@@ -97,6 +98,7 @@ has_arg() {
 DEFAULT_ARGS=()
 has_arg --map || DEFAULT_ARGS+=(--map UAVDelivery)
 has_arg --uav_n_agents || DEFAULT_ARGS+=(--uav_n_agents 4)
+has_arg --episode_limit || DEFAULT_ARGS+=(--episode_limit 400)
 has_arg --uav_total_orders || DEFAULT_ARGS+=(--uav_total_orders 8)
 has_arg --uav_max_active_orders || DEFAULT_ARGS+=(--uav_max_active_orders 4)
 has_arg --seed || DEFAULT_ARGS+=(--seed "$SEED")
