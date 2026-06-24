@@ -1,0 +1,1 @@
+.venv/bin/python3 main_level.py --alg hmappo --map UAVEnergyDeliveryLevel --uav_n_agents 4 --uav_total_orders 8 --uav_max_active_orders 4 --hmappo_meta_period 5 --high_lr_actor 3e-4 --high_lr_critic 3e-4 --high_actor_hidden_dim 128 --high_critic_hidden_dim 128 --seed 123 --eval_seed 100123 --evaluate_epoch 20 --cuda True --gpu_id 0 --experiment_device lab 

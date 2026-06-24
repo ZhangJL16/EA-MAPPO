@@ -33,6 +33,11 @@ def get_common_args():
     parser.add_argument('--uav_charging_capacity', type=int, default=2, help='maximum UAVs charging at the station in one step')
     parser.add_argument('--uav_charging_radius', type=float, default=0.18, help='distance threshold for UAVEnergyDelivery charging station')
     parser.add_argument('--uav_charging_rate', type=float, default=None, help='energy restored per charging step; defaults to energy decay per step')
+    parser.add_argument('--hmappo_meta_period', type=int, default=5, help='number of low-level steps between hierarchical high-level decisions')
+    parser.add_argument('--high_lr_actor', type=float, default=None, help='actor learning rate for hierarchical high-level policy')
+    parser.add_argument('--high_lr_critic', type=float, default=None, help='critic learning rate for hierarchical high-level policy')
+    parser.add_argument('--high_actor_hidden_dim', type=int, default=None, help='hidden dimension for hierarchical high-level actor')
+    parser.add_argument('--high_critic_hidden_dim', type=int, default=None, help='hidden dimension for hierarchical high-level critic')
     parser.add_argument(
         '--experiment_device',
         type=str,
@@ -43,7 +48,7 @@ def get_common_args():
 
     # The alternative algorithms are vdn, coma, central_v, qmix, qtran_base,
     # qtran_alt, reinforce, coma+commnet, central_v+commnet, reinforce+commnet，
-    # coma+g2anet, central_v+g2anet, reinforce+g2anet, maven, mappo, RGMComm
+    # coma+g2anet, central_v+g2anet, reinforce+g2anet, maven, mappo, hmappo, RGMComm
     parser.add_argument('--alg', type=str, default='rgmcomm', help='the algorithm to train the agent')
     parser.add_argument('--alg_list', type=str, default='', help='comma-separated list of algorithms to compare (e.g., "mappo,qmix,vdn")')
 
@@ -272,6 +277,26 @@ def get_mappo_args(args):
     args.entropy_coef = 1e-3
     args.gae_lambda = 0.95
     args.batch_size = 64
+    args.high_lr_actor = (
+        args.lr_actor
+        if getattr(args, "high_lr_actor", None) is None
+        else args.high_lr_actor
+    )
+    args.high_lr_critic = (
+        args.lr_critic
+        if getattr(args, "high_lr_critic", None) is None
+        else args.high_lr_critic
+    )
+    args.high_actor_hidden_dim = (
+        args.actor_hidden_dim
+        if getattr(args, "high_actor_hidden_dim", None) is None
+        else args.high_actor_hidden_dim
+    )
+    args.high_critic_hidden_dim = (
+        args.critic_hidden_dim
+        if getattr(args, "high_critic_hidden_dim", None) is None
+        else args.high_critic_hidden_dim
+    )
 
     # approximate the baseline rollout length (2048) using episode-based collection
     args.n_episodes = max(1, (2048 + args.episode_limit - 1) // args.episode_limit)

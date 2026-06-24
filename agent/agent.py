@@ -60,7 +60,10 @@ class Agents:
 
             self.policy = GMIX(args)
         elif args.alg.find("mappo") > -1:
-            from policy.mappo import MAPPO
+            if getattr(args, "use_level_policy", False):
+                from level_policy.mappo import MAPPO
+            else:
+                from policy.mappo import MAPPO
 
             self.policy = MAPPO(args)
         elif args.alg.find("macpo") > -1:
@@ -68,7 +71,11 @@ class Agents:
 
             self.policy = MACPO(args)
         elif args.alg.lower().find("rgmcomm") > -1:
-            from policy.maddpg import MADDPG
+            if getattr(args, "use_level_policy", False):
+                from level_policy.maddpg import MADDPG
+            else:
+                from policy.maddpg import MADDPG
+
             self.policy = MADDPG(args, agent_id)
         else:
             raise Exception("No such algorithm")
@@ -334,6 +341,25 @@ class Agents:
             action = action.cpu().item()
 
         return action
+
+    def choose_high_level_action(
+        self,
+        obs,
+        agent_num,
+        avail_actions,
+        epsilon,
+    ):
+        if not hasattr(self.policy, "choose_high_level_action"):
+            raise AttributeError("Current policy does not expose high-level actions.")
+        action = self.policy.choose_high_level_action(
+            obs,
+            agent_num,
+            avail_actions,
+            evaluate=(epsilon == 0),
+        )
+        if isinstance(action, torch.Tensor):
+            action = action.cpu().item()
+        return int(action)
 
     def prepare_comm_obs(self, observations, epsilon, active_agent_mask=None):
         raw_obs = [

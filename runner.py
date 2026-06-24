@@ -35,6 +35,9 @@ UAV_COLLISION_MAPS = {
     "UAVEnergyDelivery",
     "UAVEnergyDelivery2D",
     "UAVEnergyDelivery3D",
+    "UAVEnergyDeliveryLevel",
+    "UAVEnergyDeliveryLevel2D",
+    "UAVEnergyDeliveryLevel3D",
 }
 
 UAV_DELIVERY_MAPS = {
@@ -44,6 +47,9 @@ UAV_DELIVERY_MAPS = {
     "UAVEnergyDelivery",
     "UAVEnergyDelivery2D",
     "UAVEnergyDelivery3D",
+    "UAVEnergyDeliveryLevel",
+    "UAVEnergyDeliveryLevel2D",
+    "UAVEnergyDeliveryLevel3D",
 }
 
 DEFAULT_CSV_COLUMNS = [
@@ -131,6 +137,15 @@ UAV_DELIVERY_EXPERIMENT_COLUMNS = [
     "eval_episode_steps",
     "run_script",
     "run_command",
+    "seed",
+    "eval_seed",
+    "hmappo_meta_period",
+    "high_level_n_actions",
+    "charge_action_id",
+    "high_lr_actor",
+    "high_lr_critic",
+    "high_actor_hidden_dim",
+    "high_critic_hidden_dim",
 ]
 
 
@@ -297,8 +312,48 @@ class Runner:
             writer = csv.writer(csv_file)
             writer.writerow(row)
 
-    def _write_uav_delivery_experiment_row(self, row):
+    def _normalize_uav_delivery_experiment_log(self):
         os.makedirs(os.path.dirname(UAV_DELIVERY_EXPERIMENT_LOG), exist_ok=True)
+        if (
+            not os.path.exists(UAV_DELIVERY_EXPERIMENT_LOG)
+            or os.path.getsize(UAV_DELIVERY_EXPERIMENT_LOG) == 0
+        ):
+            return
+
+        with open(UAV_DELIVERY_EXPERIMENT_LOG, newline="", encoding="utf-8") as csv_file:
+            rows = list(csv.reader(csv_file))
+        if not rows:
+            return
+
+        header = rows[0]
+        if header == UAV_DELIVERY_EXPERIMENT_COLUMNS:
+            return
+
+        overflow_columns = [
+            column
+            for column in UAV_DELIVERY_EXPERIMENT_COLUMNS
+            if column not in header
+        ]
+        normalized_rows = [UAV_DELIVERY_EXPERIMENT_COLUMNS]
+        for row in rows[1:]:
+            values = {
+                column: row[idx] if idx < len(row) else ""
+                for idx, column in enumerate(header)
+            }
+            if len(row) > len(header):
+                for idx, value in enumerate(row[len(header):]):
+                    if idx < len(overflow_columns):
+                        values[overflow_columns[idx]] = value
+            normalized_rows.append(
+                [values.get(column, "") for column in UAV_DELIVERY_EXPERIMENT_COLUMNS]
+            )
+
+        with open(UAV_DELIVERY_EXPERIMENT_LOG, "w", newline="", encoding="utf-8") as csv_file:
+            writer = csv.writer(csv_file)
+            writer.writerows(normalized_rows)
+
+    def _write_uav_delivery_experiment_row(self, row):
+        self._normalize_uav_delivery_experiment_log()
         write_header = (
             not os.path.exists(UAV_DELIVERY_EXPERIMENT_LOG)
             or os.path.getsize(UAV_DELIVERY_EXPERIMENT_LOG) == 0
@@ -308,6 +363,22 @@ class Runner:
             if write_header:
                 writer.writerow(UAV_DELIVERY_EXPERIMENT_COLUMNS)
             writer.writerow(row)
+
+    def _uav_delivery_experiment_level_fields(self):
+        optional_values = [
+            getattr(self.args, "high_lr_actor", ""),
+            getattr(self.args, "high_lr_critic", ""),
+            getattr(self.args, "high_actor_hidden_dim", ""),
+            getattr(self.args, "high_critic_hidden_dim", ""),
+        ]
+        return [
+            int(getattr(self.args, "seed", 0)),
+            int(getattr(self.args, "eval_seed", 0)),
+            int(getattr(self.args, "hmappo_meta_period", 0)),
+            int(getattr(self.args, "high_level_n_actions", 0)),
+            int(getattr(self.args, "charge_action_id", -1)),
+            *["" if value is None else value for value in optional_values],
+        ]
 
     def _append_uav_delivery_experiment_result(self, time_steps, train_steps):
         if self.args.map not in UAV_DELIVERY_MAPS or self.last_eval_summary is None:
@@ -336,6 +407,7 @@ class Runner:
             getattr(self.args, "run_script", ""),
             getattr(self.args, "run_command", ""),
         ]
+        row.extend(self._uav_delivery_experiment_level_fields())
         self._write_uav_delivery_experiment_row(row)
 
     def _append_uav_delivery_rgm_experiment_result(
@@ -379,6 +451,7 @@ class Runner:
             getattr(self.args, "run_script", ""),
             getattr(self.args, "run_command", ""),
         ]
+        row.extend(self._uav_delivery_experiment_level_fields())
         self._write_uav_delivery_experiment_row(row)
 
     def _set_log_row_value(self, row, column, value):

@@ -1,8 +1,8 @@
-device,rl_algorithm,map,timestamp,n_agents,configured_total_orders,max_active_orders,n_steps,final_timestep,train_step,eval_episode_reward,delivery_success_rate,orders_completed,total_orders,collision_count,obstacle_collision_count,agent_collision_count,eval_episode_steps
-dorm,mappo,UAVDelivery,2026-06-23 23:14:29,4,8,4,600000,600106,275,90.70084753399715,1.0,8.0,8,10.0,8.0,2.0,179.0
-lab,mappo,UAVDelivery,2026-06-24 02:13:37,4,8,4,600000,600083,275,59.06332705449313,0.0,7.0,8.0,73.0,15.0,58.0,200.0
-lab,qmix,UAVDelivery,2026-06-24 04:21:21,4,8,4,600000,600000,3000,3.257589497603476,0.0,1.0,8.0,31.0,17.0,14.0,200.0
-lab,vdn,UAVDelivery,2026-06-24 06:12:20,4,8,4,600000,600000,3000,-19.765503380447626,0.0,0.0,8.0,29.0,27.0,2.0,200.0
-lab,macpo,UAVDelivery,2026-06-24 07:33:37,4,8,4,600000,600000,273,-16.343039778759703,0.0,1.0,8.0,216.0,216.0,0.0,200.0
-lab,rgmcomm,UAVDelivery,2026-06-24 12:40:15,4,8,4,200001,200001,200001,-0.21703213453292847,0.0,0.0,8.0,40.0,40.0,0.0,100.0
-lab,rgmcomm,UAVEnergyDelivery,2026-06-24 17:37:29,4,8,4,200001,200001,200001,-0.27139395475387573,0.0,0.0,8.0,164.0,164.0,0.0,100.0,/home/zjl/mappo/run_all_uav_energy_delivery_methods.sh,.venv/bin/python main.py --alg rgmcomm --map UAVEnergyDelivery --uav_n_agents 4 --uav_total_orders 8 --uav_max_active_orders 4 --seed 123 --eval_seed 100123 --evaluate_epoch 20 --cuda True --gpu_id 0 --experiment_device lab 
+device,rl_algorithm,map,timestamp,n_agents,configured_total_orders,max_active_orders,n_steps,final_timestep,train_step,eval_episode_reward,delivery_success_rate,orders_completed,total_orders,collision_count,obstacle_collision_count,agent_collision_count,eval_episode_steps,run_script,run_command,seed,eval_seed,hmappo_meta_period,high_level_n_actions,charge_action_id,high_lr_actor,high_lr_critic,high_actor_hidden_dim,high_critic_hidden_dim
+dorm,mappo,UAVDelivery,2026-06-23 23:14:29,4,8,4,600000,600106,275,90.70084753399715,1.0,8.0,8,10.0,8.0,2.0,179.0,,,,,,,,,,,
+lab,mappo,UAVDelivery,2026-06-24 02:13:37,4,8,4,600000,600083,275,59.06332705449313,0.0,7.0,8.0,73.0,15.0,58.0,200.0,,,,,,,,,,,
+lab,qmix,UAVDelivery,2026-06-24 04:21:21,4,8,4,600000,600000,3000,3.257589497603476,0.0,1.0,8.0,31.0,17.0,14.0,200.0,,,,,,,,,,,
+lab,vdn,UAVDelivery,2026-06-24 06:12:20,4,8,4,600000,600000,3000,-19.765503380447626,0.0,0.0,8.0,29.0,27.0,2.0,200.0,,,,,,,,,,,
+lab,macpo,UAVDelivery,2026-06-24 07:33:37,4,8,4,600000,600000,273,-16.343039778759703,0.0,1.0,8.0,216.0,216.0,0.0,200.0,,,,,,,,,,,
+lab,rgmcomm,UAVDelivery,2026-06-24 12:40:15,4,8,4,200001,200001,200001,-0.21703213453292847,0.0,0.0,8.0,40.0,40.0,0.0,100.0,,,,,,,,,,,
+lab,mappo,UAVEnergyDelivery,2026-06-24 15:40:20,4,8,4,600000,600000,273,26.147736895055278,0.0,1.95,8.0,60.7,43.6,17.1,200.0,,,,,,,,,,,
