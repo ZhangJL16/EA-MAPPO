@@ -282,15 +282,22 @@ class Runner:
             writer = csv.writer(csv_file)
             writer.writerow(row)
 
-    def _append_uav_delivery_experiment_result(self, time_steps, train_steps):
-        if self.args.map not in UAV_DELIVERY_MAPS or self.last_eval_summary is None:
-            return
-
+    def _write_uav_delivery_experiment_row(self, row):
         os.makedirs(os.path.dirname(UAV_DELIVERY_EXPERIMENT_LOG), exist_ok=True)
         write_header = (
             not os.path.exists(UAV_DELIVERY_EXPERIMENT_LOG)
             or os.path.getsize(UAV_DELIVERY_EXPERIMENT_LOG) == 0
         )
+        with open(UAV_DELIVERY_EXPERIMENT_LOG, "a", newline="", encoding="utf-8") as csv_file:
+            writer = csv.writer(csv_file)
+            if write_header:
+                writer.writerow(UAV_DELIVERY_EXPERIMENT_COLUMNS)
+            writer.writerow(row)
+
+    def _append_uav_delivery_experiment_result(self, time_steps, train_steps):
+        if self.args.map not in UAV_DELIVERY_MAPS or self.last_eval_summary is None:
+            return
+
         summary = self.last_eval_summary
         row = [
             getattr(self.args, "experiment_device", "dorm"),
@@ -312,11 +319,48 @@ class Runner:
             float(summary.get("agent_collision_count", 0.0)),
             float(summary.get("step", 0.0)),
         ]
-        with open(UAV_DELIVERY_EXPERIMENT_LOG, "a", newline="", encoding="utf-8") as csv_file:
-            writer = csv.writer(csv_file)
-            if write_header:
-                writer.writerow(UAV_DELIVERY_EXPERIMENT_COLUMNS)
-            writer.writerow(row)
+        self._write_uav_delivery_experiment_row(row)
+
+    def _append_uav_delivery_rgm_experiment_result(
+        self, result, result_episode, time_steps
+    ):
+        if self.args.map not in UAV_DELIVERY_MAPS:
+            return
+
+        summary = self.env.summary() if hasattr(self.env, "summary") else {}
+        episode_rewards = result_episode.get("reward", [])
+        if episode_rewards:
+            episode_reward = float(np.sum(episode_rewards))
+        else:
+            completed_rewards = result.get("reward", [])
+            episode_reward = float(completed_rewards[-1]) if completed_rewards else 0.0
+        win_history = result.get("win_rate", [])
+        win_rate = (
+            float(win_history[-1])
+            if win_history
+            else float(bool(summary.get("win_tag", False)))
+        )
+        row = [
+            getattr(self.args, "experiment_device", "dorm"),
+            self.args.alg,
+            self.args.map,
+            datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            int(getattr(self.args, "n_agents", 0)),
+            int(getattr(self.args, "uav_total_orders", 0)),
+            int(getattr(self.args, "uav_max_active_orders", 0)),
+            int(getattr(self.args, "time_steps", getattr(self.args, "n_steps", 0))),
+            int(time_steps if time_steps is not None else 0),
+            int(time_steps if time_steps is not None else 0),
+            episode_reward,
+            win_rate,
+            float(summary.get("orders_completed", 0.0)),
+            float(summary.get("total_orders", 0.0)),
+            float(summary.get("collision_count", 0.0)),
+            float(summary.get("obstacle_collision_count", 0.0)),
+            float(summary.get("agent_collision_count", 0.0)),
+            float(summary.get("step", 0.0)),
+        ]
+        self._write_uav_delivery_experiment_row(row)
 
     def _set_log_row_value(self, row, column, value):
         try:
@@ -1211,6 +1255,11 @@ class Runner:
         sio.savemat(
             self.save_path + f"{self.args.map}_rgmcomm_{self.args.now}.mat",
             result,
+        )
+        self._append_uav_delivery_rgm_experiment_result(
+            result,
+            result_episode,
+            int(getattr(self.args, "time_steps", 0)),
         )
         
         # 保存评估曲线

@@ -1,0 +1,6 @@
+alg	status	exit_code	log
+mappo	ok	0	logs/uav_delivery_all_methods/20260624_003521/mappo.log
+qmix	ok	0	logs/uav_delivery_all_methods/20260624_003521/qmix.log
+vdn	ok	0	logs/uav_delivery_all_methods/20260624_003521/vdn.log
+macpo	ok	0	logs/uav_delivery_all_methods/20260624_003521/macpo.log
+rgmcomm	ok	0	logs/uav_delivery_all_methods/20260624_003521/rgmcomm.log
