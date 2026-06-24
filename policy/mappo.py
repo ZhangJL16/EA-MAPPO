@@ -93,12 +93,15 @@ class MAPPO:
         return Categorical(logits=masked_logits)
 
     @torch.no_grad()
-    def choose_action(self, observation, agent_idx, avail_actions):
+    def choose_action(self, observation, agent_idx, avail_actions, evaluate=False):
         obs = torch.tensor(observation, dtype=torch.float32, device=self.device).unsqueeze(0)
         avail = torch.tensor(avail_actions, dtype=torch.float32, device=self.device).unsqueeze(0)
         logits = self.actors[agent_idx](obs)
         dist = self._masked_categorical(logits, avail)
-        action = dist.sample()
+        if evaluate:
+            action = torch.argmax(dist.logits, dim=-1)
+        else:
+            action = dist.sample()
         return int(action.item())
 
     def _prepare_batch(self, batch):

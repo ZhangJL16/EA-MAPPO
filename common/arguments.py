@@ -15,6 +15,10 @@ def get_common_args():
     parser.add_argument('--map', type=str, default='Basic2P', help='the map of the game')
     parser.add_argument('--sc2_path', type=str, default='/home/ubuntu/桌面/cc/StarCraftII', help='StarCraft II installation root path, e.g. "C:/Program Files (x86)/StarCraft II"')
     parser.add_argument('--seed', type=int, default=123, help='random seed')
+    parser.add_argument('--eval_seed', type=int, default=None, help='base seed for fixed evaluation episodes; defaults to seed + 100000')
+    parser.add_argument('--episode_seed_stride', type=int, default=1, help='stride between deterministic episode seeds')
+    parser.add_argument('--deterministic_torch', dest='deterministic_torch', action='store_true', default=True, help='use deterministic PyTorch settings when possible')
+    parser.add_argument('--no_deterministic_torch', dest='deterministic_torch', action='store_false', help='disable deterministic PyTorch settings')
     parser.add_argument('--step_mul', type=int, default=8, help='how many steps to make an action')
     parser.add_argument('--replay_dir', type=str, default='./replay', help='absolute path to save the replay') # ./replay
     parser.add_argument('--debug', type=bool, default=False, help='smac show infos')
@@ -83,6 +87,8 @@ def get_common_args():
     # timestamp
     parser.add_argument('--now', type=str, default='', help='timestamp for mat logging')
     args = parser.parse_args()
+    if args.eval_seed is None:
+        args.eval_seed = args.seed + 100000
     return args
 
 
@@ -310,7 +316,7 @@ def get_RGM_args(args):
     args.save_rate = getattr(args, 'save_rate', 2000)
     args.model_dir = getattr(args, 'model_dir', '')
 
-    args.evaluate_episodes = getattr(args, 'evaluate_episodes', 1)
+    args.evaluate_episodes = getattr(args, 'evaluate_episodes', args.evaluate_epoch)
     args.evaluate_episode_len = getattr(args, 'evaluate_episode_len', 100)
     args.evaluate = getattr(args, 'evaluate', False)
     args.evaluate_rate = getattr(args, 'evaluate_rate', 1000)

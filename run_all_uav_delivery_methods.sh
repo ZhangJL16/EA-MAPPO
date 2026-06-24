@@ -7,6 +7,9 @@ cd "$SCRIPT_DIR"
 PYTHON_BIN="${PYTHON_BIN:-.venv/bin/python3}"
 GPU_ID="${GPU_ID:-0}"
 EXPERIMENT_DEVICE="${EXPERIMENT_DEVICE:-lab}"
+SEED="${SEED:-123}"
+EVAL_SEED="${EVAL_SEED:-$((SEED + 100000))}"
+EVALUATE_EPOCH="${EVALUATE_EPOCH:-20}"
 export MARL_EXPERIMENT_DEVICE="$EXPERIMENT_DEVICE"
 RUN_DIR="${RUN_DIR:-logs/uav_delivery_all_methods/$(date +%Y%m%d_%H%M%S)}"
 
@@ -65,6 +68,9 @@ COMMON_ARGS=(
   --uav_n_agents 4
   --uav_total_orders 8
   --uav_max_active_orders 4
+  --seed "$SEED"
+  --eval_seed "$EVAL_SEED"
+  --evaluate_epoch "$EVALUATE_EPOCH"
   --cuda True
   --gpu_id "$GPU_ID"
   --experiment_device "$EXPERIMENT_DEVICE"
@@ -84,6 +90,9 @@ overall_status=0
 
 echo "Run directory: $RUN_DIR"
 echo "Experiment device: $EXPERIMENT_DEVICE"
+echo "Seed: $SEED"
+echo "Evaluation seed: $EVAL_SEED"
+echo "Evaluation episodes: $EVALUATE_EPOCH"
 echo "Algorithms: ${ALG_LIST[*]}"
 
 for alg in "${ALG_LIST[@]}"; do

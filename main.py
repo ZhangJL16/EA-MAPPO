@@ -16,6 +16,7 @@ from common.arguments import (
     lr_adjust,
 )
 from common.rollout import SMAC_MAPS, smac_penalty_enabled
+from common.seeding import seed_everything
 import matplotlib.pyplot as plt
 import os
 import torch
@@ -239,6 +240,10 @@ if __name__ == "__main__":
     # algs = ['vdn', 'vdn_Comm', 'vdn_reshape', 'vdn_reshape_Comm' # "iql_Comm"， 'gmix_reshape'
     args = get_common_args()
     args.now = datetime.now().strftime("%m%d_%H%M%S")
+    seed_everything(
+        args.seed,
+        deterministic_torch=bool(getattr(args, "deterministic_torch", True)),
+    )
     if args.cuda and torch.cuda.is_available():
         torch.cuda.set_device(int(getattr(args, "gpu_id", 0)))
     
@@ -252,6 +257,10 @@ if __name__ == "__main__":
 
     for i, alg in enumerate(algs):
         args.alg = alg
+        seed_everything(
+            args.seed,
+            deterministic_torch=bool(getattr(args, "deterministic_torch", True)),
+        )
         print(f"algo: {args.alg}")
 
         # lr_adjust(args, alg)

@@ -8,6 +8,12 @@ import pandas as pd
 import os
 from agent import agent
 from common.rollout import RolloutWorker, CommRolloutWorker, SMAC_MAPS
+from common.seeding import (
+    derive_episode_seed,
+    preserve_rng_state,
+    reset_env_with_seed,
+    temporary_seed,
+)
 from common.parallel_smac_rollout import ParallelSMACEpisodeCollector
 from agent.agent import Agents, CommAgents
 from common.replay_buffer import ReplayBuffer
@@ -247,6 +253,7 @@ class Runner:
         )
         self.log_path = self._init_csv_log()
         self.train_episode_count = 0
+        self.rgm_train_episode_index = 0
         self.eval_count = 0
         self.last_eval_summary = None
         self.last_eval_time_steps = None
@@ -370,6 +377,22 @@ class Runner:
 
     def _summary_float(self, summary, key, default=0.0):
         return float(summary.get(key, default))
+
+    def _reset_rgm_env_for_episode(self, evaluate=False, episode_index=None):
+        seed = derive_episode_seed(
+            self.args,
+            evaluate=evaluate,
+            episode_index=episode_index
+            if evaluate
+            else self.rgm_train_episode_index,
+        )
+        if evaluate:
+            return reset_env_with_seed(self.env, seed)
+
+        with preserve_rng_state(include_torch=False):
+            result = reset_env_with_seed(self.env, seed)
+        self.rgm_train_episode_index += 1
+        return result
 
     def _delivery_summary_float(self, summary, key):
         fallback_keys = {
@@ -1142,7 +1165,7 @@ class Runner:
                         result['win_rate'].append(avg_win_rate)
                 
                 # 重置环境和 episode 记录
-                self.env.reset()
+                self._reset_rgm_env_for_episode(evaluate=False)
                 s = self.env.get_obs()
                 # 更新结果，最终记录的是一个 episode 的
                 if self.args.map == "Basic2P":
@@ -1277,66 +1300,67 @@ class Runner:
     def evaluateRGM(self):
         returns = []
         for episode in range(self.args.evaluate_episodes):
-            # reset the environment
-            self.env.reset()
-            s = self.env.get_obs()
-            rewards = 0
-            for time_step in range(self.args.evaluate_episode_len):
-                if hasattr(self.env, "render"):
-                    try:
-                        self.env.render()
-                    except NotImplementedError:
-                        pass
-                actions = []
-                with torch.no_grad():
-                    for agent_id, agent in enumerate(self.agents):
-                        action = agent.select_action(s[agent_id], 0, 0)
-                        actions.append(action)
-
-                action_index = []
-                for agent_id, action in enumerate(actions):
-                    # 1. 获取当前智能体的可用动作
-                    available_actions = self.env.get_avail_agent_actions(agent_id)
-                    available_ids = np.where(np.array(available_actions) == 1)[0]  # 可用动作的索引
-
-                    # 2. 检查是否有可用动作
-                    if len(available_ids) == 0:
-                        action_index.append(8)  # 默认动作（如无操作）
-                        continue
-
-                    # 3. 在可用动作中选择概率最大的动作
-                    available_action_probs = action[available_ids]  # 仅保留可用动作的概率
-                    max_prob = np.max(available_action_probs)  # 最大概率值
-                    # 可能有多个动作具有相同最大概率，随机选一个
-                    candidate_actions = available_ids[available_action_probs == max_prob]
-                    chosen_action = np.random.choice(candidate_actions)  # 随机选一个
-                    action_index.append(chosen_action)
-
-                for i in range(self.args.n_agents, self.args.n_players):
-                    actions.append(
-                        [0, np.random.rand() * 2 - 1, 0, np.random.rand() * 2 - 1, 0]
-                    )
-                r, done, info = self.env.step(action_index)
-                
-                # 针对环境修正 reward 标准化
-                if self.args.map == "Basic2P":
-                    r *= 0.005
-                
-                if hasattr(self.env, "get_obs"):
-                    s_next = self.env.get_obs()
-                else:
-                    s_next = []
-                    for agent_id in range(self.args.n_agents):
-                        s_next.append(self.env.get_obs_agent(agent_id))
-                # self.buffer.store_episode(s[:self.args.n_agents], u, r[:self.args.n_agents], s_next[:self.args.n_agents])
-                s = s_next
-                # rewards += r[0]
-                rewards += r
-                s = s_next
+            seed = derive_episode_seed(
+                self.args,
+                evaluate=True,
+                episode_index=episode,
+            )
+            with temporary_seed(seed, include_torch=True):
+                rewards = self._evaluate_rgm_episode(episode)
             returns.append(rewards)
             print("Returns is", rewards)
-        # return sum(returns) / self.args.evaluate_episodes
-        return sum(returns) / self.args.n_episodes
+        return sum(returns) / max(1, self.args.evaluate_episodes)
+
+    def _evaluate_rgm_episode(self, episode):
+        self._reset_rgm_env_for_episode(evaluate=True, episode_index=episode)
+        s = self.env.get_obs()
+        rewards = 0
+        for time_step in range(self.args.evaluate_episode_len):
+            if hasattr(self.env, "render"):
+                try:
+                    self.env.render()
+                except NotImplementedError:
+                    pass
+            actions = []
+            with torch.no_grad():
+                for agent_id, agent in enumerate(self.agents):
+                    action = agent.select_action(s[agent_id], 0, 0)
+                    actions.append(action)
+
+            action_index = []
+            for agent_id, action in enumerate(actions):
+                available_actions = self.env.get_avail_agent_actions(agent_id)
+                available_ids = np.where(np.array(available_actions) == 1)[0]
+
+                if len(available_ids) == 0:
+                    action_index.append(8)
+                    continue
+
+                available_action_probs = action[available_ids]
+                max_prob = np.max(available_action_probs)
+                candidate_actions = available_ids[available_action_probs == max_prob]
+                chosen_action = np.random.choice(candidate_actions)
+                action_index.append(chosen_action)
+
+            for i in range(self.args.n_agents, self.args.n_players):
+                actions.append(
+                    [0, np.random.rand() * 2 - 1, 0, np.random.rand() * 2 - 1, 0]
+                )
+            r, done, info = self.env.step(action_index)
+
+            if self.args.map == "Basic2P":
+                r *= 0.005
+
+            if hasattr(self.env, "get_obs"):
+                s_next = self.env.get_obs()
+            else:
+                s_next = []
+                for agent_id in range(self.args.n_agents):
+                    s_next.append(self.env.get_obs_agent(agent_id))
+            s = s_next
+            rewards += r
+            s = s_next
+        return rewards
 
 
 if __name__ == "__main__":

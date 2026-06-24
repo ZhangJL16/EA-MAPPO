@@ -246,7 +246,12 @@ class Agents:
             self.obs_[agent_num] = np.asarray(obs, dtype=np.float32).reshape(-1)
 
         if self.args.alg.find("mappo") > -1:
-            action = self.policy.choose_action(obs, agent_num, avail_actions)
+            action = self.policy.choose_action(
+                obs,
+                agent_num,
+                avail_actions,
+                evaluate=(epsilon == 0),
+            )
             if isinstance(action, torch.Tensor):
                 action = action.cpu().item()
             return action
@@ -306,9 +311,13 @@ class Agents:
                 q_value.cpu(), avail_actions, epsilon
             )
         elif self.args.alg.find("macpo") > -1:
-            action = self._choose_action_from_softmax(
-                q_value.cpu(), avail_actions, 0
-            )
+            if epsilon == 0:
+                q_value[avail_actions == 0.0] = -float("inf")
+                action = torch.argmax(q_value)
+            else:
+                action = self._choose_action_from_softmax(
+                    q_value.cpu(), avail_actions, 0
+                )
         else:
             q_value[avail_actions == 0.0] = -float("inf")
             if np.random.uniform() < epsilon:

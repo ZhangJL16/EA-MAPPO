@@ -17,6 +17,9 @@ Defaults added when omitted:
   --uav_n_agents 4
   --uav_total_orders 8
   --uav_max_active_orders 4
+  --seed ${SEED:-123}
+  --eval_seed ${EVAL_SEED:-$((SEED + 100000))}
+  --evaluate_epoch ${EVALUATE_EPOCH:-20}
   --cuda True
   --gpu_id ${GPU_ID:-0}
   --experiment_device ${EXPERIMENT_DEVICE:-lab}
@@ -29,6 +32,9 @@ cd "$SCRIPT_DIR"
 PYTHON_BIN="${PYTHON_BIN:-.venv/bin/python3}"
 GPU_ID="${GPU_ID:-0}"
 EXPERIMENT_DEVICE="${EXPERIMENT_DEVICE:-lab}"
+SEED="${SEED:-123}"
+EVAL_SEED="${EVAL_SEED:-$((SEED + 100000))}"
+EVALUATE_EPOCH="${EVALUATE_EPOCH:-20}"
 export MARL_EXPERIMENT_DEVICE="$EXPERIMENT_DEVICE"
 RUN_DIR="${RUN_DIR:-logs/uav_delivery_single_method/$(date +%Y%m%d_%H%M%S)}"
 
@@ -91,6 +97,9 @@ has_arg --map || DEFAULT_ARGS+=(--map UAVDelivery)
 has_arg --uav_n_agents || DEFAULT_ARGS+=(--uav_n_agents 4)
 has_arg --uav_total_orders || DEFAULT_ARGS+=(--uav_total_orders 8)
 has_arg --uav_max_active_orders || DEFAULT_ARGS+=(--uav_max_active_orders 4)
+has_arg --seed || DEFAULT_ARGS+=(--seed "$SEED")
+has_arg --eval_seed || DEFAULT_ARGS+=(--eval_seed "$EVAL_SEED")
+has_arg --evaluate_epoch || DEFAULT_ARGS+=(--evaluate_epoch "$EVALUATE_EPOCH")
 has_arg --cuda || DEFAULT_ARGS+=(--cuda True)
 has_arg --gpu_id || DEFAULT_ARGS+=(--gpu_id "$GPU_ID")
 has_arg --experiment_device || DEFAULT_ARGS+=(--experiment_device "$EXPERIMENT_DEVICE")

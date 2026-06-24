@@ -4,6 +4,13 @@ import torch
 from torch.distributions import one_hot_categorical
 import time
 
+from common.seeding import (
+    derive_episode_seed,
+    preserve_rng_state,
+    reset_env_with_seed,
+    temporary_seed,
+)
+
 SMAC_MAPS = [
     "3m",
     "8m",
@@ -156,10 +163,42 @@ class RolloutWorker:
         self.epsilon = args.epsilon
         self.anneal_epsilon = args.anneal_epsilon
         self.min_epsilon = args.min_epsilon
+        self.train_episode_index = 0
         # print("Init RolloutWorker")
+
+    def _episode_seed(self, evaluate, episode_num):
+        return derive_episode_seed(
+            self.args,
+            evaluate=evaluate,
+            episode_index=episode_num if evaluate else self.train_episode_index,
+        )
+
+    def _reset_env_for_episode(self, evaluate, episode_num):
+        seed = getattr(self, "_active_episode_seed", None)
+        if seed is None:
+            seed = self._episode_seed(evaluate, episode_num)
+
+        if evaluate:
+            return reset_env_with_seed(self.env, seed)
+
+        with preserve_rng_state(include_torch=False):
+            result = reset_env_with_seed(self.env, seed)
+        self.train_episode_index += 1
+        return result
 
     @torch.no_grad()
     def generate_episode(self, episode_num=None, evaluate=False):
+        if evaluate and not getattr(self, "_inside_seeded_eval", False):
+            seed = self._episode_seed(evaluate=True, episode_num=episode_num)
+            with temporary_seed(seed, include_torch=True):
+                self._inside_seeded_eval = True
+                self._active_episode_seed = seed
+                try:
+                    return self.generate_episode(episode_num=episode_num, evaluate=True)
+                finally:
+                    self._inside_seeded_eval = False
+                    self._active_episode_seed = None
+
         if (
             self.args.replay_dir != "" and evaluate and episode_num == 0
         ):  # prepare for save replay of evaluation
@@ -178,7 +217,7 @@ class RolloutWorker:
             [],
             [],
         )
-        self.env.reset()
+        self._reset_env_for_episode(evaluate, episode_num)
         if hasattr(self.agents, "reset_episode_state"):
             self.agents.reset_episode_state()
         terminated = False
@@ -494,10 +533,42 @@ class CommRolloutWorker:
         self.epsilon = args.epsilon
         self.anneal_epsilon = args.anneal_epsilon
         self.min_epsilon = args.min_epsilon
+        self.train_episode_index = 0
         print("Init CommRolloutWorker")
+
+    def _episode_seed(self, evaluate, episode_num):
+        return derive_episode_seed(
+            self.args,
+            evaluate=evaluate,
+            episode_index=episode_num if evaluate else self.train_episode_index,
+        )
+
+    def _reset_env_for_episode(self, evaluate, episode_num):
+        seed = getattr(self, "_active_episode_seed", None)
+        if seed is None:
+            seed = self._episode_seed(evaluate, episode_num)
+
+        if evaluate:
+            return reset_env_with_seed(self.env, seed)
+
+        with preserve_rng_state(include_torch=False):
+            result = reset_env_with_seed(self.env, seed)
+        self.train_episode_index += 1
+        return result
 
     @torch.no_grad()
     def generate_episode(self, episode_num=None, evaluate=False):
+        if evaluate and not getattr(self, "_inside_seeded_eval", False):
+            seed = self._episode_seed(evaluate=True, episode_num=episode_num)
+            with temporary_seed(seed, include_torch=True):
+                self._inside_seeded_eval = True
+                self._active_episode_seed = seed
+                try:
+                    return self.generate_episode(episode_num=episode_num, evaluate=True)
+                finally:
+                    self._inside_seeded_eval = False
+                    self._active_episode_seed = None
+
         if (
             self.args.replay_dir != "" and evaluate and episode_num == 0
         ):  # prepare for save replay
@@ -512,7 +583,7 @@ class CommRolloutWorker:
             [],
             [],
         )
-        self.env.reset()
+        self._reset_env_for_episode(evaluate, episode_num)
         terminated = False
         win_tag = False
         step = 0
