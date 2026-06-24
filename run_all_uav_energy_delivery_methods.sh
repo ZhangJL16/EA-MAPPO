@@ -26,7 +26,8 @@ Environment overrides:
   ALGS="a b c"               Alternative way to override the algorithm list.
   PYTHON_BIN=.venv/bin/python Python executable.
   GPU_ID=0                   GPU id passed to main.py.
-  EXPERIMENT_DEVICE=lab      Device label written to experiment summary CSV.
+  MARL_EXPERIMENT_DEVICE=dorm Device label written to experiment summary CSV.
+  EXPERIMENT_DEVICE=lab      One-command override for this script invocation.
   RUN_DIR=...                Output directory for logs, commands, summary.
   SEED=123                   Training seed.
   EVAL_SEED=100123           Evaluation seed.
@@ -44,7 +45,7 @@ Defaults added when omitted:
   --evaluate_epoch ${EVALUATE_EPOCH:-20}
   --cuda True
   --gpu_id ${GPU_ID:-0}
-  --experiment_device ${EXPERIMENT_DEVICE:-lab}
+  --experiment_device ${EXPERIMENT_DEVICE:-${MARL_EXPERIMENT_DEVICE:-dorm}}
 EOF
 }
 
@@ -60,7 +61,7 @@ if [[ -z "${PYTHON_BIN:-}" ]]; then
 fi
 
 GPU_ID="${GPU_ID:-0}"
-EXPERIMENT_DEVICE="${EXPERIMENT_DEVICE:-lab}"
+EXPERIMENT_DEVICE="${EXPERIMENT_DEVICE:-${MARL_EXPERIMENT_DEVICE:-dorm}}"
 SEED="${SEED:-123}"
 EVAL_SEED="${EVAL_SEED:-$((SEED + 100000))}"
 EVALUATE_EPOCH="${EVALUATE_EPOCH:-20}"

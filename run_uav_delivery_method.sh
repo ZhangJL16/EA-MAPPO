@@ -22,7 +22,7 @@ Defaults added when omitted:
   --evaluate_epoch ${EVALUATE_EPOCH:-20}
   --cuda True
   --gpu_id ${GPU_ID:-0}
-  --experiment_device ${EXPERIMENT_DEVICE:-lab}
+  --experiment_device ${EXPERIMENT_DEVICE:-${MARL_EXPERIMENT_DEVICE:-dorm}}
 EOF
 }
 
@@ -31,7 +31,7 @@ cd "$SCRIPT_DIR"
 
 PYTHON_BIN="${PYTHON_BIN:-.venv/bin/python3}"
 GPU_ID="${GPU_ID:-0}"
-EXPERIMENT_DEVICE="${EXPERIMENT_DEVICE:-lab}"
+EXPERIMENT_DEVICE="${EXPERIMENT_DEVICE:-${MARL_EXPERIMENT_DEVICE:-dorm}}"
 SEED="${SEED:-123}"
 EVAL_SEED="${EVAL_SEED:-$((SEED + 100000))}"
 EVALUATE_EPOCH="${EVALUATE_EPOCH:-20}"
