@@ -39,6 +39,17 @@ def get_common_args():
     parser.add_argument('--high_lr_critic', type=float, default=None, help='critic learning rate for hierarchical high-level policy')
     parser.add_argument('--high_actor_hidden_dim', type=int, default=None, help='hidden dimension for hierarchical high-level actor')
     parser.add_argument('--high_critic_hidden_dim', type=int, default=None, help='hidden dimension for hierarchical high-level critic')
+    parser.add_argument('--hrl_use_intrinsic_reward', type=bool, default=True, help='use subgoal intrinsic rewards for the low-level policy in HMAPPO')
+    parser.add_argument('--hrl_intrinsic_reward_scale', type=float, default=1.0, help='scale for low-level HRL intrinsic rewards')
+    parser.add_argument('--hrl_intrinsic_distance_weight', type=float, default=0.05, help='distance penalty weight in the low-level intrinsic reward')
+    parser.add_argument('--hrl_intrinsic_success_bonus', type=float, default=1.0, help='success bonus in the low-level intrinsic reward')
+    parser.add_argument('--hrl_hindsight_goal', type=bool, default=True, help='enable achieved-goal hindsight auxiliary training for the low-level HMAPPO actor')
+    parser.add_argument('--hrl_hindsight_aux_coef', type=float, default=0.2, help='coefficient for the low-level achieved-goal hindsight auxiliary loss')
+    parser.add_argument('--hrl_subgoal_testing_rate', type=float, default=0.2, help='probability of marking a high-level subgoal as a feasibility test')
+    parser.add_argument('--hrl_subgoal_failure_penalty', type=float, default=5.0, help='high-level penalty when a tested subgoal is not reached')
+    parser.add_argument('--hrl_reachable_subgoal_scale', type=float, default=1.0, help='scale applied to the reachable local subgoal radius')
+    parser.add_argument('--hrl_meta_update_on_subgoal_done', type=bool, default=True, help='refresh high-level subgoals as soon as any current subgoal is reached')
+    parser.add_argument('--hrl_off_policy_correction', type=bool, default=False, help='HIRO-style off-policy correction; incompatible with on-policy HMAPPO')
     parser.add_argument(
         '--experiment_device',
         type=str,
@@ -259,6 +270,13 @@ def get_g2anet_args(args):
 
 def get_mappo_args(args):
     """MAPPO 算法的超参数"""
+    if (
+        getattr(args, "hrl_off_policy_correction", False)
+        and getattr(args, "alg", "").lower().find("mappo") > -1
+    ):
+        raise ValueError(
+            "HIRO-style off-policy correction is incompatible with on-policy MAPPO/HMAPPO."
+        )
     args.rnn_hidden_dim = 64
     args.actor_hidden_dim = 128
     args.critic_hidden_dim = 128

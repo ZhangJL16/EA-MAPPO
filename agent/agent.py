@@ -346,8 +346,8 @@ class Agents:
         self,
         obs,
         agent_num,
-        avail_actions,
-        epsilon,
+        avail_actions=None,
+        epsilon=0.0,
     ):
         if not hasattr(self.policy, "choose_high_level_action"):
             raise AttributeError("Current policy does not expose high-level actions.")
@@ -358,8 +358,8 @@ class Agents:
             evaluate=(epsilon == 0),
         )
         if isinstance(action, torch.Tensor):
-            action = action.cpu().item()
-        return int(action)
+            action = action.detach().cpu().numpy()
+        return np.asarray(action, dtype=np.float32)
 
     def prepare_comm_obs(self, observations, epsilon, active_agent_mask=None):
         raw_obs = [

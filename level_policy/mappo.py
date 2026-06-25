@@ -3,7 +3,7 @@ import os
 
 import torch
 import torch.nn as nn
-from torch.distributions import Categorical
+from torch.distributions import Categorical, Normal
 
 POLICY_SCOPE = "level_policy"
 
@@ -19,6 +19,23 @@ class DiscreteActorNetwork(nn.Module):
         x = torch.tanh(self.fc1(state))
         x = torch.tanh(self.fc2(x))
         return self.logits(x)
+
+
+class GaussianActorNetwork(nn.Module):
+    def __init__(self, input_dims, action_dim, hidden_dim=128):
+        super().__init__()
+        self.fc1 = nn.Linear(input_dims, hidden_dim)
+        self.fc2 = nn.Linear(hidden_dim, hidden_dim)
+        self.mean = nn.Linear(hidden_dim, action_dim)
+        self.log_std = nn.Parameter(torch.zeros(action_dim))
+
+    def forward(self, state):
+        x = torch.tanh(self.fc1(state))
+        x = torch.tanh(self.fc2(x))
+        mean = torch.tanh(self.mean(x))
+        log_std = torch.clamp(self.log_std, -5.0, 2.0)
+        std = torch.exp(log_std).expand_as(mean)
+        return mean, std
 
 
 class CriticNetwork(nn.Module):
@@ -74,7 +91,7 @@ class MAPPO:
         ).to(self.device)
         self.high_actors = nn.ModuleList(
             [
-                DiscreteActorNetwork(
+                GaussianActorNetwork(
                     self.high_obs_shape, self.high_n_actions, high_actor_hidden_dim
                 )
                 for _ in range(self.n_agents)
@@ -121,6 +138,10 @@ class MAPPO:
         masked_logits = logits.masked_fill(avail_actions <= 0, -1e10)
         return Categorical(logits=masked_logits)
 
+    def _gaussian_dist(self, network, observation):
+        mean, std = network(observation)
+        return Normal(mean, std)
+
     @torch.no_grad()
     def _choose_from_network(self, network, observation, avail_actions, evaluate=False):
         obs = torch.tensor(
@@ -147,16 +168,24 @@ class MAPPO:
 
     @torch.no_grad()
     def choose_high_level_action(
-        self, observation, agent_idx, avail_actions, evaluate=False
+        self, observation, agent_idx, avail_actions=None, evaluate=False
     ):
-        return self._choose_from_network(
-            self.high_actors[agent_idx], observation, avail_actions, evaluate
-        )
+        del avail_actions
+        obs = torch.tensor(
+            observation, dtype=torch.float32, device=self.device
+        ).unsqueeze(0)
+        dist = self._gaussian_dist(self.high_actors[agent_idx], obs)
+        if evaluate:
+            action = dist.mean
+        else:
+            action = dist.sample()
+        action = torch.clamp(action, -1.0, 1.0)
+        return action.squeeze(0).detach().cpu().numpy().astype("float32")
 
     def _prepare_batch(self, batch):
         tensor_batch = {}
         for key, value in batch.items():
-            if key in ("u", "high_u"):
+            if key == "u":
                 tensor_batch[key] = torch.tensor(
                     value, dtype=torch.long, device=self.device
                 )
@@ -207,11 +236,13 @@ class MAPPO:
             state_dim=self.low_state_shape,
             guard_key="guard_applied",
         )
+        if "hindsight_o" in batch and getattr(self.args, "hrl_hindsight_aux_coef", 0.0) > 0.0:
+            self._learn_hindsight_aux(batch)
 
         if "high_o" not in batch:
             return
 
-        self._learn_level(
+        self._learn_continuous_level(
             batch=batch,
             actors=self.high_actors,
             critics=self.high_critics,
@@ -221,7 +252,6 @@ class MAPPO:
             state_key="high_s",
             next_state_key="high_s_next",
             action_key="high_u",
-            avail_key="high_avail_u",
             reward_key="high_r",
             padded_key="high_padded",
             terminated_key="high_terminated",
@@ -230,6 +260,187 @@ class MAPPO:
             obs_dim=self.high_obs_shape,
             state_dim=self.high_state_shape,
         )
+
+    def _learn_hindsight_aux(self, batch):
+        coef = float(getattr(self.args, "hrl_hindsight_aux_coef", 0.0))
+        if coef <= 0.0:
+            return
+
+        obs = batch["hindsight_o"]
+        actions = batch["u"].squeeze(-1)
+        avail_actions = batch["avail_u"]
+        mask = 1 - batch["padded"].squeeze(-1)
+        active_mask = batch.get("agent_active_mask", None)
+        if active_mask is None:
+            active_mask = torch.ones(
+                (*mask.shape, self.n_agents, 1),
+                dtype=mask.dtype,
+                device=self.device,
+            )
+        active_mask = active_mask.squeeze(-1)
+        hindsight_mask = batch.get("hindsight_mask", None)
+        if hindsight_mask is None:
+            hindsight_mask = torch.ones(
+                (*mask.shape, self.n_agents, 1),
+                dtype=mask.dtype,
+                device=self.device,
+            )
+        hindsight_mask = hindsight_mask.squeeze(-1)
+
+        episode_num = obs.size(0)
+        time_len = obs.size(1)
+        for agent_idx in range(self.n_agents):
+            actor_states = obs[:, :, agent_idx, :].reshape(
+                episode_num * time_len, -1
+            )
+            agent_actions = actions[:, :, agent_idx].reshape(-1)
+            agent_avail = avail_actions[:, :, agent_idx, :].reshape(
+                -1, self.low_n_actions
+            )
+            agent_mask = mask * active_mask[:, :, agent_idx] * hindsight_mask[:, :, agent_idx]
+            flat_mask = agent_mask.reshape(-1) > 0
+            if torch.sum(flat_mask) <= 0:
+                continue
+
+            valid_states = actor_states[flat_mask]
+            valid_actions = agent_actions[flat_mask]
+            valid_avail = agent_avail[flat_mask]
+            batch_size = min(getattr(self.args, "batch_size", 64), valid_states.size(0))
+            permutation = torch.randperm(valid_states.size(0), device=self.device)
+            for start in range(0, valid_states.size(0), batch_size):
+                indices = permutation[start : start + batch_size]
+                dist = self._masked_categorical(
+                    self.low_actors[agent_idx](valid_states[indices]),
+                    valid_avail[indices],
+                )
+                aux_loss = -dist.log_prob(valid_actions[indices]).mean() * coef
+                self.low_actor_optimizers[agent_idx].zero_grad()
+                aux_loss.backward()
+                torch.nn.utils.clip_grad_norm_(
+                    self.low_actors[agent_idx].parameters(),
+                    self.args.grad_norm_clip,
+                )
+                self.low_actor_optimizers[agent_idx].step()
+
+    def _learn_continuous_level(
+        self,
+        batch,
+        actors,
+        critics,
+        actor_optimizers,
+        critic_optimizers,
+        obs_key,
+        state_key,
+        next_state_key,
+        action_key,
+        reward_key,
+        padded_key,
+        terminated_key,
+        active_key,
+        action_dim,
+        obs_dim,
+        state_dim,
+    ):
+        states = batch[state_key]
+        next_states = batch[next_state_key]
+        obs = batch[obs_key]
+        actions = batch[action_key]
+        terminated = batch[terminated_key].squeeze(-1)
+        mask = 1 - batch[padded_key].squeeze(-1)
+        active_mask = batch.get(active_key, None)
+        if active_mask is None:
+            active_mask = torch.ones(
+                (*mask.shape, self.n_agents, 1),
+                dtype=mask.dtype,
+                device=self.device,
+            )
+        active_mask = active_mask.squeeze(-1)
+
+        rewards = batch[reward_key]
+        if rewards.size(-1) == 1:
+            rewards = rewards.expand(-1, -1, self.n_agents)
+
+        episode_num = states.size(0)
+        time_len = states.size(1)
+        flat_states = states.reshape(episode_num * time_len, -1)
+
+        for agent_idx in range(self.n_agents):
+            actor_states = obs[:, :, agent_idx, :].reshape(
+                episode_num * time_len, obs_dim
+            )
+            agent_actions = actions[:, :, agent_idx, :].reshape(-1, action_dim)
+            agent_rewards = rewards[:, :, agent_idx]
+            agent_mask = mask * active_mask[:, :, agent_idx]
+            flat_agent_mask = agent_mask.reshape(-1) > 0
+
+            with torch.no_grad():
+                values = critics[agent_idx](states.reshape(-1, state_dim)).reshape(
+                    episode_num, time_len
+                )
+                next_values = critics[agent_idx](
+                    next_states.reshape(-1, state_dim)
+                ).reshape(episode_num, time_len)
+                advantages, returns = self._compute_advantages(
+                    agent_rewards, values, next_values, terminated, agent_mask
+                )
+                old_dist = self._gaussian_dist(actors[agent_idx], actor_states)
+                old_log_probs = old_dist.log_prob(agent_actions).sum(dim=-1)
+
+            valid_states = flat_states[flat_agent_mask]
+            valid_returns = returns.reshape(-1)[flat_agent_mask]
+            valid_actor_states_pg = actor_states[flat_agent_mask]
+            valid_actions_pg = agent_actions[flat_agent_mask]
+            valid_advantages_pg = advantages.reshape(-1)[flat_agent_mask]
+            valid_old_log_probs_pg = old_log_probs[flat_agent_mask]
+
+            if valid_states.size(0) == 0:
+                continue
+
+            batch_size = min(getattr(self.args, "batch_size", 64), valid_states.size(0))
+
+            for _ in range(self.args.ppo_epoch):
+                if valid_actor_states_pg.size(0) > 0:
+                    actor_batch_size = min(batch_size, valid_actor_states_pg.size(0))
+                    actor_permutation = torch.randperm(
+                        valid_actor_states_pg.size(0), device=self.device
+                    )
+                    for start in range(0, valid_actor_states_pg.size(0), actor_batch_size):
+                        indices = actor_permutation[start : start + actor_batch_size]
+                        dist = self._gaussian_dist(
+                            actors[agent_idx], valid_actor_states_pg[indices]
+                        )
+                        new_log_probs = dist.log_prob(valid_actions_pg[indices]).sum(dim=-1)
+                        ratio = torch.exp(new_log_probs - valid_old_log_probs_pg[indices])
+                        clipped_ratio = torch.clamp(
+                            ratio,
+                            1.0 - self.args.clip_param,
+                            1.0 + self.args.clip_param,
+                        )
+                        surrogate_1 = ratio * valid_advantages_pg[indices]
+                        surrogate_2 = clipped_ratio * valid_advantages_pg[indices]
+                        entropy = dist.entropy().sum(dim=-1)
+                        actor_loss = -torch.min(surrogate_1, surrogate_2)
+                        actor_loss -= self.args.entropy_coef * entropy
+                        actor_loss = actor_loss.mean()
+
+                        actor_optimizers[agent_idx].zero_grad()
+                        actor_loss.backward()
+                        torch.nn.utils.clip_grad_norm_(
+                            actors[agent_idx].parameters(), self.args.grad_norm_clip
+                        )
+                        actor_optimizers[agent_idx].step()
+
+                critic_permutation = torch.randperm(valid_states.size(0), device=self.device)
+                for start in range(0, valid_states.size(0), batch_size):
+                    indices = critic_permutation[start : start + batch_size]
+                    critic_values = critics[agent_idx](valid_states[indices]).squeeze(-1)
+                    critic_loss = (critic_values - valid_returns[indices]).pow(2).mean()
+                    critic_optimizers[agent_idx].zero_grad()
+                    critic_loss.backward()
+                    torch.nn.utils.clip_grad_norm_(
+                        critics[agent_idx].parameters(), self.args.grad_norm_clip
+                    )
+                    critic_optimizers[agent_idx].step()
 
     def _learn_level(
         self,

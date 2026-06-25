@@ -241,9 +241,27 @@ class RolloutWorker:
             and hasattr(self.env, "apply_high_level_actions")
         )
         meta_period = max(1, int(getattr(self.args, "hmappo_meta_period", 5)))
+        if level_training and hasattr(self.env, "set_meta_period"):
+            self.env.set_meta_period(meta_period)
+        if level_training and hasattr(self.env, "set_hrl_parameters"):
+            self.env.set_hrl_parameters(
+                reachable_subgoal_scale=getattr(
+                    self.args, "hrl_reachable_subgoal_scale", None
+                ),
+                intrinsic_reward_scale=getattr(
+                    self.args, "hrl_intrinsic_reward_scale", None
+                ),
+                intrinsic_distance_weight=getattr(
+                    self.args, "hrl_intrinsic_distance_weight", None
+                ),
+                intrinsic_success_bonus=getattr(
+                    self.args, "hrl_intrinsic_success_bonus", None
+                ),
+            )
         high_o, high_s, high_u, high_r = [], [], [], []
         high_avail_u, high_o_next, high_s_next = [], [], []
         high_terminate, high_padded, high_active_masks = [], [], []
+        hindsight_o, hindsight_mask = [], []
         current_high_transition = None
         current_high_reward = np.zeros(self.n_agents, dtype=np.float32)
         terminated = False
@@ -297,50 +315,87 @@ class RolloutWorker:
         while not terminated and step < self.episode_limit:
             active_agent_mask = _get_active_agent_mask(self.env, self.n_agents)
             noop_action = _get_noop_action(self.env, self.n_actions)
-            if level_training and step % meta_period == 0:
+            subgoal_success = np.zeros(self.n_agents, dtype=np.float32)
+            if (
+                level_training
+                and current_high_transition is not None
+                and getattr(self.args, "hrl_meta_update_on_subgoal_done", True)
+                and hasattr(self.env, "get_subgoal_success_mask")
+            ):
+                subgoal_success = self.env.get_subgoal_success_mask(
+                    current_high_transition.get("subgoals")
+                )
+            force_meta_update = bool(
+                np.any(subgoal_success * active_agent_mask > 0.0)
+            )
+            if level_training and (step % meta_period == 0 or force_meta_update):
                 if current_high_transition is not None:
+                    high_reward = current_high_reward.copy()
+                    subgoal_test = current_high_transition.get("subgoal_test")
+                    if subgoal_test is not None:
+                        test_mask = np.asarray(subgoal_test, dtype=np.float32).reshape(-1)
+                        success = self.env.get_subgoal_success_mask(
+                            current_high_transition.get("subgoals")
+                        )
+                        failed_test = (test_mask > 0.0) & (success <= 0.0)
+                        high_reward[failed_test] -= float(
+                            getattr(self.args, "hrl_subgoal_failure_penalty", 5.0)
+                        )
                     high_o.append(current_high_transition["o"])
                     high_s.append(current_high_transition["s"])
                     high_u.append(current_high_transition["u"])
                     high_avail_u.append(current_high_transition["avail_u"])
                     high_active_masks.append(current_high_transition["active_mask"])
-                    high_r.append(current_high_reward.copy())
+                    high_r.append(high_reward)
                     high_o_next.append(self.env.get_high_level_obs())
                     high_s_next.append(self.env.get_high_level_state())
                     high_terminate.append([False])
                     high_padded.append([0.0])
 
+                if hasattr(self.env, "prepare_high_level_decision"):
+                    self.env.prepare_high_level_decision()
                 high_obs = self.env.get_high_level_obs()
                 high_state = self.env.get_high_level_state()
-                high_avail = self.env.get_high_level_avail_actions()
+                high_action_dim = int(getattr(self.args, "high_level_n_actions", 0))
+                high_avail = np.ones(
+                    (self.n_agents, high_action_dim), dtype=np.float32
+                )
                 high_actions = []
                 for agent_id in range(self.n_agents):
-                    avail_high_action = high_avail[agent_id]
-                    if (
-                        active_agent_mask[agent_id] <= 0.0
-                        or np.sum(avail_high_action) <= 0.0
-                    ):
-                        high_action = 0
+                    if active_agent_mask[agent_id] <= 0.0:
+                        high_action = np.zeros(high_action_dim, dtype=np.float32)
                     else:
                         high_action = self.agents.choose_high_level_action(
                             high_obs[agent_id],
                             agent_id,
-                            avail_high_action,
+                            high_avail[agent_id],
                             epsilon,
                         )
-                    high_actions.append(int(high_action))
+                    high_actions.append(np.asarray(high_action, dtype=np.float32))
 
                 self.env.apply_high_level_actions(high_actions)
+                subgoal_test = np.zeros(self.n_agents, dtype=np.float32)
+                testing_rate = float(getattr(self.args, "hrl_subgoal_testing_rate", 0.0))
+                if not evaluate and testing_rate > 0.0:
+                    subgoal_test = (
+                        np.random.rand(self.n_agents) < testing_rate
+                    ).astype(np.float32)
                 current_high_transition = {
                     "o": np.asarray(high_obs, dtype=np.float32).copy(),
                     "s": np.asarray(high_state, dtype=np.float32).copy(),
-                    "u": np.asarray(high_actions, dtype=np.int64).reshape(
-                        self.n_agents, 1
+                    "u": np.asarray(high_actions, dtype=np.float32).reshape(
+                        self.n_agents, high_action_dim
                     ),
                     "avail_u": np.asarray(high_avail, dtype=np.float32).copy(),
                     "active_mask": active_agent_mask.reshape(
                         self.n_agents, 1
                     ).copy(),
+                    "subgoals": (
+                        self.env.get_current_subgoals()
+                        if hasattr(self.env, "get_current_subgoals")
+                        else None
+                    ),
+                    "subgoal_test": subgoal_test.reshape(self.n_agents, 1),
                 }
                 current_high_reward = np.zeros(self.n_agents, dtype=np.float32)
 
@@ -363,6 +418,13 @@ class RolloutWorker:
             else:
                 msg = _get_env_msg(self.env, self.args, self.n_agents)
             state = self.env.get_state()
+            prev_subgoal_distances = None
+            if (
+                level_training
+                and getattr(self.args, "hrl_use_intrinsic_reward", True)
+                and hasattr(self.env, "get_subgoal_distances")
+            ):
+                prev_subgoal_distances = self.env.get_subgoal_distances()
             actions, avail_actions, actions_onehot = [], [], []
             for agent_id in range(self.n_agents):
                 avail_action = self.env.get_avail_agent_actions(agent_id)
@@ -496,8 +558,25 @@ class RolloutWorker:
             if reward_for_batch.shape == (1,):
                 reward_for_batch = np.array([utility], dtype=np.float32)
 
+            external_reward_for_high = np.asarray(
+                reward_for_batch, dtype=np.float32
+            ).copy()
+            if (
+                level_training
+                and getattr(self.args, "hrl_use_intrinsic_reward", True)
+                and hasattr(self.env, "compute_intrinsic_rewards")
+                and prev_subgoal_distances is not None
+            ):
+                reward_for_batch = self.env.compute_intrinsic_rewards(
+                    prev_subgoal_distances
+                )
+                reward_for_batch = np.asarray(reward_for_batch, dtype=np.float32)
+                reward_for_batch *= active_agent_mask
+
             if level_training and current_high_transition is not None:
-                reward_values = np.asarray(reward_for_batch, dtype=np.float32).reshape(-1)
+                reward_values = np.asarray(
+                    external_reward_for_high, dtype=np.float32
+                ).reshape(-1)
                 if reward_values.size == self.n_agents:
                     high_step_reward = reward_values * active_agent_mask
                 else:
@@ -507,6 +586,24 @@ class RolloutWorker:
                         * active_agent_mask
                     )
                 current_high_reward += high_step_reward.astype(np.float32)
+
+            if (
+                level_training
+                and getattr(self.args, "hrl_hindsight_goal", True)
+                and hasattr(self.env, "get_agent_positions")
+                and hasattr(self.env, "relabel_observations_with_subgoals")
+                and np.asarray(raw_obs).shape[-1] == self.obs_shape
+            ):
+                achieved_subgoals = self.env.get_agent_positions()
+                hindsight_o.append(
+                    self.env.relabel_observations_with_subgoals(
+                        raw_obs, achieved_subgoals
+                    )
+                )
+                hindsight_mask.append(active_agent_mask.reshape(self.n_agents, 1).copy())
+            elif level_training:
+                hindsight_o.append(np.zeros((self.n_agents, self.obs_shape), dtype=np.float32))
+                hindsight_mask.append(np.zeros((self.n_agents, 1), dtype=np.float32))
 
             o.append(obs)
             o_raw.append(raw_obs)
@@ -539,12 +636,23 @@ class RolloutWorker:
             obs, state = self.agents.obs_state_comm()
 
         if level_training and current_high_transition is not None:
+            high_reward = current_high_reward.copy()
+            subgoal_test = current_high_transition.get("subgoal_test")
+            if subgoal_test is not None and hasattr(self.env, "get_subgoal_success_mask"):
+                test_mask = np.asarray(subgoal_test, dtype=np.float32).reshape(-1)
+                success = self.env.get_subgoal_success_mask(
+                    current_high_transition.get("subgoals")
+                )
+                failed_test = (test_mask > 0.0) & (success <= 0.0)
+                high_reward[failed_test] -= float(
+                    getattr(self.args, "hrl_subgoal_failure_penalty", 5.0)
+                )
             high_o.append(current_high_transition["o"])
             high_s.append(current_high_transition["s"])
             high_u.append(current_high_transition["u"])
             high_avail_u.append(current_high_transition["avail_u"])
             high_active_masks.append(current_high_transition["active_mask"])
-            high_r.append(current_high_reward.copy())
+            high_r.append(high_reward)
             high_o_next.append(self.env.get_high_level_obs())
             high_s_next.append(self.env.get_high_level_state())
             high_terminate.append([terminated or step >= self.episode_limit])
@@ -586,6 +694,13 @@ class RolloutWorker:
             avail_u_next.append(np.zeros((self.n_agents, self.n_actions)))
             guard_applied.append(np.zeros((self.n_agents, 1), dtype=np.float32))
             active_masks.append(np.zeros((self.n_agents, 1), dtype=np.float32))
+            if level_training:
+                hindsight_o.append(
+                    np.zeros((self.n_agents, self.obs_shape), dtype=np.float32)
+                )
+                hindsight_mask.append(
+                    np.zeros((self.n_agents, 1), dtype=np.float32)
+                )
             padded.append([1.0])
             terminate.append([1.0])
 
@@ -596,7 +711,7 @@ class RolloutWorker:
             for _ in range(len(high_o), self.episode_limit):
                 high_o.append(np.zeros((self.n_agents, high_obs_shape), dtype=np.float32))
                 high_s.append(np.zeros(high_state_shape, dtype=np.float32))
-                high_u.append(np.zeros((self.n_agents, 1), dtype=np.int64))
+                high_u.append(np.zeros((self.n_agents, high_n_actions), dtype=np.float32))
                 high_r.append(np.zeros(self.n_agents, dtype=np.float32))
                 high_avail_u.append(
                     np.zeros((self.n_agents, high_n_actions), dtype=np.float32)
@@ -641,6 +756,10 @@ class RolloutWorker:
                 high_agent_active_mask=high_active_masks.copy(),
                 high_padded=high_padded.copy(),
                 high_terminated=high_terminate.copy(),
+            )
+            episode.update(
+                hindsight_o=hindsight_o.copy(),
+                hindsight_mask=hindsight_mask.copy(),
             )
         if use_constraint_cost:
             episode["c"] = c.copy()

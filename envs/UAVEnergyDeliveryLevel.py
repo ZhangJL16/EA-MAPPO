@@ -6,6 +6,8 @@ import random
 import numpy as np
 from gymnasium import spaces
 
+from common.auction import auction_assign_min_cost
+
 
 boundary_length = 4.0
 boundary_width = 4.0
@@ -116,6 +118,11 @@ class UAVAgent:
         self.prev_collided = False
         self.assigned_order_id = None
         self.assigned_order_slot = None
+        self.auction_order_slot = None
+        self.task_target = self.pos.copy()
+        self.subgoal = self.pos.copy()
+        self.original_subgoal = self.pos.copy()
+        self.subgoal_test = False
         self.carrying_order = False
         self.current_task_type = TASK_IDLE
         self.completed_orders = 0
@@ -237,9 +244,9 @@ class UAVEnv:
         self.obstacle_crash_penalty = float(obstacle_crash_penalty)
         self.total_orders = int(total_orders)
         self.max_active_orders = min(int(max_active_orders), self.total_orders)
-        self.low_task_shape = self.max_active_orders + 1
-        self.high_level_n_actions = self.low_task_shape
-        self.charge_action_id = self.max_active_orders
+        self.low_task_shape = 0
+        self.high_level_n_actions = self.dim_actions
+        self.charge_action_id = -1
         self.pickup_reward = float(pickup_reward)
         self.delivery_reward = float(delivery_reward)
         self.initial_energy = float(initial_energy)
@@ -268,6 +275,13 @@ class UAVEnv:
         self.charging_agent_ids = []
 
         self.time_step = 0.4
+        self.meta_period = 5
+        self.reachable_subgoal_scale = 1.0
+        self.intrinsic_reward_scale = 1.0
+        self.intrinsic_distance_weight = 0.05
+        self.intrinsic_success_bonus = 1.0
+        self.charge_energy_threshold = 0.35
+        self.charge_release_threshold = 0.95
         self.goal_tolerance = 0.12
         self.v_max = 0.16
         self.a_max = 0.05
@@ -342,6 +356,83 @@ class UAVEnv:
 
     def _distance_to_goal(self, agent):
         return float(np.linalg.norm(agent.goal - agent.pos))
+
+    def set_meta_period(self, meta_period):
+        self.meta_period = max(1, int(meta_period))
+
+    def set_hrl_parameters(
+        self,
+        reachable_subgoal_scale=None,
+        intrinsic_reward_scale=None,
+        intrinsic_distance_weight=None,
+        intrinsic_success_bonus=None,
+    ):
+        if reachable_subgoal_scale is not None:
+            self.reachable_subgoal_scale = float(reachable_subgoal_scale)
+        if intrinsic_reward_scale is not None:
+            self.intrinsic_reward_scale = float(intrinsic_reward_scale)
+        if intrinsic_distance_weight is not None:
+            self.intrinsic_distance_weight = float(intrinsic_distance_weight)
+        if intrinsic_success_bonus is not None:
+            self.intrinsic_success_bonus = float(intrinsic_success_bonus)
+
+    def _max_reachable_subgoal_distance(self, agent):
+        return (
+            float(agent.v_max)
+            * float(self.time_step)
+            * float(max(1, self.meta_period))
+            * float(self.reachable_subgoal_scale)
+        )
+
+    def project_to_reachable_subgoal(self, agent, target):
+        target = np.asarray(target, dtype=np.float32)[: self.dim_actions]
+        delta = target - agent.pos
+        dist = float(np.linalg.norm(delta))
+        max_dist = self._max_reachable_subgoal_distance(agent)
+        if dist > max_dist > eps:
+            delta = delta / (dist + eps) * max_dist
+        return (agent.pos + delta).astype(np.float32)
+
+    def _set_agent_subgoal(self, agent, target, task_type, project=True):
+        target = np.asarray(target, dtype=np.float32)[: self.dim_actions]
+        agent.task_target = target.copy()
+        subgoal = self.project_to_reachable_subgoal(agent, target) if project else target
+        agent.goal = subgoal.copy()
+        agent.subgoal = subgoal.copy()
+        agent.original_subgoal = subgoal.copy()
+        agent.current_task_type = int(task_type)
+        agent.reached = self._distance_to_goal(agent) <= self.goal_tolerance
+        if agent.reached:
+            agent.vel[:] = 0.0
+        return True
+
+    def _clip_position_to_bounds(self, pos):
+        pos = np.asarray(pos, dtype=np.float32).copy()
+        upper = self._space_scale() - self.safe_radius
+        lower = np.full(self.dim_actions, self.safe_radius, dtype=np.float32)
+        return np.minimum(np.maximum(pos, lower), upper).astype(np.float32)
+
+    def _set_agent_subgoal_from_delta(self, agent, delta, task_type, task_target=None):
+        delta = np.asarray(delta, dtype=np.float32).reshape(-1)
+        if delta.size < self.dim_actions:
+            delta = np.pad(delta, (0, self.dim_actions - delta.size))
+        delta = delta[: self.dim_actions]
+        norm = float(np.linalg.norm(delta))
+        if norm > 1.0:
+            delta = delta / (norm + eps)
+        max_dist = self._max_reachable_subgoal_distance(agent)
+        subgoal = self._clip_position_to_bounds(agent.pos + delta * max_dist)
+        if task_target is None:
+            task_target = subgoal
+        agent.task_target = np.asarray(task_target, dtype=np.float32)[: self.dim_actions].copy()
+        agent.goal = subgoal.copy()
+        agent.subgoal = subgoal.copy()
+        agent.original_subgoal = subgoal.copy()
+        agent.current_task_type = int(task_type)
+        agent.reached = self._distance_to_goal(agent) <= self.goal_tolerance
+        if agent.reached:
+            agent.vel[:] = 0.0
+        return True
 
     @staticmethod
     def _nonlinear_risk_from_overlap(overlap, scale):
@@ -564,21 +655,17 @@ class UAVEnv:
     def _set_agent_idle(self, agent):
         agent.assigned_order_id = None
         agent.assigned_order_slot = None
+        agent.auction_order_slot = None
         agent.carrying_order = False
-        agent.current_task_type = TASK_IDLE
-        agent.reached = True
         agent.vel[:] = 0.0
-        agent.goal = agent.pos.copy()
+        agent.subgoal_test = False
+        return self._set_agent_subgoal(agent, agent.pos.copy(), TASK_IDLE, project=False)
 
     def _set_agent_charging(self, agent):
         if not agent.has_energy():
             return False
-        agent.current_task_type = TASK_CHARGE
-        agent.goal = self.charging_station_pos.copy()
-        agent.reached = self._distance_to_charging_station(agent) <= self.charging_radius
-        if agent.reached:
-            agent.vel[:] = 0.0
-        return True
+        agent.auction_order_slot = None
+        return self._set_agent_subgoal(agent, self.charging_station_pos, TASK_CHARGE)
 
     def _assign_order_slot_to_agent(self, agent, slot_idx):
         slot_idx = int(slot_idx)
@@ -592,15 +679,13 @@ class UAVEnv:
             and order.assigned_agent == agent.number
         )
         if owns_slot:
-            agent.current_task_type = TASK_ORDER
-            agent.reached = False
             if order.status == DeliveryOrder.PICKED or agent.carrying_order:
                 agent.carrying_order = True
-                agent.goal = order.dropoff_pos.copy()
+                target = order.dropoff_pos
             else:
                 agent.carrying_order = False
-                agent.goal = order.pickup_pos.copy()
-            return True
+                target = order.pickup_pos
+            return self._set_agent_subgoal(agent, target, TASK_ORDER)
 
         if agent.assigned_order_id is not None:
             return False
@@ -612,11 +697,58 @@ class UAVEnv:
         agent.assigned_order_id = order.order_id
         agent.assigned_order_slot = slot_idx
         agent.carrying_order = False
-        agent.current_task_type = TASK_ORDER
-        agent.reached = False
-        agent.goal = order.pickup_pos.copy()
+        agent.auction_order_slot = None
+        self._set_agent_subgoal(agent, order.pickup_pos, TASK_ORDER)
         self._sync_order_lists()
         return True
+
+    def _commit_auction_order_subgoal(self, agent):
+        slot_idx = agent.assigned_order_slot
+        if slot_idx is None:
+            slot_idx = agent.auction_order_slot
+        if slot_idx is None:
+            return False
+        return self._assign_order_slot_to_agent(agent, int(slot_idx))
+
+    def run_order_auction(self):
+        self._activate_orders()
+        for agent in self.agents:
+            if agent.assigned_order_slot is None:
+                agent.auction_order_slot = None
+
+        candidate_agents = [
+            agent
+            for agent in self.agents
+            if agent.has_energy() and agent.assigned_order_slot is None
+        ]
+        order_slots = list(self.available_order_slots)
+        if not candidate_agents or not order_slots:
+            return {}
+
+        cost_matrix = np.zeros((len(candidate_agents), len(order_slots)), dtype=np.float32)
+        for agent_row, agent in enumerate(candidate_agents):
+            for order_col, slot_idx in enumerate(order_slots):
+                order = self._slot_order(slot_idx)
+                if order is None:
+                    cost_matrix[agent_row, order_col] = 1e6
+                    continue
+                travel = np.linalg.norm(agent.pos - order.pickup_pos)
+                travel += np.linalg.norm(order.pickup_pos - order.dropoff_pos)
+                energy_ratio = agent.energy / (agent.initial_energy + eps)
+                energy_penalty = max(0.0, 0.35 - energy_ratio) * max(self.length, self.width)
+                cost_matrix[agent_row, order_col] = float(travel + energy_penalty)
+
+        assignments = auction_assign_min_cost(cost_matrix)
+        result = {}
+        for agent_row, order_col in assignments.items():
+            agent = candidate_agents[int(agent_row)]
+            slot_idx = int(order_slots[int(order_col)])
+            agent.auction_order_slot = slot_idx
+            result[agent.number] = slot_idx
+        return result
+
+    def prepare_high_level_decision(self):
+        return self.run_order_auction()
 
     def _assign_orders(self):
         self._activate_orders()
@@ -631,18 +763,26 @@ class UAVEnv:
         if (
             agent.current_task_type != TASK_ORDER
             or agent.assigned_order_id is None
-            or current_dist > self.goal_tolerance
         ):
             return 0.0
 
         order = self.orders[agent.assigned_order_id]
         if order.status == DeliveryOrder.ASSIGNED:
+            if np.linalg.norm(agent.pos - order.pickup_pos) > self.goal_tolerance:
+                return 0.0
             order.status = DeliveryOrder.PICKED
             agent.carrying_order = True
-            agent.goal = order.dropoff_pos.copy()
+            self._set_agent_subgoal(agent, agent.pos.copy(), TASK_IDLE, project=False)
+            agent.assigned_order_id = order.order_id
+            agent.assigned_order_slot = self.order_slots.index(order.order_id)
+            agent.carrying_order = True
+            agent.current_task_type = TASK_ORDER
+            agent.reached = True
             return self.pickup_reward
 
         if order.status == DeliveryOrder.PICKED:
+            if np.linalg.norm(agent.pos - order.dropoff_pos) > self.goal_tolerance:
+                return 0.0
             order.status = DeliveryOrder.COMPLETED
             order.assigned_agent = None
             self._remove_active_order(order.order_id)
@@ -661,45 +801,18 @@ class UAVEnv:
             and agent.assigned_order_id is not None
         )
 
-    def _task_context(self, agent):
-        context = np.zeros(self.low_task_shape, dtype=np.float32)
-        if (
-            agent.current_task_type == TASK_ORDER
-            and agent.assigned_order_slot is not None
-            and 0 <= int(agent.assigned_order_slot) < self.max_active_orders
-        ):
-            context[int(agent.assigned_order_slot)] = 1.0
-        elif agent.current_task_type == TASK_CHARGE:
-            context[self.charge_action_id] = 1.0
-        return context
-
-    def _task_type_onehot(self, task_type):
-        onehot = np.zeros(3, dtype=np.float32)
-        task_type = int(task_type)
-        if 0 <= task_type < onehot.size:
-            onehot[task_type] = 1.0
-        return onehot
-
-    def _assigned_slot_onehot(self, agent):
-        onehot = np.zeros(self.max_active_orders, dtype=np.float32)
-        if (
-            agent.assigned_order_slot is not None
-            and 0 <= int(agent.assigned_order_slot) < self.max_active_orders
-        ):
-            onehot[int(agent.assigned_order_slot)] = 1.0
-        return onehot
-
     def _agent_high_level_features(self, agent):
         scale = self._space_scale() + eps
         energy = np.array(
             [agent.energy / (agent.initial_energy + eps)],
             dtype=np.float32,
         )
-        flags = np.array(
+        risk = np.array(
             [
-                float(agent.has_energy()),
-                float(agent.carrying_order),
-                float(agent.current_task_type == TASK_CHARGE),
+                min(
+                    1.0,
+                    float(self.safe_value[agent.number]) / (agent.safe_radius + eps),
+                )
             ],
             dtype=np.float32,
         )
@@ -708,9 +821,7 @@ class UAVEnv:
                 agent.pos / scale,
                 agent.vel / (agent.v_max + eps),
                 energy,
-                flags,
-                self._task_type_onehot(agent.current_task_type),
-                self._assigned_slot_onehot(agent),
+                risk,
             ]
         ).astype(np.float32)
 
@@ -719,15 +830,9 @@ class UAVEnv:
         features = []
         for slot_idx in range(self.max_active_orders):
             order = self._slot_order(slot_idx)
-            visible = (
-                order is not None
-                and order.status == DeliveryOrder.ACTIVE
-                and order.assigned_agent is None
-            )
-            if visible:
+            if order is not None and order.status != DeliveryOrder.COMPLETED:
                 features.extend(
                     [
-                        np.array([1.0, 1.0], dtype=np.float32),
                         order.pickup_pos / scale,
                         order.dropoff_pos / scale,
                     ]
@@ -735,7 +840,6 @@ class UAVEnv:
             else:
                 features.extend(
                     [
-                        np.zeros(2, dtype=np.float32),
                         np.zeros(self.dim_actions, dtype=np.float32),
                         np.zeros(self.dim_actions, dtype=np.float32),
                     ]
@@ -744,52 +848,150 @@ class UAVEnv:
 
     def _charging_station_features(self):
         scale = self._space_scale() + eps
-        capacity = max(float(self.charging_capacity), 1.0)
-        current = float(len(self.charging_agent_ids))
-        free_slots = max(0.0, float(self.charging_capacity) - current)
+        return (self.charging_station_pos / scale).astype(np.float32)
+
+    def _order_target_for_agent(self, agent):
+        slot_idx = agent.assigned_order_slot
+        if slot_idx is None:
+            slot_idx = agent.auction_order_slot
+        order = self._slot_order(slot_idx)
+        if order is None:
+            return None
+        if order.status == DeliveryOrder.PICKED or agent.carrying_order:
+            return order.dropoff_pos.copy()
+        return order.pickup_pos.copy()
+
+    def _target_delta_features(self, agent, target):
+        if target is None:
+            return np.zeros(self.dim_actions + 1, dtype=np.float32)
+        scale = self._space_scale() + eps
+        delta = np.asarray(target, dtype=np.float32)[: self.dim_actions] - agent.pos
+        distance = np.linalg.norm(delta) / (np.linalg.norm(scale) + eps)
+        return np.concatenate(
+            [delta / scale, np.array([distance], dtype=np.float32)]
+        ).astype(np.float32)
+
+    def _other_agent_features(self, observer, other):
+        scale = self._space_scale() + eps
+        rel_pos = (other.pos - observer.pos) / scale
+        rel_vel = (other.vel - observer.vel) / (observer.v_max + eps)
+        distance = np.array(
+            [np.linalg.norm(other.pos - observer.pos) / (np.linalg.norm(scale) + eps)],
+            dtype=np.float32,
+        )
+        energy = np.array(
+            [other.energy / (other.initial_energy + eps)],
+            dtype=np.float32,
+        )
+        risk = np.array(
+            [
+                min(
+                    1.0,
+                    float(self.safe_value[other.number]) / (other.safe_radius + eps),
+                )
+            ],
+            dtype=np.float32,
+        )
+        return np.concatenate([rel_pos, rel_vel, energy, distance, risk]).astype(
+            np.float32
+        )
+
+    def _relative_order_slot_features(self, agent):
+        scale = self._space_scale() + eps
+        features = []
+        for slot_idx in range(self.max_active_orders):
+            order = self._slot_order(slot_idx)
+            if order is not None and order.status != DeliveryOrder.COMPLETED:
+                pickup_delta = order.pickup_pos - agent.pos
+                dropoff_delta = order.dropoff_pos - agent.pos
+                features.extend(
+                    [
+                        pickup_delta / scale,
+                        np.array(
+                            [
+                                np.linalg.norm(pickup_delta)
+                                / (np.linalg.norm(scale) + eps)
+                            ],
+                            dtype=np.float32,
+                        ),
+                        dropoff_delta / scale,
+                        np.array(
+                            [
+                                np.linalg.norm(dropoff_delta)
+                                / (np.linalg.norm(scale) + eps)
+                            ],
+                            dtype=np.float32,
+                        ),
+                    ]
+                )
+            else:
+                features.extend(
+                    [
+                        np.zeros(self.dim_actions, dtype=np.float32),
+                        np.zeros(1, dtype=np.float32),
+                        np.zeros(self.dim_actions, dtype=np.float32),
+                        np.zeros(1, dtype=np.float32),
+                    ]
+                )
+        return np.concatenate(features).astype(np.float32)
+
+    def _high_level_agent_obs(self, agent):
+        scale = self._space_scale() + eps
+        other_features = [
+            self._other_agent_features(agent, other)
+            for other in self.agents
+            if other is not agent
+        ]
+        if not other_features:
+            other_features = [np.zeros(2 * self.dim_actions + 3, dtype=np.float32)]
+        charging_delta = self._target_delta_features(agent, self.charging_station_pos)
+        lasers = np.asarray(agent.lasers, dtype=np.float32) / (agent.l_sensor + eps)
         return np.concatenate(
             [
-                self.charging_station_pos / scale,
-                np.array(
-                    [
-                        float(self.charging_capacity) / max(float(self.num_agents), 1.0),
-                        current / capacity,
-                        free_slots / capacity,
-                    ],
-                    dtype=np.float32,
-                ),
+                self._agent_high_level_features(agent),
+                self._target_delta_features(agent, self._order_target_for_agent(agent)),
+                self._target_delta_features(agent, self._assigned_target_for_agent(agent)),
+                charging_delta,
+                np.concatenate(other_features).astype(np.float32),
+                self._relative_order_slot_features(agent),
+                lasers,
             ]
         ).astype(np.float32)
 
+    def _assigned_target_for_agent(self, agent):
+        if agent.assigned_order_slot is None:
+            return None
+        order = self._slot_order(agent.assigned_order_slot)
+        if order is None:
+            return None
+        if order.status == DeliveryOrder.PICKED or agent.carrying_order:
+            return order.dropoff_pos.copy()
+        return order.pickup_pos.copy()
+
     def get_high_level_state(self):
-        agent_features = [
-            self._agent_high_level_features(agent) for agent in self.agents
+        agent_features = [self._agent_high_level_features(agent) for agent in self.agents]
+        auction_targets = [
+            self._target_delta_features(agent, self._order_target_for_agent(agent))
+            for agent in self.agents
         ]
-        available_mask = self.get_available_order_mask()
+        assigned_targets = [
+            self._target_delta_features(agent, self._assigned_target_for_agent(agent))
+            for agent in self.agents
+        ]
         return np.concatenate(
             [
                 np.concatenate(agent_features).astype(np.float32),
+                np.concatenate(auction_targets).astype(np.float32),
+                np.concatenate(assigned_targets).astype(np.float32),
                 self._order_slot_features(),
-                available_mask,
                 self._charging_station_features(),
             ]
         ).astype(np.float32)
 
     def get_high_level_obs(self):
-        state = self.get_high_level_state()
         observations = []
-        for agent_idx, agent in enumerate(self.agents):
-            agent_id = np.zeros(self.num_agents, dtype=np.float32)
-            agent_id[agent_idx] = 1.0
-            observations.append(
-                np.concatenate(
-                    [
-                        agent_id,
-                        self._agent_high_level_features(agent),
-                        state,
-                    ]
-                ).astype(np.float32)
-            )
+        for agent in self.agents:
+            observations.append(self._high_level_agent_obs(agent))
         return np.stack(observations, axis=0)
 
     def get_available_order_mask(self):
@@ -800,26 +1002,8 @@ class UAVEnv:
         return mask
 
     def get_high_level_avail_agent_actions(self, agent_id):
-        avail = np.zeros(self.high_level_n_actions, dtype=np.float32)
-        agent = self.agents[int(agent_id)]
-        if not agent.has_energy():
-            return avail
-
-        if agent.assigned_order_slot is not None:
-            slot_idx = int(agent.assigned_order_slot)
-            order = self._slot_order(slot_idx)
-            if (
-                order is not None
-                and order.assigned_agent == agent.number
-                and order.status in (DeliveryOrder.ASSIGNED, DeliveryOrder.PICKED)
-            ):
-                avail[slot_idx] = 1.0
-        else:
-            for slot_idx in self.available_order_slots:
-                avail[int(slot_idx)] = 1.0
-
-        avail[self.charge_action_id] = 1.0
-        return avail
+        del agent_id
+        return np.ones(self.high_level_n_actions, dtype=np.float32)
 
     def get_high_level_avail_actions(self):
         return np.stack(
@@ -831,31 +1015,61 @@ class UAVEnv:
         )
 
     def get_current_high_level_actions(self):
-        actions = np.full(self.num_agents, -1, dtype=np.int64)
-        for agent_idx, agent in enumerate(self.agents):
-            if agent.current_task_type == TASK_CHARGE:
-                actions[agent_idx] = self.charge_action_id
-            elif agent.assigned_order_slot is not None:
-                actions[agent_idx] = int(agent.assigned_order_slot)
-        return actions
+        actions = []
+        for agent in self.agents:
+            max_dist = self._max_reachable_subgoal_distance(agent)
+            if max_dist <= eps:
+                actions.append(np.zeros(self.dim_actions, dtype=np.float32))
+                continue
+            delta = (agent.subgoal - agent.pos) / max_dist
+            actions.append(np.clip(delta, -1.0, 1.0).astype(np.float32))
+        return np.stack(actions, axis=0)
 
     def apply_high_level_actions(self, actions):
-        actions = np.asarray(actions, dtype=np.int64).reshape(-1)
-        if actions.size != self.num_agents:
-            raise ValueError("High-level action count must match the number of UAVs.")
+        actions = np.asarray(actions, dtype=np.float32)
+        if actions.shape != (self.num_agents, self.dim_actions):
+            actions = actions.reshape(self.num_agents, self.dim_actions)
 
+        self.run_order_auction()
         applied = np.zeros(self.num_agents, dtype=np.float32)
         for agent_idx, action in enumerate(actions):
             agent = self.agents[agent_idx]
             if not agent.has_energy():
                 continue
 
-            if int(action) == self.charge_action_id:
-                applied[agent_idx] = float(self._set_agent_charging(agent))
-            elif 0 <= int(action) < self.max_active_orders:
-                applied[agent_idx] = float(
-                    self._assign_order_slot_to_agent(agent, int(action))
+            task_target = self._order_target_for_agent(agent)
+            task_type = TASK_ORDER
+            if task_target is not None:
+                if agent.assigned_order_slot is None:
+                    applied[agent_idx] = float(self._commit_auction_order_subgoal(agent))
+                    task_target = self._order_target_for_agent(agent)
+                else:
+                    applied[agent_idx] = 1.0
+            else:
+                energy_ratio = agent.energy / (agent.initial_energy + eps)
+                should_charge = (
+                    energy_ratio <= self.charge_energy_threshold
+                    or (
+                        agent.current_task_type == TASK_CHARGE
+                        and energy_ratio < self.charge_release_threshold
+                    )
                 )
+                if should_charge:
+                    agent.auction_order_slot = None
+                    task_target = self.charging_station_pos.copy()
+                    task_type = TASK_CHARGE
+                    applied[agent_idx] = 1.0
+                else:
+                    task_target = agent.pos.copy()
+                    task_type = TASK_IDLE
+                    applied[agent_idx] = 1.0
+
+            self._set_agent_subgoal_from_delta(
+                agent,
+                action,
+                task_type=task_type,
+                task_target=task_target,
+            )
 
         self._sync_order_lists()
         return applied
@@ -1346,10 +1560,7 @@ class UAVEnv:
             rewards[idx] -= 0.2 * self.reward_safe_value[idx]
             rewards[idx] -= 0.3 * min(current_dist, 1.0)
 
-            if (
-                agent.current_task_type == TASK_CHARGE
-                and current_dist <= self.charging_radius
-            ):
+            if current_dist <= self.goal_tolerance:
                 agent.reached = True
                 agent.vel[:] = 0.0
 
@@ -1431,6 +1642,66 @@ class UAVEnv:
                 )
         return messages
 
+    def get_agent_positions(self):
+        return np.stack([agent.pos.copy() for agent in self.agents], axis=0).astype(
+            np.float32
+        )
+
+    def get_current_subgoals(self):
+        return np.stack([agent.subgoal.copy() for agent in self.agents], axis=0).astype(
+            np.float32
+        )
+
+    def get_subgoal_distances(self, targets=None):
+        if targets is None:
+            targets = self.get_current_subgoals()
+        targets = np.asarray(targets, dtype=np.float32).reshape(
+            self.num_agents, self.dim_actions
+        )
+        positions = self.get_agent_positions()
+        return np.linalg.norm(positions - targets, axis=1).astype(np.float32)
+
+    def get_subgoal_success_mask(self, targets=None):
+        distances = self.get_subgoal_distances(targets)
+        return (distances <= self.goal_tolerance).astype(np.float32)
+
+    def compute_intrinsic_rewards(self, prev_distances=None, targets=None):
+        distances = self.get_subgoal_distances(targets)
+        if prev_distances is None:
+            progress = np.zeros_like(distances, dtype=np.float32)
+        else:
+            prev_distances = np.asarray(prev_distances, dtype=np.float32).reshape(-1)
+            progress = prev_distances - distances
+        space_norm = np.linalg.norm(self._space_scale()) + eps
+        rewards = progress - self.intrinsic_distance_weight * (distances / space_norm)
+        rewards += self.intrinsic_success_bonus * self.get_subgoal_success_mask(targets)
+        rewards -= 0.2 * np.asarray(self.reward_safe_value, dtype=np.float32)
+        return (self.intrinsic_reward_scale * rewards).astype(np.float32)
+
+    def relabel_observations_with_subgoals(self, observations, subgoals):
+        obs = np.asarray(observations, dtype=np.float32).copy()
+        original_shape = obs.shape
+        obs = obs.reshape((-1, self.num_agents, original_shape[-1]))
+        subgoals = np.asarray(subgoals, dtype=np.float32).reshape(
+            self.num_agents, self.dim_actions
+        )
+        scale = self._space_scale() + eps
+        goal_start = 2 * self.dim_actions + self.num_lasers
+        goal_end = goal_start + self.dim_actions + 1
+        for batch_idx in range(obs.shape[0]):
+            for agent_idx in range(self.num_agents):
+                pos = obs[batch_idx, agent_idx, : self.dim_actions] * scale
+                delta = subgoals[agent_idx] - pos
+                distance = np.linalg.norm(delta) / (np.linalg.norm(scale) + eps)
+                goal_features = np.concatenate(
+                    [
+                        delta / scale,
+                        np.array([distance], dtype=np.float32),
+                    ]
+                )
+                obs[batch_idx, agent_idx, goal_start:goal_end] = goal_features
+        return obs.reshape(original_shape).astype(np.float32)
+
     def get_obs(self):
         observations = []
         scale = self._space_scale() + eps
@@ -1446,7 +1717,6 @@ class UAVEnv:
                     np.asarray(agent.lasers, dtype=np.float32),
                     self._goal_features(agent),
                     energy,
-                    self._task_context(agent),
                 ]
             )
             observations.append(obs.astype(np.float32))
@@ -1466,7 +1736,6 @@ class UAVEnv:
                     dtype=np.float32,
                 )
             )
-            parts.append(self._task_context(agent))
         for obstacle in self.obstacles:
             parts.append(obstacle.pos / scale[:2])
             parts.append(np.array([obstacle.radius / max(self.length, self.width)], dtype=np.float32))
@@ -1575,6 +1844,11 @@ class UAVEnv:
                     "prev_collided": bool(agent.prev_collided),
                     "assigned_order_id": agent.assigned_order_id,
                     "assigned_order_slot": agent.assigned_order_slot,
+                    "auction_order_slot": agent.auction_order_slot,
+                    "task_target": agent.task_target.copy(),
+                    "subgoal": agent.subgoal.copy(),
+                    "original_subgoal": agent.original_subgoal.copy(),
+                    "subgoal_test": bool(agent.subgoal_test),
                     "carrying_order": bool(agent.carrying_order),
                     "current_task_type": int(agent.current_task_type),
                     "completed_orders": int(agent.completed_orders),
@@ -1643,6 +1917,11 @@ class UAVEnv:
             agent.prev_collided = bool(state["prev_collided"])
             agent.assigned_order_id = state.get("assigned_order_id")
             agent.assigned_order_slot = state.get("assigned_order_slot")
+            agent.auction_order_slot = state.get("auction_order_slot")
+            agent.task_target = state.get("task_target", agent.goal).copy()
+            agent.subgoal = state.get("subgoal", agent.goal).copy()
+            agent.original_subgoal = state.get("original_subgoal", agent.subgoal).copy()
+            agent.subgoal_test = bool(state.get("subgoal_test", False))
             agent.carrying_order = bool(state.get("carrying_order", False))
             default_task_type = (
                 TASK_ORDER if agent.assigned_order_id is not None else TASK_IDLE
@@ -2230,6 +2509,15 @@ class UAVEnvDiscreteWrapper:
     def get_state(self):
         return self.env.get_state()
 
+    def set_meta_period(self, meta_period):
+        return self.env.set_meta_period(meta_period)
+
+    def set_hrl_parameters(self, **kwargs):
+        return self.env.set_hrl_parameters(**kwargs)
+
+    def prepare_high_level_decision(self):
+        return self.env.prepare_high_level_decision()
+
     def get_high_level_obs(self):
         return self.env.get_high_level_obs()
 
@@ -2252,6 +2540,24 @@ class UAVEnvDiscreteWrapper:
         applied = self.env.apply_high_level_actions(actions)
         self._last_obs = self.env.get_obs()
         return applied
+
+    def get_agent_positions(self):
+        return self.env.get_agent_positions()
+
+    def get_current_subgoals(self):
+        return self.env.get_current_subgoals()
+
+    def get_subgoal_distances(self, targets=None):
+        return self.env.get_subgoal_distances(targets)
+
+    def get_subgoal_success_mask(self, targets=None):
+        return self.env.get_subgoal_success_mask(targets)
+
+    def compute_intrinsic_rewards(self, prev_distances=None, targets=None):
+        return self.env.compute_intrinsic_rewards(prev_distances, targets)
+
+    def relabel_observations_with_subgoals(self, observations, subgoals):
+        return self.env.relabel_observations_with_subgoals(observations, subgoals)
 
     def get_msg(self):
         return self.env.get_msg()
@@ -2471,6 +2777,15 @@ class UAVParallelEnv:
     def get_high_level_state(self):
         return self.base_env.get_high_level_state()
 
+    def set_meta_period(self, meta_period):
+        return self.base_env.set_meta_period(meta_period)
+
+    def set_hrl_parameters(self, **kwargs):
+        return self.base_env.set_hrl_parameters(**kwargs)
+
+    def prepare_high_level_decision(self):
+        return self.base_env.prepare_high_level_decision()
+
     def get_high_level_avail_actions(self):
         return self.base_env.get_high_level_avail_actions()
 
@@ -2491,6 +2806,24 @@ class UAVParallelEnv:
                 for agent_name in self.possible_agents
             ]
         return self.base_env.apply_high_level_actions(actions)
+
+    def get_agent_positions(self):
+        return self.base_env.get_agent_positions()
+
+    def get_current_subgoals(self):
+        return self.base_env.get_current_subgoals()
+
+    def get_subgoal_distances(self, targets=None):
+        return self.base_env.get_subgoal_distances(targets)
+
+    def get_subgoal_success_mask(self, targets=None):
+        return self.base_env.get_subgoal_success_mask(targets)
+
+    def compute_intrinsic_rewards(self, prev_distances=None, targets=None):
+        return self.base_env.compute_intrinsic_rewards(prev_distances, targets)
+
+    def relabel_observations_with_subgoals(self, observations, subgoals):
+        return self.base_env.relabel_observations_with_subgoals(observations, subgoals)
 
     def close(self):
         self.base_env.close()
