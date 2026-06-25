@@ -114,6 +114,78 @@ def parse_args():
         help="Number of UAV agents for UAV2D/UAV3D environments",
     )
     parser.add_argument(
+        "--episode-limit",
+        "--episode_limit",
+        dest="episode_limit",
+        type=positive_int,
+        default=400,
+        help="Episode length for local UAV environments",
+    )
+    parser.add_argument(
+        "--uav-total-orders",
+        "--uav_total_orders",
+        dest="uav_total_orders",
+        type=positive_int,
+        default=16,
+        help="Total delivery orders per UAVDelivery/UAVEnergyDelivery episode",
+    )
+    parser.add_argument(
+        "--uav-max-active-orders",
+        "--uav_max_active_orders",
+        dest="uav_max_active_orders",
+        type=positive_int,
+        default=8,
+        help="Maximum simultaneously active delivery orders",
+    )
+    parser.add_argument(
+        "--uav-initial-energy",
+        "--uav_initial_energy",
+        dest="uav_initial_energy",
+        type=float,
+        default=100.0,
+        help="Initial energy for UAVEnergyDelivery agents",
+    )
+    parser.add_argument(
+        "--uav-energy-decay",
+        "--uav_energy_decay",
+        dest="uav_energy_decay",
+        type=float,
+        default=None,
+        help="Energy consumed per UAVEnergyDelivery step",
+    )
+    parser.add_argument(
+        "--uav-energy-depletion-fraction",
+        "--uav_energy_depletion_fraction",
+        dest="uav_energy_depletion_fraction",
+        type=float,
+        default=0.5,
+        help="Fraction of episode length when full energy should be depleted",
+    )
+    parser.add_argument(
+        "--uav-charging-capacity",
+        "--uav_charging_capacity",
+        dest="uav_charging_capacity",
+        type=positive_int,
+        default=2,
+        help="Maximum UAVs charging at the station in one step",
+    )
+    parser.add_argument(
+        "--uav-charging-radius",
+        "--uav_charging_radius",
+        dest="uav_charging_radius",
+        type=float,
+        default=0.18,
+        help="Distance threshold for UAVEnergyDelivery charging station",
+    )
+    parser.add_argument(
+        "--uav-charging-rate",
+        "--uav_charging_rate",
+        dest="uav_charging_rate",
+        type=float,
+        default=None,
+        help="Energy restored per charging step",
+    )
+    parser.add_argument(
         "--save-xy",
         dest="save_xy",
         action="store_true",
@@ -170,6 +242,15 @@ def make_base_args(cli_args):
         cuda=cli_args.cuda,
         gpu_id=cli_args.gpu_id,
         uav_n_agents=cli_args.uav_n_agents,
+        episode_limit=cli_args.episode_limit,
+        uav_total_orders=cli_args.uav_total_orders,
+        uav_max_active_orders=cli_args.uav_max_active_orders,
+        uav_initial_energy=cli_args.uav_initial_energy,
+        uav_energy_decay=cli_args.uav_energy_decay,
+        uav_energy_depletion_fraction=cli_args.uav_energy_depletion_fraction,
+        uav_charging_capacity=cli_args.uav_charging_capacity,
+        uav_charging_radius=cli_args.uav_charging_radius,
+        uav_charging_rate=cli_args.uav_charging_rate,
         last_reward=False,
         distributed=True,
         guide_mix_network_type="vdn",
