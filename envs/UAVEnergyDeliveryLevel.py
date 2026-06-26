@@ -245,7 +245,7 @@ class UAVEnv:
         self.total_orders = int(total_orders)
         self.max_active_orders = min(int(max_active_orders), self.total_orders)
         self.low_task_shape = 0
-        self.high_level_n_actions = self.dim_actions
+        self.high_level_n_actions = 1
         self.charge_action_id = -1
         self.pickup_reward = float(pickup_reward)
         self.delivery_reward = float(delivery_reward)
@@ -283,6 +283,7 @@ class UAVEnv:
         self.charge_energy_threshold = 0.35
         self.charge_release_threshold = 0.95
         self.goal_tolerance = 0.12
+        self.min_subgoal_progress = 1.25 * self.goal_tolerance
         self.v_max = 0.16
         self.a_max = 0.05
         self.safe_radius = 0.05
@@ -425,6 +426,42 @@ class UAVEnv:
         if task_target is None:
             task_target = subgoal
         agent.task_target = np.asarray(task_target, dtype=np.float32)[: self.dim_actions].copy()
+        agent.goal = subgoal.copy()
+        agent.subgoal = subgoal.copy()
+        agent.original_subgoal = subgoal.copy()
+        agent.current_task_type = int(task_type)
+        agent.reached = self._distance_to_goal(agent) <= self.goal_tolerance
+        if agent.reached:
+            agent.vel[:] = 0.0
+        return True
+
+    def _set_agent_subgoal_on_target_line(self, agent, action, task_type, task_target=None):
+        if task_target is None:
+            task_target = agent.pos.copy()
+        target = np.asarray(task_target, dtype=np.float32)[: self.dim_actions]
+        to_target = target - agent.pos
+        target_dist = float(np.linalg.norm(to_target))
+
+        if task_type == TASK_IDLE or target_dist <= eps:
+            subgoal = agent.pos.copy()
+        else:
+            action = np.asarray(action, dtype=np.float32).reshape(-1)
+            scalar = float(action[0]) if action.size else 0.0
+            fraction = 0.5 * (np.clip(scalar, -1.0, 1.0) + 1.0)
+
+            max_reachable = self._max_reachable_subgoal_distance(agent)
+            line_length = min(target_dist, max_reachable)
+            min_progress = min(line_length, self.min_subgoal_progress)
+            if line_length > min_progress + eps:
+                progress = min_progress + fraction * (line_length - min_progress)
+            else:
+                progress = line_length
+
+            direction = to_target / (target_dist + eps)
+            subgoal = agent.pos + direction * progress
+            subgoal = self._clip_position_to_bounds(subgoal)
+
+        agent.task_target = target.copy()
         agent.goal = subgoal.copy()
         agent.subgoal = subgoal.copy()
         agent.original_subgoal = subgoal.copy()
@@ -1017,18 +1054,33 @@ class UAVEnv:
     def get_current_high_level_actions(self):
         actions = []
         for agent in self.agents:
-            max_dist = self._max_reachable_subgoal_distance(agent)
-            if max_dist <= eps:
-                actions.append(np.zeros(self.dim_actions, dtype=np.float32))
+            target = getattr(agent, "task_target", None)
+            if target is None:
+                actions.append(np.zeros(1, dtype=np.float32))
                 continue
-            delta = (agent.subgoal - agent.pos) / max_dist
-            actions.append(np.clip(delta, -1.0, 1.0).astype(np.float32))
+            target = np.asarray(target, dtype=np.float32)[: self.dim_actions]
+            to_target = target - agent.pos
+            target_dist = float(np.linalg.norm(to_target))
+            max_dist = self._max_reachable_subgoal_distance(agent)
+            line_length = min(target_dist, max_dist)
+            if line_length <= eps:
+                actions.append(np.zeros(1, dtype=np.float32))
+                continue
+            direction = to_target / (target_dist + eps)
+            progress = float(np.dot(agent.subgoal - agent.pos, direction))
+            min_progress = min(line_length, self.min_subgoal_progress)
+            if line_length > min_progress + eps:
+                fraction = (progress - min_progress) / (line_length - min_progress)
+            else:
+                fraction = 1.0
+            scalar = 2.0 * np.clip(fraction, 0.0, 1.0) - 1.0
+            actions.append(np.array([scalar], dtype=np.float32))
         return np.stack(actions, axis=0)
 
     def apply_high_level_actions(self, actions):
         actions = np.asarray(actions, dtype=np.float32)
-        if actions.shape != (self.num_agents, self.dim_actions):
-            actions = actions.reshape(self.num_agents, self.dim_actions)
+        if actions.shape != (self.num_agents, self.high_level_n_actions):
+            actions = actions.reshape(self.num_agents, self.high_level_n_actions)
 
         self.run_order_auction()
         applied = np.zeros(self.num_agents, dtype=np.float32)
@@ -1064,7 +1116,7 @@ class UAVEnv:
                     task_type = TASK_IDLE
                     applied[agent_idx] = 1.0
 
-            self._set_agent_subgoal_from_delta(
+            self._set_agent_subgoal_on_target_line(
                 agent,
                 action,
                 task_type=task_type,

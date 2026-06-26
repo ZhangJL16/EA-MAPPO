@@ -19,9 +19,16 @@ def auction_assign_min_cost(cost_matrix, epsilon=1e-3):
     costs = np.asarray(cost_matrix, dtype=np.float32)
     if costs.ndim != 2:
         raise ValueError("cost_matrix must be two-dimensional")
-    n_agents, n_items = costs.shape
-    if n_agents == 0 or n_items == 0:
+    n_agents, n_real_items = costs.shape
+    if n_agents == 0 or n_real_items == 0:
         return {}
+    if n_agents > n_real_items:
+        dummy_items = n_agents - n_real_items
+        costs = np.concatenate(
+            [costs, np.zeros((n_agents, dummy_items), dtype=np.float32)],
+            axis=1,
+        )
+    n_items = costs.shape[1]
 
     values = -costs
     prices = np.zeros(n_items, dtype=np.float32)
@@ -54,5 +61,5 @@ def auction_assign_min_cost(cost_matrix, epsilon=1e-3):
     return {
         int(agent_idx): int(item_idx)
         for agent_idx, item_idx in enumerate(agent_item)
-        if item_idx >= 0
+        if 0 <= item_idx < n_real_items
     }
