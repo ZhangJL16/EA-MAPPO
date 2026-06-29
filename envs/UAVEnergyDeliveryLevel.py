@@ -224,6 +224,8 @@ class UAVEnv:
         charging_radius=default_charging_radius,
         charging_rate=None,
         charging_station_pos=None,
+        charge_mode_fraction=0.5,
+        charge_dense_reward_scale=1.0,
     ):
         if dim_actions not in (2, 3):
             raise ValueError("Dimension must be 2 or 3")
@@ -245,7 +247,14 @@ class UAVEnv:
         self.total_orders = int(total_orders)
         self.max_active_orders = min(int(max_active_orders), self.total_orders)
         self.low_task_shape = 0
-        self.high_level_n_actions = 1
+        # High-level action is split into [mode, progress].
+        # The left part of the mode interval selects charging; the rest selects orders.
+        self.high_level_n_actions = 2
+        self.charge_mode_fraction = float(np.clip(charge_mode_fraction, 0.01, 0.99))
+        self.charge_mode_threshold = -1.0 + 2.0 * self.charge_mode_fraction
+        self.charge_mode_center = -1.0 + self.charge_mode_fraction
+        self.order_mode_center = self.charge_mode_fraction
+        self.charge_dense_reward_scale = float(charge_dense_reward_scale)
         self.charge_action_id = -1
         self.pickup_reward = float(pickup_reward)
         self.delivery_reward = float(delivery_reward)
@@ -470,6 +479,55 @@ class UAVEnv:
         if agent.reached:
             agent.vel[:] = 0.0
         return True
+
+    def _energy_required_for_distance(self, agent, distance):
+        step_distance = max(float(agent.v_max) * float(self.time_step), eps)
+        travel_steps = max(0.0, float(distance)) / step_distance
+        return travel_steps * float(self.energy_decay_per_step)
+
+    def _energy_required_ratio_for_distance(self, agent, distance):
+        required_energy = self._energy_required_for_distance(agent, distance)
+        return float(required_energy / (agent.initial_energy + eps))
+
+    def _selected_order_for_agent(self, agent):
+        slot_idx = agent.assigned_order_slot
+        if slot_idx is None:
+            slot_idx = agent.auction_order_slot
+        order = self._slot_order(slot_idx)
+        if order is None or order.status == DeliveryOrder.COMPLETED:
+            return None
+        return order
+
+    def _finish_order_then_charge_distance(self, agent):
+        order = self._selected_order_for_agent(agent)
+        if order is None:
+            return 0.0
+
+        current = agent.pos
+        distance = 0.0
+        if order.status == DeliveryOrder.PICKED or agent.carrying_order:
+            distance += float(np.linalg.norm(current - order.dropoff_pos))
+            current = order.dropoff_pos
+        else:
+            distance += float(np.linalg.norm(current - order.pickup_pos))
+            distance += float(np.linalg.norm(order.pickup_pos - order.dropoff_pos))
+            current = order.dropoff_pos
+
+        distance += float(np.linalg.norm(current - self.charging_station_pos))
+        return distance
+
+    def _energy_margin_order_for_agent(self, agent):
+        order = self._selected_order_for_agent(agent)
+        if order is None:
+            return 0.0
+        energy_ratio = float(agent.energy / (agent.initial_energy + eps))
+        required_ratio = self._energy_required_ratio_for_distance(
+            agent, self._finish_order_then_charge_distance(agent)
+        )
+        return float(np.clip(energy_ratio - required_ratio, -1.0, 1.0))
+
+    def _has_selected_order_for_agent(self, agent):
+        return 1.0 if self._selected_order_for_agent(agent) is not None else 0.0
 
     @staticmethod
     def _nonlinear_risk_from_overlap(overlap, scale):
@@ -1051,12 +1109,24 @@ class UAVEnv:
             axis=0,
         )
 
+    def get_high_level_energy_margins(self):
+        return np.asarray(
+            [[self._energy_margin_order_for_agent(agent)] for agent in self.agents],
+            dtype=np.float32,
+        )
+
+    def get_high_level_energy_order_masks(self):
+        return np.asarray(
+            [[self._has_selected_order_for_agent(agent)] for agent in self.agents],
+            dtype=np.float32,
+        )
+
     def get_current_high_level_actions(self):
         actions = []
         for agent in self.agents:
             target = getattr(agent, "task_target", None)
             if target is None:
-                actions.append(np.zeros(1, dtype=np.float32))
+                actions.append(np.zeros(self.high_level_n_actions, dtype=np.float32))
                 continue
             target = np.asarray(target, dtype=np.float32)[: self.dim_actions]
             to_target = target - agent.pos
@@ -1064,7 +1134,7 @@ class UAVEnv:
             max_dist = self._max_reachable_subgoal_distance(agent)
             line_length = min(target_dist, max_dist)
             if line_length <= eps:
-                actions.append(np.zeros(1, dtype=np.float32))
+                actions.append(np.zeros(self.high_level_n_actions, dtype=np.float32))
                 continue
             direction = to_target / (target_dist + eps)
             progress = float(np.dot(agent.subgoal - agent.pos, direction))
@@ -1073,8 +1143,17 @@ class UAVEnv:
                 fraction = (progress - min_progress) / (line_length - min_progress)
             else:
                 fraction = 1.0
-            scalar = 2.0 * np.clip(fraction, 0.0, 1.0) - 1.0
-            actions.append(np.array([scalar], dtype=np.float32))
+            progress_scalar = 2.0 * float(np.clip(fraction, 0.0, 1.0)) - 1.0
+            if agent.current_task_type == TASK_CHARGE:
+                mode_scalar = self.charge_mode_center
+            elif agent.current_task_type == TASK_ORDER:
+                mode_scalar = self.order_mode_center
+            elif agent.current_task_type != TASK_ORDER:
+                mode_scalar = 0.0
+                progress_scalar = 0.0
+            actions.append(
+                np.array([mode_scalar, progress_scalar], dtype=np.float32)
+            )
         return np.stack(actions, axis=0)
 
     def apply_high_level_actions(self, actions):
@@ -1089,9 +1168,27 @@ class UAVEnv:
             if not agent.has_energy():
                 continue
 
+            action = np.asarray(action, dtype=np.float32).reshape(-1)
+            if action.size >= 2:
+                mode_scalar = float(action[0])
+                progress_scalar = float(action[1])
+                progress_fraction = 0.5 * (np.clip(progress_scalar, -1.0, 1.0) + 1.0)
+            else:
+                raw_scalar = float(action[0]) if action.size else 0.0
+                mode_scalar = raw_scalar
+                progress_fraction = float(np.clip(abs(raw_scalar), 0.0, 1.0))
+            progress_action = np.array(
+                [2.0 * progress_fraction - 1.0],
+                dtype=np.float32,
+            )
+            requested_charge = mode_scalar < self.charge_mode_threshold
             task_target = self._order_target_for_agent(agent)
             task_type = TASK_ORDER
-            if task_target is not None:
+            if requested_charge:
+                task_target = self.charging_station_pos.copy()
+                task_type = TASK_CHARGE
+                applied[agent_idx] = 1.0
+            elif task_target is not None:
                 if agent.assigned_order_slot is None:
                     applied[agent_idx] = float(self._commit_auction_order_subgoal(agent))
                     task_target = self._order_target_for_agent(agent)
@@ -1118,7 +1215,7 @@ class UAVEnv:
 
             self._set_agent_subgoal_on_target_line(
                 agent,
-                action,
+                progress_action,
                 task_type=task_type,
                 task_target=task_target,
             )
@@ -1604,13 +1701,22 @@ class UAVEnv:
             if agent.prev_collided:
                 obstacle_penalty *= self.repeat_collision_scale
                 agent_penalty *= self.repeat_collision_scale
-            rewards[idx] += 2.5 * progress
-            rewards[idx] += self.velocity_reward_weight * max(0.0, velocity_toward_goal)
+            dense_reward_scale = (
+                self.charge_dense_reward_scale
+                if agent.current_task_type == TASK_CHARGE
+                else 1.0
+            )
+            rewards[idx] += dense_reward_scale * 2.5 * progress
+            rewards[idx] += (
+                dense_reward_scale
+                * self.velocity_reward_weight
+                * max(0.0, velocity_toward_goal)
+            )
             rewards[idx] -= 0.01
             rewards[idx] -= obstacle_penalty * float(obstacle_collisions[idx])
             rewards[idx] -= agent_penalty * float(agent_collisions[idx])
             rewards[idx] -= 0.2 * self.reward_safe_value[idx]
-            rewards[idx] -= 0.3 * min(current_dist, 1.0)
+            rewards[idx] -= dense_reward_scale * 0.3 * min(current_dist, 1.0)
 
             if current_dist <= self.goal_tolerance:
                 agent.reached = True
@@ -2008,7 +2114,7 @@ class UAVEnv:
             if order_id is None or order_id >= len(self.orders):
                 continue
             order = self.orders[order_id]
-            if order.status == DeliveryOrder.ACTIVE and order.assigned_agent is None:
+            if order.status != DeliveryOrder.COMPLETED:
                 orders.append(order)
         return orders
 
@@ -2016,6 +2122,18 @@ class UAVEnv:
         if order.assigned_agent is not None:
             return self._agent_color(order.assigned_agent)
         return "#2ca02c"
+
+    def _assigned_order_render_target(self, agent):
+        if agent.assigned_order_id is None:
+            return None
+        if agent.assigned_order_id >= len(self.orders):
+            return None
+        order = self.orders[agent.assigned_order_id]
+        if order.status == DeliveryOrder.COMPLETED:
+            return None
+        if order.status == DeliveryOrder.PICKED or agent.carrying_order:
+            return order.dropoff_pos
+        return order.pickup_pos
 
     def _math_label_font(self):
         from matplotlib import font_manager
@@ -2175,11 +2293,24 @@ class UAVEnv:
             )
             dropoff_labeled = True
 
+        assigned_labeled = False
         for idx, agent in enumerate(self.agents):
             color = self._agent_color(idx)
             trajectory = self._agent_trajectory(idx, agent)
             if len(trajectory) > 1:
                 ax.plot(trajectory[:, 0], trajectory[:, 1], color=color, alpha=0.9, linewidth=1.8)
+            assigned_target = self._assigned_order_render_target(agent)
+            if assigned_target is not None:
+                ax.plot(
+                    [agent.pos[0], assigned_target[0]],
+                    [agent.pos[1], assigned_target[1]],
+                    color=color,
+                    linestyle="--",
+                    linewidth=1.4,
+                    alpha=0.78,
+                    label="assigned order" if not assigned_labeled else None,
+                )
+                assigned_labeled = True
             ax.scatter(
                 agent.pos[0],
                 agent.pos[1],
@@ -2189,6 +2320,23 @@ class UAVEnv:
                 linewidths=0.8,
                 alpha=0.95,
                 label="hunter" if idx == 0 else None,
+            )
+            ax.text(
+                agent.pos[0] + 0.045,
+                agent.pos[1] + 0.045,
+                f"U{idx}",
+                color=color,
+                fontsize=10,
+                fontweight="bold",
+                ha="left",
+                va="bottom",
+                bbox={
+                    "boxstyle": "round,pad=0.12",
+                    "facecolor": "white",
+                    "edgecolor": color,
+                    "linewidth": 0.6,
+                    "alpha": 0.82,
+                },
             )
 
         for obstacle in self.obstacles:
@@ -2257,6 +2405,7 @@ class UAVEnv:
             )
             dropoff_labeled = True
 
+        assigned_labeled = False
         for idx, agent in enumerate(self.agents):
             color = self._agent_color(idx)
             trajectory = self._agent_trajectory(idx, agent)
@@ -2270,6 +2419,21 @@ class UAVEnv:
                     linewidth=1.8,
                 )
 
+            assigned_target = self._assigned_order_render_target(agent)
+            if assigned_target is not None:
+                target_z = assigned_target[2] if self.dim_actions == 3 else 0.0
+                ax.plot(
+                    [agent.pos[0], assigned_target[0]],
+                    [agent.pos[1], assigned_target[1]],
+                    [agent.pos[2], target_z],
+                    color=color,
+                    linestyle="--",
+                    linewidth=1.4,
+                    alpha=0.78,
+                    label="assigned order" if not assigned_labeled else None,
+                )
+                assigned_labeled = True
+
             ax.scatter(
                 agent.pos[0],
                 agent.pos[1],
@@ -2280,6 +2444,15 @@ class UAVEnv:
                 linewidths=0.8,
                 alpha=0.95,
                 label="hunter" if idx == 0 else None,
+            )
+            ax.text(
+                agent.pos[0],
+                agent.pos[1],
+                agent.pos[2] + 0.04,
+                f"U{idx}",
+                color=color,
+                fontsize=9,
+                fontweight="bold",
             )
 
             speed = np.linalg.norm(agent.vel)
@@ -2415,6 +2588,8 @@ class UAVEnvDiscreteWrapper:
         charging_radius=default_charging_radius,
         charging_rate=None,
         charging_station_pos=None,
+        charge_mode_fraction=0.5,
+        charge_dense_reward_scale=1.0,
     ):
         self.env = UAVEnv(
             dim_actions=dim_actions,
@@ -2436,6 +2611,8 @@ class UAVEnvDiscreteWrapper:
             charging_radius=charging_radius,
             charging_rate=charging_rate,
             charging_station_pos=charging_station_pos,
+            charge_mode_fraction=charge_mode_fraction,
+            charge_dense_reward_scale=charge_dense_reward_scale,
         )
         self.dim_actions = dim_actions
         self.episode_limit = episode_limit
@@ -2581,6 +2758,12 @@ class UAVEnvDiscreteWrapper:
 
     def get_high_level_avail_agent_actions(self, agent_id):
         return self.env.get_high_level_avail_agent_actions(agent_id)
+
+    def get_high_level_energy_margins(self):
+        return self.env.get_high_level_energy_margins()
+
+    def get_high_level_energy_order_masks(self):
+        return self.env.get_high_level_energy_order_masks()
 
     def get_current_high_level_actions(self):
         return self.env.get_current_high_level_actions()
@@ -2844,6 +3027,12 @@ class UAVParallelEnv:
     def get_high_level_avail_agent_actions(self, agent):
         agent_idx = self._agent_index[agent] if isinstance(agent, str) else int(agent)
         return self.base_env.get_high_level_avail_agent_actions(agent_idx)
+
+    def get_high_level_energy_margins(self):
+        return self.base_env.get_high_level_energy_margins()
+
+    def get_high_level_energy_order_masks(self):
+        return self.base_env.get_high_level_energy_order_masks()
 
     def get_current_high_level_actions(self):
         return self.base_env.get_current_high_level_actions()

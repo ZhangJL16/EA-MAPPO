@@ -98,6 +98,10 @@ def _configure_sc2_path(args):
 
 
 def build_env(args, algs):
+    def local_episode_limit(default=400):
+        value = getattr(args, "episode_limit", None)
+        return default if value is None else int(value)
+
     if args.map in {"simple_speaker_listener", "simple_speaker_listener_v4", "MPE2SpeakerListener"}:
         try:
             from envs.MPE2Env import MPE2SimpleSpeakerListenerWrapper
@@ -117,6 +121,7 @@ def build_env(args, algs):
         return UAVEnvDiscreteWrapper(
             dim_actions=2,
             num_hunters=int(getattr(args, "uav_n_agents", 4)),
+            episode_limit=local_episode_limit(),
         )
 
     if args.map == "UAV3D":
@@ -129,6 +134,7 @@ def build_env(args, algs):
         return UAVEnvDiscreteWrapper(
             dim_actions=3,
             num_hunters=int(getattr(args, "uav_n_agents", 4)),
+            episode_limit=local_episode_limit(),
         )
 
     if args.map in {"UAVDelivery", "UAVDelivery2D", "UAVDelivery3D"}:
@@ -142,6 +148,7 @@ def build_env(args, algs):
         return UAVEnvDiscreteWrapper(
             dim_actions=dim_actions,
             num_hunters=int(getattr(args, "uav_n_agents", 4)),
+            episode_limit=local_episode_limit(),
             total_orders=int(getattr(args, "uav_total_orders", 8)),
             max_active_orders=int(getattr(args, "uav_max_active_orders", 4)),
             pickup_reward=float(getattr(args, "uav_pickup_reward", 3.0)),
@@ -163,6 +170,7 @@ def build_env(args, algs):
         return UAVEnvDiscreteWrapper(
             dim_actions=dim_actions,
             num_hunters=int(getattr(args, "uav_n_agents", 4)),
+            episode_limit=local_episode_limit(),
             total_orders=int(getattr(args, "uav_total_orders", 8)),
             max_active_orders=int(getattr(args, "uav_max_active_orders", 4)),
             pickup_reward=float(getattr(args, "uav_pickup_reward", 3.0)),
@@ -175,6 +183,12 @@ def build_env(args, algs):
             charging_capacity=int(getattr(args, "uav_charging_capacity", 2)),
             charging_radius=float(getattr(args, "uav_charging_radius", 0.18)),
             charging_rate=getattr(args, "uav_charging_rate", None),
+            charge_mode_fraction=float(
+                getattr(args, "hrl_charge_mode_fraction", 0.5)
+            ),
+            charge_dense_reward_scale=float(
+                getattr(args, "hrl_charge_dense_reward_scale", 1.0)
+            ),
         )
 
     if args.map in {
@@ -192,6 +206,7 @@ def build_env(args, algs):
         return UAVEnvDiscreteWrapper(
             dim_actions=dim_actions,
             num_hunters=int(getattr(args, "uav_n_agents", 4)),
+            episode_limit=local_episode_limit(),
             total_orders=int(getattr(args, "uav_total_orders", 8)),
             max_active_orders=int(getattr(args, "uav_max_active_orders", 4)),
             pickup_reward=float(getattr(args, "uav_pickup_reward", 3.0)),
@@ -216,6 +231,7 @@ def build_env(args, algs):
         return UAVEnvDiscreteWrapper(
             dim_actions=3,
             num_hunters=int(getattr(args, "uav_n_agents", 4)),
+            episode_limit=local_episode_limit(),
         )
 
     if args.map == "Basic2P":

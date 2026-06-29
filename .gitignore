@@ -31,6 +31,7 @@ train_logs/*
 !train_logs/uav_delivery_experiments.csv
 
 # Model/checkpoint/data artifacts
+model_runs/
 *.pt
 *.pth
 *.ckpt

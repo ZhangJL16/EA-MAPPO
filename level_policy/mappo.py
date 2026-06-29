@@ -259,6 +259,8 @@ class MAPPO:
             action_dim=self.high_n_actions,
             obs_dim=self.high_obs_shape,
             state_dim=self.high_state_shape,
+            energy_margin_key="high_energy_margin",
+            energy_order_mask_key="high_energy_order_mask",
         )
 
     def _learn_hindsight_aux(self, batch):
@@ -340,6 +342,8 @@ class MAPPO:
         action_dim,
         obs_dim,
         state_dim,
+        energy_margin_key=None,
+        energy_order_mask_key=None,
     ):
         states = batch[state_key]
         next_states = batch[next_state_key]
@@ -359,6 +363,22 @@ class MAPPO:
         rewards = batch[reward_key]
         if rewards.size(-1) == 1:
             rewards = rewards.expand(-1, -1, self.n_agents)
+        energy_margins = (
+            batch.get(energy_margin_key, None) if energy_margin_key is not None else None
+        )
+        energy_order_masks = (
+            batch.get(energy_order_mask_key, None)
+            if energy_order_mask_key is not None
+            else None
+        )
+        energy_loss_coef = float(
+            getattr(self.args, "hrl_energy_margin_loss_coef", 0.0)
+        )
+        use_energy_loss = (
+            energy_loss_coef > 0.0
+            and action_dim in (1, 2)
+            and energy_margins is not None
+        )
 
         episode_num = states.size(0)
         time_len = states.size(1)
@@ -392,6 +412,23 @@ class MAPPO:
             valid_actions_pg = agent_actions[flat_agent_mask]
             valid_advantages_pg = advantages.reshape(-1)[flat_agent_mask]
             valid_old_log_probs_pg = old_log_probs[flat_agent_mask]
+            if use_energy_loss:
+                agent_energy_margins = energy_margins[:, :, agent_idx, 0].reshape(-1)
+                valid_energy_margins_pg = agent_energy_margins[flat_agent_mask]
+                if energy_order_masks is not None:
+                    agent_energy_order_masks = energy_order_masks[
+                        :, :, agent_idx, 0
+                    ].reshape(-1)
+                    valid_energy_order_masks_pg = agent_energy_order_masks[
+                        flat_agent_mask
+                    ]
+                else:
+                    valid_energy_order_masks_pg = torch.ones_like(
+                        valid_energy_margins_pg
+                    )
+            else:
+                valid_energy_margins_pg = None
+                valid_energy_order_masks_pg = None
 
             if valid_states.size(0) == 0:
                 continue
@@ -422,6 +459,41 @@ class MAPPO:
                         actor_loss = -torch.min(surrogate_1, surrogate_2)
                         actor_loss -= self.args.entropy_coef * entropy
                         actor_loss = actor_loss.mean()
+                        if valid_energy_margins_pg is not None:
+                            margin = valid_energy_margins_pg[indices]
+                            order_mask = valid_energy_order_masks_pg[indices]
+                            beta = float(
+                                getattr(
+                                    self.args,
+                                    "hrl_energy_margin_charge_beta",
+                                    0.5,
+                                )
+                            )
+                            charge_fraction = float(
+                                getattr(self.args, "hrl_charge_mode_fraction", 0.5)
+                            )
+                            charge_fraction = max(0.01, min(0.99, charge_fraction))
+                            charge_threshold = -1.0 + 2.0 * charge_fraction
+                            if action_dim >= 2:
+                                mode_dist = Normal(dist.loc[:, 0], dist.scale[:, 0])
+                                p_charge = mode_dist.cdf(
+                                    torch.full_like(mode_dist.loc, charge_threshold)
+                                )
+                            else:
+                                p_charge = dist.cdf(
+                                    torch.full_like(dist.loc, charge_threshold)
+                                ).squeeze(-1)
+                            p_order = 1.0 - p_charge
+                            unsafe_order_weight = torch.relu(-margin)
+                            feasible_order_weight = torch.relu(margin)
+                            energy_terms = (
+                                unsafe_order_weight * p_order
+                                + beta * feasible_order_weight * p_charge
+                            )
+                            energy_terms = energy_terms * order_mask
+                            denom = order_mask.sum().clamp_min(1.0)
+                            energy_loss = energy_terms.sum() / denom
+                            actor_loss = actor_loss + energy_loss_coef * energy_loss
 
                         actor_optimizers[agent_idx].zero_grad()
                         actor_loss.backward()

@@ -261,6 +261,7 @@ class RolloutWorker:
         high_o, high_s, high_u, high_r = [], [], [], []
         high_avail_u, high_o_next, high_s_next = [], [], []
         high_terminate, high_padded, high_active_masks = [], [], []
+        high_energy_margins, high_energy_order_masks = [], []
         hindsight_o, hindsight_mask = [], []
         current_high_transition = None
         current_high_reward = np.zeros(self.n_agents, dtype=np.float32)
@@ -346,6 +347,10 @@ class RolloutWorker:
                     high_u.append(current_high_transition["u"])
                     high_avail_u.append(current_high_transition["avail_u"])
                     high_active_masks.append(current_high_transition["active_mask"])
+                    high_energy_margins.append(current_high_transition["energy_margin"])
+                    high_energy_order_masks.append(
+                        current_high_transition["energy_order_mask"]
+                    )
                     high_r.append(high_reward)
                     high_o_next.append(self.env.get_high_level_obs())
                     high_s_next.append(self.env.get_high_level_state())
@@ -357,6 +362,18 @@ class RolloutWorker:
                 high_obs = self.env.get_high_level_obs()
                 high_state = self.env.get_high_level_state()
                 high_action_dim = int(getattr(self.args, "high_level_n_actions", 0))
+                if hasattr(self.env, "get_high_level_energy_margins"):
+                    high_energy_margin = self.env.get_high_level_energy_margins()
+                else:
+                    high_energy_margin = np.zeros((self.n_agents, 1), dtype=np.float32)
+                if hasattr(self.env, "get_high_level_energy_order_masks"):
+                    high_energy_order_mask = (
+                        self.env.get_high_level_energy_order_masks()
+                    )
+                else:
+                    high_energy_order_mask = np.zeros(
+                        (self.n_agents, 1), dtype=np.float32
+                    )
                 high_avail = np.ones(
                     (self.n_agents, high_action_dim), dtype=np.float32
                 )
@@ -390,6 +407,12 @@ class RolloutWorker:
                     "active_mask": active_agent_mask.reshape(
                         self.n_agents, 1
                     ).copy(),
+                    "energy_margin": np.asarray(
+                        high_energy_margin, dtype=np.float32
+                    ).reshape(self.n_agents, 1),
+                    "energy_order_mask": np.asarray(
+                        high_energy_order_mask, dtype=np.float32
+                    ).reshape(self.n_agents, 1),
                     "subgoals": (
                         self.env.get_current_subgoals()
                         if hasattr(self.env, "get_current_subgoals")
@@ -652,6 +675,8 @@ class RolloutWorker:
             high_u.append(current_high_transition["u"])
             high_avail_u.append(current_high_transition["avail_u"])
             high_active_masks.append(current_high_transition["active_mask"])
+            high_energy_margins.append(current_high_transition["energy_margin"])
+            high_energy_order_masks.append(current_high_transition["energy_order_mask"])
             high_r.append(high_reward)
             high_o_next.append(self.env.get_high_level_obs())
             high_s_next.append(self.env.get_high_level_state())
@@ -723,6 +748,12 @@ class RolloutWorker:
                 high_active_masks.append(
                     np.zeros((self.n_agents, 1), dtype=np.float32)
                 )
+                high_energy_margins.append(
+                    np.zeros((self.n_agents, 1), dtype=np.float32)
+                )
+                high_energy_order_masks.append(
+                    np.zeros((self.n_agents, 1), dtype=np.float32)
+                )
                 high_padded.append([1.0])
                 high_terminate.append([1.0])
 
@@ -754,6 +785,8 @@ class RolloutWorker:
                 high_o_next=high_o_next.copy(),
                 high_s_next=high_s_next.copy(),
                 high_agent_active_mask=high_active_masks.copy(),
+                high_energy_margin=high_energy_margins.copy(),
+                high_energy_order_mask=high_energy_order_masks.copy(),
                 high_padded=high_padded.copy(),
                 high_terminated=high_terminate.copy(),
             )

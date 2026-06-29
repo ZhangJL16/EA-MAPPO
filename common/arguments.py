@@ -50,6 +50,11 @@ def get_common_args():
     parser.add_argument('--hrl_reachable_subgoal_scale', type=float, default=1.0, help='scale applied to the reachable local subgoal radius')
     parser.add_argument('--hrl_meta_update_on_subgoal_done', type=bool, default=True, help='refresh high-level subgoals as soon as any current subgoal is reached')
     parser.add_argument('--hrl_off_policy_correction', type=bool, default=False, help='HIRO-style off-policy correction; incompatible with on-policy HMAPPO')
+    parser.add_argument('--hrl_energy_margin_loss_coef', type=float, default=0.0, help='coefficient for the high-level energy feasibility action loss')
+    parser.add_argument('--hrl_energy_margin_reserve_ratio', type=float, default=0.05, help='legacy compatibility option; current energy-margin loss uses zero margin as the feasibility boundary')
+    parser.add_argument('--hrl_energy_margin_charge_beta', type=float, default=0.5, help='relative penalty for charging when the current order is energy-feasible')
+    parser.add_argument('--hrl_charge_mode_fraction', type=float, default=0.5, help='fraction of the high-level mode interval reserved for charging; 0.25 means charge:order = 1:3')
+    parser.add_argument('--hrl_charge_dense_reward_scale', type=float, default=1.0, help='scale for dense goal-shaping rewards when the current high-level target is charging')
     parser.add_argument(
         '--experiment_device',
         type=str,

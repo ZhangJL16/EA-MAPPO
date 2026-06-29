@@ -19,8 +19,8 @@ from common.arguments import (
     get_mixer_args,
     get_reinforce_args,
 )
-from common.rollout import _build_env_summary, _get_env_msg
-from main import build_env
+from common.rollout import _build_env_summary, _get_active_agent_mask, _get_env_msg
+from main_level import build_env
 
 
 def positive_int(value):
@@ -186,6 +186,14 @@ def parse_args():
         help="Energy restored per charging step",
     )
     parser.add_argument(
+        "--hmappo-meta-period",
+        "--hmappo_meta_period",
+        dest="hmappo_meta_period",
+        type=positive_int,
+        default=5,
+        help="Low-level steps between high-level HMAPPO decisions",
+    )
+    parser.add_argument(
         "--save-xy",
         dest="save_xy",
         action="store_true",
@@ -241,6 +249,15 @@ def make_base_args(cli_args):
         evaluate=True,
         cuda=cli_args.cuda,
         gpu_id=cli_args.gpu_id,
+        use_level_policy=cli_args.map.startswith("UAVEnergyDeliveryLevel")
+        or cli_args.alg.lower() == "hmappo",
+        is_level_training=cli_args.map.startswith("UAVEnergyDeliveryLevel"),
+        hmappo_meta_period=cli_args.hmappo_meta_period,
+        hrl_reachable_subgoal_scale=1.0,
+        hrl_intrinsic_reward_scale=0.5,
+        hrl_intrinsic_distance_weight=0.05,
+        hrl_intrinsic_success_bonus=1.0,
+        hrl_meta_update_on_subgoal_done=True,
         uav_n_agents=cli_args.uav_n_agents,
         episode_limit=cli_args.episode_limit,
         uav_total_orders=cli_args.uav_total_orders,
@@ -447,6 +464,56 @@ def choose_actions(env, agents, args, last_action, step):
     return raw_obs, actions, avail_actions, actions_onehot
 
 
+def apply_high_level_action_if_needed(env, agents, args, step, current_subgoals):
+    level_training = bool(
+        getattr(args, "is_level_training", False)
+        and hasattr(env, "get_high_level_obs")
+        and hasattr(env, "apply_high_level_actions")
+    )
+    if not level_training:
+        return current_subgoals
+
+    meta_period = max(1, int(getattr(args, "hmappo_meta_period", 5)))
+    active_agent_mask = _get_active_agent_mask(env, args.n_agents)
+    force_update = False
+    if (
+        current_subgoals is not None
+        and getattr(args, "hrl_meta_update_on_subgoal_done", True)
+        and hasattr(env, "get_subgoal_success_mask")
+    ):
+        success = env.get_subgoal_success_mask(current_subgoals)
+        force_update = bool(np.any(success * active_agent_mask > 0.0))
+
+    if step % meta_period != 0 and not force_update:
+        return current_subgoals
+
+    if hasattr(env, "prepare_high_level_decision"):
+        env.prepare_high_level_decision()
+    high_obs = env.get_high_level_obs()
+    high_avail = (
+        env.get_high_level_avail_actions()
+        if hasattr(env, "get_high_level_avail_actions")
+        else np.ones((args.n_agents, args.high_level_n_actions), dtype=np.float32)
+    )
+    high_actions = []
+    for agent_id in range(args.n_agents):
+        if active_agent_mask[agent_id] <= 0.0:
+            high_action = np.zeros(args.high_level_n_actions, dtype=np.float32)
+        else:
+            high_action = agents.choose_high_level_action(
+                high_obs[agent_id],
+                agent_id,
+                high_avail[agent_id],
+                0.0,
+            )
+        high_actions.append(np.asarray(high_action, dtype=np.float32))
+
+    env.apply_high_level_actions(high_actions)
+    if hasattr(env, "get_current_subgoals"):
+        return env.get_current_subgoals()
+    return current_subgoals
+
+
 def run_episode(env, agents, args, cli_args, episode_idx):
     if cli_args.seed is None:
         seed = int(np.random.SeedSequence().generate_state(1, dtype=np.uint32)[0])
@@ -460,6 +527,15 @@ def run_episode(env, agents, args, cli_args, episode_idx):
         agents.reset_episode_state()
     if hasattr(agents.policy, "init_hidden"):
         agents.policy.init_hidden(1)
+    if hasattr(env, "set_meta_period"):
+        env.set_meta_period(getattr(args, "hmappo_meta_period", 5))
+    if hasattr(env, "set_hrl_parameters"):
+        env.set_hrl_parameters(
+            reachable_subgoal_scale=getattr(args, "hrl_reachable_subgoal_scale", None),
+            intrinsic_reward_scale=getattr(args, "hrl_intrinsic_reward_scale", None),
+            intrinsic_distance_weight=getattr(args, "hrl_intrinsic_distance_weight", None),
+            intrinsic_success_bonus=getattr(args, "hrl_intrinsic_success_bonus", None),
+        )
 
     max_steps = cli_args.max_steps or args.episode_limit
     terminated = False
@@ -469,6 +545,7 @@ def run_episode(env, agents, args, cli_args, episode_idx):
     info = {
         "battle_won": False,
     }
+    current_high_subgoals = None
 
     frames = []
     save_frame_images = bool(cli_args.save_frames and cli_args.render_mode == "rgb_array")
@@ -496,6 +573,13 @@ def run_episode(env, agents, args, cli_args, episode_idx):
     )
 
     while not terminated and step < max_steps:
+        current_high_subgoals = apply_high_level_action_if_needed(
+            env,
+            agents,
+            args,
+            step,
+            current_high_subgoals,
+        )
         raw_obs, actions, avail_actions, _ = choose_actions(env, agents, args, last_action, step)
         if hasattr(agents, "revise_safe_actions"):
             revised_actions = agents.revise_safe_actions(
@@ -581,6 +665,14 @@ def main():
         args.raw_obs_shape = env_info["obs_shape"]
         args.episode_limit = env_info["episode_limit"]
         args.msg_shape = env_info.get("msg_shape", 0)
+        args.high_level_n_actions = env_info.get("high_level_n_actions", 0)
+        args.high_level_obs_shape = env_info.get("high_level_obs_shape", 0)
+        args.high_level_state_shape = env_info.get("high_level_state_shape", 0)
+        args.low_task_shape = env_info.get("low_task_shape", 0)
+        args.max_active_orders = env_info.get(
+            "max_active_orders", getattr(args, "uav_max_active_orders", 0)
+        )
+        args.charge_action_id = env_info.get("charge_action_id", args.max_active_orders)
         args = configure_algorithm_args(args)
 
         agents = Agents(args, env)
