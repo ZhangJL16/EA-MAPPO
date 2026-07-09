@@ -7,6 +7,17 @@ Here are the param for the training
 """
 
 
+def _str2bool(value):
+    if isinstance(value, bool):
+        return value
+    value = str(value).strip().lower()
+    if value in {"true", "1", "yes", "y", "on"}:
+        return True
+    if value in {"false", "0", "no", "n", "off"}:
+        return False
+    raise argparse.ArgumentTypeError(f"invalid boolean value: {value}")
+
+
 def get_common_args():
     parser = argparse.ArgumentParser()
     # the environment setting
@@ -21,7 +32,7 @@ def get_common_args():
     parser.add_argument('--no_deterministic_torch', dest='deterministic_torch', action='store_false', help='disable deterministic PyTorch settings')
     parser.add_argument('--step_mul', type=int, default=8, help='how many steps to make an action')
     parser.add_argument('--replay_dir', type=str, default='./replay', help='absolute path to save the replay') # ./replay
-    parser.add_argument('--debug', type=bool, default=False, help='smac show infos')
+    parser.add_argument('--debug', type=_str2bool, default=False, help='smac show infos')
     parser.add_argument('--uav_n_agents', type=int, default=4, help='number of UAV agents for UAV2D/UAV3D/UAVEncircle/UAVDelivery environments')
     parser.add_argument('--episode_limit', type=int, default=400, help='episode length for local UAV environments')
     parser.add_argument('--uav_total_orders', type=int, default=16, help='total delivery orders per UAVDelivery episode')
@@ -31,7 +42,7 @@ def get_common_args():
     parser.add_argument('--uav_initial_energy', type=float, default=100.0, help='initial energy for UAVEnergyDelivery agents')
     parser.add_argument('--uav_energy_decay', type=float, default=None, help='energy consumed per UAVEnergyDelivery step; defaults to depletion at half episode length')
     parser.add_argument('--uav_energy_depletion_fraction', type=float, default=0.5, help='fraction of episode length when full energy should be depleted')
-    parser.add_argument('--uav_charging_capacity', type=int, default=2, help='maximum UAVs charging at the station in one step')
+    parser.add_argument('--uav_charging_capacity', type=int, default=None, help='maximum UAVs charging at the station in one step; defaults to ceil(uav_n_agents / 2)')
     parser.add_argument('--uav_charging_radius', type=float, default=0.18, help='distance threshold for UAVEnergyDelivery charging station')
     parser.add_argument('--uav_charging_rate', type=float, default=None, help='energy restored per charging step; defaults to 4x energy decay per step')
     parser.add_argument('--hmappo_meta_period', type=int, default=5, help='number of low-level steps between hierarchical high-level decisions')
@@ -39,31 +50,35 @@ def get_common_args():
     parser.add_argument('--high_lr_critic', type=float, default=None, help='critic learning rate for hierarchical high-level policy')
     parser.add_argument('--high_actor_hidden_dim', type=int, default=None, help='hidden dimension for hierarchical high-level actor')
     parser.add_argument('--high_critic_hidden_dim', type=int, default=None, help='hidden dimension for hierarchical high-level critic')
-    parser.add_argument('--hrl_use_intrinsic_reward', type=bool, default=True, help='use subgoal intrinsic rewards for the low-level policy in HMAPPO')
+    parser.add_argument('--hrl_use_intrinsic_reward', type=_str2bool, default=True, help='use subgoal intrinsic rewards for the low-level policy in HMAPPO')
     parser.add_argument('--hrl_intrinsic_reward_scale', type=float, default=1.0, help='scale for low-level HRL intrinsic rewards')
     parser.add_argument('--hrl_intrinsic_distance_weight', type=float, default=0.05, help='distance penalty weight in the low-level intrinsic reward')
     parser.add_argument('--hrl_intrinsic_success_bonus', type=float, default=1.0, help='success bonus in the low-level intrinsic reward')
     parser.add_argument('--hrl_delivery_intrinsic_progress_bonus', type=float, default=0.0, help='extra low-level intrinsic reward multiplier for positive progress while carrying an order to dropoff')
     parser.add_argument('--hrl_intrinsic_collision_penalty', type=float, default=0.0, help='low-level intrinsic penalty for a collision on the current environment step')
     parser.add_argument('--hrl_order_progress_override', type=float, default=None, help='override high-level progress scalar for order-mode subgoals; disabled when unset')
-    parser.add_argument('--hrl_hindsight_goal', type=bool, default=True, help='enable achieved-goal hindsight auxiliary training for the low-level HMAPPO actor')
+    parser.add_argument('--hrl_hindsight_goal', type=_str2bool, default=True, help='enable achieved-goal hindsight auxiliary training for the low-level HMAPPO actor')
     parser.add_argument('--hrl_hindsight_aux_coef', type=float, default=0.2, help='coefficient for the low-level achieved-goal hindsight auxiliary loss')
     parser.add_argument('--hrl_subgoal_testing_rate', type=float, default=0.2, help='probability of marking a high-level subgoal as a feasibility test')
     parser.add_argument('--hrl_subgoal_failure_penalty', type=float, default=5.0, help='high-level penalty when a tested subgoal is not reached')
     parser.add_argument('--hrl_reachable_subgoal_scale', type=float, default=1.0, help='scale applied to the reachable local subgoal radius')
-    parser.add_argument('--hrl_oracle_high_level', type=bool, default=False, help='use oracle order-seeking high-level actions for low-level pretraining')
-    parser.add_argument('--hmappo_freeze_high_level', type=bool, default=False, help='skip high-level policy updates in HMAPPO')
-    parser.add_argument('--hmappo_freeze_low_level', type=bool, default=False, help='skip low-level policy updates in HMAPPO')
+    parser.add_argument('--hrl_oracle_high_level', type=_str2bool, default=False, help='use oracle order-seeking high-level actions for low-level pretraining')
+    parser.add_argument('--hmappo_freeze_high_level', type=_str2bool, default=False, help='skip high-level policy updates in HMAPPO')
+    parser.add_argument('--hmappo_freeze_low_level', type=_str2bool, default=False, help='skip low-level policy updates in HMAPPO')
     parser.add_argument('--hmappo_pretrained_low_model_dir', type=str, default='', help='directory containing pretrained HMAPPO low-level actor/critic checkpoints')
-    parser.add_argument('--hrl_meta_update_on_subgoal_done', type=bool, default=False, help='refresh high-level subgoals as soon as any current subgoal is reached')
-    parser.add_argument('--hrl_safe_action_guard_enabled', type=bool, default=False, help='enable a SCOPE-style deterministic low-level safety action replacement for local UAV HMAPPO')
+    parser.add_argument('--hrl_meta_update_on_subgoal_done', type=_str2bool, default=False, help='refresh high-level subgoals as soon as any current subgoal is reached')
+    parser.add_argument('--hrl_safe_action_guard_enabled', type=_str2bool, default=False, help='enable a SCOPE-style deterministic low-level safety action replacement for local UAV HMAPPO')
     parser.add_argument('--hrl_safe_action_guard_margin', type=float, default=0.04, help='extra collision prediction margin used by the low-level safety action replacement')
-    parser.add_argument('--hrl_off_policy_correction', type=bool, default=False, help='HIRO-style off-policy correction; incompatible with on-policy HMAPPO')
+    parser.add_argument('--hrl_off_policy_correction', type=_str2bool, default=False, help='HIRO-style off-policy correction; incompatible with on-policy HMAPPO')
     parser.add_argument('--hrl_energy_margin_loss_coef', type=float, default=0.0, help='coefficient for the high-level energy feasibility action loss')
-    parser.add_argument('--hrl_energy_shield_enabled', type=bool, default=False, help='enable a hard high-level energy feasibility shield for charge/order mode selection')
+    parser.add_argument('--hrl_energy_shield_enabled', type=_str2bool, default=False, help='enable a hard high-level energy feasibility shield for charge/order mode selection')
     parser.add_argument('--hrl_energy_margin_reserve_ratio', type=float, default=0.05, help='normalized energy reserve kept after completing an order and returning to the charging station')
     parser.add_argument('--hrl_energy_margin_charge_beta', type=float, default=0.5, help='relative penalty for charging when the current order is energy-feasible')
-    parser.add_argument('--hrl_charge_queue_enabled', type=bool, default=False, help='spread charging subgoals across capacity-aware dock and waiting slots')
+    parser.add_argument('--hrl_auction_enabled', type=_str2bool, default=True, help='enable auction-based order pre-assignment in UAVEnergyDeliveryLevel')
+    parser.add_argument('--hrl_fixed_charge_threshold_enabled', type=_str2bool, default=False, help='replace learned high-level charge/order mode with fixed energy thresholds')
+    parser.add_argument('--hrl_fixed_charge_threshold', type=float, default=0.35, help='energy ratio below which fixed-threshold H-MAPPO chooses charging')
+    parser.add_argument('--hrl_fixed_charge_release_threshold', type=float, default=0.65, help='energy ratio above which fixed-threshold H-MAPPO releases charging')
+    parser.add_argument('--hrl_charge_queue_enabled', type=_str2bool, default=False, help='spread charging subgoals across capacity-aware dock and waiting slots')
     parser.add_argument('--hrl_charge_queue_radius', type=float, default=0.24, help='radius of the charging waiting ring when charge queue is enabled')
     parser.add_argument('--hrl_charge_mode_fraction', type=float, default=0.5, help='fraction of the high-level mode interval reserved for charging; 0.25 means charge:order = 1:3')
     parser.add_argument('--hrl_charge_dense_reward_scale', type=float, default=1.0, help='scale for dense goal-shaping rewards when the current high-level target is charging')
@@ -84,6 +99,20 @@ def get_common_args():
     # time slot = n_steps / evaluate_cycle
     parser.add_argument('--n_steps', type=int, default=600000, help='total time steps')  # 4000000
     parser.add_argument('--time_steps', type=int, default=None, help='total time steps for RGMComm/MADDPG; defaults to n_steps')
+    parser.add_argument('--evaluate_rate', type=int, default=1000, help='evaluation interval for RGMComm/MADDPG/MATD3')
+    parser.add_argument('--evaluate_episode_len', type=int, default=100, help='evaluation episode length for RGMComm/MADDPG/MATD3')
+    parser.add_argument('--sample_rate', type=int, default=2000, help='Q-sample interval for RGMComm/MADDPG/MATD3 diagnostics')
+    parser.add_argument('--sample_start', type=int, default=1000, help='first Q-sample step for RGMComm/MADDPG/MATD3 diagnostics')
+    parser.add_argument('--buffer_size', type=int, default=int(5e5), help='replay buffer size for RGMComm/MADDPG/MATD3')
+    parser.add_argument('--batch_size', type=int, default=256, help='training batch size')
+    parser.add_argument('--save_rate', type=int, default=2000, help='model save interval for RGMComm/MADDPG/MATD3')
+    parser.add_argument('--lr_actor', type=float, default=1e-4, help='actor learning rate for RGMComm/MADDPG/MATD3')
+    parser.add_argument('--lr_critic', type=float, default=1e-3, help='critic learning rate for RGMComm/MADDPG/MATD3')
+    parser.add_argument('--noise_rate', type=float, default=0.1, help='exploration noise rate for RGMComm/MADDPG/MATD3')
+    parser.add_argument('--tau', type=float, default=0.01, help='target network soft update coefficient')
+    parser.add_argument('--matd3_policy_delay', type=int, default=2, help='critic updates per delayed MATD3 actor update')
+    parser.add_argument('--matd3_target_noise', type=float, default=0.2, help='MATD3 target policy smoothing noise scale')
+    parser.add_argument('--matd3_target_noise_clip', type=float, default=0.5, help='MATD3 target policy smoothing noise clip scale')
     parser.add_argument('--n_episodes', type=int, default=1, help='the number of episodes before once training')
     # 需要大于一个 episode 的长度
     parser.add_argument('--evaluate_cycle', type=int, default=20, help='how often to evaluate the model') # 5000
@@ -91,25 +120,25 @@ def get_common_args():
     parser.add_argument('--evaluate_epoch', type=int, default=1, help='number of the epoch to evaluate the agent') # 32
     parser.add_argument('--smac_parallel_envs', type=int, default=1, help='number of parallel SMAC rollout workers for qmix/vdn series')
 
-    parser.add_argument('--last_action', type=bool, default=False,
+    parser.add_argument('--last_action', type=_str2bool, default=False,
                         help='whether to use the last action to choose action')
-    parser.add_argument('--reuse_network', type=bool, default=True, help='whether to use one network for all agents')
+    parser.add_argument('--reuse_network', type=_str2bool, default=True, help='whether to use one network for all agents')
     parser.add_argument('--gamma', type=float, default=0.99, help='discount factor')
     parser.add_argument('--optimizer', type=str, default="RMS", help='optimizer')
     parser.add_argument('--model_dir', type=str, default='./model', help='model directory of the policy')
     parser.add_argument('--result_dir', type=str, default='./result', help='result directory of the policy')
-    parser.add_argument('--load_model', type=bool, default=False, help='whether to load the pretrained model')
-    parser.add_argument('--evaluate', type=bool, default=False, help='whether to evaluate the model')
-    parser.add_argument('--cuda', type=bool, default=True, help='whether to use the GPU')
+    parser.add_argument('--load_model', type=_str2bool, default=False, help='whether to load the pretrained model')
+    parser.add_argument('--evaluate', type=_str2bool, default=False, help='whether to evaluate the model')
+    parser.add_argument('--cuda', type=_str2bool, default=True, help='whether to use the GPU')
     parser.add_argument('--gpu_id', type=int, default=0, help='GPU id to use when CUDA is enabled')
     # parser.add_argument('--record', type=bool, default=True, help='whether to save the exp (fig and numpy)')
-    parser.add_argument('--last_reward', type=bool, default=False, help='draw last reward or not')
+    parser.add_argument('--last_reward', type=_str2bool, default=False, help='draw last reward or not')
     # G-network related
-    parser.add_argument('--distributed', type=bool, default=True,
+    parser.add_argument('--distributed', type=_str2bool, default=True,
                         help='equip every q network with a guide (mix after fix)')
     parser.add_argument('--guide_mix_network_type', type=str, default='vdn', help='use vdn or qmix to sum G values')
     # communication related
-    parser.add_argument('--comm', type=bool, default=False, help='whether to communicate')
+    parser.add_argument('--comm', type=_str2bool, default=False, help='whether to communicate')
     parser.add_argument('--msg_size', type=int, default=3, help='size of message')
     parser.add_argument('--aoi_threshold', type=float, default=0.25, help='AoI freshness threshold in seconds')
     parser.add_argument('--aoi_min_weight', type=float, default=0.2, help='minimum retained weight for stale message dimensions')
@@ -352,6 +381,11 @@ def get_mappo_args(args):
     return args
 
 
+def get_ippo_args(args):
+    """IPPO uses PPO updates with independent local-observation critics."""
+    return get_mappo_args(args)
+
+
 def get_macpo_args(args):
     """MACPO 算法的超参数"""
     args = get_mappo_args(args)
@@ -363,6 +397,17 @@ def get_macpo_args(args):
     args.lambda_lr = 5e-2
     args.lambda_init = 0.0
 
+    return args
+
+
+def get_mappo_lagrangian_args(args):
+    """MAPPO-Lagrangian hyperparameters."""
+    args = get_mappo_args(args)
+    args.lr_cost_critic = 5e-4
+    args.cost_limit = 0.1
+    args.cost_coef = 1.0
+    args.lambda_lr = 5e-2
+    args.lambda_init = 0.0
     return args
 
 def get_RGM_args(args):
@@ -385,7 +430,11 @@ def get_RGM_args(args):
     args.buffer_size = getattr(args, 'buffer_size', int(5e5))
     args.batch_size = getattr(args, 'batch_size', 256)
 
-    args.save_dir = getattr(args, 'save_dir', './model/simple_tag_6_stage1_test_2023')
+    args.save_dir = getattr(
+        args,
+        'save_dir',
+        args.model_dir if getattr(args, 'model_dir', '') else './model/simple_tag_6_stage1_test_2023',
+    )
     args.load_dir = getattr(args, 'load_dir', './model/simple_tag_6_preTrain')
     args.save_rate = getattr(args, 'save_rate', 2000)
     args.model_dir = getattr(args, 'model_dir', '')

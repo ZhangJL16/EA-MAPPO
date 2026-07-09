@@ -11,7 +11,9 @@ from common.arguments import (
     get_commnet_args,
     get_g2anet_args,
     get_RGM_args,
+    get_ippo_args,
     get_mappo_args,
+    get_mappo_lagrangian_args,
     get_macpo_args,
     lr_adjust,
 )
@@ -30,6 +32,13 @@ plt.rcParams["axes.unicode_minus"] = True
 plt.rcParams["text.color"] = "black"
 plt.set_cmap("jet")
 colors = ["blue", "orange", "red", "forestgreen", "darkviolet", "black"]
+
+
+def _charging_capacity_arg(args):
+    capacity = getattr(args, "uav_charging_capacity", None)
+    if capacity is not None:
+        return int(capacity)
+    return max(1, (int(getattr(args, "uav_n_agents", 4)) + 1) // 2)
 
 
 @contextmanager
@@ -175,7 +184,7 @@ def build_env(args, algs):
             energy_depletion_fraction=float(
                 getattr(args, "uav_energy_depletion_fraction", 0.5)
             ),
-            charging_capacity=int(getattr(args, "uav_charging_capacity", 2)),
+            charging_capacity=_charging_capacity_arg(args),
             charging_radius=float(getattr(args, "uav_charging_radius", 0.18)),
             charging_rate=getattr(args, "uav_charging_rate", None),
         )
@@ -323,6 +332,10 @@ if __name__ == "__main__":
             args = get_centralv_args(args)
         elif args.alg.find("reinforce") > -1:
             args = get_reinforce_args(args)
+        elif args.alg.find("ippo") > -1:
+            args = get_ippo_args(args)
+        elif args.alg.find("mappo_lagrangian") > -1:
+            args = get_mappo_lagrangian_args(args)
         elif args.alg.find("mappo") > -1:
             args = get_mappo_args(args)
         elif args.alg.find("macpo") > -1:

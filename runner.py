@@ -242,6 +242,7 @@ class Runner:
             and args.alg.find("coma") == -1
             and args.alg.find("central_v") == -1
             and args.alg.find("reinforce") == -1
+            and args.alg.find("ippo") == -1
             and args.alg.find("mappo") == -1
             and args.alg.find("macpo") == -1
             and args.alg.lower().find("rgmcomm") == -1
@@ -852,6 +853,7 @@ class Runner:
                         self.args.alg.find("coma") > -1
                         or self.args.alg.find("central_v") > -1
                         or self.args.alg.find("reinforce") > -1
+                        or self.args.alg.find("ippo") > -1
                         or self.args.alg.find("mappo") > -1
                         or self.args.alg.find("macpo") > -1
                     ):

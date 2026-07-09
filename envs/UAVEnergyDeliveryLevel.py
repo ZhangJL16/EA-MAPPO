@@ -16,7 +16,7 @@ default_num_obstacles = 10
 default_obstacle_radius_range = (0.16, 0.24)
 default_initial_energy = 100.0
 default_energy_depletion_fraction = 0.5
-default_charging_capacity = 2
+default_charging_capacity = None
 default_charging_radius = 0.18
 eps = 1e-6
 TASK_IDLE = 0
@@ -247,6 +247,10 @@ class UAVEnv:
         charging_station_pos=None,
         charge_mode_fraction=0.5,
         charge_dense_reward_scale=1.0,
+        auction_enabled=True,
+        fixed_charge_threshold_enabled=False,
+        fixed_charge_threshold=0.35,
+        fixed_charge_release_threshold=0.65,
     ):
         if dim_actions not in (2, 3):
             raise ValueError("Dimension must be 2 or 3")
@@ -278,6 +282,10 @@ class UAVEnv:
         self.order_mode_center = self.charge_mode_fraction
         self._last_high_mode_train_mask = np.ones((self.num_agents, 1), dtype=np.float32)
         self.charge_dense_reward_scale = float(charge_dense_reward_scale)
+        self.auction_enabled = bool(auction_enabled)
+        self.fixed_charge_threshold_enabled = bool(fixed_charge_threshold_enabled)
+        self.fixed_charge_threshold = float(fixed_charge_threshold)
+        self.fixed_charge_release_threshold = float(fixed_charge_release_threshold)
         self.charge_action_id = -1
         self.pickup_reward = float(pickup_reward)
         self.delivery_reward = float(delivery_reward)
@@ -290,6 +298,8 @@ class UAVEnv:
             )
             energy_decay_per_step = self.initial_energy / depletion_steps
         self.energy_decay_per_step = round(float(energy_decay_per_step), 1)
+        if charging_capacity is None:
+            charging_capacity = max(1, (int(self.num_agents) + 1) // 2)
         self.charging_capacity = int(charging_capacity)
         self.charging_radius = float(charging_radius)
         self.charging_rate = round(
@@ -1183,6 +1193,31 @@ class UAVEnv:
             return False
         return self._assign_order_slot_to_agent(agent, int(slot_idx))
 
+    def _select_greedy_order_slot(self, agent):
+        best_slot = None
+        best_cost = float("inf")
+        for slot_idx in self.available_order_slots:
+            order = self._slot_order(slot_idx)
+            if order is None:
+                continue
+            if not self._order_slot_energy_feasible(agent, slot_idx):
+                continue
+            travel = float(np.linalg.norm(agent.pos - order.pickup_pos))
+            travel += float(np.linalg.norm(order.pickup_pos - order.dropoff_pos))
+            if travel < best_cost:
+                best_cost = travel
+                best_slot = int(slot_idx)
+        return best_slot
+
+    def _maybe_set_greedy_order_slot(self, agent):
+        if self.auction_enabled:
+            return
+        if agent.assigned_order_slot is not None or agent.auction_order_slot is not None:
+            return
+        slot_idx = self._select_greedy_order_slot(agent)
+        if slot_idx is not None:
+            agent.auction_order_slot = slot_idx
+
     def run_order_auction(self, record=False):
         self._activate_orders()
         for agent in self.agents:
@@ -1194,6 +1229,13 @@ class UAVEnv:
                 self._set_agent_idle(agent)
             if agent.assigned_order_slot is None:
                 agent.auction_order_slot = None
+
+        if not self.auction_enabled:
+            if record:
+                self.high_diag_auction_calls += 1.0
+                self.high_diag_auction_candidates += 0.0
+                self.high_diag_auction_orders += float(len(self.available_order_slots))
+            return {}
 
         candidate_agents = [
             agent
@@ -1579,8 +1621,26 @@ class UAVEnv:
 
             mode_id, progress_scalar = self._parse_high_level_action(action)
             task_target = self._order_target_for_agent(agent)
+            self._maybe_set_greedy_order_slot(agent)
+            if task_target is None:
+                task_target = self._order_target_for_agent(agent)
             order_locked = self._agent_order_locked(agent)
             charge_locked = self._agent_charge_locked(agent)
+            energy_ratio = agent.energy / (agent.initial_energy + eps)
+            if (
+                self.fixed_charge_threshold_enabled
+                and not order_locked
+                and not charge_locked
+            ):
+                if energy_ratio <= self.fixed_charge_threshold:
+                    mode_id = HIGH_MODE_CHARGE
+                elif (
+                    agent.current_task_type == TASK_CHARGE
+                    and energy_ratio < self.fixed_charge_release_threshold
+                ):
+                    mode_id = HIGH_MODE_CHARGE
+                else:
+                    mode_id = HIGH_MODE_ORDER
             energy_blocked_order = (
                 self.energy_shield_enabled
                 and mode_id == HIGH_MODE_ORDER
@@ -1598,7 +1658,6 @@ class UAVEnv:
                     )
                 )
             )
-            energy_ratio = agent.energy / (agent.initial_energy + eps)
             should_charge_fallback = (
                 task_target is None
                 and (
@@ -3244,6 +3303,10 @@ class UAVEnvDiscreteWrapper:
         charging_station_pos=None,
         charge_mode_fraction=0.5,
         charge_dense_reward_scale=1.0,
+        auction_enabled=True,
+        fixed_charge_threshold_enabled=False,
+        fixed_charge_threshold=0.35,
+        fixed_charge_release_threshold=0.65,
     ):
         self.env = UAVEnv(
             dim_actions=dim_actions,
@@ -3267,6 +3330,10 @@ class UAVEnvDiscreteWrapper:
             charging_station_pos=charging_station_pos,
             charge_mode_fraction=charge_mode_fraction,
             charge_dense_reward_scale=charge_dense_reward_scale,
+            auction_enabled=auction_enabled,
+            fixed_charge_threshold_enabled=fixed_charge_threshold_enabled,
+            fixed_charge_threshold=fixed_charge_threshold,
+            fixed_charge_release_threshold=fixed_charge_release_threshold,
         )
         self.dim_actions = dim_actions
         self.episode_limit = episode_limit
@@ -3578,6 +3645,10 @@ class UAVParallelEnv:
         charging_radius=default_charging_radius,
         charging_rate=None,
         charging_station_pos=None,
+        auction_enabled=True,
+        fixed_charge_threshold_enabled=False,
+        fixed_charge_threshold=0.35,
+        fixed_charge_release_threshold=0.65,
     ):
         self.render_mode = render_mode
         self.continuous_actions = continuous_actions
@@ -3613,6 +3684,10 @@ class UAVParallelEnv:
             charging_radius=charging_radius,
             charging_rate=charging_rate,
             charging_station_pos=charging_station_pos,
+            auction_enabled=auction_enabled,
+            fixed_charge_threshold_enabled=fixed_charge_threshold_enabled,
+            fixed_charge_threshold=fixed_charge_threshold,
+            fixed_charge_release_threshold=fixed_charge_release_threshold,
         )
         self.msg_shape = getattr(self.base_env, "msg_shape", 0)
 
@@ -3828,6 +3903,10 @@ def parallel_env(
     charging_radius=default_charging_radius,
     charging_rate=None,
     charging_station_pos=None,
+    auction_enabled=True,
+    fixed_charge_threshold_enabled=False,
+    fixed_charge_threshold=0.35,
+    fixed_charge_release_threshold=0.65,
 ):
     return UAVParallelEnv(
         dim_actions=dim_actions,
@@ -3854,4 +3933,8 @@ def parallel_env(
         charging_radius=charging_radius,
         charging_rate=charging_rate,
         charging_station_pos=charging_station_pos,
+        auction_enabled=auction_enabled,
+        fixed_charge_threshold_enabled=fixed_charge_threshold_enabled,
+        fixed_charge_threshold=fixed_charge_threshold,
+        fixed_charge_release_threshold=fixed_charge_release_threshold,
     )

@@ -14,7 +14,7 @@ default_num_obstacles = 10
 default_obstacle_radius_range = (0.16, 0.24)
 default_initial_energy = 100.0
 default_energy_depletion_fraction = 0.5
-default_charging_capacity = 2
+default_charging_capacity = None
 default_charging_radius = 0.18
 eps = 1e-6
 legend_font_size_xy = 26
@@ -243,6 +243,8 @@ class UAVEnv:
             )
             energy_decay_per_step = self.initial_energy / depletion_steps
         self.energy_decay_per_step = round(float(energy_decay_per_step), 1)
+        if charging_capacity is None:
+            charging_capacity = max(1, (int(self.num_agents) + 1) // 2)
         self.charging_capacity = int(charging_capacity)
         self.charging_radius = float(charging_radius)
         self.charging_rate = round(

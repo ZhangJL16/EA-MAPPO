@@ -295,7 +295,8 @@ class RolloutWorker:
 
         penalty_applied = False
         uses_policy_gradient_reward = any(
-            alg_name in self.args.alg.lower() for alg_name in ("mappo", "macpo")
+            alg_name in self.args.alg.lower()
+            for alg_name in ("ippo", "mappo", "macpo")
         )
         apply_warning_reshape = (
             "reshape" in self.args.alg.lower()
@@ -305,7 +306,10 @@ class RolloutWorker:
                 and self.args.alg.lower().find("safe") > -1
             )
         )
-        use_constraint_cost = "macpo" in self.args.alg.lower()
+        use_constraint_cost = (
+            "macpo" in self.args.alg.lower()
+            or "lagrangian" in self.args.alg.lower()
+        )
         reward_template = np.zeros(
             (self.n_agents,) if uses_policy_gradient_reward else (1,),
             dtype=np.float32,

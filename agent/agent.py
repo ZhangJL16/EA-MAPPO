@@ -59,6 +59,18 @@ class Agents:
             from policy.gmix import GMIX
 
             self.policy = GMIX(args)
+        elif args.alg.find("ippo") > -1:
+            if getattr(args, "use_level_policy", False):
+                raise ValueError("ippo is only implemented for flat PPO.")
+            from policy.ippo import IPPO
+
+            self.policy = IPPO(args)
+        elif args.alg.find("mappo_lagrangian") > -1:
+            if getattr(args, "use_level_policy", False):
+                raise ValueError("mappo_lagrangian is only implemented for flat MAPPO.")
+            from policy.mappo_lagrangian import MAPPOLagrangian
+
+            self.policy = MAPPOLagrangian(args)
         elif args.alg.find("mappo") > -1:
             if getattr(args, "use_level_policy", False):
                 from level_policy.mappo import MAPPO
@@ -73,10 +85,14 @@ class Agents:
         elif args.alg.lower().find("rgmcomm") > -1:
             if getattr(args, "use_level_policy", False):
                 from level_policy.maddpg import MADDPG
+                self.policy = MADDPG(args, agent_id)
+            elif args.alg.lower().find("matd3") > -1:
+                from policy.matd3 import MATD3
+
+                self.policy = MATD3(args, agent_id)
             else:
                 from policy.maddpg import MADDPG
-
-            self.policy = MADDPG(args, agent_id)
+                self.policy = MADDPG(args, agent_id)
         else:
             raise Exception("No such algorithm")
 
@@ -252,7 +268,7 @@ class Agents:
         ):
             self.obs_[agent_num] = np.asarray(obs, dtype=np.float32).reshape(-1)
 
-        if self.args.alg.find("mappo") > -1:
+        if self.args.alg.find("ippo") > -1 or self.args.alg.find("mappo") > -1:
             action = self.policy.choose_action(
                 obs,
                 agent_num,
