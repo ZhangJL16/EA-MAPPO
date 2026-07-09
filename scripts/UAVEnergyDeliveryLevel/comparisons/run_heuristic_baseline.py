@@ -58,7 +58,10 @@ def finish_order_then_charge_distance(base, agent, order):
         distance += float(np.linalg.norm(order.pickup_pos - order.dropoff_pos))
     elif order.status == DeliveryOrder.PICKED:
         distance += float(np.linalg.norm(current - order.dropoff_pos))
-    distance += float(np.linalg.norm(order.dropoff_pos - base.charging_station_pos))
+    if hasattr(base, "_distance_to_nearest_charging_station_from_pos"):
+        distance += base._distance_to_nearest_charging_station_from_pos(order.dropoff_pos)
+    else:
+        distance += float(np.linalg.norm(order.dropoff_pos - base.charging_station_pos))
     return distance
 
 

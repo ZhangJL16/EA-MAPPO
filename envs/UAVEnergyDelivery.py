@@ -14,7 +14,8 @@ default_num_obstacles = 10
 default_obstacle_radius_range = (0.16, 0.24)
 default_initial_energy = 100.0
 default_energy_depletion_fraction = 0.5
-default_charging_capacity = None
+default_charging_station_count = None
+default_charging_capacity = 2
 default_charging_radius = 0.18
 eps = 1e-6
 legend_font_size_xy = 26
@@ -209,6 +210,7 @@ class UAVEnv:
         energy_decay_per_step=None,
         energy_depletion_fraction=default_energy_depletion_fraction,
         charging_capacity=default_charging_capacity,
+        charging_station_count=default_charging_station_count,
         charging_radius=default_charging_radius,
         charging_rate=None,
         charging_station_pos=None,
@@ -243,8 +245,11 @@ class UAVEnv:
             )
             energy_decay_per_step = self.initial_energy / depletion_steps
         self.energy_decay_per_step = round(float(energy_decay_per_step), 1)
+        if charging_station_count is None:
+            charging_station_count = max(1, (int(self.num_agents) + 1) // 2)
+        self.charging_station_count = int(max(1, charging_station_count))
         if charging_capacity is None:
-            charging_capacity = max(1, (int(self.num_agents) + 1) // 2)
+            charging_capacity = 2
         self.charging_capacity = int(charging_capacity)
         self.charging_radius = float(charging_radius)
         self.charging_rate = round(
@@ -255,15 +260,14 @@ class UAVEnv:
             ),
             1,
         )
-        if charging_station_pos is None:
-            charging_station_pos = [self.length * 0.5, self.width * 0.5]
-            if dim_actions == 3:
-                charging_station_pos.append(self.height * 0.5)
-        self.charging_station_pos = np.asarray(
-            charging_station_pos,
-            dtype=np.float32,
-        )[: self.dim_actions]
+        self.charging_station_positions = self._init_charging_station_positions(
+            charging_station_pos
+        )
+        self.charging_station_pos = self.charging_station_positions[0].copy()
         self.charging_agent_ids = []
+        self.charging_station_agent_ids = {
+            station_idx: [] for station_idx in range(self.charging_station_count)
+        }
 
         self.time_step = 0.4
         self.goal_tolerance = 0.12
@@ -588,8 +592,55 @@ class UAVEnv:
             dtype=np.float32,
         )
 
+    def _init_charging_station_positions(self, charging_station_pos):
+        if charging_station_pos is not None:
+            positions = np.asarray(charging_station_pos, dtype=np.float32)
+            if positions.ndim == 1:
+                positions = positions.reshape(1, -1)
+            positions = positions[:, : self.dim_actions]
+            if len(positions) >= self.charging_station_count:
+                return positions[: self.charging_station_count].copy()
+            extra = self._default_charging_station_positions(
+                self.charging_station_count - len(positions)
+            )
+            return np.concatenate([positions, extra], axis=0).astype(np.float32)
+        return self._default_charging_station_positions(self.charging_station_count)
+
+    def _default_charging_station_positions(self, count):
+        count = int(max(1, count))
+        center = np.array([self.length * 0.5, self.width * 0.5], dtype=np.float32)
+        radius = min(self.length, self.width) * 0.22
+        positions = []
+        for idx in range(count):
+            angle = 2.0 * np.pi * float(idx) / float(count)
+            pos2 = center + radius * np.array(
+                [np.cos(angle), np.sin(angle)],
+                dtype=np.float32,
+            )
+            pos2[0] = np.clip(pos2[0], self.charging_radius, self.length - self.charging_radius)
+            pos2[1] = np.clip(pos2[1], self.charging_radius, self.width - self.charging_radius)
+            if self.dim_actions == 3:
+                positions.append(np.array([pos2[0], pos2[1], self.height * 0.5], dtype=np.float32))
+            else:
+                positions.append(pos2.astype(np.float32))
+        return np.stack(positions, axis=0).astype(np.float32)
+
+    def _nearest_charging_station_index(self, pos):
+        distances = np.linalg.norm(
+            self.charging_station_positions - np.asarray(pos, dtype=np.float32)[: self.dim_actions],
+            axis=1,
+        )
+        return int(np.argmin(distances))
+
+    def _nearest_charging_station_pos(self, pos):
+        return self.charging_station_positions[
+            self._nearest_charging_station_index(pos)
+        ].copy()
+
     def _distance_to_charging_station(self, agent):
-        return float(np.linalg.norm(agent.pos - self.charging_station_pos))
+        return float(
+            np.min(np.linalg.norm(self.charging_station_positions - agent.pos, axis=1))
+        )
 
     def _consume_step_energy(self, powered_mask):
         for is_powered, agent in zip(powered_mask, self.agents):
@@ -597,20 +648,28 @@ class UAVEnv:
                 agent.consume_energy(self.energy_decay_per_step)
 
     def _charge_agents_at_station(self):
-        candidates = [
-            agent
-            for agent in self.agents
-            if self._distance_to_charging_station(agent) <= self.charging_radius
-            and agent.energy < agent.initial_energy
-        ]
-        candidates.sort(
-            key=lambda agent: (
-                self._distance_to_charging_station(agent),
-                agent.number,
+        selected = []
+        station_assignments = {
+            station_idx: [] for station_idx in range(self.charging_station_count)
+        }
+        for station_idx, station_pos in enumerate(self.charging_station_positions):
+            candidates = [
+                agent
+                for agent in self.agents
+                if np.linalg.norm(agent.pos - station_pos) <= self.charging_radius
+                and agent.energy < agent.initial_energy
+            ]
+            candidates.sort(
+                key=lambda agent: (
+                    float(np.linalg.norm(agent.pos - station_pos)),
+                    agent.number,
+                )
             )
-        )
-        selected = candidates[: max(0, self.charging_capacity)]
-        self.charging_agent_ids = [agent.number for agent in selected]
+            station_selected = candidates[: max(0, self.charging_capacity)]
+            station_assignments[station_idx] = [agent.number for agent in station_selected]
+            selected.extend(station_selected)
+        self.charging_station_agent_ids = station_assignments
+        self.charging_agent_ids = sorted({agent.number for agent in selected})
         for agent in selected:
             agent.charge_energy(self.charging_rate)
 
@@ -637,6 +696,9 @@ class UAVEnv:
             self.next_order_id_to_activate = 0
             self.completed_order_count = 0
             self.charging_agent_ids = []
+            self.charging_station_agent_ids = {
+                station_idx: [] for station_idx in range(self.charging_station_count)
+            }
 
             try:
                 self._initialize_obstacles()
@@ -1240,7 +1302,11 @@ class UAVEnv:
             "depleted_agents": float(self.num_agents - powered_agents),
             "mean_energy": mean_energy,
             "energy_decay_per_step": float(self.energy_decay_per_step),
+            "charging_station_count": float(self.charging_station_count),
             "charging_capacity": float(self.charging_capacity),
+            "total_charging_capacity": float(
+                self.charging_station_count * self.charging_capacity
+            ),
             "charging_agents": float(len(self.charging_agent_ids)),
             "mean_goal_distance": mean_goal_distance,
             "episode_reward": float(0.0),
@@ -1260,6 +1326,10 @@ class UAVEnv:
             "next_order_id_to_activate": int(self.next_order_id_to_activate),
             "completed_order_count": int(self.completed_order_count),
             "charging_agent_ids": list(self.charging_agent_ids),
+            "charging_station_agent_ids": {
+                int(station_idx): list(agent_ids)
+                for station_idx, agent_ids in self.charging_station_agent_ids.items()
+            },
             "python_random_state": random.getstate(),
             "numpy_random_state": np.random.get_state(),
             "orders": [
@@ -1311,6 +1381,13 @@ class UAVEnv:
         )
         self.completed_order_count = int(snapshot.get("completed_order_count", 0))
         self.charging_agent_ids = list(snapshot.get("charging_agent_ids", []))
+        self.charging_station_agent_ids = {
+            int(station_idx): list(agent_ids)
+            for station_idx, agent_ids in snapshot.get(
+                "charging_station_agent_ids",
+                {idx: [] for idx in range(self.charging_station_count)},
+            ).items()
+        }
         if "python_random_state" in snapshot:
             random.setstate(snapshot["python_random_state"])
         if "numpy_random_state" in snapshot:
@@ -1554,17 +1631,18 @@ class UAVEnv:
                 alpha=0.5,
             ))
 
-        ax.scatter(
-            self.charging_station_pos[0],
-            self.charging_station_pos[1],
-            c=["#1f77b4"],
-            marker="P",
-            s=145,
-            edgecolors="black",
-            linewidths=0.8,
-            alpha=0.95,
-            label="charging station",
-        )
+        for station_idx, station_pos in enumerate(self.charging_station_positions):
+            ax.scatter(
+                station_pos[0],
+                station_pos[1],
+                c=["#1f77b4"],
+                marker="P",
+                s=145,
+                edgecolors="black",
+                linewidths=0.8,
+                alpha=0.95,
+                label="charging station" if station_idx == 0 else None,
+            )
 
         ax.set_xlim(-0.1, self.length + 0.1)
         ax.set_ylim(-0.1, self.width + 0.1)
@@ -1665,19 +1743,20 @@ class UAVEnv:
                 shade=True,
             )
 
-        station_z = self.charging_station_pos[2] if self.dim_actions == 3 else 0.0
-        ax.scatter(
-            self.charging_station_pos[0],
-            self.charging_station_pos[1],
-            station_z,
-            c=["#1f77b4"],
-            marker="P",
-            s=130,
-            edgecolors="black",
-            linewidths=0.8,
-            alpha=0.95,
-            label="charging station",
-        )
+        for station_idx, station_pos in enumerate(self.charging_station_positions):
+            station_z = station_pos[2] if self.dim_actions == 3 else 0.0
+            ax.scatter(
+                station_pos[0],
+                station_pos[1],
+                station_z,
+                c=["#1f77b4"],
+                marker="P",
+                s=130,
+                edgecolors="black",
+                linewidths=0.8,
+                alpha=0.95,
+                label="charging station" if station_idx == 0 else None,
+            )
 
         ax.set_xlim(0.0, self.length)
         ax.set_ylim(0.0, self.width)
@@ -1767,6 +1846,7 @@ class UAVEnvDiscreteWrapper:
         energy_decay_per_step=None,
         energy_depletion_fraction=default_energy_depletion_fraction,
         charging_capacity=default_charging_capacity,
+        charging_station_count=default_charging_station_count,
         charging_radius=default_charging_radius,
         charging_rate=None,
         charging_station_pos=None,
@@ -1788,6 +1868,7 @@ class UAVEnvDiscreteWrapper:
             energy_decay_per_step=energy_decay_per_step,
             energy_depletion_fraction=energy_depletion_fraction,
             charging_capacity=charging_capacity,
+            charging_station_count=charging_station_count,
             charging_radius=charging_radius,
             charging_rate=charging_rate,
             charging_station_pos=charging_station_pos,
@@ -1958,6 +2039,7 @@ class UAVParallelEnv:
         energy_decay_per_step=None,
         energy_depletion_fraction=default_energy_depletion_fraction,
         charging_capacity=default_charging_capacity,
+        charging_station_count=default_charging_station_count,
         charging_radius=default_charging_radius,
         charging_rate=None,
         charging_station_pos=None,
@@ -1993,6 +2075,7 @@ class UAVParallelEnv:
             energy_decay_per_step=energy_decay_per_step,
             energy_depletion_fraction=energy_depletion_fraction,
             charging_capacity=charging_capacity,
+            charging_station_count=charging_station_count,
             charging_radius=charging_radius,
             charging_rate=charging_rate,
             charging_station_pos=charging_station_pos,
@@ -2148,6 +2231,7 @@ def parallel_env(
     energy_decay_per_step=None,
     energy_depletion_fraction=default_energy_depletion_fraction,
     charging_capacity=default_charging_capacity,
+    charging_station_count=default_charging_station_count,
     charging_radius=default_charging_radius,
     charging_rate=None,
     charging_station_pos=None,
@@ -2174,6 +2258,7 @@ def parallel_env(
         energy_decay_per_step=energy_decay_per_step,
         energy_depletion_fraction=energy_depletion_fraction,
         charging_capacity=charging_capacity,
+        charging_station_count=charging_station_count,
         charging_radius=charging_radius,
         charging_rate=charging_rate,
         charging_station_pos=charging_station_pos,

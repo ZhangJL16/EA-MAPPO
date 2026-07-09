@@ -38,6 +38,13 @@ def _charging_capacity_arg(args):
     capacity = getattr(args, "uav_charging_capacity", None)
     if capacity is not None:
         return int(capacity)
+    return 2
+
+
+def _charging_station_count_arg(args):
+    station_count = getattr(args, "uav_charging_station_count", None)
+    if station_count is not None:
+        return int(station_count)
     return max(1, (int(getattr(args, "uav_n_agents", 4)) + 1) // 2)
 
 
@@ -185,6 +192,7 @@ def build_env(args, algs):
                 getattr(args, "uav_energy_depletion_fraction", 0.5)
             ),
             charging_capacity=_charging_capacity_arg(args),
+            charging_station_count=_charging_station_count_arg(args),
             charging_radius=float(getattr(args, "uav_charging_radius", 0.18)),
             charging_rate=getattr(args, "uav_charging_rate", None),
         )
