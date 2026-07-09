@@ -257,11 +257,33 @@ class RolloutWorker:
                 intrinsic_success_bonus=getattr(
                     self.args, "hrl_intrinsic_success_bonus", None
                 ),
+                delivery_intrinsic_progress_bonus=getattr(
+                    self.args, "hrl_delivery_intrinsic_progress_bonus", None
+                ),
+                intrinsic_collision_penalty=getattr(
+                    self.args, "hrl_intrinsic_collision_penalty", None
+                ),
+                order_progress_override=getattr(
+                    self.args, "hrl_order_progress_override", None
+                ),
+                energy_shield_enabled=getattr(
+                    self.args, "hrl_energy_shield_enabled", None
+                ),
+                energy_margin_reserve_ratio=getattr(
+                    self.args, "hrl_energy_margin_reserve_ratio", None
+                ),
+                charge_queue_enabled=getattr(
+                    self.args, "hrl_charge_queue_enabled", None
+                ),
+                charge_queue_radius=getattr(
+                    self.args, "hrl_charge_queue_radius", None
+                ),
             )
         high_o, high_s, high_u, high_r = [], [], [], []
         high_avail_u, high_o_next, high_s_next = [], [], []
         high_terminate, high_padded, high_active_masks = [], [], []
         high_energy_margins, high_energy_order_masks = [], []
+        high_mode_train_masks = []
         hindsight_o, hindsight_mask = [], []
         current_high_transition = None
         current_high_reward = np.zeros(self.n_agents, dtype=np.float32)
@@ -347,6 +369,9 @@ class RolloutWorker:
                     high_u.append(current_high_transition["u"])
                     high_avail_u.append(current_high_transition["avail_u"])
                     high_active_masks.append(current_high_transition["active_mask"])
+                    high_mode_train_masks.append(
+                        current_high_transition["mode_train_mask"]
+                    )
                     high_energy_margins.append(current_high_transition["energy_margin"])
                     high_energy_order_masks.append(
                         current_high_transition["energy_order_mask"]
@@ -378,9 +403,18 @@ class RolloutWorker:
                     (self.n_agents, high_action_dim), dtype=np.float32
                 )
                 high_actions = []
+                use_oracle_high_level = bool(
+                    getattr(self.args, "hrl_oracle_high_level", False)
+                )
                 for agent_id in range(self.n_agents):
                     if active_agent_mask[agent_id] <= 0.0:
                         high_action = np.zeros(high_action_dim, dtype=np.float32)
+                    elif use_oracle_high_level:
+                        high_action = np.zeros(high_action_dim, dtype=np.float32)
+                        if high_action_dim >= 1:
+                            high_action[0] = 1.0
+                        if high_action_dim >= 2:
+                            high_action[1] = 1.0
                     else:
                         high_action = self.agents.choose_high_level_action(
                             high_obs[agent_id],
@@ -391,6 +425,10 @@ class RolloutWorker:
                     high_actions.append(np.asarray(high_action, dtype=np.float32))
 
                 self.env.apply_high_level_actions(high_actions)
+                if hasattr(self.env, "get_high_level_mode_training_mask"):
+                    high_mode_train_mask = self.env.get_high_level_mode_training_mask()
+                else:
+                    high_mode_train_mask = active_agent_mask.reshape(self.n_agents, 1)
                 subgoal_test = np.zeros(self.n_agents, dtype=np.float32)
                 testing_rate = float(getattr(self.args, "hrl_subgoal_testing_rate", 0.0))
                 if not evaluate and testing_rate > 0.0:
@@ -407,6 +445,9 @@ class RolloutWorker:
                     "active_mask": active_agent_mask.reshape(
                         self.n_agents, 1
                     ).copy(),
+                    "mode_train_mask": np.asarray(
+                        high_mode_train_mask, dtype=np.float32
+                    ).reshape(self.n_agents, 1),
                     "energy_margin": np.asarray(
                         high_energy_margin, dtype=np.float32
                     ).reshape(self.n_agents, 1),
@@ -675,6 +716,7 @@ class RolloutWorker:
             high_u.append(current_high_transition["u"])
             high_avail_u.append(current_high_transition["avail_u"])
             high_active_masks.append(current_high_transition["active_mask"])
+            high_mode_train_masks.append(current_high_transition["mode_train_mask"])
             high_energy_margins.append(current_high_transition["energy_margin"])
             high_energy_order_masks.append(current_high_transition["energy_order_mask"])
             high_r.append(high_reward)
@@ -748,6 +790,9 @@ class RolloutWorker:
                 high_active_masks.append(
                     np.zeros((self.n_agents, 1), dtype=np.float32)
                 )
+                high_mode_train_masks.append(
+                    np.zeros((self.n_agents, 1), dtype=np.float32)
+                )
                 high_energy_margins.append(
                     np.zeros((self.n_agents, 1), dtype=np.float32)
                 )
@@ -785,6 +830,7 @@ class RolloutWorker:
                 high_o_next=high_o_next.copy(),
                 high_s_next=high_s_next.copy(),
                 high_agent_active_mask=high_active_masks.copy(),
+                high_mode_train_mask=high_mode_train_masks.copy(),
                 high_energy_margin=high_energy_margins.copy(),
                 high_energy_order_mask=high_energy_order_masks.copy(),
                 high_padded=high_padded.copy(),

@@ -22,6 +22,7 @@ __pycache__/
 result/
 model/
 replay/
+logs/
 train_logs/
 test_result/
 plots/
@@ -32,6 +33,9 @@ train_logs/*
 
 # Model/checkpoint/data artifacts
 model_runs/
+model_runs*/
+eval_model_runs/
+saved_methods/
 *.pt
 *.pth
 *.ckpt

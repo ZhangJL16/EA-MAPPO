@@ -535,18 +535,50 @@ class Agents:
         return 0.0
 
     def revise_safe_actions(self, observations, avail_actions, base_actions):
+        guard_flags = np.zeros(self.n_agents, dtype=np.float32)
+        revised_actions = [int(action) for action in base_actions]
+
         if self.safety_guard is None:
-            self.last_guard_applied = [0 for _ in range(self.n_agents)]
-            return [int(action) for action in base_actions]
-        revised_actions = self.safety_guard.revise_actions(
-            observations=observations,
-            avail_actions=avail_actions,
-            base_actions=base_actions,
-            env=self.env,
-        )
-        self.last_guard_applied = list(
-            getattr(self.safety_guard, "last_guard_applied", [0 for _ in range(self.n_agents)])
-        )
+            self.last_guard_applied = guard_flags.tolist()
+        else:
+            revised_actions = self.safety_guard.revise_actions(
+                observations=observations,
+                avail_actions=avail_actions,
+                base_actions=base_actions,
+                env=self.env,
+            )
+            guard_flags = np.asarray(
+                getattr(
+                    self.safety_guard,
+                    "last_guard_applied",
+                    [0 for _ in range(self.n_agents)],
+                ),
+                dtype=np.float32,
+            )
+
+        if (
+            getattr(self.args, "hrl_safe_action_guard_enabled", False)
+            and hasattr(self.env, "revise_safe_actions")
+        ):
+            env_result = self.env.revise_safe_actions(
+                revised_actions,
+                avail_actions=avail_actions,
+                guard_margin=getattr(
+                    self.args,
+                    "hrl_safe_action_guard_margin",
+                    None,
+                ),
+            )
+            if isinstance(env_result, tuple):
+                revised_actions, env_guard_flags = env_result
+                guard_flags = np.maximum(
+                    guard_flags,
+                    np.asarray(env_guard_flags, dtype=np.float32).reshape(-1),
+                )
+            else:
+                revised_actions = env_result
+
+        self.last_guard_applied = guard_flags.astype(np.float32).tolist()
         return revised_actions
 
     def obs_state_comm(self, reward=-9999):

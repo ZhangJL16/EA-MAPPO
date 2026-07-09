@@ -246,7 +246,11 @@ class UAVEnv:
         self.charging_capacity = int(charging_capacity)
         self.charging_radius = float(charging_radius)
         self.charging_rate = round(
-            float(self.energy_decay_per_step if charging_rate is None else charging_rate),
+            float(
+                4.0 * self.energy_decay_per_step
+                if charging_rate is None
+                else charging_rate
+            ),
             1,
         )
         if charging_station_pos is None:

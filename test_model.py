@@ -30,6 +30,17 @@ def positive_int(value):
     return int_value
 
 
+def str2bool(value):
+    if isinstance(value, bool):
+        return value
+    value = str(value).strip().lower()
+    if value in {"1", "true", "t", "yes", "y", "on"}:
+        return True
+    if value in {"0", "false", "f", "no", "n", "off"}:
+        return False
+    raise argparse.ArgumentTypeError(f"Invalid boolean value: {value}")
+
+
 def parse_args():
     parser = argparse.ArgumentParser(
         description="Load a trained model and run evaluation episodes."
@@ -183,7 +194,7 @@ def parse_args():
         dest="uav_charging_rate",
         type=float,
         default=None,
-        help="Energy restored per charging step",
+        help="Energy restored per charging step; defaults to 4x energy decay per step",
     )
     parser.add_argument(
         "--hmappo-meta-period",
@@ -192,6 +203,142 @@ def parse_args():
         type=positive_int,
         default=5,
         help="Low-level steps between high-level HMAPPO decisions",
+    )
+    parser.add_argument(
+        "--hrl-reachable-subgoal-scale",
+        "--hrl_reachable_subgoal_scale",
+        dest="hrl_reachable_subgoal_scale",
+        type=float,
+        default=1.0,
+        help="Scale applied to the reachable local subgoal radius",
+    )
+    parser.add_argument(
+        "--hrl-intrinsic-reward-scale",
+        "--hrl_intrinsic_reward_scale",
+        dest="hrl_intrinsic_reward_scale",
+        type=float,
+        default=1.0,
+        help="Scale for low-level HRL intrinsic rewards",
+    )
+    parser.add_argument(
+        "--hrl-intrinsic-distance-weight",
+        "--hrl_intrinsic_distance_weight",
+        dest="hrl_intrinsic_distance_weight",
+        type=float,
+        default=0.05,
+        help="Distance penalty weight in the low-level intrinsic reward",
+    )
+    parser.add_argument(
+        "--hrl-intrinsic-success-bonus",
+        "--hrl_intrinsic_success_bonus",
+        dest="hrl_intrinsic_success_bonus",
+        type=float,
+        default=1.0,
+        help="Success bonus in the low-level intrinsic reward",
+    )
+    parser.add_argument(
+        "--hrl-delivery-intrinsic-progress-bonus",
+        "--hrl_delivery_intrinsic_progress_bonus",
+        dest="hrl_delivery_intrinsic_progress_bonus",
+        type=float,
+        default=0.0,
+        help="Extra intrinsic reward multiplier for delivery progress",
+    )
+    parser.add_argument(
+        "--hrl-intrinsic-collision-penalty",
+        "--hrl_intrinsic_collision_penalty",
+        dest="hrl_intrinsic_collision_penalty",
+        type=float,
+        default=0.0,
+        help="Low-level intrinsic penalty for a collision on the current step",
+    )
+    parser.add_argument(
+        "--hrl-order-progress-override",
+        "--hrl_order_progress_override",
+        dest="hrl_order_progress_override",
+        type=float,
+        default=None,
+        help="Override high-level progress scalar for order-mode subgoals",
+    )
+    parser.add_argument(
+        "--hrl-energy-shield-enabled",
+        "--hrl_energy_shield_enabled",
+        dest="hrl_energy_shield_enabled",
+        type=str2bool,
+        default=False,
+        help="Enable hard high-level energy feasibility shield",
+    )
+    parser.add_argument(
+        "--hrl-energy-margin-reserve-ratio",
+        "--hrl_energy_margin_reserve_ratio",
+        dest="hrl_energy_margin_reserve_ratio",
+        type=float,
+        default=0.05,
+        help="Normalized energy reserve after completing an order and returning",
+    )
+    parser.add_argument(
+        "--hrl-energy-margin-loss-coef",
+        "--hrl_energy_margin_loss_coef",
+        dest="hrl_energy_margin_loss_coef",
+        type=float,
+        default=0.0,
+        help="High-level energy feasibility loss coefficient",
+    )
+    parser.add_argument(
+        "--hrl-energy-margin-charge-beta",
+        "--hrl_energy_margin_charge_beta",
+        dest="hrl_energy_margin_charge_beta",
+        type=float,
+        default=0.5,
+        help="Relative penalty for charging when order is energy-feasible",
+    )
+    parser.add_argument(
+        "--hrl-charge-queue-enabled",
+        "--hrl_charge_queue_enabled",
+        dest="hrl_charge_queue_enabled",
+        type=str2bool,
+        default=False,
+        help="Spread charging subgoals across dock and waiting slots",
+    )
+    parser.add_argument(
+        "--hrl-charge-queue-radius",
+        "--hrl_charge_queue_radius",
+        dest="hrl_charge_queue_radius",
+        type=float,
+        default=0.24,
+        help="Radius of the charging waiting ring",
+    )
+    parser.add_argument(
+        "--hrl-charge-mode-fraction",
+        "--hrl_charge_mode_fraction",
+        dest="hrl_charge_mode_fraction",
+        type=float,
+        default=0.5,
+        help="Fraction of high-level mode interval reserved for charging",
+    )
+    parser.add_argument(
+        "--hrl-charge-dense-reward-scale",
+        "--hrl_charge_dense_reward_scale",
+        dest="hrl_charge_dense_reward_scale",
+        type=float,
+        default=1.0,
+        help="Dense goal-shaping scale when current high-level target is charging",
+    )
+    parser.add_argument(
+        "--hrl-safe-action-guard-enabled",
+        "--hrl_safe_action_guard_enabled",
+        dest="hrl_safe_action_guard_enabled",
+        type=str2bool,
+        default=False,
+        help="Enable SCOPE-style deterministic low-level safety action replacement",
+    )
+    parser.add_argument(
+        "--hrl-safe-action-guard-margin",
+        "--hrl_safe_action_guard_margin",
+        dest="hrl_safe_action_guard_margin",
+        type=float,
+        default=0.04,
+        help="Extra collision prediction margin used by the low-level safety action replacement",
     )
     parser.add_argument(
         "--save-xy",
@@ -253,11 +400,24 @@ def make_base_args(cli_args):
         or cli_args.alg.lower() == "hmappo",
         is_level_training=cli_args.map.startswith("UAVEnergyDeliveryLevel"),
         hmappo_meta_period=cli_args.hmappo_meta_period,
-        hrl_reachable_subgoal_scale=1.0,
-        hrl_intrinsic_reward_scale=0.5,
-        hrl_intrinsic_distance_weight=0.05,
-        hrl_intrinsic_success_bonus=1.0,
-        hrl_meta_update_on_subgoal_done=True,
+        hrl_reachable_subgoal_scale=cli_args.hrl_reachable_subgoal_scale,
+        hrl_intrinsic_reward_scale=cli_args.hrl_intrinsic_reward_scale,
+        hrl_intrinsic_distance_weight=cli_args.hrl_intrinsic_distance_weight,
+        hrl_intrinsic_success_bonus=cli_args.hrl_intrinsic_success_bonus,
+        hrl_delivery_intrinsic_progress_bonus=cli_args.hrl_delivery_intrinsic_progress_bonus,
+        hrl_intrinsic_collision_penalty=cli_args.hrl_intrinsic_collision_penalty,
+        hrl_order_progress_override=cli_args.hrl_order_progress_override,
+        hrl_energy_shield_enabled=cli_args.hrl_energy_shield_enabled,
+        hrl_energy_margin_reserve_ratio=cli_args.hrl_energy_margin_reserve_ratio,
+        hrl_energy_margin_loss_coef=cli_args.hrl_energy_margin_loss_coef,
+        hrl_energy_margin_charge_beta=cli_args.hrl_energy_margin_charge_beta,
+        hrl_charge_queue_enabled=cli_args.hrl_charge_queue_enabled,
+        hrl_charge_queue_radius=cli_args.hrl_charge_queue_radius,
+        hrl_charge_mode_fraction=cli_args.hrl_charge_mode_fraction,
+        hrl_charge_dense_reward_scale=cli_args.hrl_charge_dense_reward_scale,
+        hrl_meta_update_on_subgoal_done=False,
+        hrl_safe_action_guard_enabled=cli_args.hrl_safe_action_guard_enabled,
+        hrl_safe_action_guard_margin=cli_args.hrl_safe_action_guard_margin,
         uav_n_agents=cli_args.uav_n_agents,
         episode_limit=cli_args.episode_limit,
         uav_total_orders=cli_args.uav_total_orders,
@@ -535,6 +695,27 @@ def run_episode(env, agents, args, cli_args, episode_idx):
             intrinsic_reward_scale=getattr(args, "hrl_intrinsic_reward_scale", None),
             intrinsic_distance_weight=getattr(args, "hrl_intrinsic_distance_weight", None),
             intrinsic_success_bonus=getattr(args, "hrl_intrinsic_success_bonus", None),
+            delivery_intrinsic_progress_bonus=getattr(
+                args, "hrl_delivery_intrinsic_progress_bonus", None
+            ),
+            intrinsic_collision_penalty=getattr(
+                args, "hrl_intrinsic_collision_penalty", None
+            ),
+            order_progress_override=getattr(
+                args, "hrl_order_progress_override", None
+            ),
+            energy_shield_enabled=getattr(
+                args, "hrl_energy_shield_enabled", None
+            ),
+            energy_margin_reserve_ratio=getattr(
+                args, "hrl_energy_margin_reserve_ratio", None
+            ),
+            charge_queue_enabled=getattr(
+                args, "hrl_charge_queue_enabled", None
+            ),
+            charge_queue_radius=getattr(
+                args, "hrl_charge_queue_radius", None
+            ),
         )
 
     max_steps = cli_args.max_steps or args.episode_limit
@@ -666,6 +847,7 @@ def main():
         args.episode_limit = env_info["episode_limit"]
         args.msg_shape = env_info.get("msg_shape", 0)
         args.high_level_n_actions = env_info.get("high_level_n_actions", 0)
+        args.high_level_mode_n_actions = env_info.get("high_level_mode_n_actions", 0)
         args.high_level_obs_shape = env_info.get("high_level_obs_shape", 0)
         args.high_level_state_shape = env_info.get("high_level_state_shape", 0)
         args.low_task_shape = env_info.get("low_task_shape", 0)

@@ -22,8 +22,29 @@ eps = 1e-6
 TASK_IDLE = 0
 TASK_ORDER = 1
 TASK_CHARGE = 2
+HIGH_MODE_CHARGE = 0
+HIGH_MODE_ORDER = 1
 legend_font_size_xy = 26
 legend_font_size_3d = 26
+ORDER_EXEC_DIAGNOSTIC_ATTRS = (
+    "order_diag_order_steps",
+    "order_diag_pickup_steps",
+    "order_diag_delivery_steps",
+    "order_diag_pickup_successes",
+    "order_diag_delivery_successes",
+    "order_diag_progress_sum",
+    "order_diag_positive_progress_steps",
+    "order_diag_regress_steps",
+    "order_diag_target_distance_sum",
+    "order_diag_charge_steps",
+    "order_diag_idle_steps",
+    "order_diag_order_obstacle_collisions",
+    "order_diag_order_agent_collisions",
+    "order_diag_charge_obstacle_collisions",
+    "order_diag_charge_agent_collisions",
+    "order_diag_idle_obstacle_collisions",
+    "order_diag_idle_agent_collisions",
+)
 
 
 def _laser_angles(num_lasers):
@@ -247,13 +268,15 @@ class UAVEnv:
         self.total_orders = int(total_orders)
         self.max_active_orders = min(int(max_active_orders), self.total_orders)
         self.low_task_shape = 0
-        # High-level action is split into [mode, progress].
-        # The left part of the mode interval selects charging; the rest selects orders.
+        # High-level action is encoded as [mode_id, progress].
+        # mode_id is discrete: 0 selects charging, 1 selects order service.
         self.high_level_n_actions = 2
+        self.high_level_mode_n_actions = 2
         self.charge_mode_fraction = float(np.clip(charge_mode_fraction, 0.01, 0.99))
         self.charge_mode_threshold = -1.0 + 2.0 * self.charge_mode_fraction
         self.charge_mode_center = -1.0 + self.charge_mode_fraction
         self.order_mode_center = self.charge_mode_fraction
+        self._last_high_mode_train_mask = np.ones((self.num_agents, 1), dtype=np.float32)
         self.charge_dense_reward_scale = float(charge_dense_reward_scale)
         self.charge_action_id = -1
         self.pickup_reward = float(pickup_reward)
@@ -270,7 +293,11 @@ class UAVEnv:
         self.charging_capacity = int(charging_capacity)
         self.charging_radius = float(charging_radius)
         self.charging_rate = round(
-            float(self.energy_decay_per_step if charging_rate is None else charging_rate),
+            float(
+                4.0 * self.energy_decay_per_step
+                if charging_rate is None
+                else charging_rate
+            ),
             1,
         )
         if charging_station_pos is None:
@@ -289,9 +316,21 @@ class UAVEnv:
         self.intrinsic_reward_scale = 1.0
         self.intrinsic_distance_weight = 0.05
         self.intrinsic_success_bonus = 1.0
+        self.delivery_intrinsic_progress_bonus = 0.0
+        self.intrinsic_collision_penalty = 0.0
+        self.order_progress_override = None
+        self.energy_shield_enabled = False
+        self.energy_margin_reserve_ratio = 0.05
+        self.charge_queue_enabled = False
+        self.charge_queue_radius = 0.24
+        self.charge_dock_radius = 0.05
         self.charge_energy_threshold = 0.35
-        self.charge_release_threshold = 0.95
+        self.charge_release_threshold = 0.65
         self.goal_tolerance = 0.12
+        self.charge_dock_radius = min(
+            0.65 * self.goal_tolerance,
+            0.65 * self.charging_radius,
+        )
         self.min_subgoal_progress = 1.25 * self.goal_tolerance
         self.v_max = 0.16
         self.a_max = 0.05
@@ -315,6 +354,7 @@ class UAVEnv:
         self.active_order_ids = []
         self.next_order_id_to_activate = 0
         self.completed_order_count = 0
+        self._last_step_order_status_before = [None for _ in range(self.num_agents)]
         self.obstacles = []
         self.agent_paths = [[] for _ in range(self.num_agents)]
         self.current_step = 0
@@ -323,6 +363,8 @@ class UAVEnv:
         self.collision_count = 0.0
         self.obstacle_collision_count = 0.0
         self.agent_collision_count = 0.0
+        self._reset_high_level_diagnostics()
+        self._reset_order_execution_diagnostics()
         self._render_fig = None
         self._render_has_shown = False
 
@@ -376,6 +418,13 @@ class UAVEnv:
         intrinsic_reward_scale=None,
         intrinsic_distance_weight=None,
         intrinsic_success_bonus=None,
+        delivery_intrinsic_progress_bonus=None,
+        intrinsic_collision_penalty=None,
+        order_progress_override=None,
+        energy_shield_enabled=None,
+        energy_margin_reserve_ratio=None,
+        charge_queue_enabled=None,
+        charge_queue_radius=None,
     ):
         if reachable_subgoal_scale is not None:
             self.reachable_subgoal_scale = float(reachable_subgoal_scale)
@@ -385,6 +434,30 @@ class UAVEnv:
             self.intrinsic_distance_weight = float(intrinsic_distance_weight)
         if intrinsic_success_bonus is not None:
             self.intrinsic_success_bonus = float(intrinsic_success_bonus)
+        if delivery_intrinsic_progress_bonus is not None:
+            self.delivery_intrinsic_progress_bonus = float(
+                delivery_intrinsic_progress_bonus
+            )
+        if intrinsic_collision_penalty is not None:
+            self.intrinsic_collision_penalty = float(intrinsic_collision_penalty)
+        if order_progress_override is not None:
+            self.order_progress_override = float(
+                np.clip(order_progress_override, -1.0, 1.0)
+            )
+        if energy_shield_enabled is not None:
+            self.energy_shield_enabled = bool(energy_shield_enabled)
+        if energy_margin_reserve_ratio is not None:
+            self.energy_margin_reserve_ratio = float(
+                np.clip(energy_margin_reserve_ratio, 0.0, 1.0)
+            )
+        if charge_queue_enabled is not None:
+            self.charge_queue_enabled = bool(charge_queue_enabled)
+        if charge_queue_radius is not None:
+            min_radius = self.goal_tolerance + self.safe_radius + 0.02
+            max_radius = 0.45 * float(np.max(self._space_scale()))
+            self.charge_queue_radius = float(
+                np.clip(charge_queue_radius, min_radius, max_radius)
+            )
 
     def _max_reachable_subgoal_distance(self, agent):
         return (
@@ -412,7 +485,7 @@ class UAVEnv:
         agent.original_subgoal = subgoal.copy()
         agent.current_task_type = int(task_type)
         agent.reached = self._distance_to_goal(agent) <= self.goal_tolerance
-        if agent.reached:
+        if agent.reached and self._is_at_task_terminal_target(agent):
             agent.vel[:] = 0.0
         return True
 
@@ -440,7 +513,7 @@ class UAVEnv:
         agent.original_subgoal = subgoal.copy()
         agent.current_task_type = int(task_type)
         agent.reached = self._distance_to_goal(agent) <= self.goal_tolerance
-        if agent.reached:
+        if agent.reached and self._is_at_task_terminal_target(agent):
             agent.vel[:] = 0.0
         return True
 
@@ -476,9 +549,285 @@ class UAVEnv:
         agent.original_subgoal = subgoal.copy()
         agent.current_task_type = int(task_type)
         agent.reached = self._distance_to_goal(agent) <= self.goal_tolerance
-        if agent.reached:
+        if agent.reached and self._is_at_task_terminal_target(agent):
             agent.vel[:] = 0.0
         return True
+
+    def _is_at_task_terminal_target(self, agent):
+        if agent.current_task_type == TASK_IDLE:
+            return True
+        if agent.current_task_type == TASK_CHARGE:
+            return self._distance_to_charging_station(agent) <= self.goal_tolerance
+        if (
+            agent.current_task_type == TASK_ORDER
+            and agent.assigned_order_id is not None
+        ):
+            order = self.orders[agent.assigned_order_id]
+            if order.status == DeliveryOrder.ASSIGNED:
+                target = order.pickup_pos
+            elif order.status == DeliveryOrder.PICKED:
+                target = order.dropoff_pos
+            else:
+                return True
+            return bool(np.linalg.norm(agent.pos - target) <= self.goal_tolerance)
+        target = getattr(agent, "task_target", None)
+        if target is None:
+            return True
+        return bool(
+            np.linalg.norm(
+                agent.pos - np.asarray(target, dtype=np.float32)[: self.dim_actions]
+            )
+            <= self.goal_tolerance
+        )
+
+    def _advance_intermediate_subgoal_if_needed(self, agent):
+        if not agent.reached or self._is_at_task_terminal_target(agent):
+            return False
+        if not self._agent_has_motion_task(agent):
+            return False
+
+        task_target = (
+            self.charging_station_pos
+            if agent.current_task_type == TASK_CHARGE
+            else getattr(agent, "task_target", agent.goal)
+        )
+        self._set_agent_subgoal_on_target_line(
+            agent,
+            np.array([1.0], dtype=np.float32),
+            task_type=agent.current_task_type,
+            task_target=task_target,
+        )
+        return not agent.reached
+
+    def _charge_option_complete(self, agent):
+        if agent.current_task_type != TASK_CHARGE:
+            return True
+        energy_ratio = agent.energy / (agent.initial_energy + eps)
+        return bool(
+            self._agent_ready_to_charge(agent)
+            and energy_ratio >= self.charge_release_threshold
+        )
+
+    def _agent_ready_to_charge(self, agent):
+        if agent.current_task_type != TASK_CHARGE:
+            return False
+        if not agent.reached:
+            return False
+        if self._distance_to_charging_station(agent) > self.goal_tolerance:
+            return False
+        return bool(np.linalg.norm(agent.vel) <= eps)
+
+    def _agent_charge_locked(self, agent):
+        return (
+            agent.current_task_type == TASK_CHARGE
+            and not self._charge_option_complete(agent)
+        )
+
+    def _agent_order_locked(self, agent):
+        if agent.assigned_order_id is None or agent.assigned_order_slot is None:
+            return False
+        order = self._slot_order(agent.assigned_order_slot)
+        return order is not None and order.status in (
+            DeliveryOrder.ASSIGNED,
+            DeliveryOrder.PICKED,
+        )
+
+    def _parse_high_level_action(self, action):
+        action = np.asarray(action, dtype=np.float32).reshape(-1)
+        if self.high_level_mode_n_actions > 1 and action.size >= 2:
+            mode_id = int(
+                np.clip(
+                    np.rint(float(action[0])),
+                    HIGH_MODE_CHARGE,
+                    HIGH_MODE_ORDER,
+                )
+            )
+            return mode_id, float(action[1])
+
+        mode_scalar = float(action[0]) if action.size else 0.0
+        progress_scalar = float(action[1]) if action.size >= 2 else mode_scalar
+        mode_id = (
+            HIGH_MODE_CHARGE
+            if mode_scalar < self.charge_mode_threshold
+            else HIGH_MODE_ORDER
+        )
+        return mode_id, progress_scalar
+
+    def _reset_high_level_diagnostics(self):
+        self.high_diag_decision_count = 0.0
+        self.high_diag_sampled_charge = 0.0
+        self.high_diag_sampled_order = 0.0
+        self.high_diag_executed_charge = 0.0
+        self.high_diag_executed_order = 0.0
+        self.high_diag_executed_idle = 0.0
+        self.high_diag_order_locked = 0.0
+        self.high_diag_charge_locked = 0.0
+        self.high_diag_mode_train_mask_sum = 0.0
+        self.high_diag_mode_train_mask_count = 0.0
+        self.high_diag_auction_calls = 0.0
+        self.high_diag_auction_candidates = 0.0
+        self.high_diag_auction_orders = 0.0
+        self.high_diag_auction_assignments = 0.0
+        self.high_diag_order_commit_attempts = 0.0
+        self.high_diag_order_commit_successes = 0.0
+        self.high_diag_charge_fallbacks = 0.0
+
+    def _high_diag_rate(self, numerator, denominator=None):
+        denom = self.high_diag_decision_count if denominator is None else denominator
+        return float(numerator / denom) if denom > eps else 0.0
+
+    def _high_level_diagnostics_summary(self):
+        return {
+            "high_decision_count": float(self.high_diag_decision_count),
+            "sampled_charge_rate": self._high_diag_rate(
+                self.high_diag_sampled_charge
+            ),
+            "sampled_order_rate": self._high_diag_rate(
+                self.high_diag_sampled_order
+            ),
+            "executed_charge_rate": self._high_diag_rate(
+                self.high_diag_executed_charge
+            ),
+            "executed_order_rate": self._high_diag_rate(
+                self.high_diag_executed_order
+            ),
+            "executed_idle_rate": self._high_diag_rate(
+                self.high_diag_executed_idle
+            ),
+            "order_locked_rate": self._high_diag_rate(self.high_diag_order_locked),
+            "charge_locked_rate": self._high_diag_rate(self.high_diag_charge_locked),
+            "mode_train_mask_mean": self._high_diag_rate(
+                self.high_diag_mode_train_mask_sum,
+                self.high_diag_mode_train_mask_count,
+            ),
+            "auction_calls": float(self.high_diag_auction_calls),
+            "auction_candidate_mean": self._high_diag_rate(
+                self.high_diag_auction_candidates,
+                self.high_diag_auction_calls,
+            ),
+            "auction_order_mean": self._high_diag_rate(
+                self.high_diag_auction_orders,
+                self.high_diag_auction_calls,
+            ),
+            "auction_assignment_mean": self._high_diag_rate(
+                self.high_diag_auction_assignments,
+                self.high_diag_auction_calls,
+            ),
+            "order_commit_attempt_rate": self._high_diag_rate(
+                self.high_diag_order_commit_attempts
+            ),
+            "order_commit_success_rate": self._high_diag_rate(
+                self.high_diag_order_commit_successes
+            ),
+            "charge_fallback_rate": self._high_diag_rate(
+                self.high_diag_charge_fallbacks
+            ),
+        }
+
+    def _reset_order_execution_diagnostics(self):
+        self.order_diag_order_steps = 0.0
+        self.order_diag_pickup_steps = 0.0
+        self.order_diag_delivery_steps = 0.0
+        self.order_diag_pickup_successes = 0.0
+        self.order_diag_delivery_successes = 0.0
+        self.order_diag_progress_sum = 0.0
+        self.order_diag_positive_progress_steps = 0.0
+        self.order_diag_regress_steps = 0.0
+        self.order_diag_target_distance_sum = 0.0
+        self.order_diag_charge_steps = 0.0
+        self.order_diag_idle_steps = 0.0
+        self.order_diag_order_obstacle_collisions = 0.0
+        self.order_diag_order_agent_collisions = 0.0
+        self.order_diag_charge_obstacle_collisions = 0.0
+        self.order_diag_charge_agent_collisions = 0.0
+        self.order_diag_idle_obstacle_collisions = 0.0
+        self.order_diag_idle_agent_collisions = 0.0
+
+    def _order_exec_rate(self, numerator, denominator):
+        return float(numerator / denominator) if denominator > eps else 0.0
+
+    def _order_execution_diagnostics_summary(self):
+        order_collisions = (
+            self.order_diag_order_obstacle_collisions
+            + self.order_diag_order_agent_collisions
+        )
+        charge_collisions = (
+            self.order_diag_charge_obstacle_collisions
+            + self.order_diag_charge_agent_collisions
+        )
+        idle_collisions = (
+            self.order_diag_idle_obstacle_collisions
+            + self.order_diag_idle_agent_collisions
+        )
+        return {
+            "order_exec_steps": float(self.order_diag_order_steps),
+            "order_pickup_steps": float(self.order_diag_pickup_steps),
+            "order_delivery_steps": float(self.order_diag_delivery_steps),
+            "order_pickup_success_count": float(self.order_diag_pickup_successes),
+            "order_delivery_success_count": float(self.order_diag_delivery_successes),
+            "order_progress_mean": self._order_exec_rate(
+                self.order_diag_progress_sum,
+                self.order_diag_order_steps,
+            ),
+            "order_positive_progress_rate": self._order_exec_rate(
+                self.order_diag_positive_progress_steps,
+                self.order_diag_order_steps,
+            ),
+            "order_regress_rate": self._order_exec_rate(
+                self.order_diag_regress_steps,
+                self.order_diag_order_steps,
+            ),
+            "order_target_distance_mean": self._order_exec_rate(
+                self.order_diag_target_distance_sum,
+                self.order_diag_order_steps,
+            ),
+            "pickup_success_per_pickup_step": self._order_exec_rate(
+                self.order_diag_pickup_successes,
+                self.order_diag_pickup_steps,
+            ),
+            "delivery_success_per_delivery_step": self._order_exec_rate(
+                self.order_diag_delivery_successes,
+                self.order_diag_delivery_steps,
+            ),
+            "charge_exec_steps": float(self.order_diag_charge_steps),
+            "idle_exec_steps": float(self.order_diag_idle_steps),
+            "order_obstacle_collision_count": float(
+                self.order_diag_order_obstacle_collisions
+            ),
+            "order_agent_collision_count": float(
+                self.order_diag_order_agent_collisions
+            ),
+            "charge_obstacle_collision_count": float(
+                self.order_diag_charge_obstacle_collisions
+            ),
+            "charge_agent_collision_count": float(
+                self.order_diag_charge_agent_collisions
+            ),
+            "idle_obstacle_collision_count": float(
+                self.order_diag_idle_obstacle_collisions
+            ),
+            "idle_agent_collision_count": float(
+                self.order_diag_idle_agent_collisions
+            ),
+            "order_collision_rate": self._order_exec_rate(
+                order_collisions,
+                self.order_diag_order_steps,
+            ),
+            "charge_collision_rate": self._order_exec_rate(
+                charge_collisions,
+                self.order_diag_charge_steps,
+            ),
+            "idle_collision_rate": self._order_exec_rate(
+                idle_collisions,
+                self.order_diag_idle_steps,
+            ),
+        }
+
+    def _order_execution_diagnostics_state(self):
+        return {
+            attr: float(getattr(self, attr, 0.0))
+            for attr in ORDER_EXEC_DIAGNOSTIC_ATTRS
+        }
 
     def _energy_required_for_distance(self, agent, distance):
         step_distance = max(float(agent.v_max) * float(self.time_step), eps)
@@ -498,8 +847,7 @@ class UAVEnv:
             return None
         return order
 
-    def _finish_order_then_charge_distance(self, agent):
-        order = self._selected_order_for_agent(agent)
+    def _finish_order_then_charge_distance_for_order(self, agent, order):
         if order is None:
             return 0.0
 
@@ -516,15 +864,45 @@ class UAVEnv:
         distance += float(np.linalg.norm(current - self.charging_station_pos))
         return distance
 
-    def _energy_margin_order_for_agent(self, agent):
-        order = self._selected_order_for_agent(agent)
+    def _finish_order_then_charge_distance(self, agent):
+        return self._finish_order_then_charge_distance_for_order(
+            agent, self._selected_order_for_agent(agent)
+        )
+
+    def _energy_margin_for_order(self, agent, order):
         if order is None:
             return 0.0
         energy_ratio = float(agent.energy / (agent.initial_energy + eps))
         required_ratio = self._energy_required_ratio_for_distance(
-            agent, self._finish_order_then_charge_distance(agent)
+            agent, self._finish_order_then_charge_distance_for_order(agent, order)
         )
-        return float(np.clip(energy_ratio - required_ratio, -1.0, 1.0))
+        margin = energy_ratio - required_ratio - self.energy_margin_reserve_ratio
+        return float(np.clip(margin, -1.0, 1.0))
+
+    def _energy_margin_order_for_agent(self, agent):
+        order = self._selected_order_for_agent(agent)
+        return self._energy_margin_for_order(agent, order)
+
+    def _order_slot_energy_feasible(self, agent, slot_idx):
+        if not self.energy_shield_enabled:
+            return True
+        order = self._slot_order(slot_idx)
+        return self._energy_margin_for_order(agent, order) >= 0.0
+
+    def _selected_order_energy_feasible(self, agent):
+        if not self.energy_shield_enabled:
+            return True
+        return self._energy_margin_order_for_agent(agent) >= 0.0
+
+    def _has_available_order(self):
+        return any(self._slot_order(slot_idx) is not None for slot_idx in self.available_order_slots)
+
+    def _has_energy_feasible_available_order(self, agent):
+        return any(
+            self._slot_order(slot_idx) is not None
+            and self._order_slot_energy_feasible(agent, slot_idx)
+            for slot_idx in self.available_order_slots
+        )
 
     def _has_selected_order_for_agent(self, agent):
         return 1.0 if self._selected_order_for_agent(agent) is not None else 0.0
@@ -805,18 +1183,30 @@ class UAVEnv:
             return False
         return self._assign_order_slot_to_agent(agent, int(slot_idx))
 
-    def run_order_auction(self):
+    def run_order_auction(self, record=False):
         self._activate_orders()
         for agent in self.agents:
+            if (
+                agent.current_task_type == TASK_CHARGE
+                and self._charge_option_complete(agent)
+                and agent.assigned_order_slot is None
+            ):
+                self._set_agent_idle(agent)
             if agent.assigned_order_slot is None:
                 agent.auction_order_slot = None
 
         candidate_agents = [
             agent
             for agent in self.agents
-            if agent.has_energy() and agent.assigned_order_slot is None
+            if agent.has_energy()
+            and agent.assigned_order_slot is None
+            and not self._agent_charge_locked(agent)
         ]
         order_slots = list(self.available_order_slots)
+        if record:
+            self.high_diag_auction_calls += 1.0
+            self.high_diag_auction_candidates += float(len(candidate_agents))
+            self.high_diag_auction_orders += float(len(order_slots))
         if not candidate_agents or not order_slots:
             return {}
 
@@ -825,6 +1215,9 @@ class UAVEnv:
             for order_col, slot_idx in enumerate(order_slots):
                 order = self._slot_order(slot_idx)
                 if order is None:
+                    cost_matrix[agent_row, order_col] = 1e6
+                    continue
+                if not self._order_slot_energy_feasible(agent, slot_idx):
                     cost_matrix[agent_row, order_col] = 1e6
                     continue
                 travel = np.linalg.norm(agent.pos - order.pickup_pos)
@@ -836,14 +1229,18 @@ class UAVEnv:
         assignments = auction_assign_min_cost(cost_matrix)
         result = {}
         for agent_row, order_col in assignments.items():
+            if cost_matrix[int(agent_row), int(order_col)] >= 1e5:
+                continue
             agent = candidate_agents[int(agent_row)]
             slot_idx = int(order_slots[int(order_col)])
             agent.auction_order_slot = slot_idx
             result[agent.number] = slot_idx
+        if record:
+            self.high_diag_auction_assignments += float(len(result))
         return result
 
     def prepare_high_level_decision(self):
-        return self.run_order_auction()
+        return self.run_order_auction(record=False)
 
     def _assign_orders(self):
         self._activate_orders()
@@ -1121,12 +1518,22 @@ class UAVEnv:
             dtype=np.float32,
         )
 
+    def get_high_level_mode_training_mask(self):
+        return np.asarray(self._last_high_mode_train_mask, dtype=np.float32).copy()
+
     def get_current_high_level_actions(self):
         actions = []
         for agent in self.agents:
+            mode_value = (
+                HIGH_MODE_CHARGE
+                if agent.current_task_type == TASK_CHARGE
+                else HIGH_MODE_ORDER
+            )
             target = getattr(agent, "task_target", None)
             if target is None:
-                actions.append(np.zeros(self.high_level_n_actions, dtype=np.float32))
+                actions.append(
+                    np.array([mode_value, 0.0], dtype=np.float32)
+                )
                 continue
             target = np.asarray(target, dtype=np.float32)[: self.dim_actions]
             to_target = target - agent.pos
@@ -1134,25 +1541,23 @@ class UAVEnv:
             max_dist = self._max_reachable_subgoal_distance(agent)
             line_length = min(target_dist, max_dist)
             if line_length <= eps:
-                actions.append(np.zeros(self.high_level_n_actions, dtype=np.float32))
+                actions.append(
+                    np.array([mode_value, 0.0], dtype=np.float32)
+                )
                 continue
             direction = to_target / (target_dist + eps)
             progress = float(np.dot(agent.subgoal - agent.pos, direction))
+            progress = float(np.clip(progress, 0.0, line_length))
             min_progress = min(line_length, self.min_subgoal_progress)
             if line_length > min_progress + eps:
                 fraction = (progress - min_progress) / (line_length - min_progress)
             else:
                 fraction = 1.0
             progress_scalar = 2.0 * float(np.clip(fraction, 0.0, 1.0)) - 1.0
-            if agent.current_task_type == TASK_CHARGE:
-                mode_scalar = self.charge_mode_center
-            elif agent.current_task_type == TASK_ORDER:
-                mode_scalar = self.order_mode_center
-            elif agent.current_task_type != TASK_ORDER:
-                mode_scalar = 0.0
+            if agent.current_task_type not in (TASK_CHARGE, TASK_ORDER):
                 progress_scalar = 0.0
             actions.append(
-                np.array([mode_scalar, progress_scalar], dtype=np.float32)
+                np.array([mode_value, progress_scalar], dtype=np.float32)
             )
         return np.stack(actions, axis=0)
 
@@ -1161,51 +1566,144 @@ class UAVEnv:
         if actions.shape != (self.num_agents, self.high_level_n_actions):
             actions = actions.reshape(self.num_agents, self.high_level_n_actions)
 
-        self.run_order_auction()
+        self.run_order_auction(record=True)
         applied = np.zeros(self.num_agents, dtype=np.float32)
+        mode_train_mask = np.zeros((self.num_agents, 1), dtype=np.float32)
+        action_contexts = []
+        charge_intent_agent_ids = []
         for agent_idx, action in enumerate(actions):
             agent = self.agents[agent_idx]
             if not agent.has_energy():
+                action_contexts.append(None)
                 continue
 
-            action = np.asarray(action, dtype=np.float32).reshape(-1)
-            if action.size >= 2:
-                mode_scalar = float(action[0])
-                progress_scalar = float(action[1])
-                progress_fraction = 0.5 * (np.clip(progress_scalar, -1.0, 1.0) + 1.0)
-            else:
-                raw_scalar = float(action[0]) if action.size else 0.0
-                mode_scalar = raw_scalar
-                progress_fraction = float(np.clip(abs(raw_scalar), 0.0, 1.0))
-            progress_action = np.array(
-                [2.0 * progress_fraction - 1.0],
-                dtype=np.float32,
-            )
-            requested_charge = mode_scalar < self.charge_mode_threshold
+            mode_id, progress_scalar = self._parse_high_level_action(action)
             task_target = self._order_target_for_agent(agent)
-            task_type = TASK_ORDER
-            if requested_charge:
-                task_target = self.charging_station_pos.copy()
-                task_type = TASK_CHARGE
-                applied[agent_idx] = 1.0
-            elif task_target is not None:
-                if agent.assigned_order_slot is None:
-                    applied[agent_idx] = float(self._commit_auction_order_subgoal(agent))
-                    task_target = self._order_target_for_agent(agent)
-                else:
-                    applied[agent_idx] = 1.0
-            else:
-                energy_ratio = agent.energy / (agent.initial_energy + eps)
-                should_charge = (
+            order_locked = self._agent_order_locked(agent)
+            charge_locked = self._agent_charge_locked(agent)
+            energy_blocked_order = (
+                self.energy_shield_enabled
+                and mode_id == HIGH_MODE_ORDER
+                and not order_locked
+                and not charge_locked
+                and (
+                    (
+                        task_target is not None
+                        and not self._selected_order_energy_feasible(agent)
+                    )
+                    or (
+                        task_target is None
+                        and self._has_available_order()
+                        and not self._has_energy_feasible_available_order(agent)
+                    )
+                )
+            )
+            energy_ratio = agent.energy / (agent.initial_energy + eps)
+            should_charge_fallback = (
+                task_target is None
+                and (
                     energy_ratio <= self.charge_energy_threshold
                     or (
                         agent.current_task_type == TASK_CHARGE
                         and energy_ratio < self.charge_release_threshold
                     )
                 )
-                if should_charge:
+            )
+            will_charge = (
+                not order_locked
+                and (
+                    charge_locked
+                    or energy_blocked_order
+                    or mode_id == HIGH_MODE_CHARGE
+                    or should_charge_fallback
+                )
+            )
+            if will_charge:
+                charge_intent_agent_ids.append(agent_idx)
+            action_contexts.append(
+                {
+                    "mode_id": mode_id,
+                    "progress_scalar": progress_scalar,
+                    "task_target": task_target,
+                    "order_locked": order_locked,
+                    "charge_locked": charge_locked,
+                    "energy_blocked_order": energy_blocked_order,
+                    "should_charge_fallback": should_charge_fallback,
+                }
+            )
+        charge_rank_by_agent = {
+            agent_idx: rank for rank, agent_idx in enumerate(sorted(charge_intent_agent_ids))
+        }
+
+        for agent_idx, action in enumerate(actions):
+            agent = self.agents[agent_idx]
+            if not agent.has_energy():
+                continue
+
+            context = action_contexts[agent_idx]
+            mode_id = context["mode_id"]
+            progress_scalar = context["progress_scalar"]
+            self.high_diag_decision_count += 1.0
+            if mode_id == HIGH_MODE_CHARGE:
+                self.high_diag_sampled_charge += 1.0
+            else:
+                self.high_diag_sampled_order += 1.0
+
+            task_target = context["task_target"]
+            task_type = TASK_ORDER
+            order_locked = context["order_locked"]
+            charge_locked = context["charge_locked"]
+            energy_blocked_order = context["energy_blocked_order"]
+            should_charge_fallback = context["should_charge_fallback"]
+
+            if order_locked:
+                self.high_diag_order_locked += 1.0
+                task_target = self._order_target_for_agent(agent)
+                task_type = TASK_ORDER
+                applied[agent_idx] = 1.0
+            elif charge_locked:
+                self.high_diag_charge_locked += 1.0
+                agent.auction_order_slot = None
+                task_target = self._charge_slot_target(
+                    agent, charge_rank_by_agent.get(agent_idx)
+                )
+                task_type = TASK_CHARGE
+                applied[agent_idx] = 1.0
+            elif energy_blocked_order:
+                self.high_diag_charge_fallbacks += 1.0
+                agent.auction_order_slot = None
+                task_target = self._charge_slot_target(
+                    agent, charge_rank_by_agent.get(agent_idx)
+                )
+                task_type = TASK_CHARGE
+                applied[agent_idx] = 1.0
+            elif mode_id == HIGH_MODE_CHARGE:
+                agent.auction_order_slot = None
+                task_target = self._charge_slot_target(
+                    agent, charge_rank_by_agent.get(agent_idx)
+                )
+                task_type = TASK_CHARGE
+                applied[agent_idx] = 1.0
+                mode_train_mask[agent_idx, 0] = 1.0
+            elif task_target is not None:
+                if agent.assigned_order_slot is None:
+                    self.high_diag_order_commit_attempts += 1.0
+                    applied[agent_idx] = float(self._commit_auction_order_subgoal(agent))
+                    self.high_diag_order_commit_successes += float(
+                        applied[agent_idx] > 0.0
+                    )
+                    task_target = self._order_target_for_agent(agent)
+                    mode_train_mask[agent_idx, 0] = float(applied[agent_idx] > 0.0)
+                else:
+                    applied[agent_idx] = 1.0
+                    mode_train_mask[agent_idx, 0] = 1.0
+            else:
+                if should_charge_fallback:
+                    self.high_diag_charge_fallbacks += 1.0
                     agent.auction_order_slot = None
-                    task_target = self.charging_station_pos.copy()
+                    task_target = self._charge_slot_target(
+                        agent, charge_rank_by_agent.get(agent_idx)
+                    )
                     task_type = TASK_CHARGE
                     applied[agent_idx] = 1.0
                 else:
@@ -1213,14 +1711,31 @@ class UAVEnv:
                     task_type = TASK_IDLE
                     applied[agent_idx] = 1.0
 
+            if task_type == TASK_CHARGE:
+                self.high_diag_executed_charge += 1.0
+                progress_scalar = 1.0
+            elif task_type == TASK_ORDER:
+                self.high_diag_executed_order += 1.0
+                if self.order_progress_override is not None:
+                    progress_scalar = self.order_progress_override
+            else:
+                self.high_diag_executed_idle += 1.0
+            self.high_diag_mode_train_mask_sum += float(
+                mode_train_mask[agent_idx, 0]
+            )
+            self.high_diag_mode_train_mask_count += 1.0
+
             self._set_agent_subgoal_on_target_line(
                 agent,
-                progress_action,
+                np.array([progress_scalar], dtype=np.float32),
                 task_type=task_type,
                 task_target=task_target,
             )
 
         self._sync_order_lists()
+        self._last_high_mode_train_mask = mode_train_mask
+        if hasattr(self, "get_current_high_level_actions"):
+            return self.get_current_high_level_actions()
         return applied
 
     def get_active_agent_mask(self):
@@ -1232,6 +1747,29 @@ class UAVEnv:
     def _distance_to_charging_station(self, agent):
         return float(np.linalg.norm(agent.pos - self.charging_station_pos))
 
+    def _charge_slot_target(self, agent, charge_rank):
+        if not self.charge_queue_enabled or charge_rank is None:
+            return self.charging_station_pos.copy()
+
+        charge_rank = int(max(0, charge_rank))
+        capacity = max(1, int(self.charging_capacity))
+        if charge_rank < capacity:
+            radius = float(self.charge_dock_radius)
+            slot_idx = charge_rank
+            slot_count = capacity
+        else:
+            radius = float(self.charge_queue_radius)
+            slot_idx = charge_rank - capacity
+            slot_count = max(1, self.num_agents - capacity)
+
+        angle = 2.0 * np.pi * float(slot_idx) / float(max(1, slot_count))
+        offset = np.zeros(self.dim_actions, dtype=np.float32)
+        offset[0] = radius * np.cos(angle)
+        if self.dim_actions >= 2:
+            offset[1] = radius * np.sin(angle)
+        target = self.charging_station_pos + offset
+        return self._clip_position_to_bounds(target)
+
     def _consume_step_energy(self, powered_mask):
         for is_powered, agent in zip(powered_mask, self.agents):
             if is_powered:
@@ -1241,7 +1779,7 @@ class UAVEnv:
         candidates = [
             agent
             for agent in self.agents
-            if self._distance_to_charging_station(agent) <= self.charging_radius
+            if self._agent_ready_to_charge(agent)
             and agent.energy < agent.initial_energy
         ]
         candidates.sort(
@@ -1279,7 +1817,15 @@ class UAVEnv:
             self.active_order_ids = []
             self.next_order_id_to_activate = 0
             self.completed_order_count = 0
+            self._last_step_order_status_before = [
+                None for _ in range(self.num_agents)
+            ]
             self.charging_agent_ids = []
+            self._last_high_mode_train_mask = np.ones(
+                (self.num_agents, 1), dtype=np.float32
+            )
+            self._reset_high_level_diagnostics()
+            self._reset_order_execution_diagnostics()
 
             try:
                 self._initialize_obstacles()
@@ -1633,8 +2179,20 @@ class UAVEnv:
         )
 
         prev_dists = np.array([self._distance_to_goal(agent) for agent in self.agents], dtype=np.float32)
+        task_types_before_step = [agent.current_task_type for agent in self.agents]
+        order_status_before_step = []
+        for agent in self.agents:
+            if agent.assigned_order_id is None:
+                order_status_before_step.append(None)
+            else:
+                order_status_before_step.append(
+                    self.orders[agent.assigned_order_id].status
+                )
+        self._last_step_order_status_before = list(order_status_before_step)
 
         for idx, (agent, action) in enumerate(zip(self.agents, actions)):
+            if powered_mask[idx] and agent.reached:
+                self._advance_intermediate_subgoal_if_needed(agent)
             if (
                 not powered_mask[idx]
                 or agent.reached
@@ -1706,7 +2264,11 @@ class UAVEnv:
                 if agent.current_task_type == TASK_CHARGE
                 else 1.0
             )
-            rewards[idx] += dense_reward_scale * 2.5 * progress
+            rewards[idx] += (
+                dense_reward_scale
+                * 2.5
+                * progress
+            )
             rewards[idx] += (
                 dense_reward_scale
                 * self.velocity_reward_weight
@@ -1718,18 +2280,62 @@ class UAVEnv:
             rewards[idx] -= 0.2 * self.reward_safe_value[idx]
             rewards[idx] -= dense_reward_scale * 0.3 * min(current_dist, 1.0)
 
+            if (
+                agent.current_task_type == TASK_ORDER
+                and agent.assigned_order_id is not None
+            ):
+                self.order_diag_order_steps += 1.0
+                self.order_diag_progress_sum += float(progress)
+                self.order_diag_target_distance_sum += float(current_dist)
+                if progress > 1e-4:
+                    self.order_diag_positive_progress_steps += 1.0
+                elif progress < -1e-4:
+                    self.order_diag_regress_steps += 1.0
+                order_status = order_status_before_step[idx]
+                if order_status == DeliveryOrder.ASSIGNED:
+                    self.order_diag_pickup_steps += 1.0
+                elif order_status == DeliveryOrder.PICKED:
+                    self.order_diag_delivery_steps += 1.0
+            elif agent.current_task_type == TASK_CHARGE:
+                self.order_diag_charge_steps += 1.0
+            else:
+                self.order_diag_idle_steps += 1.0
+
             if current_dist <= self.goal_tolerance:
                 agent.reached = True
-                agent.vel[:] = 0.0
+                if self._is_at_task_terminal_target(agent):
+                    agent.vel[:] = 0.0
 
+            prev_order_status = order_status_before_step[idx]
             order_reward = self._advance_order_if_reached(agent, current_dist)
             if order_reward > 0.0:
                 agent.vel[:] = 0.0
                 rewards[idx] += order_reward
+                if prev_order_status == DeliveryOrder.ASSIGNED:
+                    self.order_diag_pickup_successes += 1.0
+                elif prev_order_status == DeliveryOrder.PICKED:
+                    self.order_diag_delivery_successes += 1.0
 
             agent.prev_collided = agent.collided
             agent.collided = obstacle_collisions[idx] or agent_collisions[idx]
             self.agent_paths[idx].append(agent.pos.copy())
+
+        for idx, task_type in enumerate(task_types_before_step):
+            if task_type == TASK_ORDER:
+                if obstacle_collisions[idx]:
+                    self.order_diag_order_obstacle_collisions += 1.0
+                if agent_collisions[idx]:
+                    self.order_diag_order_agent_collisions += 1.0
+            elif task_type == TASK_CHARGE:
+                if obstacle_collisions[idx]:
+                    self.order_diag_charge_obstacle_collisions += 1.0
+                if agent_collisions[idx]:
+                    self.order_diag_charge_agent_collisions += 1.0
+            else:
+                if obstacle_collisions[idx]:
+                    self.order_diag_idle_obstacle_collisions += 1.0
+                if agent_collisions[idx]:
+                    self.order_diag_idle_agent_collisions += 1.0
 
         self._assign_orders()
         delivery_done = self._all_orders_completed()
@@ -1833,6 +2439,34 @@ class UAVEnv:
         space_norm = np.linalg.norm(self._space_scale()) + eps
         rewards = progress - self.intrinsic_distance_weight * (distances / space_norm)
         rewards += self.intrinsic_success_bonus * self.get_subgoal_success_mask(targets)
+        delivery_mask = np.asarray(
+            [
+                float(
+                    agent.current_task_type == TASK_ORDER
+                    and agent.assigned_order_id is not None
+                    and status == DeliveryOrder.PICKED
+                )
+                for agent, status in zip(
+                    self.agents,
+                    getattr(
+                        self,
+                        "_last_step_order_status_before",
+                        [None for _ in range(self.num_agents)],
+                    ),
+                )
+            ],
+            dtype=np.float32,
+        )
+        rewards += (
+            self.delivery_intrinsic_progress_bonus
+            * np.maximum(progress, 0.0)
+            * delivery_mask
+        )
+        if self.intrinsic_collision_penalty > 0.0:
+            collision_mask = np.asarray(
+                [float(agent.collided) for agent in self.agents], dtype=np.float32
+            )
+            rewards -= self.intrinsic_collision_penalty * collision_mask
         rewards -= 0.2 * np.asarray(self.reward_safe_value, dtype=np.float32)
         return (self.intrinsic_reward_scale * rewards).astype(np.float32)
 
@@ -1933,7 +2567,7 @@ class UAVEnv:
         )
         mean_goal_distance = float(np.mean(remaining)) if remaining else 0.0
         completed_orders = float(self.completed_order_count)
-        return {
+        summary = {
             "step": float(self.current_step),
             "agent_health": healthy_agents,
             "enemy_health": mean_goal_distance,
@@ -1961,6 +2595,9 @@ class UAVEnv:
             "episode_reward": float(0.0),
             "win_tag": bool(self._all_orders_completed()),
         }
+        summary.update(self._high_level_diagnostics_summary())
+        summary.update(self._order_execution_diagnostics_summary())
+        return summary
 
     def _capture_runtime_state(self):
         return {
@@ -1970,12 +2607,20 @@ class UAVEnv:
             "collision_count": float(self.collision_count),
             "obstacle_collision_count": float(self.obstacle_collision_count),
             "agent_collision_count": float(self.agent_collision_count),
+            "order_execution_diagnostics": self._order_execution_diagnostics_state(),
             "agent_paths": [[pos.copy() for pos in path] for path in self.agent_paths],
             "order_slots": list(self.order_slots),
             "available_order_slots": list(self.available_order_slots),
             "active_order_ids": list(self.active_order_ids),
             "next_order_id_to_activate": int(self.next_order_id_to_activate),
             "completed_order_count": int(self.completed_order_count),
+            "last_step_order_status_before": list(
+                getattr(
+                    self,
+                    "_last_step_order_status_before",
+                    [None for _ in range(self.num_agents)],
+                )
+            ),
             "charging_agent_ids": list(self.charging_agent_ids),
             "python_random_state": random.getstate(),
             "numpy_random_state": np.random.get_state(),
@@ -2028,6 +2673,9 @@ class UAVEnv:
         self.agent_collision_count = float(
             snapshot.get("agent_collision_count", 0.0)
         )
+        for attr, value in snapshot.get("order_execution_diagnostics", {}).items():
+            if attr in ORDER_EXEC_DIAGNOSTIC_ATTRS:
+                setattr(self, attr, float(value))
         self.agent_paths = [[pos.copy() for pos in path] for path in snapshot["agent_paths"]]
         self.order_slots = list(
             snapshot.get("order_slots", [None for _ in range(self.max_active_orders)])
@@ -2043,6 +2691,12 @@ class UAVEnv:
             snapshot.get("next_order_id_to_activate", 0)
         )
         self.completed_order_count = int(snapshot.get("completed_order_count", 0))
+        self._last_step_order_status_before = list(
+            snapshot.get(
+                "last_step_order_status_before",
+                [None for _ in range(self.num_agents)],
+            )
+        )
         self.charging_agent_ids = list(snapshot.get("charging_agent_ids", []))
         if "python_random_state" in snapshot:
             random.setstate(snapshot["python_random_state"])
@@ -2708,6 +3362,84 @@ class UAVEnvDiscreteWrapper:
         agent_actions = [self.discrete_actions[int(action)] for action in actions]
         return self.env.predict_joint_collision_flags(agent_actions)
 
+    def _candidate_goal_progress(self, agent_id, action_id):
+        agent = self.env.agents[int(agent_id)]
+        if agent.reached or not agent.has_energy():
+            return 0.0
+        pred_pos, _ = self.env._predict_agent_kinematics(
+            agent,
+            self.discrete_actions[int(action_id)],
+        )
+        current_dist = float(np.linalg.norm(agent.goal - agent.pos))
+        pred_dist = float(np.linalg.norm(agent.goal - pred_pos))
+        return current_dist - pred_dist
+
+    def revise_safe_actions(self, actions, avail_actions=None, guard_margin=None):
+        active_mask = self.get_active_agent_mask()
+        for agent_id, agent in enumerate(self.env.agents):
+            if active_mask[agent_id] > 0.0 and agent.reached:
+                self.env._advance_intermediate_subgoal_if_needed(agent)
+        noop_action = self.get_noop_action()
+        revised = [
+            int(action) if active_mask[idx] > 0.0 else noop_action
+            for idx, action in enumerate(actions)
+        ]
+        guard_flags = np.zeros(self.n_agents, dtype=np.float32)
+
+        if avail_actions is None:
+            avail_actions = np.ones((self.n_agents, self.n_actions), dtype=np.float32)
+        avail_actions = np.asarray(avail_actions, dtype=np.float32)
+
+        old_margin = self.env.guard_prediction_margin
+        if guard_margin is not None:
+            self.env.guard_prediction_margin = float(max(0.0, guard_margin))
+        try:
+            collision_flags = self.estimate_joint_collision_flags(revised)
+            if not np.any(collision_flags * active_mask > 0.0):
+                return revised, guard_flags
+
+            for agent_id in range(self.n_agents):
+                if active_mask[agent_id] <= 0.0 or collision_flags[agent_id] <= 0.0:
+                    continue
+
+                candidate_ids = np.flatnonzero(avail_actions[agent_id] > 0.0)
+                if candidate_ids.size == 0:
+                    candidate_ids = np.array([noop_action], dtype=np.int64)
+
+                joint_candidates = []
+                for candidate_id in candidate_ids:
+                    joint = list(revised)
+                    joint[agent_id] = int(candidate_id)
+                    joint_candidates.append(joint)
+
+                risks = self.estimate_joint_short_risk_batch(joint_candidates)
+                best_action = revised[agent_id]
+                best_score = None
+                for cand_idx, candidate_id in enumerate(candidate_ids):
+                    joint = joint_candidates[cand_idx]
+                    cand_flags = self.estimate_joint_collision_flags(joint)
+                    progress = self._candidate_goal_progress(agent_id, candidate_id)
+                    candidate_changed = int(candidate_id != revised[agent_id])
+                    score = (
+                        int(cand_flags[agent_id] > 0.0),
+                        int(np.sum(cand_flags * active_mask)),
+                        float(risks[cand_idx, agent_id]),
+                        -float(progress),
+                        candidate_changed,
+                    )
+                    if best_score is None or score < best_score:
+                        best_score = score
+                        best_action = int(candidate_id)
+
+                if best_action != revised[agent_id]:
+                    revised[agent_id] = best_action
+                    guard_flags[agent_id] = 1.0
+                    collision_flags = self.estimate_joint_collision_flags(revised)
+
+            return revised, guard_flags
+        finally:
+            self.env.guard_prediction_margin = old_margin
+
     def get_env_info(self):
         self.reset()
         obs = self.get_obs()
@@ -2720,6 +3452,7 @@ class UAVEnvDiscreteWrapper:
             "episode_limit": self.episode_limit,
             "msg_shape": int(self.env.msg_shape),
             "high_level_n_actions": int(self.env.high_level_n_actions),
+            "high_level_mode_n_actions": int(self.env.high_level_mode_n_actions),
             "high_level_obs_shape": int(self.env.get_high_level_obs().shape[-1]),
             "high_level_state_shape": int(self.env.get_high_level_state().shape[-1]),
             "low_task_shape": int(self.env.low_task_shape),

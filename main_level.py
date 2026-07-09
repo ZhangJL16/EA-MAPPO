@@ -362,6 +362,7 @@ if __name__ == "__main__":
         args.episode_limit = env_info["episode_limit"]
         args.msg_shape = env_info.get("msg_shape", 0)
         args.high_level_n_actions = env_info.get("high_level_n_actions", 0)
+        args.high_level_mode_n_actions = env_info.get("high_level_mode_n_actions", 0)
         args.high_level_obs_shape = env_info.get("high_level_obs_shape", 0)
         args.high_level_state_shape = env_info.get("high_level_state_shape", 0)
         args.low_task_shape = env_info.get("low_task_shape", 0)

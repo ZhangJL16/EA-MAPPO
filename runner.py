@@ -91,6 +91,10 @@ UAV_DELIVERY_CSV_COLUMNS = [
     "available_orders",
     "picked_orders",
     "idle_agents",
+    "powered_agents",
+    "depleted_agents",
+    "mean_energy",
+    "charging_agents",
     "mean_goal_distance",
     "healthy_agents",
     "collision_count",
@@ -108,9 +112,60 @@ UAV_DELIVERY_SUMMARY_KEYS = [
     "available_orders",
     "picked_orders",
     "idle_agents",
+    "powered_agents",
+    "depleted_agents",
+    "mean_energy",
+    "charging_agents",
     "mean_goal_distance",
     "healthy_agents",
 ]
+
+UAV_DELIVERY_DIAGNOSTIC_KEYS = [
+    "high_decision_count",
+    "sampled_charge_rate",
+    "sampled_order_rate",
+    "executed_charge_rate",
+    "executed_order_rate",
+    "executed_idle_rate",
+    "order_locked_rate",
+    "charge_locked_rate",
+    "mode_train_mask_mean",
+    "auction_calls",
+    "auction_candidate_mean",
+    "auction_order_mean",
+    "auction_assignment_mean",
+    "order_commit_attempt_rate",
+    "order_commit_success_rate",
+    "charge_fallback_rate",
+    "order_exec_steps",
+    "order_pickup_steps",
+    "order_delivery_steps",
+    "order_pickup_success_count",
+    "order_delivery_success_count",
+    "order_progress_mean",
+    "order_positive_progress_rate",
+    "order_regress_rate",
+    "order_target_distance_mean",
+    "pickup_success_per_pickup_step",
+    "delivery_success_per_delivery_step",
+    "charge_exec_steps",
+    "idle_exec_steps",
+    "order_obstacle_collision_count",
+    "order_agent_collision_count",
+    "charge_obstacle_collision_count",
+    "charge_agent_collision_count",
+    "idle_obstacle_collision_count",
+    "idle_agent_collision_count",
+    "order_collision_rate",
+    "charge_collision_rate",
+    "idle_collision_rate",
+]
+
+UAV_DELIVERY_CSV_COLUMNS = (
+    UAV_DELIVERY_CSV_COLUMNS[:-1]
+    + UAV_DELIVERY_DIAGNOSTIC_KEYS
+    + UAV_DELIVERY_CSV_COLUMNS[-1:]
+)
 
 UAV_DELIVERY_EXPERIMENT_LOG = os.path.join(
     "train_logs", "uav_delivery_experiments.csv"
@@ -223,6 +278,10 @@ class Runner:
                 "available_orders": [],
                 "picked_orders": [],
                 "idle_agents": [],
+                "powered_agents": [],
+                "depleted_agents": [],
+                "mean_energy": [],
+                "charging_agents": [],
                 "mean_goal_distance": [],
                 "healthy_agents": [],
             }
@@ -492,6 +551,12 @@ class Runner:
             return float(summary.get(fallback_key, 0.0))
         return 0.0
 
+    def _delivery_diagnostic_values(self, summary):
+        return [
+            float(summary.get(key, 0.0))
+            for key in UAV_DELIVERY_DIAGNOSTIC_KEYS
+        ]
+
     def _build_default_log_row(
         self,
         event,
@@ -569,6 +634,10 @@ class Runner:
             self._delivery_summary_float(summary, "available_orders"),
             self._delivery_summary_float(summary, "picked_orders"),
             self._delivery_summary_float(summary, "idle_agents"),
+            self._delivery_summary_float(summary, "powered_agents"),
+            self._delivery_summary_float(summary, "depleted_agents"),
+            self._delivery_summary_float(summary, "mean_energy"),
+            self._delivery_summary_float(summary, "charging_agents"),
             self._delivery_summary_float(summary, "mean_goal_distance"),
             self._delivery_summary_float(summary, "healthy_agents"),
             self._summary_float(summary, "collision_count"),
@@ -576,6 +645,7 @@ class Runner:
             self._summary_float(summary, "agent_collision_count"),
             safety_loss,
             eval_episode_steps,
+            *self._delivery_diagnostic_values(summary),
             datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         ]
 
@@ -881,6 +951,8 @@ class Runner:
             }
             for key in UAV_DELIVERY_SUMMARY_KEYS:
                 summary[key] = 0
+            for key in UAV_DELIVERY_DIAGNOSTIC_KEYS:
+                summary[key] = 0
         else:
             summary = {
                 "episode_reward": 0,
@@ -930,6 +1002,8 @@ class Runner:
                 summary["healthy_agents"] += episode_summary.get(
                     "healthy_agents", episode_summary.get("agent_health", 0.0)
                 )
+                for key in UAV_DELIVERY_DIAGNOSTIC_KEYS:
+                    summary[key] += episode_summary.get(key, 0.0)
             else:
                 summary["agent_health"] += episode_summary["agent_health"]
                 summary["enemy_health"] += episode_summary["enemy_health"]
