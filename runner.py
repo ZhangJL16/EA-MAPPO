@@ -372,15 +372,23 @@ class Runner:
             writer = csv.writer(csv_file)
             writer.writerow(row)
 
+    def _uav_delivery_experiment_log_path(self):
+        return (
+            getattr(self.args, "experiment_log_csv", "")
+            or os.environ.get("MARL_EXPERIMENT_LOG_CSV", "")
+            or UAV_DELIVERY_EXPERIMENT_LOG
+        )
+
     def _normalize_uav_delivery_experiment_log(self):
-        os.makedirs(os.path.dirname(UAV_DELIVERY_EXPERIMENT_LOG), exist_ok=True)
+        log_path = self._uav_delivery_experiment_log_path()
+        os.makedirs(os.path.dirname(log_path) or ".", exist_ok=True)
         if (
-            not os.path.exists(UAV_DELIVERY_EXPERIMENT_LOG)
-            or os.path.getsize(UAV_DELIVERY_EXPERIMENT_LOG) == 0
+            not os.path.exists(log_path)
+            or os.path.getsize(log_path) == 0
         ):
             return
 
-        with open(UAV_DELIVERY_EXPERIMENT_LOG, newline="", encoding="utf-8") as csv_file:
+        with open(log_path, newline="", encoding="utf-8") as csv_file:
             rows = list(csv.reader(csv_file))
         if not rows:
             return
@@ -408,17 +416,19 @@ class Runner:
                 [values.get(column, "") for column in UAV_DELIVERY_EXPERIMENT_COLUMNS]
             )
 
-        with open(UAV_DELIVERY_EXPERIMENT_LOG, "w", newline="", encoding="utf-8") as csv_file:
+        with open(log_path, "w", newline="", encoding="utf-8") as csv_file:
             writer = csv.writer(csv_file)
             writer.writerows(normalized_rows)
 
     def _write_uav_delivery_experiment_row(self, row):
+        log_path = self._uav_delivery_experiment_log_path()
         self._normalize_uav_delivery_experiment_log()
         write_header = (
-            not os.path.exists(UAV_DELIVERY_EXPERIMENT_LOG)
-            or os.path.getsize(UAV_DELIVERY_EXPERIMENT_LOG) == 0
+            not os.path.exists(log_path)
+            or os.path.getsize(log_path) == 0
         )
-        with open(UAV_DELIVERY_EXPERIMENT_LOG, "a", newline="", encoding="utf-8") as csv_file:
+        os.makedirs(os.path.dirname(log_path) or ".", exist_ok=True)
+        with open(log_path, "a", newline="", encoding="utf-8") as csv_file:
             writer = csv.writer(csv_file)
             if write_header:
                 writer.writerow(UAV_DELIVERY_EXPERIMENT_COLUMNS)

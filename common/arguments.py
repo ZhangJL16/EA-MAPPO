@@ -87,7 +87,6 @@ def get_common_args():
         '--experiment_device',
         type=str,
         default=os.environ.get('MARL_EXPERIMENT_DEVICE', 'dorm'),
-        choices=['dorm', 'lab'],
         help='device label written to the UAVDelivery experiment summary CSV',
     )
 
@@ -157,6 +156,7 @@ def get_common_args():
     parser.add_argument('--warning_penalty_weight', type=float, default=None, help='override warning-signal penalty weight used in reward shaping/logging')
     parser.add_argument('--run_script', type=str, default=os.environ.get('MARL_RUN_SCRIPT', ''), help='training script path written to experiment summary CSV')
     parser.add_argument('--run_command', type=str, default=os.environ.get('MARL_RUN_COMMAND', ''), help='training command written to experiment summary CSV')
+    parser.add_argument('--experiment_log_csv', type=str, default=os.environ.get('MARL_EXPERIMENT_LOG_CSV', ''), help='UAV delivery experiment summary CSV path; defaults to train_logs/uav_delivery_experiments.csv')
     # timestamp
     parser.add_argument('--now', type=str, default='', help='timestamp for mat logging')
     args = parser.parse_args()

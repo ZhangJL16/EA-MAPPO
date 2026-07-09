@@ -6,63 +6,57 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 cd "$REPO_ROOT"
 
 PYTHON_BIN="${PYTHON_BIN:-.venv/bin/python}"
-SUITE_ID="${SUITE_ID:-uedl_hier_suite_$(date +%m%d_%H%M%S)}"
+SUITE_ID="${SUITE_ID:-uedl_hmappo_warmstart_$(date +%m%d_%H%M%S)}"
 COMPUTER_ID="${COMPUTER_ID:-$(hostname | tr -c 'A-Za-z0-9_.-' '_')}"
 SHARD_INDEX="${SHARD_INDEX:-0}"
-NUM_SHARDS="${NUM_SHARDS:-1}"
+NUM_SHARDS="${NUM_SHARDS:-2}"
 MAX_PARALLEL="${MAX_PARALLEL:-4}"
 GPU_IDS="${GPU_IDS:-${GPU_ID:-0}}"
 CUDA="${CUDA:-True}"
-N_STEPS="${N_STEPS:-600000}"
+N_STEPS="${N_STEPS:-120000}"
 EVALUATE_CYCLE="${EVALUATE_CYCLE:-5000}"
 EVALUATE_EPOCH="${EVALUATE_EPOCH:-20}"
-SEEDS="${SEEDS:-123}"
-METHODS="${METHODS:-all}"
+SEEDS="${SEEDS:-123,456,789,101112,131415,161718,192021,222324}"
 UAV_N_AGENTS="${UAV_N_AGENTS:-4}"
 UAV_TOTAL_ORDERS="${UAV_TOTAL_ORDERS:-16}"
 UAV_MAX_ACTIVE_ORDERS="${UAV_MAX_ACTIVE_ORDERS:-8}"
 EPISODE_LIMIT="${EPISODE_LIMIT:-400}"
 DRY_RUN="${DRY_RUN:-0}"
-EXPERIMENT_DEVICE="${EXPERIMENT_DEVICE:-${MARL_EXPERIMENT_DEVICE:-$COMPUTER_ID}}"
+EXPERIMENT_DEVICE="${EXPERIMENT_DEVICE:-$COMPUTER_ID}"
+EXPERIMENT_LOG_CSV="${EXPERIMENT_LOG_CSV:-train_logs/${EXPERIMENT_DEVICE}_train_log.csv}"
+TRAIN_SCRIPT="${TRAIN_SCRIPT:-scripts/UAVEnergyDeliveryLevel/comparisons/train_hmappo_warmstart_low180k.sh}"
 
 usage() {
   cat <<'EOF'
 Usage:
-  scripts/UAVEnergyDeliveryLevel/run_hierarchical_suite_4proc.sh [options] [-- extra training args]
+  scripts/UAVEnergyDeliveryLevel/run_hmappo_warmstart_2pc.sh [options] [-- extra training args]
 
-Runs the hierarchical-learning line only. The default order starts with the
-current full H-MAPPO method, then runs hierarchical baselines and ablations.
+Runs the warm-start H-MAPPO training line across two computers. Use the same
+SUITE_ID and different SHARD_INDEX values on the two machines.
 
-Common options:
-  --suite-id ID          Shared experiment id. Use the same id on all computers.
+Options:
+  --suite-id ID          Shared experiment id.
   --computer-id ID       Label for this machine. Defaults to hostname.
-  --num-shards N         Total number of computers/shards.
+  --num-shards N         Total computers. Defaults to 2.
   --shard-index I        This computer's zero-based shard index.
-  -j, --max-parallel N   Concurrent processes on this computer. Defaults to 4.
-  --gpu-ids LIST         Comma/space-separated GPU ids, e.g. 0 or 0,1.
-  --methods LIST         Comma/space-separated methods, or all.
-  --seeds LIST           Comma/space-separated seeds. Defaults to 123.
-  --n-steps N            Training steps. Defaults to 600000.
-  --evaluate-cycle N     Evaluation interval. Defaults to 5000.
-  --evaluate-epoch N     Evaluation episodes. Defaults to 20.
+  -j, --max-parallel N   Concurrent jobs on this computer. Defaults to 4.
+  --gpu-ids LIST         Comma/space-separated GPU ids. Defaults to 0.
+  --seeds LIST           Comma/space-separated seeds. Defaults to 8 seeds, 4 per computer with NUM_SHARDS=2.
+  --n-steps N            Second-stage fine-tuning steps. Defaults to 120000.
   --cuda True|False      Defaults to True.
   --dry-run              Print commands and write status without training.
 
-Default methods, in order:
-  current_hmappo, hsd, hmappo_basic, hmappo_wo_energy_aware_design,
-  ours_wo_energy_constraint, ours_wo_charging_resource_modeling,
-  ours_wo_safety_layer, ours_wo_auction_module,
-  ours_wo_high_level_temporal_abstraction,
-  ours_with_fixed_charging_threshold
+Per-machine CSV:
+  Defaults to train_logs/<EXPERIMENT_DEVICE>_train_log.csv.
+  Override with EXPERIMENT_LOG_CSV=/path/to/file.csv.
 
-Examples:
-  scripts/UAVEnergyDeliveryLevel/run_hierarchical_suite_4proc.sh
+Example computer 0:
+  SUITE_ID=uedl_hmappo_warmstart_0709 SHARD_INDEX=0 COMPUTER_ID=desktop \
+    scripts/UAVEnergyDeliveryLevel/run_hmappo_warmstart_2pc.sh
 
-  SUITE_ID=uedl_hier_0709 SEEDS=123,456 GPU_IDS=0 \
-    scripts/UAVEnergyDeliveryLevel/run_hierarchical_suite_4proc.sh
-
-  METHODS=current_hmappo,hmappo_basic N_STEPS=120000 CUDA=False \
-    scripts/UAVEnergyDeliveryLevel/run_hierarchical_suite_4proc.sh
+Example computer 1:
+  SUITE_ID=uedl_hmappo_warmstart_0709 SHARD_INDEX=1 COMPUTER_ID=laptop \
+    scripts/UAVEnergyDeliveryLevel/run_hmappo_warmstart_2pc.sh
 EOF
 }
 
@@ -121,14 +115,6 @@ while [[ $# -gt 0 ]]; do
       GPU_IDS="${1#*=}"
       shift
       ;;
-    --methods)
-      METHODS="$2"
-      shift 2
-      ;;
-    --methods=*)
-      METHODS="${1#*=}"
-      shift
-      ;;
     --seeds)
       SEEDS="$2"
       shift 2
@@ -145,19 +131,27 @@ while [[ $# -gt 0 ]]; do
       N_STEPS="${1#*=}"
       shift
       ;;
-    --evaluate-cycle)
+    --n_steps)
+      N_STEPS="$2"
+      shift 2
+      ;;
+    --n_steps=*)
+      N_STEPS="${1#*=}"
+      shift
+      ;;
+    --evaluate-cycle|--evaluate_cycle)
       EVALUATE_CYCLE="$2"
       shift 2
       ;;
-    --evaluate-cycle=*)
+    --evaluate-cycle=*|--evaluate_cycle=*)
       EVALUATE_CYCLE="${1#*=}"
       shift
       ;;
-    --evaluate-epoch)
+    --evaluate-epoch|--evaluate_epoch)
       EVALUATE_EPOCH="$2"
       shift 2
       ;;
-    --evaluate-epoch=*)
+    --evaluate-epoch=*|--evaluate_epoch=*)
       EVALUATE_EPOCH="${1#*=}"
       shift
       ;;
@@ -203,6 +197,10 @@ require_nonnegative_int() {
   fi
 }
 
+normalize_list() {
+  printf "%s" "$1" | tr ',;' '  ' | xargs -n1
+}
+
 require_positive_int MAX_PARALLEL "$MAX_PARALLEL"
 require_positive_int NUM_SHARDS "$NUM_SHARDS"
 require_nonnegative_int SHARD_INDEX "$SHARD_INDEX"
@@ -210,50 +208,15 @@ if (( SHARD_INDEX >= NUM_SHARDS )); then
   echo "SHARD_INDEX must be smaller than NUM_SHARDS." >&2
   exit 2
 fi
-
 if [[ ! -x "$PYTHON_BIN" ]]; then
   echo "Python executable not found or not executable: $PYTHON_BIN" >&2
   exit 2
 fi
-
-normalize_list() {
-  printf "%s" "$1" | tr ',;' '  ' | xargs -n1
-}
-
-ALL_METHODS=(
-  current_hmappo
-  hsd
-  hmappo_basic
-  hmappo_wo_energy_aware_design
-  ours_wo_energy_constraint
-  ours_wo_charging_resource_modeling
-  ours_wo_safety_layer
-  ours_wo_auction_module
-  ours_wo_high_level_temporal_abstraction
-  ours_with_fixed_charging_threshold
-)
-
-script_for_method() {
-  case "$1" in
-    current_hmappo) echo "scripts/UAVEnergyDeliveryLevel/comparisons/train_hmappo_warmstart_low180k.sh" ;;
-    hsd) echo "scripts/UAVEnergyDeliveryLevel/comparisons/train_hsd.sh" ;;
-    hmappo_basic) echo "scripts/UAVEnergyDeliveryLevel/comparisons/train_hmappo_basic.sh" ;;
-    hmappo_wo_energy_aware_design) echo "scripts/UAVEnergyDeliveryLevel/comparisons/train_hmappo_wo_energy_aware_design.sh" ;;
-    ours_wo_energy_constraint) echo "scripts/UAVEnergyDeliveryLevel/comparisons/train_ours_wo_energy_constraint.sh" ;;
-    ours_wo_charging_resource_modeling) echo "scripts/UAVEnergyDeliveryLevel/comparisons/train_ours_wo_charging_resource_modeling.sh" ;;
-    ours_wo_safety_layer) echo "scripts/UAVEnergyDeliveryLevel/comparisons/train_ours_wo_safety_layer.sh" ;;
-    ours_wo_auction_module) echo "scripts/UAVEnergyDeliveryLevel/comparisons/train_ours_wo_auction_module.sh" ;;
-    ours_wo_high_level_temporal_abstraction) echo "scripts/UAVEnergyDeliveryLevel/comparisons/train_ours_wo_high_level_temporal_abstraction.sh" ;;
-    ours_with_fixed_charging_threshold) echo "scripts/UAVEnergyDeliveryLevel/comparisons/train_ours_with_fixed_charging_threshold.sh" ;;
-    *) return 1 ;;
-  esac
-}
-
-if [[ "$METHODS" == "all" ]]; then
-  SELECTED_METHODS=("${ALL_METHODS[@]}")
-else
-  mapfile -t SELECTED_METHODS < <(normalize_list "$METHODS")
+if [[ ! -x "$TRAIN_SCRIPT" ]]; then
+  echo "Training script not found or not executable: $TRAIN_SCRIPT" >&2
+  exit 2
 fi
+
 mapfile -t SEED_LIST < <(normalize_list "$SEEDS")
 mapfile -t GPU_LIST < <(normalize_list "$GPU_IDS")
 if (( ${#GPU_LIST[@]} == 0 )); then
@@ -263,22 +226,22 @@ fi
 SUITE_DIR="logs/uav_energy_delivery_comparison_suites/$SUITE_ID"
 RUNS_DIR="$SUITE_DIR/runs"
 STATUS_DIR="$SUITE_DIR/status"
-mkdir -p "$RUNS_DIR" "$STATUS_DIR"
+mkdir -p "$RUNS_DIR" "$STATUS_DIR" "$(dirname "$EXPERIMENT_LOG_CSV")"
 
-MANIFEST="$SUITE_DIR/manifest.tsv"
-printf "suite_id\tcomputer_id\tshard_index\tnum_shards\tmax_parallel\tmethods\tseeds\tn_steps\tevaluate_cycle\tevaluate_epoch\tcuda\tgpu_ids\tstarted_at\n" > "$MANIFEST"
+MANIFEST="$SUITE_DIR/manifest_${COMPUTER_ID}.tsv"
+printf "suite_id\tcomputer_id\tshard_index\tnum_shards\tmax_parallel\tseeds\tn_steps\tevaluate_cycle\tevaluate_epoch\tcuda\tgpu_ids\texperiment_log_csv\tstarted_at\n" > "$MANIFEST"
 printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" \
   "$SUITE_ID" "$COMPUTER_ID" "$SHARD_INDEX" "$NUM_SHARDS" "$MAX_PARALLEL" \
-  "$METHODS" "$SEEDS" "$N_STEPS" "$EVALUATE_CYCLE" "$EVALUATE_EPOCH" \
-  "$CUDA" "$GPU_IDS" "$(date '+%Y-%m-%d %H:%M:%S')" >> "$MANIFEST"
+  "$SEEDS" "$N_STEPS" "$EVALUATE_CYCLE" "$EVALUATE_EPOCH" "$CUDA" "$GPU_IDS" \
+  "$EXPERIMENT_LOG_CSV" "$(date '+%Y-%m-%d %H:%M:%S')" >> "$MANIFEST"
 
 echo "SUITE_ID=$SUITE_ID"
 echo "SUITE_DIR=$SUITE_DIR"
 echo "COMPUTER_ID=$COMPUTER_ID"
 echo "SHARD=$SHARD_INDEX/$NUM_SHARDS"
 echo "MAX_PARALLEL=$MAX_PARALLEL"
-echo "METHODS=${SELECTED_METHODS[*]}"
 echo "SEEDS=${SEED_LIST[*]}"
+echo "EXPERIMENT_LOG_CSV=$EXPERIMENT_LOG_CSV"
 
 active_job_count() {
   jobs -rp | wc -l
@@ -295,10 +258,9 @@ wait_for_slot() {
 
 run_one() {
   local work_index="$1"
-  local method="$2"
-  local seed="$3"
-  local gpu_id="$4"
-  local script="$5"
+  local seed="$2"
+  local gpu_id="$3"
+  local method="hmappo_warmstart_low180k"
   local run_name="${SUITE_ID}_${COMPUTER_ID}_${method}_seed${seed}"
   local log_dir="$RUNS_DIR/$run_name"
   local model_dir="model_runs/comparisons/$run_name"
@@ -328,23 +290,28 @@ run_one() {
     --uav_max_active_orders "$UAV_MAX_ACTIVE_ORDERS"
     --cuda "$CUDA"
     --gpu_id "$gpu_id"
+    --experiment_log_csv "$EXPERIMENT_LOG_CSV"
     "${EXTRA_ARGS[@]}"
   )
-  command_text="RUN_NAME=$run_name LOG_DIR=$log_dir MODEL_DIR=$model_dir EXPERIMENT_DEVICE=$EXPERIMENT_DEVICE $script ${rl_args[*]}"
+  command_text="RUN_NAME=$run_name LOG_DIR=$log_dir MODEL_DIR=$model_dir EXPERIMENT_DEVICE=$EXPERIMENT_DEVICE EXPERIMENT_LOG_CSV=$EXPERIMENT_LOG_CSV $TRAIN_SCRIPT ${rl_args[*]}"
 
   if [[ "$DRY_RUN" == "1" ]]; then
     (
       export DRY_RUN=1 RUN_NAME="$run_name" LOG_DIR="$log_dir" MODEL_DIR="$model_dir"
-      export EXPERIMENT_DEVICE="$EXPERIMENT_DEVICE" MARL_EXPERIMENT_DEVICE="$EXPERIMENT_DEVICE"
-      "$script" "${rl_args[@]}"
+      export PYTHON_BIN="$PYTHON_BIN" EXPERIMENT_DEVICE="$EXPERIMENT_DEVICE"
+      export MARL_EXPERIMENT_DEVICE="$EXPERIMENT_DEVICE" EXPERIMENT_LOG_CSV="$EXPERIMENT_LOG_CSV"
+      export MARL_EXPERIMENT_LOG_CSV="$EXPERIMENT_LOG_CSV"
+      "$TRAIN_SCRIPT" "${rl_args[@]}"
     )
     exit_code=0
     status="dry_run"
   else
     (
       export RUN_NAME="$run_name" LOG_DIR="$log_dir" MODEL_DIR="$model_dir"
-      export EXPERIMENT_DEVICE="$EXPERIMENT_DEVICE" MARL_EXPERIMENT_DEVICE="$EXPERIMENT_DEVICE"
-      "$script" "${rl_args[@]}"
+      export PYTHON_BIN="$PYTHON_BIN" EXPERIMENT_DEVICE="$EXPERIMENT_DEVICE"
+      export MARL_EXPERIMENT_DEVICE="$EXPERIMENT_DEVICE" EXPERIMENT_LOG_CSV="$EXPERIMENT_LOG_CSV"
+      export MARL_EXPERIMENT_LOG_CSV="$EXPERIMENT_LOG_CSV"
+      "$TRAIN_SCRIPT" "${rl_args[@]}"
     )
     exit_code=$?
     status=$([[ "$exit_code" == "0" ]] && echo ok || echo fail)
@@ -355,7 +322,7 @@ run_one() {
   elapsed=$((end_epoch - start_epoch))
   printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" \
     "$SUITE_ID" "$COMPUTER_ID" "$SHARD_INDEX" "$NUM_SHARDS" "$work_index" \
-    "$method" "$seed" "$run_name" "$status" "$exit_code" "$elapsed" "$script" \
+    "$method" "$seed" "$run_name" "$status" "$exit_code" "$elapsed" "$TRAIN_SCRIPT" \
     "$log_dir" "$model_dir" "$start_time" "$end_time" "$command_text" >> "$status_file"
   echo "DONE method=$method seed=$seed status=$status elapsed=${elapsed}s"
   return "$exit_code"
@@ -364,32 +331,22 @@ run_one() {
 work_index=0
 launched=0
 for seed in "${SEED_LIST[@]}"; do
-  for method in "${SELECTED_METHODS[@]}"; do
-    script="$(script_for_method "$method")" || {
-      echo "Unknown method: $method" >&2
-      exit 2
-    }
-    if [[ ! -x "$script" ]]; then
-      echo "Script not found or not executable for $method: $script" >&2
-      exit 2
-    fi
-    if (( work_index % NUM_SHARDS == SHARD_INDEX )); then
-      wait_for_slot
-      gpu_id="${GPU_LIST[$((launched % ${#GPU_LIST[@]}))]}"
-      run_one "$work_index" "$method" "$seed" "$gpu_id" "$script" &
-      launched=$((launched + 1))
-    fi
-    work_index=$((work_index + 1))
-  done
+  if (( work_index % NUM_SHARDS == SHARD_INDEX )); then
+    wait_for_slot
+    gpu_id="${GPU_LIST[$((launched % ${#GPU_LIST[@]}))]}"
+    run_one "$work_index" "$seed" "$gpu_id" &
+    launched=$((launched + 1))
+  fi
+  work_index=$((work_index + 1))
 done
 
 while (( $(active_job_count) > 0 )); do
   wait -n || true
 done
 
-if [[ -f train_logs/uav_delivery_experiments.csv ]]; then
-  cp train_logs/uav_delivery_experiments.csv "$SUITE_DIR/uav_delivery_experiments_${COMPUTER_ID}.csv"
+if [[ -f "$EXPERIMENT_LOG_CSV" ]]; then
+  cp "$EXPERIMENT_LOG_CSV" "$SUITE_DIR/$(basename "$EXPERIMENT_LOG_CSV")"
 fi
 
 scripts/UAVEnergyDeliveryLevel/aggregate_comparison_results.sh --suite-dir "$SUITE_DIR"
-echo "Hierarchical suite complete: $SUITE_DIR"
+echo "Warm-start H-MAPPO suite complete: $SUITE_DIR"

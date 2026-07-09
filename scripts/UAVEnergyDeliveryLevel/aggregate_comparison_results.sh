@@ -22,7 +22,7 @@ Options:
 This script aggregates:
   - status TSV files produced by run_comparison_suite_4proc.sh
   - heuristic_eval.csv files under the suite directory
-  - train_logs/uav_delivery_experiments.csv snapshots copied into the suite
+  - experiment summary CSV snapshots copied into the suite
 
 For multi-computer aggregation, copy each computer's suite directory into the
 same suite directory on one machine, then run this script with --suite-dir.
@@ -149,8 +149,8 @@ write_csv(combined_status, status_rows, status_fields)
 run_by_name = {row.get("run_name", ""): row for row in status_rows if row.get("run_name")}
 
 experiment_csvs = []
-snapshot_names = {"uav_delivery_experiments.csv"}
 experiment_csvs.extend(sorted(suite_dir.rglob("uav_delivery_experiments*.csv")))
+experiment_csvs.extend(sorted(suite_dir.rglob("*_train_log.csv")))
 global_csv = repo_root / "train_logs" / "uav_delivery_experiments.csv"
 if global_csv.exists():
     experiment_csvs.append(global_csv)
