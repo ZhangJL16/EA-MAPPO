@@ -393,6 +393,9 @@ if __name__ == "__main__":
         args.high_level_mode_n_actions = env_info.get("high_level_mode_n_actions", 0)
         args.high_level_obs_shape = env_info.get("high_level_obs_shape", 0)
         args.high_level_state_shape = env_info.get("high_level_state_shape", 0)
+        args.high_energy_consequence_shape = env_info.get(
+            "high_energy_consequence_shape", 5
+        )
         args.low_task_shape = env_info.get("low_task_shape", 0)
         args.max_active_orders = env_info.get(
             "max_active_orders", getattr(args, "uav_max_active_orders", 0)

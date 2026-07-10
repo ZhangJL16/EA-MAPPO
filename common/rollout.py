@@ -283,6 +283,7 @@ class RolloutWorker:
         high_avail_u, high_o_next, high_s_next = [], [], []
         high_terminate, high_padded, high_active_masks = [], [], []
         high_energy_margins, high_energy_order_masks = [], []
+        high_energy_consequences = []
         high_mode_train_masks = []
         hindsight_o, hindsight_mask = [], []
         current_high_transition = None
@@ -380,6 +381,13 @@ class RolloutWorker:
                     high_energy_order_masks.append(
                         current_high_transition["energy_order_mask"]
                     )
+                    high_energy_consequences.append(
+                        (
+                            self.env.get_high_level_energy_consequences()
+                            if hasattr(self.env, "get_high_level_energy_consequences")
+                            else np.zeros((self.n_agents, 5), dtype=np.float32)
+                        )
+                    )
                     high_r.append(high_reward)
                     high_o_next.append(self.env.get_high_level_obs())
                     high_s_next.append(self.env.get_high_level_state())
@@ -428,7 +436,9 @@ class RolloutWorker:
                         )
                     high_actions.append(np.asarray(high_action, dtype=np.float32))
 
-                self.env.apply_high_level_actions(high_actions)
+                applied_high_actions = self.env.apply_high_level_actions(high_actions)
+                if applied_high_actions is not None:
+                    high_actions = np.asarray(applied_high_actions, dtype=np.float32)
                 if hasattr(self.env, "get_high_level_mode_training_mask"):
                     high_mode_train_mask = self.env.get_high_level_mode_training_mask()
                 else:
@@ -723,6 +733,13 @@ class RolloutWorker:
             high_mode_train_masks.append(current_high_transition["mode_train_mask"])
             high_energy_margins.append(current_high_transition["energy_margin"])
             high_energy_order_masks.append(current_high_transition["energy_order_mask"])
+            high_energy_consequences.append(
+                (
+                    self.env.get_high_level_energy_consequences()
+                    if hasattr(self.env, "get_high_level_energy_consequences")
+                    else np.zeros((self.n_agents, 5), dtype=np.float32)
+                )
+            )
             high_r.append(high_reward)
             high_o_next.append(self.env.get_high_level_obs())
             high_s_next.append(self.env.get_high_level_state())
@@ -803,6 +820,9 @@ class RolloutWorker:
                 high_energy_order_masks.append(
                     np.zeros((self.n_agents, 1), dtype=np.float32)
                 )
+                high_energy_consequences.append(
+                    np.zeros((self.n_agents, 5), dtype=np.float32)
+                )
                 high_padded.append([1.0])
                 high_terminate.append([1.0])
 
@@ -837,6 +857,7 @@ class RolloutWorker:
                 high_mode_train_mask=high_mode_train_masks.copy(),
                 high_energy_margin=high_energy_margins.copy(),
                 high_energy_order_mask=high_energy_order_masks.copy(),
+                high_energy_consequence=high_energy_consequences.copy(),
                 high_padded=high_padded.copy(),
                 high_terminated=high_terminate.copy(),
             )

@@ -3,6 +3,7 @@ import os
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 from torch.distributions import Categorical, Normal
 
 POLICY_SCOPE = "level_policy"
@@ -39,22 +40,47 @@ class GaussianActorNetwork(nn.Module):
 
 
 class HybridHighActorNetwork(nn.Module):
-    def __init__(self, input_dims, n_modes, continuous_dim, hidden_dim=128):
+    def __init__(
+        self,
+        input_dims,
+        n_modes,
+        continuous_dim,
+        hidden_dim=128,
+        consequence_dim=5,
+    ):
         super().__init__()
         self.fc1 = nn.Linear(input_dims, hidden_dim)
         self.fc2 = nn.Linear(hidden_dim, hidden_dim)
         self.mode_logits = nn.Linear(hidden_dim, n_modes)
         self.mean = nn.Linear(hidden_dim, continuous_dim)
         self.log_std = nn.Parameter(torch.zeros(continuous_dim))
+        self.energy_head = nn.Sequential(
+            nn.Linear(hidden_dim + 1 + continuous_dim, hidden_dim),
+            nn.ReLU(),
+            nn.Linear(hidden_dim, hidden_dim),
+            nn.ReLU(),
+        )
+        self.energy_consequence = nn.Linear(hidden_dim, consequence_dim)
+        self.energy_feas_logit = nn.Linear(hidden_dim, 1)
+
+    def encode(self, state):
+        x = torch.tanh(self.fc1(state))
+        return torch.tanh(self.fc2(x))
 
     def forward(self, state):
-        x = torch.tanh(self.fc1(state))
-        x = torch.tanh(self.fc2(x))
-        mode_logits = self.mode_logits(x)
-        mean = torch.tanh(self.mean(x))
+        h = self.encode(state)
+        mode_logits = self.mode_logits(h)
+        mean = torch.tanh(self.mean(h))
         log_std = torch.clamp(self.log_std, -5.0, 2.0)
         std = torch.exp(log_std).expand_as(mean)
-        return mode_logits, mean, std
+        return mode_logits, mean, std, h
+
+    def energy_predict(self, h, high_action):
+        e = self.energy_head(torch.cat([h, high_action], dim=-1))
+        consequence = self.energy_consequence(e)
+        feas_logit = self.energy_feas_logit(e)
+        feas_prob = torch.sigmoid(feas_logit)
+        return feas_prob, consequence, feas_logit
 
 
 class CriticNetwork(nn.Module):
@@ -85,6 +111,9 @@ class MAPPO:
         )
         self.high_obs_shape = int(getattr(args, "high_level_obs_shape", 0))
         self.high_state_shape = int(getattr(args, "high_level_state_shape", 0))
+        self.high_energy_consequence_shape = int(
+            getattr(args, "high_energy_consequence_shape", 5)
+        )
         if self.high_n_actions <= 0 or self.high_obs_shape <= 0 or self.high_state_shape <= 0:
             raise ValueError("Level MAPPO requires high-level env_info fields.")
 
@@ -121,6 +150,7 @@ class MAPPO:
                         self.high_mode_n_actions,
                         self.high_continuous_dim,
                         high_actor_hidden_dim,
+                        self.high_energy_consequence_shape,
                     )
                     if self.use_hybrid_high_policy
                     else GaussianActorNetwork(
@@ -180,9 +210,38 @@ class MAPPO:
         mean, std = network(observation)
         return Normal(mean, std)
 
-    def _hybrid_high_dist(self, network, observation):
-        mode_logits, mean, std = network(observation)
-        return Categorical(logits=mode_logits), Normal(mean, std)
+    def _ecf_adjust_mode_logits(self, network, h, mean, mode_logits):
+        if (
+            not bool(getattr(self.args, "hrl_ecf_enabled", True))
+            or float(getattr(self.args, "hrl_ecf_logit_bias_coef", 0.0)) <= 0.0
+            or not hasattr(network, "energy_predict")
+            or self.high_mode_n_actions <= 0
+        ):
+            return mode_logits
+
+        q_modes = []
+        for mode_id in range(self.high_mode_n_actions):
+            mode = torch.full(
+                (mean.size(0), 1),
+                float(mode_id),
+                dtype=mean.dtype,
+                device=mean.device,
+            )
+            candidate_action = torch.cat([mode, mean], dim=-1)
+            q_feas, _, _ = network.energy_predict(h, candidate_action)
+            q_modes.append(q_feas)
+        q_modes = torch.cat(q_modes, dim=-1).detach()
+        alpha = float(getattr(self.args, "hrl_ecf_logit_bias_coef", 0.0))
+        return mode_logits + alpha * torch.log(q_modes.clamp_min(1e-6))
+
+    def _hybrid_high_dist(self, network, observation, return_aux=False):
+        mode_logits, mean, std, h = network(observation)
+        adjusted_logits = self._ecf_adjust_mode_logits(network, h, mean, mode_logits)
+        mode_dist = Categorical(logits=adjusted_logits)
+        cont_dist = Normal(mean, std)
+        if return_aux:
+            return mode_dist, cont_dist, h, mode_logits
+        return mode_dist, cont_dist
 
     @torch.no_grad()
     def _choose_from_network(self, network, observation, avail_actions, evaluate=False):
@@ -329,6 +388,7 @@ class MAPPO:
             state_dim=self.high_state_shape,
             energy_margin_key="high_energy_margin",
             energy_order_mask_key="high_energy_order_mask",
+            energy_consequence_key="high_energy_consequence",
             mode_mask_key="high_mode_train_mask",
         )
 
@@ -413,6 +473,7 @@ class MAPPO:
         state_dim,
         energy_margin_key=None,
         energy_order_mask_key=None,
+        energy_consequence_key=None,
         mode_mask_key=None,
     ):
         del action_dim
@@ -456,6 +517,22 @@ class MAPPO:
             getattr(self.args, "hrl_energy_margin_loss_coef", 0.0)
         )
         use_energy_loss = energy_loss_coef > 0.0 and energy_margins is not None
+        energy_consequences = (
+            batch.get(energy_consequence_key, None)
+            if energy_consequence_key is not None
+            else None
+        )
+        ecf_enabled = (
+            bool(getattr(self.args, "hrl_ecf_enabled", True))
+            and energy_consequences is not None
+        )
+        ecf_consequence_coef = float(
+            getattr(self.args, "hrl_ecf_consequence_loss_coef", 0.0)
+        )
+        ecf_feas_coef = float(getattr(self.args, "hrl_ecf_feas_loss_coef", 0.0))
+        use_ecf_loss = ecf_enabled and (
+            ecf_consequence_coef > 0.0 or ecf_feas_coef > 0.0
+        )
 
         episode_num = states.size(0)
         time_len = states.size(1)
@@ -526,6 +603,16 @@ class MAPPO:
             else:
                 valid_energy_margins_pg = None
                 valid_energy_order_masks_pg = None
+            if use_ecf_loss:
+                consequence_dim = energy_consequences.size(-1)
+                agent_energy_consequences = energy_consequences[
+                    :, :, agent_idx, :
+                ].reshape(-1, consequence_dim)
+                valid_energy_consequences_pg = agent_energy_consequences[
+                    flat_agent_mask
+                ]
+            else:
+                valid_energy_consequences_pg = None
 
             if valid_states.size(0) == 0:
                 continue
@@ -540,8 +627,10 @@ class MAPPO:
                     )
                     for start in range(0, valid_actor_states_pg.size(0), actor_batch_size):
                         indices = actor_permutation[start : start + actor_batch_size]
-                        mode_dist, cont_dist = self._hybrid_high_dist(
-                            actors[agent_idx], valid_actor_states_pg[indices]
+                        mode_dist, cont_dist, h, _ = self._hybrid_high_dist(
+                            actors[agent_idx],
+                            valid_actor_states_pg[indices],
+                            return_aux=True,
                         )
                         new_mode_log_probs = mode_dist.log_prob(valid_modes_pg[indices])
                         new_cont_log_probs = cont_dist.log_prob(
@@ -592,6 +681,37 @@ class MAPPO:
                             denom = (order_mask * mode_mask).sum().clamp_min(1.0)
                             energy_loss = energy_terms.sum() / denom
                             actor_loss = actor_loss + energy_loss_coef * energy_loss
+
+                        if valid_energy_consequences_pg is not None:
+                            mode_feature = valid_modes_pg[indices].float().unsqueeze(-1)
+                            high_action = torch.cat(
+                                [mode_feature, valid_continuous_pg[indices]],
+                                dim=-1,
+                            )
+                            q_feas, c_pred, feas_logit = actors[
+                                agent_idx
+                            ].energy_predict(h, high_action)
+                            c_target = valid_energy_consequences_pg[indices]
+                            if c_target.size(-1) >= 5:
+                                loss_con = F.mse_loss(
+                                    c_pred[:, :4],
+                                    c_target[:, :4],
+                                )
+                                y_target = c_target[:, 4:5].clamp(0.0, 1.0)
+                            else:
+                                loss_con = F.mse_loss(c_pred, c_target)
+                                y_target = (
+                                    c_target[:, :1] > 0.0
+                                ).float()
+                            loss_feas = F.binary_cross_entropy_with_logits(
+                                feas_logit,
+                                y_target,
+                            )
+                            actor_loss = (
+                                actor_loss
+                                + ecf_consequence_coef * loss_con
+                                + ecf_feas_coef * loss_feas
+                            )
 
                         if not torch.isfinite(actor_loss):
                             continue
@@ -1002,8 +1122,10 @@ class MAPPO:
             critic_path = self._latest_paths(level, "critic", agent_idx, model_dir=model_dir)
             if actor_path is None or critic_path is None:
                 raise Exception(f"No {level} model for agent {agent_idx}!")
+            actor_state = torch.load(actor_path, map_location=self.device)
             actors[agent_idx].load_state_dict(
-                torch.load(actor_path, map_location=self.device)
+                actor_state,
+                strict=(level != "high"),
             )
             critics[agent_idx].load_state_dict(
                 torch.load(critic_path, map_location=self.device)

@@ -1585,6 +1585,30 @@ class UAVEnv:
             dtype=np.float32,
         )
 
+    def get_high_level_energy_consequences(self):
+        consequences = []
+        scale_norm = float(np.linalg.norm(self._space_scale()) + eps)
+        for agent in self.agents:
+            energy_ratio = float(agent.energy / (agent.initial_energy + eps))
+            margin = float(self._energy_margin_order_for_agent(agent))
+            charge_dist = float(
+                self._distance_to_nearest_charging_station_from_pos(agent.pos)
+                / scale_norm
+            )
+            reserved = float(self._agent_has_charge_reservation(agent))
+            feasible = float(
+                energy_ratio > eps
+                and (
+                    margin >= 0.0
+                    or agent.current_task_type == TASK_CHARGE
+                    or self._agent_ready_to_charge(agent)
+                )
+            )
+            consequences.append(
+                [energy_ratio, margin, charge_dist, reserved, feasible]
+            )
+        return np.asarray(consequences, dtype=np.float32)
+
     def get_high_level_mode_training_mask(self):
         return np.asarray(self._last_high_mode_train_mask, dtype=np.float32).copy()
 
@@ -4000,6 +4024,9 @@ class UAVEnvDiscreteWrapper:
             "high_level_mode_n_actions": int(self.env.high_level_mode_n_actions),
             "high_level_obs_shape": int(self.env.get_high_level_obs().shape[-1]),
             "high_level_state_shape": int(self.env.get_high_level_state().shape[-1]),
+            "high_energy_consequence_shape": int(
+                self.env.get_high_level_energy_consequences().shape[-1]
+            ),
             "low_task_shape": int(self.env.low_task_shape),
             "max_active_orders": int(self.env.max_active_orders),
             "charge_action_id": int(self.env.charge_action_id),
@@ -4042,6 +4069,9 @@ class UAVEnvDiscreteWrapper:
 
     def get_high_level_energy_order_masks(self):
         return self.env.get_high_level_energy_order_masks()
+
+    def get_high_level_energy_consequences(self):
+        return self.env.get_high_level_energy_consequences()
 
     def get_current_high_level_actions(self):
         return self.env.get_current_high_level_actions()
@@ -4321,6 +4351,9 @@ class UAVParallelEnv:
 
     def get_high_level_energy_order_masks(self):
         return self.base_env.get_high_level_energy_order_masks()
+
+    def get_high_level_energy_consequences(self):
+        return self.base_env.get_high_level_energy_consequences()
 
     def get_current_high_level_actions(self):
         return self.base_env.get_current_high_level_actions()
