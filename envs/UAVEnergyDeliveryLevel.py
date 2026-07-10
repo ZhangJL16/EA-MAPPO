@@ -141,6 +141,8 @@ class UAVAgent:
         self.assigned_order_id = None
         self.assigned_order_slot = None
         self.auction_order_slot = None
+        self.charge_station_idx = None
+        self.charge_slot_idx = None
         self.task_target = self.pos.copy()
         self.subgoal = self.pos.copy()
         self.original_subgoal = self.pos.copy()
@@ -323,6 +325,7 @@ class UAVEnv:
         self.charging_station_agent_ids = {
             station_idx: [] for station_idx in range(self.charging_station_count)
         }
+        self.charging_slot_reservations = self._empty_charge_reservations()
 
         self.time_step = 0.4
         self.meta_period = 5
@@ -492,6 +495,8 @@ class UAVEnv:
         return (agent.pos + delta).astype(np.float32)
 
     def _set_agent_subgoal(self, agent, target, task_type, project=True):
+        if int(task_type) != TASK_CHARGE:
+            self._release_charge_reservation(agent)
         target = np.asarray(target, dtype=np.float32)[: self.dim_actions]
         agent.task_target = target.copy()
         subgoal = self.project_to_reachable_subgoal(agent, target) if project else target
@@ -511,6 +516,8 @@ class UAVEnv:
         return np.minimum(np.maximum(pos, lower), upper).astype(np.float32)
 
     def _set_agent_subgoal_from_delta(self, agent, delta, task_type, task_target=None):
+        if int(task_type) != TASK_CHARGE:
+            self._release_charge_reservation(agent)
         delta = np.asarray(delta, dtype=np.float32).reshape(-1)
         if delta.size < self.dim_actions:
             delta = np.pad(delta, (0, self.dim_actions - delta.size))
@@ -533,6 +540,8 @@ class UAVEnv:
         return True
 
     def _set_agent_subgoal_on_target_line(self, agent, action, task_type, task_target=None):
+        if int(task_type) != TASK_CHARGE:
+            self._release_charge_reservation(agent)
         if task_target is None:
             task_target = agent.pos.copy()
         target = np.asarray(task_target, dtype=np.float32)[: self.dim_actions]
@@ -1141,6 +1150,7 @@ class UAVEnv:
         ]
 
     def _set_agent_idle(self, agent):
+        self._release_charge_reservation(agent)
         agent.assigned_order_id = None
         agent.assigned_order_slot = None
         agent.auction_order_slot = None
@@ -1153,13 +1163,15 @@ class UAVEnv:
         if not agent.has_energy():
             return False
         agent.auction_order_slot = None
+        self._reserve_charge_slot(agent)
         return self._set_agent_subgoal(
             agent,
-            self._nearest_charging_station_pos(agent.pos),
+            self._charge_slot_target(agent, None),
             TASK_CHARGE,
         )
 
     def _assign_order_slot_to_agent(self, agent, slot_idx):
+        self._release_charge_reservation(agent)
         slot_idx = int(slot_idx)
         order = self._slot_order(slot_idx)
         if order is None or not agent.has_energy():
@@ -1622,6 +1634,7 @@ class UAVEnv:
             actions = actions.reshape(self.num_agents, self.high_level_n_actions)
 
         self.run_order_auction(record=True)
+        self._refresh_charge_reservations()
         applied = np.zeros(self.num_agents, dtype=np.float32)
         mode_train_mask = np.zeros((self.num_agents, 1), dtype=np.float32)
         action_contexts = []
@@ -1703,6 +1716,8 @@ class UAVEnv:
                     "should_charge_fallback": should_charge_fallback,
                 }
             )
+        for agent_idx in sorted(charge_intent_agent_ids):
+            self._reserve_charge_slot(self.agents[agent_idx])
         charge_rank_by_agent = {
             agent_idx: rank for rank, agent_idx in enumerate(sorted(charge_intent_agent_ids))
         }
@@ -1874,24 +1889,113 @@ class UAVEnv:
     def _distance_to_charging_station(self, agent):
         return self._distance_to_nearest_charging_station_from_pos(agent.pos)
 
-    def _charge_slot_target(self, agent, charge_rank):
+    def _empty_charge_reservations(self):
+        return {
+            station_idx: [None for _ in range(max(1, int(self.charging_capacity)))]
+            for station_idx in range(self.charging_station_count)
+        }
+
+    def _release_charge_reservation(self, agent):
+        station_idx = getattr(agent, "charge_station_idx", None)
+        slot_idx = getattr(agent, "charge_slot_idx", None)
+        if station_idx is not None and slot_idx is not None:
+            station_idx = int(station_idx)
+            slot_idx = int(slot_idx)
+            slots = self.charging_slot_reservations.get(station_idx)
+            if slots is not None and 0 <= slot_idx < len(slots):
+                if slots[slot_idx] == agent.number:
+                    slots[slot_idx] = None
+        agent.charge_station_idx = None
+        agent.charge_slot_idx = None
+
+    def _agent_has_charge_reservation(self, agent):
+        station_idx = getattr(agent, "charge_station_idx", None)
+        slot_idx = getattr(agent, "charge_slot_idx", None)
+        if station_idx is None or slot_idx is None:
+            return False
+        station_idx = int(station_idx)
+        slot_idx = int(slot_idx)
+        slots = self.charging_slot_reservations.get(station_idx)
+        return bool(
+            slots is not None
+            and 0 <= slot_idx < len(slots)
+            and slots[slot_idx] == agent.number
+        )
+
+    def _refresh_charge_reservations(self):
+        active_charge_ids = {
+            agent.number
+            for agent in self.agents
+            if agent.has_energy()
+            and agent.current_task_type == TASK_CHARGE
+            and not self._charge_option_complete(agent)
+        }
+        for station_idx, slots in self.charging_slot_reservations.items():
+            for slot_idx, agent_id in enumerate(slots):
+                if agent_id is None or agent_id in active_charge_ids:
+                    continue
+                slots[slot_idx] = None
+        for agent in self.agents:
+            if agent.number in active_charge_ids:
+                continue
+            agent.charge_station_idx = None
+            agent.charge_slot_idx = None
+
+    def _reserve_charge_slot(self, agent):
+        if not agent.has_energy():
+            self._release_charge_reservation(agent)
+            return None
+        if self._agent_has_charge_reservation(agent):
+            return int(agent.charge_station_idx), int(agent.charge_slot_idx)
+
+        self._release_charge_reservation(agent)
+        free_slots = []
+        for station_idx, station_pos in enumerate(self.charging_station_positions):
+            slots = self.charging_slot_reservations.get(station_idx, [])
+            for slot_idx, holder in enumerate(slots):
+                if holder is None:
+                    free_slots.append(
+                        (
+                            float(np.linalg.norm(agent.pos - station_pos)),
+                            station_idx,
+                            slot_idx,
+                        )
+                    )
+        if not free_slots:
+            return None
+        _, station_idx, slot_idx = min(free_slots, key=lambda item: item)
+        self.charging_slot_reservations[station_idx][slot_idx] = agent.number
+        agent.charge_station_idx = int(station_idx)
+        agent.charge_slot_idx = int(slot_idx)
+        return int(station_idx), int(slot_idx)
+
+    def _charge_dock_target(self, station_idx, slot_idx):
+        capacity = max(1, int(self.charging_capacity))
+        slot_count = capacity
+        angle = 2.0 * np.pi * float(slot_idx) / float(max(1, slot_count))
+        offset = np.zeros(self.dim_actions, dtype=np.float32)
+        offset[0] = float(self.charge_dock_radius) * np.cos(angle)
+        if self.dim_actions >= 2:
+            offset[1] = float(self.charge_dock_radius) * np.sin(angle)
+        target = self.charging_station_positions[int(station_idx)] + offset
+        return self._clip_position_to_bounds(target)
+
+    def _charge_wait_target(self, agent, charge_rank):
         if not self.charge_queue_enabled or charge_rank is None:
             return self._nearest_charging_station_pos(agent.pos)
 
         charge_rank = int(max(0, charge_rank))
         capacity = max(1, int(self.charging_capacity))
         dock_slots = max(1, self.charging_station_count * capacity)
-        if charge_rank < dock_slots:
-            radius = float(self.charge_dock_radius)
-            station_idx = charge_rank // capacity
-            slot_idx = charge_rank % capacity
-            slot_count = capacity
-        else:
-            radius = float(self.charge_queue_radius)
-            queue_rank = charge_rank - dock_slots
-            station_idx = queue_rank % self.charging_station_count
-            slot_idx = queue_rank // self.charging_station_count
-            slot_count = max(1, (self.num_agents + self.charging_station_count - 1) // self.charging_station_count)
+        queue_rank = max(0, charge_rank - dock_slots)
+        radius = float(self.charge_queue_radius)
+        station_idx = queue_rank % self.charging_station_count
+        slot_idx = queue_rank // self.charging_station_count
+        slot_count = max(
+            1,
+            (self.num_agents + self.charging_station_count - 1)
+            // self.charging_station_count,
+        )
 
         angle = 2.0 * np.pi * float(slot_idx) / float(max(1, slot_count))
         offset = np.zeros(self.dim_actions, dtype=np.float32)
@@ -1901,32 +2005,41 @@ class UAVEnv:
         target = self.charging_station_positions[int(station_idx)] + offset
         return self._clip_position_to_bounds(target)
 
+    def _charge_slot_target(self, agent, charge_rank):
+        reservation = self._reserve_charge_slot(agent)
+        if reservation is not None:
+            station_idx, slot_idx = reservation
+            return self._charge_dock_target(station_idx, slot_idx)
+        return self._charge_wait_target(agent, charge_rank)
+
     def _consume_step_energy(self, powered_mask):
         for is_powered, agent in zip(powered_mask, self.agents):
             if is_powered:
                 agent.consume_energy(self.energy_decay_per_step)
 
     def _charge_agents_at_station(self):
+        self._refresh_charge_reservations()
         selected = []
         station_assignments = {
             station_idx: [] for station_idx in range(self.charging_station_count)
         }
         for station_idx, station_pos in enumerate(self.charging_station_positions):
-            candidates = [
-                agent
-                for agent in self.agents
-                if agent.current_task_type == TASK_CHARGE
-                and agent.reached
-                and np.linalg.norm(agent.pos - station_pos) <= self.goal_tolerance
-                and agent.energy < agent.initial_energy
-            ]
-            candidates.sort(
-                key=lambda agent: (
-                    float(np.linalg.norm(agent.pos - station_pos)),
-                    agent.number,
-                )
-            )
-            station_selected = candidates[: max(0, self.charging_capacity)]
+            station_selected = []
+            slots = self.charging_slot_reservations.get(station_idx, [])
+            for slot_idx, agent_id in enumerate(slots):
+                if agent_id is None:
+                    continue
+                agent = self.agents[int(agent_id)]
+                if (
+                    agent.current_task_type == TASK_CHARGE
+                    and agent.reached
+                    and self._agent_has_charge_reservation(agent)
+                    and int(agent.charge_station_idx) == int(station_idx)
+                    and int(agent.charge_slot_idx) == int(slot_idx)
+                    and np.linalg.norm(agent.pos - station_pos) <= self.goal_tolerance
+                    and agent.energy < agent.initial_energy
+                ):
+                    station_selected.append(agent)
             station_assignments[station_idx] = [agent.number for agent in station_selected]
             selected.extend(station_selected)
         self.charging_station_agent_ids = station_assignments
@@ -1965,6 +2078,7 @@ class UAVEnv:
             self.charging_station_agent_ids = {
                 station_idx: [] for station_idx in range(self.charging_station_count)
             }
+            self.charging_slot_reservations = self._empty_charge_reservations()
             self._last_high_mode_train_mask = np.ones(
                 (self.num_agents, 1), dtype=np.float32
             )
@@ -2885,6 +2999,17 @@ class UAVEnv:
             if self.agents
             else 0.0
         )
+        reserved_charge_slots = float(
+            sum(
+                holder is not None
+                for slots in self.charging_slot_reservations.values()
+                for holder in slots
+            )
+        )
+        charge_task_agents = float(
+            np.sum([agent.current_task_type == TASK_CHARGE for agent in self.agents])
+        )
+        waiting_charge_agents = max(0.0, charge_task_agents - reserved_charge_slots)
         mean_goal_distance = float(np.mean(remaining)) if remaining else 0.0
         completed_orders = float(self.completed_order_count)
         summary = {
@@ -2915,6 +3040,9 @@ class UAVEnv:
                 self.charging_station_count * self.charging_capacity
             ),
             "charging_agents": float(len(self.charging_agent_ids)),
+            "reserved_charge_slots": reserved_charge_slots,
+            "charge_task_agents": charge_task_agents,
+            "waiting_charge_agents": waiting_charge_agents,
             "mean_goal_distance": mean_goal_distance,
             "episode_reward": float(0.0),
             "win_tag": bool(self._all_orders_completed()),
@@ -2950,6 +3078,10 @@ class UAVEnv:
                 int(station_idx): list(agent_ids)
                 for station_idx, agent_ids in self.charging_station_agent_ids.items()
             },
+            "charging_slot_reservations": {
+                int(station_idx): list(agent_ids)
+                for station_idx, agent_ids in self.charging_slot_reservations.items()
+            },
             "python_random_state": random.getstate(),
             "numpy_random_state": np.random.get_state(),
             "orders": [
@@ -2976,6 +3108,8 @@ class UAVEnv:
                     "assigned_order_id": agent.assigned_order_id,
                     "assigned_order_slot": agent.assigned_order_slot,
                     "auction_order_slot": agent.auction_order_slot,
+                    "charge_station_idx": agent.charge_station_idx,
+                    "charge_slot_idx": agent.charge_slot_idx,
                     "task_target": agent.task_target.copy(),
                     "subgoal": agent.subgoal.copy(),
                     "original_subgoal": agent.original_subgoal.copy(),
@@ -3033,6 +3167,13 @@ class UAVEnv:
                 {idx: [] for idx in range(self.charging_station_count)},
             ).items()
         }
+        self.charging_slot_reservations = {
+            int(station_idx): list(agent_ids)
+            for station_idx, agent_ids in snapshot.get(
+                "charging_slot_reservations",
+                self._empty_charge_reservations(),
+            ).items()
+        }
         if "python_random_state" in snapshot:
             random.setstate(snapshot["python_random_state"])
         if "numpy_random_state" in snapshot:
@@ -3065,6 +3206,8 @@ class UAVEnv:
             agent.assigned_order_id = state.get("assigned_order_id")
             agent.assigned_order_slot = state.get("assigned_order_slot")
             agent.auction_order_slot = state.get("auction_order_slot")
+            agent.charge_station_idx = state.get("charge_station_idx")
+            agent.charge_slot_idx = state.get("charge_slot_idx")
             agent.task_target = state.get("task_target", agent.goal).copy()
             agent.subgoal = state.get("subgoal", agent.goal).copy()
             agent.original_subgoal = state.get("original_subgoal", agent.subgoal).copy()
