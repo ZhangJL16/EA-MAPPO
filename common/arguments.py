@@ -70,6 +70,7 @@ def get_common_args():
     parser.add_argument('--hrl_meta_update_on_subgoal_done', type=_str2bool, default=False, help='refresh high-level subgoals as soon as any current subgoal is reached')
     parser.add_argument('--hrl_safe_action_guard_enabled', type=_str2bool, default=False, help='enable a SCOPE-style deterministic low-level safety action replacement for local UAV HMAPPO')
     parser.add_argument('--hrl_safe_action_guard_margin', type=float, default=0.04, help='extra collision prediction margin used by the low-level safety action replacement')
+    parser.add_argument('--hrl_safe_action_guard_horizon', type=int, default=4, help='number of future low-level steps checked by the deterministic safety action replacement')
     parser.add_argument('--hrl_off_policy_correction', type=_str2bool, default=False, help='HIRO-style off-policy correction; incompatible with on-policy HMAPPO')
     parser.add_argument('--hrl_energy_margin_loss_coef', type=float, default=0.0, help='coefficient for the high-level energy feasibility action loss')
     parser.add_argument('--hrl_energy_shield_enabled', type=_str2bool, default=False, help='enable a hard high-level energy feasibility shield for charge/order mode selection')

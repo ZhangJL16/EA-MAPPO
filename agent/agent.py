@@ -584,6 +584,11 @@ class Agents:
                     "hrl_safe_action_guard_margin",
                     None,
                 ),
+                guard_horizon=getattr(
+                    self.args,
+                    "hrl_safe_action_guard_horizon",
+                    None,
+                ),
             )
             if isinstance(env_result, tuple):
                 revised_actions, env_guard_flags = env_result

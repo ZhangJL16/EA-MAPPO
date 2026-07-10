@@ -351,6 +351,7 @@ class UAVEnv:
         self.safe_radius = 0.05
         self.risk_warning_margin = 0.06
         self.guard_prediction_margin = 0.04
+        self.guard_prediction_horizon = 4
         self.velocity_reward_weight = 0.9
         self.obstacle_collision_penalty = 1.2
         self.agent_collision_penalty = 1.5
@@ -2065,7 +2066,7 @@ class UAVEnv:
                     overlap, warning_min_dist
                 )
                 pair_reward_risk = self._nonlinear_risk_from_overlap(
-                    max(0.0, collision_min_dist - dist), collision_min_dist
+                    overlap, warning_min_dist
                 )
                 self.safe_value[i] += pair_risk
                 self.safe_value[j] += pair_risk
@@ -2306,6 +2307,170 @@ class UAVEnv:
                     collision_flags[j] = True
 
         return collision_flags.astype(np.float32)
+
+    def _evaluate_joint_guard_horizon(self, actions_batch, horizon=None, guard_margin=None):
+        actions_batch = np.asarray(actions_batch, dtype=np.float32)
+        if actions_batch.ndim == 2:
+            actions_batch = actions_batch.reshape(1, self.num_agents, self.dim_actions)
+        if actions_batch.ndim != 3:
+            raise ValueError(
+                "actions_batch must have shape (batch, n_agents, dim_actions)"
+            )
+        if actions_batch.shape[1] != self.num_agents:
+            raise ValueError("Action count does not match the number of UAVs.")
+        if actions_batch.shape[2] != self.dim_actions:
+            raise ValueError("Action dimension does not match UAV action dimension.")
+
+        horizon = self.guard_prediction_horizon if horizon is None else horizon
+        horizon = max(1, int(horizon))
+        margin = self.guard_prediction_margin if guard_margin is None else guard_margin
+        margin = float(max(0.0, margin))
+
+        batch_size = actions_batch.shape[0]
+        positions = np.asarray([agent.pos for agent in self.agents], dtype=np.float32)
+        velocities = np.asarray([agent.vel for agent in self.agents], dtype=np.float32)
+        safe_radii = np.asarray(
+            [agent.safe_radius for agent in self.agents], dtype=np.float32
+        )
+        moving = np.asarray(
+            [
+                (not agent.reached) and agent.has_energy()
+                for agent in self.agents
+            ],
+            dtype=bool,
+        )
+        powered = np.asarray(
+            [agent.has_energy() for agent in self.agents],
+            dtype=bool,
+        )
+        agent_a_max = np.asarray([agent.a_max for agent in self.agents], dtype=np.float32)
+        agent_v_max = np.asarray([agent.v_max for agent in self.agents], dtype=np.float32)
+        boundaries = np.asarray(
+            [self.length, self.width, self.height][: self.dim_actions],
+            dtype=np.float32,
+        )
+        obstacle_pos = np.asarray(
+            [obstacle.pos for obstacle in self.obstacles], dtype=np.float32
+        )
+        obstacle_radius = np.asarray(
+            [obstacle.radius for obstacle in self.obstacles], dtype=np.float32
+        )
+
+        batch_flags = np.zeros((batch_size, self.num_agents), dtype=np.float32)
+        batch_risk = np.zeros((batch_size, self.num_agents), dtype=np.float32)
+
+        for batch_idx in range(batch_size):
+            pos = positions.copy()
+            vel = velocities.copy()
+            actions = actions_batch[batch_idx].copy()
+
+            for step_idx in range(horizon):
+                for agent_idx in range(self.num_agents):
+                    if not moving[agent_idx]:
+                        continue
+
+                    accel = actions[agent_idx]
+                    norm = np.linalg.norm(accel)
+                    if norm > agent_a_max[agent_idx]:
+                        accel = accel / (norm + eps) * agent_a_max[agent_idx]
+
+                    pos[agent_idx] = (
+                        pos[agent_idx]
+                        + vel[agent_idx] * self.time_step
+                        + 0.5 * accel * (self.time_step ** 2)
+                    )
+                    vel[agent_idx] = vel[agent_idx] + accel * self.time_step
+                    speed = np.linalg.norm(vel[agent_idx])
+                    if speed > agent_v_max[agent_idx]:
+                        vel[agent_idx] = (
+                            vel[agent_idx] / (speed + eps) * agent_v_max[agent_idx]
+                        )
+
+                horizon_discount = 1.0 / float(step_idx + 1)
+
+                for agent_idx in range(self.num_agents):
+                    if not moving[agent_idx]:
+                        continue
+
+                    boundary_clearance = safe_radii[agent_idx] + margin
+                    boundary_warning = boundary_clearance + self.risk_warning_margin
+                    for dim_idx, boundary in enumerate(boundaries):
+                        lower_clearance = float(pos[agent_idx, dim_idx])
+                        upper_clearance = float(boundary - pos[agent_idx, dim_idx])
+                        if (
+                            lower_clearance < boundary_clearance
+                            or upper_clearance < boundary_clearance
+                        ):
+                            batch_flags[batch_idx, agent_idx] = 1.0
+                        lower_overlap = max(0.0, boundary_warning - lower_clearance)
+                        upper_overlap = max(0.0, boundary_warning - upper_clearance)
+                        batch_risk[batch_idx, agent_idx] += horizon_discount * (
+                            self._nonlinear_risk_from_overlap(
+                                lower_overlap, boundary_warning
+                            )
+                            + self._nonlinear_risk_from_overlap(
+                                upper_overlap, boundary_warning
+                            )
+                        )
+
+                    for obs_idx in range(len(self.obstacles)):
+                        delta_xy = pos[agent_idx, :2] - obstacle_pos[obs_idx]
+                        dist_xy = float(np.linalg.norm(delta_xy))
+                        collision_min_dist = (
+                            obstacle_radius[obs_idx] + safe_radii[agent_idx] + margin
+                        )
+                        warning_min_dist = (
+                            collision_min_dist + self.risk_warning_margin
+                        )
+                        if dist_xy < collision_min_dist:
+                            batch_flags[batch_idx, agent_idx] = 1.0
+                        overlap = max(0.0, warning_min_dist - dist_xy)
+                        batch_risk[batch_idx, agent_idx] += horizon_discount * (
+                            self._nonlinear_risk_from_overlap(
+                                overlap, warning_min_dist
+                            )
+                        )
+
+                for i in range(self.num_agents):
+                    if not powered[i]:
+                        continue
+                    for j in range(i + 1, self.num_agents):
+                        if not powered[j]:
+                            continue
+                        dist = float(np.linalg.norm(pos[i] - pos[j]))
+                        collision_min_dist = (
+                            safe_radii[i] + safe_radii[j] + margin
+                        )
+                        warning_min_dist = (
+                            collision_min_dist + self.risk_warning_margin
+                        )
+                        if dist < collision_min_dist:
+                            batch_flags[batch_idx, i] = 1.0
+                            batch_flags[batch_idx, j] = 1.0
+                        overlap = max(0.0, warning_min_dist - dist)
+                        pair_risk = horizon_discount * self._nonlinear_risk_from_overlap(
+                            overlap, warning_min_dist
+                        )
+                        batch_risk[batch_idx, i] += pair_risk
+                        batch_risk[batch_idx, j] += pair_risk
+
+        return batch_flags, batch_risk
+
+    def predict_joint_collision_flags_horizon(self, actions, horizon=None, guard_margin=None):
+        flags, _ = self._evaluate_joint_guard_horizon(
+            actions,
+            horizon=horizon,
+            guard_margin=guard_margin,
+        )
+        return flags[0].astype(np.float32)
+
+    def estimate_joint_risk_horizon_batch(self, actions_batch, horizon=None, guard_margin=None):
+        _, risk = self._evaluate_joint_guard_horizon(
+            actions_batch,
+            horizon=horizon,
+            guard_margin=guard_margin,
+        )
+        return risk.astype(np.float32)
 
     def step(self, actions):
         if len(actions) != self.num_agents:
@@ -2685,6 +2850,18 @@ class UAVEnv:
                     agent.pos[:2], obstacle.pos, radius, agent.l_sensor, agent.num_lasers
                 )
                 current_lasers = np.minimum(current_lasers, obstacle_lasers)
+            for other in self.agents:
+                if other is agent:
+                    continue
+                radius = agent.safe_radius + other.safe_radius
+                agent_lasers = update_lasers_to_obstacle(
+                    agent.pos[:2],
+                    other.pos[:2],
+                    radius,
+                    agent.l_sensor,
+                    agent.num_lasers,
+                )
+                current_lasers = np.minimum(current_lasers, agent_lasers)
             boundary_lasers = update_lasers_to_boundary(
                 agent.pos[:2], agent.l_sensor, agent.num_lasers, self.length, self.width
             )
@@ -3532,6 +3709,31 @@ class UAVEnvDiscreteWrapper:
         agent_actions = [self.discrete_actions[int(action)] for action in actions]
         return self.env.predict_joint_collision_flags(agent_actions)
 
+    def estimate_joint_short_risk_horizon_batch(self, actions_batch, horizon=None, guard_margin=None):
+        actions_batch = np.asarray(actions_batch)
+        if actions_batch.ndim != 2:
+            raise ValueError("actions_batch must have shape (batch, n_agents)")
+        agent_actions_batch = np.asarray(
+            [
+                [self.discrete_actions[int(action)] for action in joint_actions]
+                for joint_actions in actions_batch
+            ],
+            dtype=np.float32,
+        )
+        return self.env.estimate_joint_risk_horizon_batch(
+            agent_actions_batch,
+            horizon=horizon,
+            guard_margin=guard_margin,
+        )
+
+    def estimate_joint_collision_flags_horizon(self, actions, horizon=None, guard_margin=None):
+        agent_actions = [self.discrete_actions[int(action)] for action in actions]
+        return self.env.predict_joint_collision_flags_horizon(
+            agent_actions,
+            horizon=horizon,
+            guard_margin=guard_margin,
+        )
+
     def _candidate_goal_progress(self, agent_id, action_id):
         agent = self.env.agents[int(agent_id)]
         if agent.reached or not agent.has_energy():
@@ -3544,7 +3746,13 @@ class UAVEnvDiscreteWrapper:
         pred_dist = float(np.linalg.norm(agent.goal - pred_pos))
         return current_dist - pred_dist
 
-    def revise_safe_actions(self, actions, avail_actions=None, guard_margin=None):
+    def revise_safe_actions(
+        self,
+        actions,
+        avail_actions=None,
+        guard_margin=None,
+        guard_horizon=None,
+    ):
         active_mask = self.get_active_agent_mask()
         for agent_id, agent in enumerate(self.env.agents):
             if active_mask[agent_id] > 0.0 and agent.reached:
@@ -3561,10 +3769,21 @@ class UAVEnvDiscreteWrapper:
         avail_actions = np.asarray(avail_actions, dtype=np.float32)
 
         old_margin = self.env.guard_prediction_margin
+        old_horizon = self.env.guard_prediction_horizon
         if guard_margin is not None:
             self.env.guard_prediction_margin = float(max(0.0, guard_margin))
+        horizon = (
+            self.env.guard_prediction_horizon
+            if guard_horizon is None
+            else max(1, int(guard_horizon))
+        )
+        self.env.guard_prediction_horizon = horizon
         try:
-            collision_flags = self.estimate_joint_collision_flags(revised)
+            collision_flags = self.estimate_joint_collision_flags_horizon(
+                revised,
+                horizon=horizon,
+                guard_margin=self.env.guard_prediction_margin,
+            )
             if not np.any(collision_flags * active_mask > 0.0):
                 return revised, guard_flags
 
@@ -3582,12 +3801,20 @@ class UAVEnvDiscreteWrapper:
                     joint[agent_id] = int(candidate_id)
                     joint_candidates.append(joint)
 
-                risks = self.estimate_joint_short_risk_batch(joint_candidates)
+                risks = self.estimate_joint_short_risk_horizon_batch(
+                    joint_candidates,
+                    horizon=horizon,
+                    guard_margin=self.env.guard_prediction_margin,
+                )
                 best_action = revised[agent_id]
                 best_score = None
                 for cand_idx, candidate_id in enumerate(candidate_ids):
                     joint = joint_candidates[cand_idx]
-                    cand_flags = self.estimate_joint_collision_flags(joint)
+                    cand_flags = self.estimate_joint_collision_flags_horizon(
+                        joint,
+                        horizon=horizon,
+                        guard_margin=self.env.guard_prediction_margin,
+                    )
                     progress = self._candidate_goal_progress(agent_id, candidate_id)
                     candidate_changed = int(candidate_id != revised[agent_id])
                     score = (
@@ -3604,11 +3831,16 @@ class UAVEnvDiscreteWrapper:
                 if best_action != revised[agent_id]:
                     revised[agent_id] = best_action
                     guard_flags[agent_id] = 1.0
-                    collision_flags = self.estimate_joint_collision_flags(revised)
+                    collision_flags = self.estimate_joint_collision_flags_horizon(
+                        revised,
+                        horizon=horizon,
+                        guard_margin=self.env.guard_prediction_margin,
+                    )
 
             return revised, guard_flags
         finally:
             self.env.guard_prediction_margin = old_margin
+            self.env.guard_prediction_horizon = old_horizon
 
     def get_env_info(self):
         self.reset()
