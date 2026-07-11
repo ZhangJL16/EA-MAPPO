@@ -35,6 +35,11 @@ def parse_args():
     parser.add_argument("--seed", type=int, default=123)
     parser.add_argument("--eval_seed", type=int, default=100123)
     parser.add_argument("--max_steps", type=int, default=400)
+    parser.add_argument("--total_orders", type=int, default=16)
+    parser.add_argument("--max_active_orders", type=int, default=8)
+    parser.add_argument("--energy_decay", type=float, default=None)
+    parser.add_argument("--charging_rate", type=float, default=None)
+    parser.add_argument("--ecf_logit_bias_coef", type=float, default=None)
     parser.add_argument("--frame_stride", type=int, default=2)
     parser.add_argument("--duration_ms", type=int, default=90)
     parser.add_argument("--cuda", default="True")
@@ -56,9 +61,9 @@ def build_hmappo_args(script_args):
         "--episode_limit",
         str(script_args.max_steps),
         "--uav_total_orders",
-        "16",
+        str(script_args.total_orders),
         "--uav_max_active_orders",
-        "8",
+        str(script_args.max_active_orders),
         "--hmappo_meta_period",
         "5",
         "--hmappo_pretrained_low_model_dir",
@@ -108,6 +113,12 @@ def build_hmappo_args(script_args):
         "--gpu_id",
         str(script_args.gpu_id),
     ]
+    if script_args.energy_decay is not None:
+        sys.argv.extend(["--uav_energy_decay", str(script_args.energy_decay)])
+    if script_args.charging_rate is not None:
+        sys.argv.extend(["--uav_charging_rate", str(script_args.charging_rate)])
+    if script_args.ecf_logit_bias_coef is not None:
+        sys.argv.extend(["--hrl_ecf_logit_bias_coef", str(script_args.ecf_logit_bias_coef)])
     try:
         args = get_common_args()
     finally:

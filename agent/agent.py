@@ -530,6 +530,13 @@ class Agents:
                 batch[key] = batch[key][:, :max_episode_len]
         metrics = {}
         self.policy.learn(batch, max_episode_len, train_step, epsilon)
+        policy_metrics = getattr(self.policy, "last_train_metrics", None)
+        if isinstance(policy_metrics, dict):
+            for key, value in policy_metrics.items():
+                try:
+                    metrics[key] = float(value)
+                except (TypeError, ValueError):
+                    continue
 
         if self.safety_guard is not None:
             safety_loss = self.safety_guard.learn(batch, max_episode_len, train_step)

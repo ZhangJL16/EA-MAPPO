@@ -34,6 +34,8 @@ def parse_args():
     parser.add_argument("--uav_n_agents", type=int, default=4)
     parser.add_argument("--uav_total_orders", type=int, default=16)
     parser.add_argument("--uav_max_active_orders", type=int, default=8)
+    parser.add_argument("--uav_energy_decay", type=float, default=None)
+    parser.add_argument("--uav_charging_rate", type=float, default=None)
     parser.add_argument("--charge_threshold", type=float, default=0.35)
     parser.add_argument("--charge_release_threshold", type=float, default=0.65)
     parser.add_argument("--energy_reserve_ratio", type=float, default=0.04)
@@ -171,6 +173,8 @@ def run_episode(args, episode_idx):
         episode_limit=args.episode_limit,
         total_orders=args.uav_total_orders,
         max_active_orders=args.uav_max_active_orders,
+        energy_decay_per_step=args.uav_energy_decay,
+        charging_rate=args.uav_charging_rate,
     )
     env.reset(seed=args.seed + episode_idx)
     total_reward = 0.0

@@ -40,6 +40,100 @@ SMAC_MAPS = [
 SMAC_SAFE_DISABLED_ALGS = set()
 
 
+def _summary_delta(start_summary, end_summary, key):
+    try:
+        return float(end_summary.get(key, 0.0)) - float(start_summary.get(key, 0.0))
+    except Exception:
+        return 0.0
+
+
+def _summary_snapshot(env):
+    if hasattr(env, "summary"):
+        return dict(env.summary())
+    return {}
+
+
+def _build_energy_consequence_target(
+    start_consequence,
+    end_consequence,
+    high_actions,
+    high_reward=None,
+    start_summary=None,
+    end_summary=None,
+    utility_target_enabled=True,
+    charge_margin=0.03,
+    reward_threshold=0.0,
+):
+    start = np.asarray(start_consequence, dtype=np.float32)
+    end = np.asarray(end_consequence, dtype=np.float32)
+    actions = np.asarray(high_actions, dtype=np.float32)
+    if start.shape != end.shape or end.ndim != 2 or end.shape[-1] < 5:
+        return end
+
+    target = np.zeros_like(end, dtype=np.float32)
+    start_energy = start[:, 0]
+    end_energy = end[:, 0]
+    start_margin = start[:, 1]
+    start_charge_dist = start[:, 2]
+    end_charge_dist = end[:, 2]
+    energy_delta = end_energy - start_energy
+    charge_progress = start_charge_dist - end_charge_dist
+    reserved = end[:, 3]
+    survived = end_energy > 1e-6
+    if actions.ndim == 2 and actions.shape[1] > 0:
+        mode = np.rint(actions[:, 0]).astype(np.int32)
+    else:
+        mode = np.ones(end.shape[0], dtype=np.int32)
+
+    charge_needed = start_margin < float(charge_margin)
+    charge_success = survived & (
+        (energy_delta > 0.01)
+        | (charge_needed & ((reserved > 0.5) | (charge_progress > 0.03)))
+    )
+    order_energy_safe = survived & (end[:, 1] >= 0.0)
+
+    if utility_target_enabled:
+        if high_reward is None:
+            reward_utility = np.zeros(end.shape[0], dtype=np.float32)
+        else:
+            reward_utility = np.asarray(high_reward, dtype=np.float32).reshape(-1)
+            if reward_utility.size != end.shape[0]:
+                reward_utility = np.resize(reward_utility, end.shape[0]).astype(np.float32)
+
+        start_summary = start_summary or {}
+        end_summary = end_summary or {}
+        task_progress = (
+            1.0 * _summary_delta(start_summary, end_summary, "orders_completed")
+            + 0.5 * _summary_delta(start_summary, end_summary, "picked_orders")
+            + 0.5 * _summary_delta(
+                start_summary, end_summary, "order_pickup_success_count"
+            )
+            + 1.0 * _summary_delta(
+                start_summary, end_summary, "order_delivery_success_count"
+            )
+        )
+        collision_delta = (
+            _summary_delta(start_summary, end_summary, "agent_collision_count")
+            + _summary_delta(start_summary, end_summary, "obstacle_collision_count")
+        )
+        utility_good = (
+            (reward_utility >= float(reward_threshold))
+            | (task_progress > 0.0 and collision_delta <= 0.0)
+        )
+        order_success = order_energy_safe & utility_good
+    else:
+        order_success = order_energy_safe
+
+    feasible = np.where(mode == 0, charge_success, order_success).astype(np.float32)
+
+    target[:, 0] = end_energy
+    target[:, 1] = np.clip(energy_delta, -1.0, 1.0)
+    target[:, 2] = np.clip(end_charge_dist, 0.0, 1.0)
+    target[:, 3] = reserved
+    target[:, 4] = feasible
+    return target
+
+
 def smac_safe_enabled(args):
     return (
         getattr(args, "map", None) in SMAC_MAPS
@@ -382,10 +476,31 @@ class RolloutWorker:
                         current_high_transition["energy_order_mask"]
                     )
                     high_energy_consequences.append(
-                        (
-                            self.env.get_high_level_energy_consequences()
-                            if hasattr(self.env, "get_high_level_energy_consequences")
-                            else np.zeros((self.n_agents, 5), dtype=np.float32)
+                        _build_energy_consequence_target(
+                            current_high_transition.get(
+                                "energy_consequence_start",
+                                np.zeros((self.n_agents, 5), dtype=np.float32),
+                            ),
+                            (
+                                self.env.get_high_level_energy_consequences()
+                                if hasattr(self.env, "get_high_level_energy_consequences")
+                                else np.zeros((self.n_agents, 5), dtype=np.float32)
+                            ),
+                            current_high_transition["u"],
+                            high_reward=high_reward,
+                            start_summary=current_high_transition.get(
+                                "summary_start", {}
+                            ),
+                            end_summary=_summary_snapshot(self.env),
+                            utility_target_enabled=getattr(
+                                self.args, "hrl_ecf_utility_target_enabled", True
+                            ),
+                            charge_margin=getattr(
+                                self.args, "hrl_ecf_utility_charge_margin", 0.03
+                            ),
+                            reward_threshold=getattr(
+                                self.args, "hrl_ecf_utility_reward_threshold", 0.0
+                            ),
                         )
                     )
                     high_r.append(high_reward)
@@ -468,6 +583,12 @@ class RolloutWorker:
                     "energy_order_mask": np.asarray(
                         high_energy_order_mask, dtype=np.float32
                     ).reshape(self.n_agents, 1),
+                    "energy_consequence_start": (
+                        self.env.get_high_level_energy_consequences()
+                        if hasattr(self.env, "get_high_level_energy_consequences")
+                        else np.zeros((self.n_agents, 5), dtype=np.float32)
+                    ),
+                    "summary_start": _summary_snapshot(self.env),
                     "subgoals": (
                         self.env.get_current_subgoals()
                         if hasattr(self.env, "get_current_subgoals")
@@ -734,10 +855,29 @@ class RolloutWorker:
             high_energy_margins.append(current_high_transition["energy_margin"])
             high_energy_order_masks.append(current_high_transition["energy_order_mask"])
             high_energy_consequences.append(
-                (
-                    self.env.get_high_level_energy_consequences()
-                    if hasattr(self.env, "get_high_level_energy_consequences")
-                    else np.zeros((self.n_agents, 5), dtype=np.float32)
+                _build_energy_consequence_target(
+                    current_high_transition.get(
+                        "energy_consequence_start",
+                        np.zeros((self.n_agents, 5), dtype=np.float32),
+                    ),
+                    (
+                        self.env.get_high_level_energy_consequences()
+                        if hasattr(self.env, "get_high_level_energy_consequences")
+                        else np.zeros((self.n_agents, 5), dtype=np.float32)
+                    ),
+                    current_high_transition["u"],
+                    high_reward=high_reward,
+                    start_summary=current_high_transition.get("summary_start", {}),
+                    end_summary=_summary_snapshot(self.env),
+                    utility_target_enabled=getattr(
+                        self.args, "hrl_ecf_utility_target_enabled", True
+                    ),
+                    charge_margin=getattr(
+                        self.args, "hrl_ecf_utility_charge_margin", 0.03
+                    ),
+                    reward_threshold=getattr(
+                        self.args, "hrl_ecf_utility_reward_threshold", 0.0
+                    ),
                 )
             )
             high_r.append(high_reward)

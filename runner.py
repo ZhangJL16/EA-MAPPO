@@ -159,6 +159,20 @@ UAV_DELIVERY_DIAGNOSTIC_KEYS = [
     "order_collision_rate",
     "charge_collision_rate",
     "idle_collision_rate",
+    "ecf_con_loss",
+    "ecf_feas_loss",
+    "ecf_policy_loss",
+    "ecf_charge_need_loss",
+    "ecf_q_charge",
+    "ecf_q_order",
+    "ecf_feas_target",
+    "ecf_charge_need_target",
+    "td_energy_loss",
+    "td_energy_cost",
+    "td_energy_mu_charge",
+    "td_energy_mu_order",
+    "td_energy_std_order",
+    "td_energy_lambda",
 ]
 
 UAV_DELIVERY_CSV_COLUMNS = (
@@ -877,6 +891,11 @@ class Runner:
                         )
                         for row in pending_train_rows:
                             self._set_log_row_value(row, "safety_loss", safety_loss)
+                            if isinstance(train_metrics, dict):
+                                for metric_key, metric_value in train_metrics.items():
+                                    self._set_log_row_value(
+                                        row, metric_key, metric_value
+                                    )
                             self._append_log_row(row)
                         train_steps += 1
                         self._save_policy_if_needed(time_steps)
