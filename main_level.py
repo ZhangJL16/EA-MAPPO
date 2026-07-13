@@ -196,6 +196,11 @@ def build_env(args, algs):
             energy_depletion_fraction=float(
                 getattr(args, "uav_energy_depletion_fraction", 0.5)
             ),
+            energy_model=str(getattr(args, "uav_energy_model", "fixed")),
+            energy_idle_coef=getattr(args, "uav_energy_idle_coef", None),
+            energy_speed_coef=float(getattr(args, "uav_energy_speed_coef", 2.0)),
+            energy_accel_coef=float(getattr(args, "uav_energy_accel_coef", 30.0)),
+            energy_payload_coef=float(getattr(args, "uav_energy_payload_coef", 0.1)),
             charging_capacity=_charging_capacity_arg(args),
             charging_station_count=_charging_station_count_arg(args),
             charging_radius=float(getattr(args, "uav_charging_radius", 0.18)),
@@ -206,6 +211,8 @@ def build_env(args, algs):
             charge_dense_reward_scale=float(
                 getattr(args, "hrl_charge_dense_reward_scale", 1.0)
             ),
+            high_goal_style=str(getattr(args, "hrl_high_goal_style", "line")),
+            high_lateral_scale=float(getattr(args, "hrl_high_lateral_scale", 0.35)),
             auction_enabled=bool(getattr(args, "hrl_auction_enabled", True)),
             fixed_charge_threshold_enabled=bool(
                 getattr(args, "hrl_fixed_charge_threshold_enabled", False)
@@ -393,9 +400,6 @@ if __name__ == "__main__":
         args.high_level_mode_n_actions = env_info.get("high_level_mode_n_actions", 0)
         args.high_level_obs_shape = env_info.get("high_level_obs_shape", 0)
         args.high_level_state_shape = env_info.get("high_level_state_shape", 0)
-        args.high_energy_consequence_shape = env_info.get(
-            "high_energy_consequence_shape", 5
-        )
         args.low_task_shape = env_info.get("low_task_shape", 0)
         args.max_active_orders = env_info.get(
             "max_active_orders", getattr(args, "uav_max_active_orders", 0)

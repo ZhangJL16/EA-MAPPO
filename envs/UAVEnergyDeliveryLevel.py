@@ -147,6 +147,9 @@ class UAVAgent:
         self.subgoal = self.pos.copy()
         self.original_subgoal = self.pos.copy()
         self.subgoal_test = False
+        self.high_energy_budget_ratio = 0.0
+        self.high_energy_budget_remaining = 0.0
+        self.high_energy_budget_steps_remaining = 0
         self.carrying_order = False
         self.current_task_type = TASK_IDLE
         self.completed_orders = 0
@@ -244,6 +247,11 @@ class UAVEnv:
         initial_energy=default_initial_energy,
         energy_decay_per_step=None,
         energy_depletion_fraction=default_energy_depletion_fraction,
+        energy_model="fixed",
+        energy_idle_coef=None,
+        energy_speed_coef=2.0,
+        energy_accel_coef=30.0,
+        energy_payload_coef=0.1,
         charging_capacity=default_charging_capacity,
         charging_station_count=default_charging_station_count,
         charging_radius=default_charging_radius,
@@ -251,6 +259,8 @@ class UAVEnv:
         charging_station_pos=None,
         charge_mode_fraction=0.5,
         charge_dense_reward_scale=1.0,
+        high_goal_style="line",
+        high_lateral_scale=0.35,
         auction_enabled=True,
         fixed_charge_threshold_enabled=False,
         fixed_charge_threshold=0.35,
@@ -276,9 +286,26 @@ class UAVEnv:
         self.total_orders = int(total_orders)
         self.max_active_orders = min(int(max_active_orders), self.total_orders)
         self.low_task_shape = 0
-        # High-level action is encoded as [mode_id, progress].
-        # mode_id is discrete: 0 selects charging, 1 selects order service.
-        self.high_level_n_actions = 2
+        self.high_goal_style = str(high_goal_style).lower()
+        if self.high_goal_style not in {
+            "line_lateral",
+            "target_relative",
+            "free_relative",
+            "line",
+        }:
+            raise ValueError(
+                "high_goal_style must be 'line_lateral', 'target_relative', "
+                "'free_relative', or 'line'"
+            )
+        self.high_lateral_scale = float(np.clip(high_lateral_scale, 0.0, 1.0))
+        # line_lateral/target_relative: [mode_id, progress, lateral, budget] in 2-D.
+        # free_relative: [mode_id, dx, dy, budget]. Legacy line: [mode_id, progress, budget].
+        self.high_level_n_actions = (
+            1 + self.dim_actions + 1
+            if self.high_goal_style
+            in {"line_lateral", "target_relative", "free_relative"}
+            else 3
+        )
         self.high_level_mode_n_actions = 2
         self.charge_mode_fraction = float(np.clip(charge_mode_fraction, 0.01, 0.99))
         self.charge_mode_threshold = -1.0 + 2.0 * self.charge_mode_fraction
@@ -302,6 +329,9 @@ class UAVEnv:
             )
             energy_decay_per_step = self.initial_energy / depletion_steps
         self.energy_decay_per_step = round(float(energy_decay_per_step), 1)
+        self.energy_model = str(energy_model).lower()
+        if self.energy_model not in {"fixed", "dynamic"}:
+            raise ValueError("energy_model must be 'fixed' or 'dynamic'")
         if charging_station_count is None:
             charging_station_count = max(1, (int(self.num_agents) + 1) // 2)
         self.charging_station_count = int(max(1, charging_station_count))
@@ -328,6 +358,14 @@ class UAVEnv:
         self.charging_slot_reservations = self._empty_charge_reservations()
 
         self.time_step = 0.4
+        self.energy_idle_coef = (
+            float(self.energy_decay_per_step) / (self.time_step + eps)
+            if energy_idle_coef is None
+            else float(energy_idle_coef)
+        )
+        self.energy_speed_coef = float(energy_speed_coef)
+        self.energy_accel_coef = float(energy_accel_coef)
+        self.energy_payload_coef = float(energy_payload_coef)
         self.meta_period = 5
         self.reachable_subgoal_scale = 1.0
         self.intrinsic_reward_scale = 1.0
@@ -335,6 +373,10 @@ class UAVEnv:
         self.intrinsic_success_bonus = 1.0
         self.delivery_intrinsic_progress_bonus = 0.0
         self.intrinsic_collision_penalty = 0.0
+        self.low_energy_budget_enabled = False
+        self.low_energy_budget_min_ratio = 0.0
+        self.low_energy_budget_max_ratio = 0.08
+        self.low_energy_budget_overuse_coef = 2.0
         self.order_progress_override = None
         self.energy_shield_enabled = False
         self.energy_margin_reserve_ratio = 0.05
@@ -378,6 +420,8 @@ class UAVEnv:
         self.current_step = 0
         self.safe_value = np.zeros(self.num_agents, dtype=np.float32)
         self.reward_safe_value = np.zeros(self.num_agents, dtype=np.float32)
+        self._last_step_energy_ratio = np.zeros(self.num_agents, dtype=np.float32)
+        self._last_budget_overuse_ratio = np.zeros(self.num_agents, dtype=np.float32)
         self.collision_count = 0.0
         self.obstacle_collision_count = 0.0
         self.agent_collision_count = 0.0
@@ -391,6 +435,7 @@ class UAVEnv:
             + self.num_lasers
             + (self.dim_actions + 1)
             + 1
+            + 2
             + self.low_task_shape
         )
         self.action_space = {
@@ -438,9 +483,17 @@ class UAVEnv:
         intrinsic_success_bonus=None,
         delivery_intrinsic_progress_bonus=None,
         intrinsic_collision_penalty=None,
+        low_energy_budget_enabled=None,
+        low_energy_budget_min_ratio=None,
+        low_energy_budget_max_ratio=None,
+        low_energy_budget_overuse_coef=None,
+        high_goal_style=None,
+        high_lateral_scale=None,
         order_progress_override=None,
         energy_shield_enabled=None,
         energy_margin_reserve_ratio=None,
+        charge_energy_threshold=None,
+        charge_release_threshold=None,
         charge_queue_enabled=None,
         charge_queue_radius=None,
     ):
@@ -458,6 +511,42 @@ class UAVEnv:
             )
         if intrinsic_collision_penalty is not None:
             self.intrinsic_collision_penalty = float(intrinsic_collision_penalty)
+        if low_energy_budget_enabled is not None:
+            self.low_energy_budget_enabled = bool(low_energy_budget_enabled)
+        if low_energy_budget_min_ratio is not None:
+            self.low_energy_budget_min_ratio = float(
+                np.clip(low_energy_budget_min_ratio, 0.0, 1.0)
+            )
+        if low_energy_budget_max_ratio is not None:
+            self.low_energy_budget_max_ratio = float(
+                np.clip(low_energy_budget_max_ratio, 0.0, 1.0)
+            )
+        if self.low_energy_budget_max_ratio < self.low_energy_budget_min_ratio:
+            self.low_energy_budget_max_ratio = self.low_energy_budget_min_ratio
+        if low_energy_budget_overuse_coef is not None:
+            self.low_energy_budget_overuse_coef = float(
+                max(0.0, low_energy_budget_overuse_coef)
+            )
+        if high_goal_style is not None:
+            style = str(high_goal_style).lower()
+            if style not in {
+                "line_lateral",
+                "target_relative",
+                "free_relative",
+                "line",
+            }:
+                raise ValueError(
+                    "high_goal_style must be 'line_lateral', 'target_relative', "
+                    "'free_relative', or 'line'"
+                )
+            self.high_goal_style = style
+            self.high_level_n_actions = (
+                1 + self.dim_actions + 1
+                if style in {"line_lateral", "target_relative", "free_relative"}
+                else 3
+            )
+        if high_lateral_scale is not None:
+            self.high_lateral_scale = float(np.clip(high_lateral_scale, 0.0, 1.0))
         if order_progress_override is not None:
             self.order_progress_override = float(
                 np.clip(order_progress_override, -1.0, 1.0)
@@ -467,6 +556,14 @@ class UAVEnv:
         if energy_margin_reserve_ratio is not None:
             self.energy_margin_reserve_ratio = float(
                 np.clip(energy_margin_reserve_ratio, 0.0, 1.0)
+            )
+        if charge_energy_threshold is not None:
+            self.charge_energy_threshold = float(
+                np.clip(charge_energy_threshold, 0.0, 1.0)
+            )
+        if charge_release_threshold is not None:
+            self.charge_release_threshold = float(
+                np.clip(charge_release_threshold, 0.0, 1.0)
             )
         if charge_queue_enabled is not None:
             self.charge_queue_enabled = bool(charge_queue_enabled)
@@ -553,6 +650,7 @@ class UAVEnv:
         else:
             action = np.asarray(action, dtype=np.float32).reshape(-1)
             scalar = float(action[0]) if action.size else 0.0
+            lateral_scalar = float(action[1]) if action.size >= 2 else 0.0
             fraction = 0.5 * (np.clip(scalar, -1.0, 1.0) + 1.0)
 
             max_reachable = self._max_reachable_subgoal_distance(agent)
@@ -565,6 +663,19 @@ class UAVEnv:
 
             direction = to_target / (target_dist + eps)
             subgoal = agent.pos + direction * progress
+            if self.high_goal_style == "line_lateral" and self.dim_actions >= 2:
+                lateral_dir = np.zeros(self.dim_actions, dtype=np.float32)
+                lateral_dir[0] = -direction[1]
+                lateral_dir[1] = direction[0]
+                lateral_scale = min(
+                    self.high_lateral_scale * max_reachable,
+                    max(0.0, target_dist),
+                )
+                subgoal = subgoal + lateral_dir * lateral_scalar * lateral_scale
+                delta = subgoal - agent.pos
+                delta_norm = float(np.linalg.norm(delta))
+                if delta_norm > max_reachable:
+                    subgoal = agent.pos + delta / (delta_norm + eps) * max_reachable
             subgoal = self._clip_position_to_bounds(subgoal)
 
         agent.task_target = target.copy()
@@ -605,6 +716,8 @@ class UAVEnv:
         )
 
     def _advance_intermediate_subgoal_if_needed(self, agent):
+        if self.high_goal_style in {"target_relative", "free_relative"}:
+            return False
         if not agent.reached or self._is_at_task_terminal_target(agent):
             return False
         if not self._agent_has_motion_task(agent):
@@ -658,6 +771,31 @@ class UAVEnv:
 
     def _parse_high_level_action(self, action):
         action = np.asarray(action, dtype=np.float32).reshape(-1)
+        if self.high_goal_style in {"line_lateral", "target_relative", "free_relative"}:
+            mode_scalar = float(action[0]) if action.size else 0.0
+            if self.high_level_mode_n_actions > 1:
+                mode_id = int(
+                    np.clip(
+                        np.rint(mode_scalar),
+                        HIGH_MODE_CHARGE,
+                        HIGH_MODE_ORDER,
+                    )
+                )
+            else:
+                mode_id = (
+                    HIGH_MODE_CHARGE
+                    if mode_scalar < self.charge_mode_threshold
+                    else HIGH_MODE_ORDER
+                )
+            delta_start = 1
+            delta_end = delta_start + self.dim_actions
+            delta = action[delta_start:delta_end]
+            if delta.size < self.dim_actions:
+                delta = np.pad(delta, (0, self.dim_actions - delta.size))
+            budget_idx = delta_end
+            budget_scalar = float(action[budget_idx]) if action.size > budget_idx else 0.0
+            return mode_id, delta.astype(np.float32), budget_scalar
+
         if self.high_level_mode_n_actions > 1 and action.size >= 2:
             mode_id = int(
                 np.clip(
@@ -666,16 +804,142 @@ class UAVEnv:
                     HIGH_MODE_ORDER,
                 )
             )
-            return mode_id, float(action[1])
+            budget_scalar = float(action[2]) if action.size >= 3 else 0.0
+            return mode_id, float(action[1]), budget_scalar
 
         mode_scalar = float(action[0]) if action.size else 0.0
         progress_scalar = float(action[1]) if action.size >= 2 else mode_scalar
+        budget_scalar = float(action[2]) if action.size >= 3 else 0.0
         mode_id = (
             HIGH_MODE_CHARGE
             if mode_scalar < self.charge_mode_threshold
             else HIGH_MODE_ORDER
         )
-        return mode_id, progress_scalar
+        return mode_id, progress_scalar, budget_scalar
+
+    def _default_relative_goal_action(self, agent, task_target):
+        if self.high_goal_style in {"line_lateral", "target_relative"}:
+            action = np.zeros(self.dim_actions, dtype=np.float32)
+            action[0] = 1.0
+            return action
+        if task_target is None:
+            return np.zeros(self.dim_actions, dtype=np.float32)
+        target = np.asarray(task_target, dtype=np.float32)[: self.dim_actions]
+        to_target = target - agent.pos
+        distance = float(np.linalg.norm(to_target))
+        if distance <= eps:
+            return np.zeros(self.dim_actions, dtype=np.float32)
+        max_dist = self._max_reachable_subgoal_distance(agent)
+        return (to_target / (distance + eps) * min(distance, max_dist) / (max_dist + eps)).astype(
+            np.float32
+        )
+
+    def _target_relative_goal_delta(self, agent, action, task_target):
+        if task_target is None:
+            return np.zeros(self.dim_actions, dtype=np.float32)
+        target = np.asarray(task_target, dtype=np.float32)[: self.dim_actions]
+        to_target = target - agent.pos
+        target_dist = float(np.linalg.norm(to_target))
+        if target_dist <= eps:
+            return np.zeros(self.dim_actions, dtype=np.float32)
+
+        action = np.asarray(action, dtype=np.float32).reshape(-1)
+        progress_scalar = float(action[0]) if action.size else 0.0
+        lateral_scalar = float(action[1]) if action.size >= 2 else 0.0
+        fraction = 0.5 * (np.clip(progress_scalar, -1.0, 1.0) + 1.0)
+
+        max_reachable = self._max_reachable_subgoal_distance(agent)
+        line_length = min(target_dist, max_reachable)
+        min_progress = min(line_length, self.min_subgoal_progress)
+        if line_length > min_progress + eps:
+            progress = min_progress + fraction * (line_length - min_progress)
+        else:
+            progress = line_length
+
+        direction = to_target / (target_dist + eps)
+        delta = direction * progress
+        if self.dim_actions >= 2:
+            lateral_dir = np.zeros(self.dim_actions, dtype=np.float32)
+            lateral_dir[0] = -direction[1]
+            lateral_dir[1] = direction[0]
+            lateral_scale = min(
+                self.high_lateral_scale * max_reachable,
+                max(0.0, target_dist),
+            )
+            delta = delta + lateral_dir * lateral_scalar * lateral_scale
+        norm = float(np.linalg.norm(delta))
+        if norm > max_reachable:
+            delta = delta / (norm + eps) * max_reachable
+        return delta.astype(np.float32) / (max_reachable + eps)
+
+    def _target_relative_action_from_displacement(
+        self, start_pos, end_pos, task_target, fallback_action
+    ):
+        fallback = np.asarray(fallback_action, dtype=np.float32).reshape(-1)
+        if task_target is None or fallback.size < self.high_level_n_actions:
+            return fallback.copy()
+        start = np.asarray(start_pos, dtype=np.float32)[: self.dim_actions]
+        end = np.asarray(end_pos, dtype=np.float32)[: self.dim_actions]
+        target = np.asarray(task_target, dtype=np.float32)[: self.dim_actions]
+        to_target = target - start
+        target_dist = float(np.linalg.norm(to_target))
+        if target_dist <= eps:
+            return fallback.copy()
+
+        direction = to_target / (target_dist + eps)
+        achieved = end - start
+        max_reachable = float(self.meta_period) * self.v_max * float(
+            self.reachable_subgoal_scale
+        )
+        line_length = min(target_dist, max_reachable)
+        min_progress = min(line_length, self.min_subgoal_progress)
+        achieved_progress = float(np.clip(np.dot(achieved, direction), 0.0, line_length))
+        if line_length > min_progress + eps:
+            fraction = (achieved_progress - min_progress) / (line_length - min_progress)
+        else:
+            fraction = 1.0
+        progress_scalar = 2.0 * float(np.clip(fraction, 0.0, 1.0)) - 1.0
+
+        lateral_scalar = 0.0
+        if self.dim_actions >= 2:
+            lateral_dir = np.zeros(self.dim_actions, dtype=np.float32)
+            lateral_dir[0] = -direction[1]
+            lateral_dir[1] = direction[0]
+            lateral_scale = min(
+                self.high_lateral_scale * max_reachable,
+                max(0.0, target_dist),
+            )
+            if lateral_scale > eps:
+                lateral_scalar = float(
+                    np.clip(np.dot(achieved, lateral_dir) / lateral_scale, -1.0, 1.0)
+                )
+
+        corrected = fallback.copy()
+        corrected[1] = progress_scalar
+        if corrected.size > 2:
+            corrected[2] = lateral_scalar
+        return corrected.astype(np.float32)
+
+    def _budget_ratio_from_scalar(self, scalar):
+        fraction = 0.5 * (float(np.clip(scalar, -1.0, 1.0)) + 1.0)
+        return float(
+            self.low_energy_budget_min_ratio
+            + fraction
+            * (self.low_energy_budget_max_ratio - self.low_energy_budget_min_ratio)
+        )
+
+    def _budget_scalar_from_ratio(self, ratio):
+        span = self.low_energy_budget_max_ratio - self.low_energy_budget_min_ratio
+        if span <= eps:
+            return 0.0
+        fraction = (float(ratio) - self.low_energy_budget_min_ratio) / span
+        return 2.0 * float(np.clip(fraction, 0.0, 1.0)) - 1.0
+
+    def _set_agent_energy_budget(self, agent, budget_scalar):
+        budget_ratio = self._budget_ratio_from_scalar(budget_scalar)
+        agent.high_energy_budget_ratio = budget_ratio
+        agent.high_energy_budget_remaining = budget_ratio * float(agent.initial_energy)
+        agent.high_energy_budget_steps_remaining = int(max(1, self.meta_period))
 
     def _reset_high_level_diagnostics(self):
         self.high_diag_decision_count = 0.0
@@ -853,14 +1117,50 @@ class UAVEnv:
             for attr in ORDER_EXEC_DIAGNOSTIC_ATTRS
         }
 
-    def _energy_required_for_distance(self, agent, distance):
+    def _energy_required_for_distance(self, agent, distance, payload=False):
         step_distance = max(float(agent.v_max) * float(self.time_step), eps)
         travel_steps = max(0.0, float(distance)) / step_distance
+        if self.energy_model == "dynamic":
+            power = (
+                self.energy_idle_coef
+                + self.energy_speed_coef * float(agent.v_max ** 2)
+                + self.energy_payload_coef * float(bool(payload))
+            )
+            return travel_steps * max(0.0, power * self.time_step)
         return travel_steps * float(self.energy_decay_per_step)
 
-    def _energy_required_ratio_for_distance(self, agent, distance):
-        required_energy = self._energy_required_for_distance(agent, distance)
+    def _energy_required_ratio_for_distance(self, agent, distance, payload=False):
+        required_energy = self._energy_required_for_distance(agent, distance, payload)
         return float(required_energy / (agent.initial_energy + eps))
+
+    def _energy_required_for_order_then_charge(self, agent, order):
+        if order is None:
+            return 0.0
+
+        current = agent.pos
+        required = 0.0
+        if order.status == DeliveryOrder.PICKED or agent.carrying_order:
+            delivery_dist = float(np.linalg.norm(current - order.dropoff_pos))
+            required += self._energy_required_for_distance(
+                agent, delivery_dist, payload=True
+            )
+            current = order.dropoff_pos
+        else:
+            pickup_dist = float(np.linalg.norm(current - order.pickup_pos))
+            delivery_dist = float(np.linalg.norm(order.pickup_pos - order.dropoff_pos))
+            required += self._energy_required_for_distance(
+                agent, pickup_dist, payload=False
+            )
+            required += self._energy_required_for_distance(
+                agent, delivery_dist, payload=True
+            )
+            current = order.dropoff_pos
+
+        charge_dist = self._distance_to_nearest_charging_station_from_pos(current)
+        required += self._energy_required_for_distance(
+            agent, charge_dist, payload=False
+        )
+        return float(required)
 
     def _selected_order_for_agent(self, agent):
         slot_idx = agent.assigned_order_slot
@@ -897,8 +1197,9 @@ class UAVEnv:
         if order is None:
             return 0.0
         energy_ratio = float(agent.energy / (agent.initial_energy + eps))
-        required_ratio = self._energy_required_ratio_for_distance(
-            agent, self._finish_order_then_charge_distance_for_order(agent, order)
+        required_ratio = float(
+            self._energy_required_for_order_then_charge(agent, order)
+            / (agent.initial_energy + eps)
         )
         margin = energy_ratio - required_ratio - self.energy_margin_reserve_ratio
         return float(np.clip(margin, -1.0, 1.0))
@@ -1225,8 +1526,14 @@ class UAVEnv:
                 continue
             travel = float(np.linalg.norm(agent.pos - order.pickup_pos))
             travel += float(np.linalg.norm(order.pickup_pos - order.dropoff_pos))
-            if travel < best_cost:
-                best_cost = travel
+            required_ratio = self._energy_required_for_order_then_charge(
+                agent, order
+            ) / (agent.initial_energy + eps)
+            margin = self._energy_margin_for_order(agent, order)
+            risk_penalty = max(0.0, -margin) * max(self.length, self.width)
+            cost = travel + required_ratio * max(self.length, self.width) + risk_penalty
+            if cost < best_cost:
+                best_cost = cost
                 best_slot = int(slot_idx)
         return best_slot
 
@@ -1283,11 +1590,17 @@ class UAVEnv:
                 if not self._order_slot_energy_feasible(agent, slot_idx):
                     cost_matrix[agent_row, order_col] = 1e6
                     continue
-                travel = np.linalg.norm(agent.pos - order.pickup_pos)
-                travel += np.linalg.norm(order.pickup_pos - order.dropoff_pos)
-                energy_ratio = agent.energy / (agent.initial_energy + eps)
-                energy_penalty = max(0.0, 0.35 - energy_ratio) * max(self.length, self.width)
-                cost_matrix[agent_row, order_col] = float(travel + energy_penalty)
+                travel = float(np.linalg.norm(agent.pos - order.pickup_pos))
+                travel += float(np.linalg.norm(order.pickup_pos - order.dropoff_pos))
+                required_ratio = self._energy_required_for_order_then_charge(
+                    agent, order
+                ) / (agent.initial_energy + eps)
+                margin = self._energy_margin_for_order(agent, order)
+                risk_penalty = max(0.0, -margin) * max(self.length, self.width)
+                energy_cost = required_ratio * max(self.length, self.width)
+                cost_matrix[agent_row, order_col] = float(
+                    travel + energy_cost + risk_penalty
+                )
 
         assignments = auction_assign_min_cost(cost_matrix)
         result = {}
@@ -1401,10 +1714,79 @@ class UAVEnv:
                 )
         return np.concatenate(features).astype(np.float32)
 
+    def _station_queue_length(self, station_idx):
+        station_pos = self.charging_station_positions[int(station_idx)]
+        queue_len = 0
+        for agent in self.agents:
+            if agent.current_task_type != TASK_CHARGE:
+                continue
+            if self._agent_has_charge_reservation(agent):
+                continue
+            if self._nearest_charging_station_index(agent.pos) == int(station_idx):
+                queue_len += 1
+            elif (
+                np.linalg.norm(agent.goal - station_pos)
+                <= self.charge_queue_radius + self.goal_tolerance
+            ):
+                queue_len += 1
+        return queue_len
+
     def _charging_station_features(self):
         scale = self._space_scale() + eps
-        station_center = np.mean(self.charging_station_positions, axis=0)
-        return (station_center / scale).astype(np.float32)
+        features = []
+        capacity = max(1, int(self.charging_capacity))
+        for station_idx, station_pos in enumerate(self.charging_station_positions):
+            slots = self.charging_slot_reservations.get(station_idx, [])
+            reserved = float(sum(holder is not None for holder in slots))
+            free_ratio = float(max(0.0, capacity - reserved) / capacity)
+            reserved_ratio = float(reserved / capacity)
+            queue_ratio = float(self._station_queue_length(station_idx)) / float(
+                max(1, self.num_agents)
+            )
+            features.extend(
+                [
+                    station_pos / scale,
+                    np.array(
+                        [
+                            free_ratio,
+                            reserved_ratio,
+                            queue_ratio,
+                            self.charging_rate / (self.initial_energy + eps),
+                        ],
+                        dtype=np.float32,
+                    ),
+                ]
+            )
+        return np.concatenate(features).astype(np.float32)
+
+    def _charging_station_features_for_agent(self, agent):
+        scale = self._space_scale() + eps
+        features = []
+        capacity = max(1, int(self.charging_capacity))
+        for station_idx, station_pos in enumerate(self.charging_station_positions):
+            slots = self.charging_slot_reservations.get(station_idx, [])
+            reserved = float(sum(holder is not None for holder in slots))
+            free_ratio = float(max(0.0, capacity - reserved) / capacity)
+            reserved_ratio = float(reserved / capacity)
+            queue_ratio = float(self._station_queue_length(station_idx)) / float(
+                max(1, self.num_agents)
+            )
+            delta = (station_pos - agent.pos) / scale
+            features.extend(
+                [
+                    delta,
+                    np.array(
+                        [
+                            free_ratio,
+                            reserved_ratio,
+                            queue_ratio,
+                            self.charging_rate / (agent.initial_energy + eps),
+                        ],
+                        dtype=np.float32,
+                    ),
+                ]
+            )
+        return np.concatenate(features).astype(np.float32)
 
     def _order_target_for_agent(self, agent):
         slot_idx = agent.assigned_order_slot
@@ -1511,6 +1893,7 @@ class UAVEnv:
                 self._target_delta_features(agent, self._order_target_for_agent(agent)),
                 self._target_delta_features(agent, self._assigned_target_for_agent(agent)),
                 charging_delta,
+                self._charging_station_features_for_agent(agent),
                 np.concatenate(other_features).astype(np.float32),
                 self._relative_order_slot_features(agent),
                 lasers,
@@ -1561,8 +1944,31 @@ class UAVEnv:
         return mask
 
     def get_high_level_avail_agent_actions(self, agent_id):
-        del agent_id
-        return np.ones(self.high_level_n_actions, dtype=np.float32)
+        agent = self.agents[int(agent_id)]
+        avail = np.zeros(self.high_level_mode_n_actions, dtype=np.float32)
+        if not agent.has_energy():
+            return avail
+        if self._agent_order_locked(agent):
+            avail[HIGH_MODE_ORDER] = 1.0
+            return avail
+        if self._agent_charge_locked(agent):
+            avail[HIGH_MODE_CHARGE] = 1.0
+            return avail
+
+        avail[HIGH_MODE_CHARGE] = 1.0
+        selected_order_ok = (
+            self._has_selected_order_for_agent(agent)
+            and self._selected_order_energy_feasible(agent)
+        )
+        available_order_ok = (
+            self._has_available_order()
+            and self._has_energy_feasible_available_order(agent)
+        )
+        if selected_order_ok or available_order_ok:
+            avail[HIGH_MODE_ORDER] = 1.0
+        if np.sum(avail) <= 0.0:
+            avail[HIGH_MODE_CHARGE] = 1.0
+        return avail
 
     def get_high_level_avail_actions(self):
         return np.stack(
@@ -1585,29 +1991,20 @@ class UAVEnv:
             dtype=np.float32,
         )
 
-    def get_high_level_energy_consequences(self):
-        consequences = []
-        scale_norm = float(np.linalg.norm(self._space_scale()) + eps)
-        for agent in self.agents:
-            energy_ratio = float(agent.energy / (agent.initial_energy + eps))
-            margin = float(self._energy_margin_order_for_agent(agent))
-            charge_dist = float(
-                self._distance_to_nearest_charging_station_from_pos(agent.pos)
-                / scale_norm
-            )
-            reserved = float(self._agent_has_charge_reservation(agent))
-            feasible = float(
-                energy_ratio > eps
-                and (
-                    margin >= 0.0
-                    or agent.current_task_type == TASK_CHARGE
-                    or self._agent_ready_to_charge(agent)
-                )
-            )
-            consequences.append(
-                [energy_ratio, margin, charge_dist, reserved, feasible]
-            )
-        return np.asarray(consequences, dtype=np.float32)
+    def get_agent_energy_ratios(self):
+        return np.asarray(
+            [
+                [agent.energy / (agent.initial_energy + eps)]
+                for agent in self.agents
+            ],
+            dtype=np.float32,
+        )
+
+    def get_agent_completed_order_counts(self):
+        return np.asarray(
+            [[float(agent.completed_orders)] for agent in self.agents],
+            dtype=np.float32,
+        )
 
     def get_high_level_mode_training_mask(self):
         return np.asarray(self._last_high_mode_train_mask, dtype=np.float32).copy()
@@ -1620,10 +2017,55 @@ class UAVEnv:
                 if agent.current_task_type == TASK_CHARGE
                 else HIGH_MODE_ORDER
             )
+            budget_scalar = self._budget_scalar_from_ratio(
+                getattr(agent, "high_energy_budget_ratio", 0.0)
+            )
+            if self.high_goal_style in {
+                "line_lateral",
+                "target_relative",
+                "free_relative",
+            }:
+                max_dist = self._max_reachable_subgoal_distance(agent)
+                if self.high_goal_style in {"line_lateral", "target_relative"}:
+                    target = getattr(agent, "task_target", None)
+                    delta = self._target_relative_action_from_displacement(
+                        agent.pos,
+                        agent.subgoal,
+                        target,
+                        np.concatenate(
+                            [
+                                np.array([mode_value], dtype=np.float32),
+                                self._default_relative_goal_action(agent, target),
+                                np.array([budget_scalar], dtype=np.float32),
+                            ]
+                        ),
+                    )[1 : 1 + self.dim_actions]
+                else:
+                    delta = (agent.subgoal - agent.pos) / (max_dist + eps)
+                    delta = np.clip(delta, -1.0, 1.0)
+                if agent.current_task_type not in (TASK_CHARGE, TASK_ORDER):
+                    delta = np.zeros(self.dim_actions, dtype=np.float32)
+                actions.append(
+                    np.concatenate(
+                        [
+                            np.array([mode_value], dtype=np.float32),
+                            delta.astype(np.float32),
+                            np.array([budget_scalar], dtype=np.float32),
+                        ]
+                    )
+                )
+                continue
             target = getattr(agent, "task_target", None)
             if target is None:
                 actions.append(
-                    np.array([mode_value, 0.0], dtype=np.float32)
+                    np.array(
+                        [
+                            mode_value,
+                            0.0,
+                            budget_scalar,
+                        ],
+                        dtype=np.float32,
+                    )
                 )
                 continue
             target = np.asarray(target, dtype=np.float32)[: self.dim_actions]
@@ -1633,7 +2075,14 @@ class UAVEnv:
             line_length = min(target_dist, max_dist)
             if line_length <= eps:
                 actions.append(
-                    np.array([mode_value, 0.0], dtype=np.float32)
+                    np.array(
+                        [
+                            mode_value,
+                            0.0,
+                            budget_scalar,
+                        ],
+                        dtype=np.float32,
+                    )
                 )
                 continue
             direction = to_target / (target_dist + eps)
@@ -1648,7 +2097,14 @@ class UAVEnv:
             if agent.current_task_type not in (TASK_CHARGE, TASK_ORDER):
                 progress_scalar = 0.0
             actions.append(
-                np.array([mode_value, progress_scalar], dtype=np.float32)
+                np.array(
+                    [
+                        mode_value,
+                        progress_scalar,
+                        budget_scalar,
+                    ],
+                    dtype=np.float32,
+                )
             )
         return np.stack(actions, axis=0)
 
@@ -1669,7 +2125,7 @@ class UAVEnv:
                 action_contexts.append(None)
                 continue
 
-            mode_id, progress_scalar = self._parse_high_level_action(action)
+            mode_id, goal_action, budget_scalar = self._parse_high_level_action(action)
             task_target = self._order_target_for_agent(agent)
             self._maybe_set_greedy_order_slot(agent)
             if task_target is None:
@@ -1732,7 +2188,8 @@ class UAVEnv:
             action_contexts.append(
                 {
                     "mode_id": mode_id,
-                    "progress_scalar": progress_scalar,
+                    "goal_action": goal_action,
+                    "budget_scalar": budget_scalar,
                     "task_target": task_target,
                     "order_locked": order_locked,
                     "charge_locked": charge_locked,
@@ -1753,7 +2210,8 @@ class UAVEnv:
 
             context = action_contexts[agent_idx]
             mode_id = context["mode_id"]
-            progress_scalar = context["progress_scalar"]
+            goal_action = context["goal_action"]
+            budget_scalar = context["budget_scalar"]
             self.high_diag_decision_count += 1.0
             if mode_id == HIGH_MODE_CHARGE:
                 self.high_diag_sampled_charge += 1.0
@@ -1824,24 +2282,82 @@ class UAVEnv:
 
             if task_type == TASK_CHARGE:
                 self.high_diag_executed_charge += 1.0
-                progress_scalar = 1.0
+                if self.high_goal_style == "line":
+                    goal_action = 1.0
+                elif self.high_goal_style == "line_lateral":
+                    goal_action = self._default_relative_goal_action(agent, task_target)
             elif task_type == TASK_ORDER:
                 self.high_diag_executed_order += 1.0
-                if self.order_progress_override is not None:
-                    progress_scalar = self.order_progress_override
+                if self.high_goal_style == "line" and self.order_progress_override is not None:
+                    goal_action = self.order_progress_override
+                elif (
+                    self.high_goal_style == "line_lateral"
+                    and self.order_progress_override is not None
+                ):
+                    goal_action = np.asarray(goal_action, dtype=np.float32).reshape(-1)
+                    if goal_action.size < self.dim_actions:
+                        goal_action = np.pad(
+                            goal_action, (0, self.dim_actions - goal_action.size)
+                        )
+                    goal_action[0] = self.order_progress_override
             else:
                 self.high_diag_executed_idle += 1.0
+            if self.high_goal_style in {
+                "line_lateral",
+                "target_relative",
+                "free_relative",
+            }:
+                forced_charge = (
+                    task_type == TASK_CHARGE
+                    and (
+                        mode_id != HIGH_MODE_CHARGE
+                        or energy_blocked_order
+                        or should_charge_fallback
+                    )
+                )
+                forced_order = task_type == TASK_ORDER and mode_id != HIGH_MODE_ORDER
+                if forced_charge or forced_order:
+                    goal_action = self._default_relative_goal_action(agent, task_target)
             self.high_diag_mode_train_mask_sum += float(
                 mode_train_mask[agent_idx, 0]
             )
             self.high_diag_mode_train_mask_count += 1.0
 
-            self._set_agent_subgoal_on_target_line(
-                agent,
-                np.array([progress_scalar], dtype=np.float32),
-                task_type=task_type,
-                task_target=task_target,
-            )
+            self._set_agent_energy_budget(agent, budget_scalar)
+            if self.high_goal_style in {"target_relative", "free_relative"}:
+                if task_type == TASK_IDLE:
+                    relative_goal = np.zeros(self.dim_actions, dtype=np.float32)
+                elif self.high_goal_style == "target_relative":
+                    relative_goal = self._target_relative_goal_delta(
+                        agent, goal_action, task_target
+                    )
+                else:
+                    relative_goal = np.asarray(goal_action, dtype=np.float32).reshape(-1)
+                    if relative_goal.size < self.dim_actions:
+                        relative_goal = np.pad(
+                            relative_goal, (0, self.dim_actions - relative_goal.size)
+                        )
+                    relative_goal = relative_goal[: self.dim_actions]
+                self._set_agent_subgoal_from_delta(
+                    agent,
+                    relative_goal,
+                    task_type=task_type,
+                    task_target=task_target,
+                )
+            elif self.high_goal_style == "line_lateral":
+                self._set_agent_subgoal_on_target_line(
+                    agent,
+                    np.asarray(goal_action, dtype=np.float32).reshape(-1),
+                    task_type=task_type,
+                    task_target=task_target,
+                )
+            else:
+                self._set_agent_subgoal_on_target_line(
+                    agent,
+                    np.array([float(goal_action)], dtype=np.float32),
+                    task_type=task_type,
+                    task_target=task_target,
+                )
 
         self._sync_order_lists()
         self._last_high_mode_train_mask = mode_train_mask
@@ -2036,10 +2552,57 @@ class UAVEnv:
             return self._charge_dock_target(station_idx, slot_idx)
         return self._charge_wait_target(agent, charge_rank)
 
-    def _consume_step_energy(self, powered_mask):
-        for is_powered, agent in zip(powered_mask, self.agents):
+    def _compute_step_energy(self, agent, acceleration):
+        if self.energy_model == "fixed":
+            return float(self.energy_decay_per_step)
+
+        acceleration = np.asarray(acceleration, dtype=np.float32)[
+            : self.dim_actions
+        ]
+        velocity = np.asarray(agent.vel, dtype=np.float32)[: self.dim_actions]
+        speed_sq = float(np.dot(velocity, velocity))
+        accel_sq = float(np.dot(acceleration, acceleration))
+        payload = float(bool(getattr(agent, "carrying_order", False)))
+        power = (
+            self.energy_idle_coef
+            + self.energy_speed_coef * speed_sq
+            + self.energy_accel_coef * accel_sq
+            + self.energy_payload_coef * payload
+        )
+        return max(0.0, float(power) * self.time_step)
+
+    def _consume_step_energy(self, powered_mask, actions):
+        self._last_step_energy_ratio = np.zeros(self.num_agents, dtype=np.float32)
+        self._last_budget_overuse_ratio = np.zeros(self.num_agents, dtype=np.float32)
+        for agent_idx, (is_powered, agent, action) in enumerate(
+            zip(powered_mask, self.agents, actions)
+        ):
             if is_powered:
-                agent.consume_energy(self.energy_decay_per_step)
+                step_energy = self._compute_step_energy(agent, action)
+                self._last_step_energy_ratio[agent_idx] = float(
+                    step_energy / (agent.initial_energy + eps)
+                )
+                if self.low_energy_budget_enabled:
+                    remaining = float(
+                        max(0.0, getattr(agent, "high_energy_budget_remaining", 0.0))
+                    )
+                    steps_remaining = int(
+                        max(1, getattr(agent, "high_energy_budget_steps_remaining", 1))
+                    )
+                    allowance = remaining / float(steps_remaining)
+                    self._last_budget_overuse_ratio[agent_idx] = float(
+                        max(0.0, step_energy - allowance)
+                        / (agent.initial_energy + eps)
+                    )
+                    agent.high_energy_budget_remaining = max(
+                        0.0,
+                        remaining - step_energy,
+                    )
+                    agent.high_energy_budget_steps_remaining = max(
+                        0,
+                        steps_remaining - 1,
+                    )
+                agent.consume_energy(step_energy)
 
     def _charge_agents_at_station(self):
         self._refresh_charge_reservations()
@@ -2082,6 +2645,8 @@ class UAVEnv:
             self.current_step = 0
             self.safe_value = np.zeros(self.num_agents, dtype=np.float32)
             self.reward_safe_value = np.zeros(self.num_agents, dtype=np.float32)
+            self._last_step_energy_ratio = np.zeros(self.num_agents, dtype=np.float32)
+            self._last_budget_overuse_ratio = np.zeros(self.num_agents, dtype=np.float32)
             self.collision_count = 0.0
             self.obstacle_collision_count = 0.0
             self.agent_collision_count = 0.0
@@ -2677,7 +3242,7 @@ class UAVEnv:
         for agent in self.agents:
             agent.pos = agent.prev_pos.copy()
 
-        self._consume_step_energy(powered_mask)
+        self._consume_step_energy(powered_mask, actions)
         self._charge_agents_at_station()
         self.update_lasers()
 
@@ -2862,6 +3427,44 @@ class UAVEnv:
             np.float32
         )
 
+    def get_current_task_targets(self):
+        targets = []
+        for agent in self.agents:
+            target = getattr(agent, "task_target", None)
+            if target is None:
+                target = agent.subgoal
+            targets.append(np.asarray(target, dtype=np.float32)[: self.dim_actions].copy())
+        return np.stack(targets, axis=0).astype(np.float32)
+
+    def hiro_correct_high_level_actions(
+        self, start_positions, end_positions, actions, task_targets=None
+    ):
+        actions = np.asarray(actions, dtype=np.float32).reshape(
+            self.num_agents, self.high_level_n_actions
+        )
+        if self.high_goal_style != "target_relative":
+            return actions.copy()
+        start_positions = np.asarray(start_positions, dtype=np.float32).reshape(
+            self.num_agents, self.dim_actions
+        )
+        end_positions = np.asarray(end_positions, dtype=np.float32).reshape(
+            self.num_agents, self.dim_actions
+        )
+        if task_targets is None:
+            task_targets = self.get_current_task_targets()
+        task_targets = np.asarray(task_targets, dtype=np.float32).reshape(
+            self.num_agents, self.dim_actions
+        )
+        corrected = actions.copy()
+        for agent_idx in range(self.num_agents):
+            corrected[agent_idx] = self._target_relative_action_from_displacement(
+                start_positions[agent_idx],
+                end_positions[agent_idx],
+                task_targets[agent_idx],
+                actions[agent_idx],
+            )
+        return corrected.astype(np.float32)
+
     def get_subgoal_distances(self, targets=None):
         if targets is None:
             targets = self.get_current_subgoals()
@@ -2913,6 +3516,11 @@ class UAVEnv:
                 [float(agent.collided) for agent in self.agents], dtype=np.float32
             )
             rewards -= self.intrinsic_collision_penalty * collision_mask
+        if self.low_energy_budget_enabled and self.low_energy_budget_overuse_coef > 0.0:
+            rewards -= (
+                self.low_energy_budget_overuse_coef
+                * np.asarray(self._last_budget_overuse_ratio, dtype=np.float32)
+            )
         rewards -= 0.2 * np.asarray(self.reward_safe_value, dtype=np.float32)
         return (self.intrinsic_reward_scale * rewards).astype(np.float32)
 
@@ -2949,12 +3557,28 @@ class UAVEnv:
                 [agent.energy / (agent.initial_energy + eps)],
                 dtype=np.float32,
             )
+            budget_remaining = float(
+                getattr(agent, "high_energy_budget_remaining", 0.0)
+                / (agent.initial_energy + eps)
+            )
+            budget_steps = float(
+                getattr(agent, "high_energy_budget_steps_remaining", 0)
+                / float(max(1, self.meta_period))
+            )
+            budget_features = np.array(
+                [
+                    np.clip(budget_remaining, 0.0, 1.0),
+                    np.clip(budget_steps, 0.0, 1.0),
+                ],
+                dtype=np.float32,
+            )
             obs = np.concatenate(
                 [
                     own,
                     np.asarray(agent.lasers, dtype=np.float32),
                     self._goal_features(agent),
                     energy,
+                    budget_features,
                 ]
             )
             observations.append(obs.astype(np.float32))
@@ -3058,6 +3682,22 @@ class UAVEnv:
             "depleted_agents": float(self.num_agents - powered_agents),
             "mean_energy": mean_energy,
             "energy_decay_per_step": float(self.energy_decay_per_step),
+            "energy_model_dynamic": float(self.energy_model == "dynamic"),
+            "energy_idle_coef": float(self.energy_idle_coef),
+            "energy_speed_coef": float(self.energy_speed_coef),
+            "energy_accel_coef": float(self.energy_accel_coef),
+            "energy_payload_coef": float(self.energy_payload_coef),
+            "low_energy_budget_enabled": float(self.low_energy_budget_enabled),
+            "low_energy_step_ratio_mean": float(
+                np.mean(self._last_step_energy_ratio)
+                if self._last_step_energy_ratio.size
+                else 0.0
+            ),
+            "low_energy_budget_overuse_mean": float(
+                np.mean(self._last_budget_overuse_ratio)
+                if self._last_budget_overuse_ratio.size
+                else 0.0
+            ),
             "charging_station_count": float(self.charging_station_count),
             "charging_capacity": float(self.charging_capacity),
             "total_charging_capacity": float(
@@ -3138,6 +3778,15 @@ class UAVEnv:
                     "subgoal": agent.subgoal.copy(),
                     "original_subgoal": agent.original_subgoal.copy(),
                     "subgoal_test": bool(agent.subgoal_test),
+                    "high_energy_budget_ratio": float(
+                        getattr(agent, "high_energy_budget_ratio", 0.0)
+                    ),
+                    "high_energy_budget_remaining": float(
+                        getattr(agent, "high_energy_budget_remaining", 0.0)
+                    ),
+                    "high_energy_budget_steps_remaining": int(
+                        getattr(agent, "high_energy_budget_steps_remaining", 0)
+                    ),
                     "carrying_order": bool(agent.carrying_order),
                     "current_task_type": int(agent.current_task_type),
                     "completed_orders": int(agent.completed_orders),
@@ -3236,6 +3885,15 @@ class UAVEnv:
             agent.subgoal = state.get("subgoal", agent.goal).copy()
             agent.original_subgoal = state.get("original_subgoal", agent.subgoal).copy()
             agent.subgoal_test = bool(state.get("subgoal_test", False))
+            agent.high_energy_budget_ratio = float(
+                state.get("high_energy_budget_ratio", 0.0)
+            )
+            agent.high_energy_budget_remaining = float(
+                state.get("high_energy_budget_remaining", 0.0)
+            )
+            agent.high_energy_budget_steps_remaining = int(
+                state.get("high_energy_budget_steps_remaining", 0)
+            )
             agent.carrying_order = bool(state.get("carrying_order", False))
             default_task_type = (
                 TASK_ORDER if agent.assigned_order_id is not None else TASK_IDLE
@@ -3742,6 +4400,11 @@ class UAVEnvDiscreteWrapper:
         initial_energy=default_initial_energy,
         energy_decay_per_step=None,
         energy_depletion_fraction=default_energy_depletion_fraction,
+        energy_model="fixed",
+        energy_idle_coef=None,
+        energy_speed_coef=2.0,
+        energy_accel_coef=30.0,
+        energy_payload_coef=0.1,
         charging_capacity=default_charging_capacity,
         charging_station_count=default_charging_station_count,
         charging_radius=default_charging_radius,
@@ -3749,6 +4412,8 @@ class UAVEnvDiscreteWrapper:
         charging_station_pos=None,
         charge_mode_fraction=0.5,
         charge_dense_reward_scale=1.0,
+        high_goal_style="line",
+        high_lateral_scale=0.35,
         auction_enabled=True,
         fixed_charge_threshold_enabled=False,
         fixed_charge_threshold=0.35,
@@ -3770,6 +4435,11 @@ class UAVEnvDiscreteWrapper:
             initial_energy=initial_energy,
             energy_decay_per_step=energy_decay_per_step,
             energy_depletion_fraction=energy_depletion_fraction,
+            energy_model=energy_model,
+            energy_idle_coef=energy_idle_coef,
+            energy_speed_coef=energy_speed_coef,
+            energy_accel_coef=energy_accel_coef,
+            energy_payload_coef=energy_payload_coef,
             charging_capacity=charging_capacity,
             charging_station_count=charging_station_count,
             charging_radius=charging_radius,
@@ -3777,6 +4447,8 @@ class UAVEnvDiscreteWrapper:
             charging_station_pos=charging_station_pos,
             charge_mode_fraction=charge_mode_fraction,
             charge_dense_reward_scale=charge_dense_reward_scale,
+            high_goal_style=high_goal_style,
+            high_lateral_scale=high_lateral_scale,
             auction_enabled=auction_enabled,
             fixed_charge_threshold_enabled=fixed_charge_threshold_enabled,
             fixed_charge_threshold=fixed_charge_threshold,
@@ -4024,9 +4696,6 @@ class UAVEnvDiscreteWrapper:
             "high_level_mode_n_actions": int(self.env.high_level_mode_n_actions),
             "high_level_obs_shape": int(self.env.get_high_level_obs().shape[-1]),
             "high_level_state_shape": int(self.env.get_high_level_state().shape[-1]),
-            "high_energy_consequence_shape": int(
-                self.env.get_high_level_energy_consequences().shape[-1]
-            ),
             "low_task_shape": int(self.env.low_task_shape),
             "max_active_orders": int(self.env.max_active_orders),
             "charge_action_id": int(self.env.charge_action_id),
@@ -4070,8 +4739,11 @@ class UAVEnvDiscreteWrapper:
     def get_high_level_energy_order_masks(self):
         return self.env.get_high_level_energy_order_masks()
 
-    def get_high_level_energy_consequences(self):
-        return self.env.get_high_level_energy_consequences()
+    def get_agent_energy_ratios(self):
+        return self.env.get_agent_energy_ratios()
+
+    def get_agent_completed_order_counts(self):
+        return self.env.get_agent_completed_order_counts()
 
     def get_current_high_level_actions(self):
         return self.env.get_current_high_level_actions()
@@ -4089,6 +4761,16 @@ class UAVEnvDiscreteWrapper:
 
     def get_current_subgoals(self):
         return self.env.get_current_subgoals()
+
+    def get_current_task_targets(self):
+        return self.env.get_current_task_targets()
+
+    def hiro_correct_high_level_actions(
+        self, start_positions, end_positions, actions, task_targets=None
+    ):
+        return self.env.hiro_correct_high_level_actions(
+            start_positions, end_positions, actions, task_targets=task_targets
+        )
 
     def get_subgoal_distances(self, targets=None):
         return self.env.get_subgoal_distances(targets)
@@ -4154,6 +4836,8 @@ class UAVParallelEnv:
         charging_radius=default_charging_radius,
         charging_rate=None,
         charging_station_pos=None,
+        high_goal_style="line",
+        high_lateral_scale=0.35,
         auction_enabled=True,
         fixed_charge_threshold_enabled=False,
         fixed_charge_threshold=0.35,
@@ -4194,6 +4878,8 @@ class UAVParallelEnv:
             charging_radius=charging_radius,
             charging_rate=charging_rate,
             charging_station_pos=charging_station_pos,
+            high_goal_style=high_goal_style,
+            high_lateral_scale=high_lateral_scale,
             auction_enabled=auction_enabled,
             fixed_charge_threshold_enabled=fixed_charge_threshold_enabled,
             fixed_charge_threshold=fixed_charge_threshold,
@@ -4352,8 +5038,11 @@ class UAVParallelEnv:
     def get_high_level_energy_order_masks(self):
         return self.base_env.get_high_level_energy_order_masks()
 
-    def get_high_level_energy_consequences(self):
-        return self.base_env.get_high_level_energy_consequences()
+    def get_agent_energy_ratios(self):
+        return self.base_env.get_agent_energy_ratios()
+
+    def get_agent_completed_order_counts(self):
+        return self.base_env.get_agent_completed_order_counts()
 
     def get_current_high_level_actions(self):
         return self.base_env.get_current_high_level_actions()
@@ -4374,6 +5063,16 @@ class UAVParallelEnv:
 
     def get_current_subgoals(self):
         return self.base_env.get_current_subgoals()
+
+    def get_current_task_targets(self):
+        return self.base_env.get_current_task_targets()
+
+    def hiro_correct_high_level_actions(
+        self, start_positions, end_positions, actions, task_targets=None
+    ):
+        return self.base_env.hiro_correct_high_level_actions(
+            start_positions, end_positions, actions, task_targets=task_targets
+        )
 
     def get_subgoal_distances(self, targets=None):
         return self.base_env.get_subgoal_distances(targets)
@@ -4417,6 +5116,8 @@ def parallel_env(
     charging_radius=default_charging_radius,
     charging_rate=None,
     charging_station_pos=None,
+    high_goal_style="line",
+    high_lateral_scale=0.35,
     auction_enabled=True,
     fixed_charge_threshold_enabled=False,
     fixed_charge_threshold=0.35,
@@ -4448,6 +5149,8 @@ def parallel_env(
         charging_radius=charging_radius,
         charging_rate=charging_rate,
         charging_station_pos=charging_station_pos,
+        high_goal_style=high_goal_style,
+        high_lateral_scale=high_lateral_scale,
         auction_enabled=auction_enabled,
         fixed_charge_threshold_enabled=fixed_charge_threshold_enabled,
         fixed_charge_threshold=fixed_charge_threshold,

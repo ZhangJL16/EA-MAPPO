@@ -94,6 +94,9 @@ UAV_DELIVERY_CSV_COLUMNS = [
     "powered_agents",
     "depleted_agents",
     "mean_energy",
+    "low_energy_budget_enabled",
+    "low_energy_step_ratio_mean",
+    "low_energy_budget_overuse_mean",
     "charging_agents",
     "mean_goal_distance",
     "healthy_agents",
@@ -159,20 +162,13 @@ UAV_DELIVERY_DIAGNOSTIC_KEYS = [
     "order_collision_rate",
     "charge_collision_rate",
     "idle_collision_rate",
-    "ecf_con_loss",
-    "ecf_feas_loss",
-    "ecf_policy_loss",
-    "ecf_charge_need_loss",
-    "ecf_q_charge",
-    "ecf_q_order",
-    "ecf_feas_target",
-    "ecf_charge_need_target",
-    "td_energy_loss",
-    "td_energy_cost",
-    "td_energy_mu_charge",
-    "td_energy_mu_order",
-    "td_energy_std_order",
-    "td_energy_lambda",
+    "low_energy_budget_enabled",
+    "low_energy_step_ratio_mean",
+    "low_energy_budget_overuse_mean",
+    "ecm_loss",
+    "ecm_reg_loss",
+    "ecm_cls_loss",
+    "ecm_policy_loss",
 ]
 
 UAV_DELIVERY_CSV_COLUMNS = (
@@ -662,6 +658,9 @@ class Runner:
             self._delivery_summary_float(summary, "powered_agents"),
             self._delivery_summary_float(summary, "depleted_agents"),
             self._delivery_summary_float(summary, "mean_energy"),
+            self._delivery_summary_float(summary, "low_energy_budget_enabled"),
+            self._delivery_summary_float(summary, "low_energy_step_ratio_mean"),
+            self._delivery_summary_float(summary, "low_energy_budget_overuse_mean"),
             self._delivery_summary_float(summary, "charging_agents"),
             self._delivery_summary_float(summary, "mean_goal_distance"),
             self._delivery_summary_float(summary, "healthy_agents"),
@@ -949,8 +948,9 @@ class Runner:
             self.episode_rewards.append(episode_reward)
             for key in summary.keys():
                 self.smac_summary.setdefault(key, []).append(summary[key])
-            self.plt(num)
-            self.plt_smac(num, self.args)
+            if self.args.map not in UAV_DELIVERY_MAPS:
+                self.plt(num)
+                self.plt_smac(num, self.args)
             self._log_eval_summary(summary, time_steps=time_steps, train_steps=train_steps)
 
     def add_metrics(self):

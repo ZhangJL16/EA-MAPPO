@@ -152,7 +152,6 @@ def configure_env_and_args(args):
     args.high_level_mode_n_actions = env_info.get("high_level_mode_n_actions", 0)
     args.high_level_obs_shape = env_info.get("high_level_obs_shape", 0)
     args.high_level_state_shape = env_info.get("high_level_state_shape", 0)
-    args.high_energy_consequence_shape = env_info.get("high_energy_consequence_shape", 5)
     args.low_task_shape = env_info.get("low_task_shape", 0)
     args.max_active_orders = env_info.get(
         "max_active_orders", getattr(args, "uav_max_active_orders", 0)
@@ -175,9 +174,13 @@ def maybe_set_hrl_parameters(env, args):
                 args, "hrl_delivery_intrinsic_progress_bonus", None
             ),
             intrinsic_collision_penalty=getattr(args, "hrl_intrinsic_collision_penalty", None),
+            high_goal_style=getattr(args, "hrl_high_goal_style", None),
+            high_lateral_scale=getattr(args, "hrl_high_lateral_scale", None),
             order_progress_override=getattr(args, "hrl_order_progress_override", None),
             energy_shield_enabled=getattr(args, "hrl_energy_shield_enabled", None),
             energy_margin_reserve_ratio=getattr(args, "hrl_energy_margin_reserve_ratio", None),
+            charge_energy_threshold=getattr(args, "hrl_charge_energy_threshold", None),
+            charge_release_threshold=getattr(args, "hrl_charge_release_threshold", None),
             charge_queue_enabled=getattr(args, "hrl_charge_queue_enabled", None),
             charge_queue_radius=getattr(args, "hrl_charge_queue_radius", None),
         )

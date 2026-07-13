@@ -40,100 +40,6 @@ SMAC_MAPS = [
 SMAC_SAFE_DISABLED_ALGS = set()
 
 
-def _summary_delta(start_summary, end_summary, key):
-    try:
-        return float(end_summary.get(key, 0.0)) - float(start_summary.get(key, 0.0))
-    except Exception:
-        return 0.0
-
-
-def _summary_snapshot(env):
-    if hasattr(env, "summary"):
-        return dict(env.summary())
-    return {}
-
-
-def _build_energy_consequence_target(
-    start_consequence,
-    end_consequence,
-    high_actions,
-    high_reward=None,
-    start_summary=None,
-    end_summary=None,
-    utility_target_enabled=True,
-    charge_margin=0.03,
-    reward_threshold=0.0,
-):
-    start = np.asarray(start_consequence, dtype=np.float32)
-    end = np.asarray(end_consequence, dtype=np.float32)
-    actions = np.asarray(high_actions, dtype=np.float32)
-    if start.shape != end.shape or end.ndim != 2 or end.shape[-1] < 5:
-        return end
-
-    target = np.zeros_like(end, dtype=np.float32)
-    start_energy = start[:, 0]
-    end_energy = end[:, 0]
-    start_margin = start[:, 1]
-    start_charge_dist = start[:, 2]
-    end_charge_dist = end[:, 2]
-    energy_delta = end_energy - start_energy
-    charge_progress = start_charge_dist - end_charge_dist
-    reserved = end[:, 3]
-    survived = end_energy > 1e-6
-    if actions.ndim == 2 and actions.shape[1] > 0:
-        mode = np.rint(actions[:, 0]).astype(np.int32)
-    else:
-        mode = np.ones(end.shape[0], dtype=np.int32)
-
-    charge_needed = start_margin < float(charge_margin)
-    charge_success = survived & (
-        (energy_delta > 0.01)
-        | (charge_needed & ((reserved > 0.5) | (charge_progress > 0.03)))
-    )
-    order_energy_safe = survived & (end[:, 1] >= 0.0)
-
-    if utility_target_enabled:
-        if high_reward is None:
-            reward_utility = np.zeros(end.shape[0], dtype=np.float32)
-        else:
-            reward_utility = np.asarray(high_reward, dtype=np.float32).reshape(-1)
-            if reward_utility.size != end.shape[0]:
-                reward_utility = np.resize(reward_utility, end.shape[0]).astype(np.float32)
-
-        start_summary = start_summary or {}
-        end_summary = end_summary or {}
-        task_progress = (
-            1.0 * _summary_delta(start_summary, end_summary, "orders_completed")
-            + 0.5 * _summary_delta(start_summary, end_summary, "picked_orders")
-            + 0.5 * _summary_delta(
-                start_summary, end_summary, "order_pickup_success_count"
-            )
-            + 1.0 * _summary_delta(
-                start_summary, end_summary, "order_delivery_success_count"
-            )
-        )
-        collision_delta = (
-            _summary_delta(start_summary, end_summary, "agent_collision_count")
-            + _summary_delta(start_summary, end_summary, "obstacle_collision_count")
-        )
-        utility_good = (
-            (reward_utility >= float(reward_threshold))
-            | (task_progress > 0.0 and collision_delta <= 0.0)
-        )
-        order_success = order_energy_safe & utility_good
-    else:
-        order_success = order_energy_safe
-
-    feasible = np.where(mode == 0, charge_success, order_success).astype(np.float32)
-
-    target[:, 0] = end_energy
-    target[:, 1] = np.clip(energy_delta, -1.0, 1.0)
-    target[:, 2] = np.clip(end_charge_dist, 0.0, 1.0)
-    target[:, 3] = reserved
-    target[:, 4] = feasible
-    return target
-
-
 def smac_safe_enabled(args):
     return (
         getattr(args, "map", None) in SMAC_MAPS
@@ -357,6 +263,22 @@ class RolloutWorker:
                 intrinsic_collision_penalty=getattr(
                     self.args, "hrl_intrinsic_collision_penalty", None
                 ),
+                low_energy_budget_enabled=getattr(
+                    self.args, "hrl_low_energy_budget_enabled", None
+                ),
+                low_energy_budget_min_ratio=getattr(
+                    self.args, "hrl_low_energy_budget_min_ratio", None
+                ),
+                low_energy_budget_max_ratio=getattr(
+                    self.args, "hrl_low_energy_budget_max_ratio", None
+                ),
+                low_energy_budget_overuse_coef=getattr(
+                    self.args, "hrl_low_energy_budget_overuse_coef", None
+                ),
+                high_goal_style=getattr(self.args, "hrl_high_goal_style", None),
+                high_lateral_scale=getattr(
+                    self.args, "hrl_high_lateral_scale", None
+                ),
                 order_progress_override=getattr(
                     self.args, "hrl_order_progress_override", None
                 ),
@@ -366,6 +288,12 @@ class RolloutWorker:
                 energy_margin_reserve_ratio=getattr(
                     self.args, "hrl_energy_margin_reserve_ratio", None
                 ),
+                charge_energy_threshold=getattr(
+                    self.args, "hrl_charge_energy_threshold", None
+                ),
+                charge_release_threshold=getattr(
+                    self.args, "hrl_charge_release_threshold", None
+                ),
                 charge_queue_enabled=getattr(
                     self.args, "hrl_charge_queue_enabled", None
                 ),
@@ -373,15 +301,131 @@ class RolloutWorker:
                     self.args, "hrl_charge_queue_radius", None
                 ),
             )
-        high_o, high_s, high_u, high_r = [], [], [], []
+        high_o, high_s, high_u, high_u_raw, high_r = [], [], [], [], []
         high_avail_u, high_o_next, high_s_next = [], [], []
         high_terminate, high_padded, high_active_masks = [], [], []
         high_energy_margins, high_energy_order_masks = [], []
-        high_energy_consequences = []
         high_mode_train_masks = []
+        high_intervention_masks = []
+        high_durations = []
+        high_ecm_targets = []
+        high_hiro_u = []
+        high_low_o = []
+        high_low_u = []
+        high_low_mask = []
         hindsight_o, hindsight_mask = [], []
         current_high_transition = None
         current_high_reward = np.zeros(self.n_agents, dtype=np.float32)
+        high_ecm_target_dim = 6
+
+        def _pad_segment_array(values, shape, dtype=np.float32):
+            padded = np.zeros((meta_period, *shape), dtype=dtype)
+            mask_values = np.zeros((meta_period, self.n_agents, 1), dtype=np.float32)
+            count = min(len(values), meta_period)
+            if count > 0:
+                padded[:count] = np.asarray(values[:count], dtype=dtype)
+                mask_values[:count] = 1.0
+            return padded, mask_values
+
+        def _build_hiro_corrected_action(transition):
+            actions = np.asarray(
+                transition.get(
+                    "u", np.zeros((self.n_agents, high_action_dim), dtype=np.float32)
+                ),
+                dtype=np.float32,
+            ).reshape(self.n_agents, high_action_dim)
+            if (
+                not bool(getattr(self.args, "hrl_hiro_correction_enabled", False))
+                or not hasattr(self.env, "hiro_correct_high_level_actions")
+                or not hasattr(self.env, "get_agent_positions")
+            ):
+                return actions.copy()
+            start_positions = transition.get("start_positions", None)
+            task_targets = transition.get("task_targets", None)
+            if start_positions is None:
+                return actions.copy()
+            return np.asarray(
+                self.env.hiro_correct_high_level_actions(
+                    start_positions,
+                    self.env.get_agent_positions(),
+                    actions,
+                    task_targets=task_targets,
+                ),
+                dtype=np.float32,
+            ).reshape(self.n_agents, high_action_dim)
+
+        def _agent_energy_ratios():
+            if hasattr(self.env, "get_agent_energy_ratios"):
+                return np.asarray(
+                    self.env.get_agent_energy_ratios(), dtype=np.float32
+                ).reshape(self.n_agents, 1)
+            return np.zeros((self.n_agents, 1), dtype=np.float32)
+
+        def _agent_completed_counts():
+            if hasattr(self.env, "get_agent_completed_order_counts"):
+                return np.asarray(
+                    self.env.get_agent_completed_order_counts(), dtype=np.float32
+                ).reshape(self.n_agents, 1)
+            return np.zeros((self.n_agents, 1), dtype=np.float32)
+
+        def _high_energy_margins():
+            if hasattr(self.env, "get_high_level_energy_margins"):
+                return np.asarray(
+                    self.env.get_high_level_energy_margins(), dtype=np.float32
+                ).reshape(self.n_agents, 1)
+            return np.zeros((self.n_agents, 1), dtype=np.float32)
+
+        def _build_high_ecm_target(transition, terminated_flag=False):
+            start_energy = np.asarray(
+                transition.get("start_energy", np.zeros((self.n_agents, 1))),
+                dtype=np.float32,
+            ).reshape(self.n_agents, 1)
+            end_energy = _agent_energy_ratios()
+            end_margin = _high_energy_margins()
+            duration = float(max(1, transition.get("duration", 1)))
+            duration_ratio = np.full(
+                (self.n_agents, 1),
+                float(np.clip(duration / max(1, self.episode_limit), 0.0, 1.0)),
+                dtype=np.float32,
+            )
+            start_completed = np.asarray(
+                transition.get(
+                    "start_completed_orders", np.zeros((self.n_agents, 1))
+                ),
+                dtype=np.float32,
+            ).reshape(self.n_agents, 1)
+            completed_delta = np.maximum(0.0, _agent_completed_counts() - start_completed)
+            success = (completed_delta > 0.0).astype(np.float32)
+            if hasattr(self.env, "get_subgoal_success_mask"):
+                subgoal_success = np.asarray(
+                    self.env.get_subgoal_success_mask(transition.get("subgoals")),
+                    dtype=np.float32,
+                ).reshape(self.n_agents, 1)
+                success = np.maximum(success, subgoal_success)
+            actions = np.asarray(
+                transition.get(
+                    "u", np.zeros((self.n_agents, high_action_dim), dtype=np.float32)
+                ),
+                dtype=np.float32,
+            ).reshape(self.n_agents, high_action_dim)
+            mode = np.rint(actions[:, :1]).astype(np.float32)
+            depleted = (end_energy <= 1e-5).astype(np.float32)
+            unsafe_order = ((mode >= 0.5) & (end_margin < 0.0)).astype(np.float32)
+            violation = np.maximum(depleted, unsafe_order)
+            if terminated_flag:
+                violation = np.maximum(violation, depleted)
+            delta_energy = start_energy - end_energy
+            return np.concatenate(
+                [
+                    delta_energy,
+                    end_energy,
+                    end_margin,
+                    duration_ratio,
+                    success,
+                    violation,
+                ],
+                axis=-1,
+            ).astype(np.float32)
         terminated = False
         win_tag = False
         step = 0
@@ -466,42 +510,40 @@ class RolloutWorker:
                     high_o.append(current_high_transition["o"])
                     high_s.append(current_high_transition["s"])
                     high_u.append(current_high_transition["u"])
+                    high_u_raw.append(current_high_transition["u_raw"])
                     high_avail_u.append(current_high_transition["avail_u"])
                     high_active_masks.append(current_high_transition["active_mask"])
                     high_mode_train_masks.append(
                         current_high_transition["mode_train_mask"]
                     )
+                    high_intervention_masks.append(
+                        current_high_transition["intervention_mask"]
+                    )
+                    high_durations.append(
+                        [float(max(1, current_high_transition["duration"]))]
+                    )
+                    high_hiro_u.append(
+                        _build_hiro_corrected_action(current_high_transition)
+                    )
+                    segment_o, segment_mask = _pad_segment_array(
+                        current_high_transition.get("segment_o", []),
+                        (self.n_agents, self.obs_shape),
+                        dtype=np.float32,
+                    )
+                    segment_u, _ = _pad_segment_array(
+                        current_high_transition.get("segment_u", []),
+                        (self.n_agents, 1),
+                        dtype=np.int64,
+                    )
+                    high_low_o.append(segment_o)
+                    high_low_u.append(segment_u)
+                    high_low_mask.append(segment_mask)
                     high_energy_margins.append(current_high_transition["energy_margin"])
                     high_energy_order_masks.append(
                         current_high_transition["energy_order_mask"]
                     )
-                    high_energy_consequences.append(
-                        _build_energy_consequence_target(
-                            current_high_transition.get(
-                                "energy_consequence_start",
-                                np.zeros((self.n_agents, 5), dtype=np.float32),
-                            ),
-                            (
-                                self.env.get_high_level_energy_consequences()
-                                if hasattr(self.env, "get_high_level_energy_consequences")
-                                else np.zeros((self.n_agents, 5), dtype=np.float32)
-                            ),
-                            current_high_transition["u"],
-                            high_reward=high_reward,
-                            start_summary=current_high_transition.get(
-                                "summary_start", {}
-                            ),
-                            end_summary=_summary_snapshot(self.env),
-                            utility_target_enabled=getattr(
-                                self.args, "hrl_ecf_utility_target_enabled", True
-                            ),
-                            charge_margin=getattr(
-                                self.args, "hrl_ecf_utility_charge_margin", 0.03
-                            ),
-                            reward_threshold=getattr(
-                                self.args, "hrl_ecf_utility_reward_threshold", 0.0
-                            ),
-                        )
+                    high_ecm_targets.append(
+                        _build_high_ecm_target(current_high_transition)
                     )
                     high_r.append(high_reward)
                     high_o_next.append(self.env.get_high_level_obs())
@@ -526,9 +568,15 @@ class RolloutWorker:
                     high_energy_order_mask = np.zeros(
                         (self.n_agents, 1), dtype=np.float32
                     )
-                high_avail = np.ones(
-                    (self.n_agents, high_action_dim), dtype=np.float32
-                )
+                if hasattr(self.env, "get_high_level_avail_actions"):
+                    high_avail = np.asarray(
+                        self.env.get_high_level_avail_actions(),
+                        dtype=np.float32,
+                    )
+                else:
+                    high_avail = np.ones(
+                        (self.n_agents, high_action_dim), dtype=np.float32
+                    )
                 high_actions = []
                 use_oracle_high_level = bool(
                     getattr(self.args, "hrl_oracle_high_level", False)
@@ -542,6 +590,8 @@ class RolloutWorker:
                             high_action[0] = 1.0
                         if high_action_dim >= 2:
                             high_action[1] = 1.0
+                        if high_action_dim >= 3:
+                            high_action[2] = 0.0
                     else:
                         high_action = self.agents.choose_high_level_action(
                             high_obs[agent_id],
@@ -551,9 +601,24 @@ class RolloutWorker:
                         )
                     high_actions.append(np.asarray(high_action, dtype=np.float32))
 
+                raw_high_actions = np.asarray(high_actions, dtype=np.float32).reshape(
+                    self.n_agents, high_action_dim
+                )
                 applied_high_actions = self.env.apply_high_level_actions(high_actions)
                 if applied_high_actions is not None:
                     high_actions = np.asarray(applied_high_actions, dtype=np.float32)
+                executed_high_actions = np.asarray(
+                    high_actions, dtype=np.float32
+                ).reshape(self.n_agents, high_action_dim)
+                intervention_mask = (
+                    np.max(
+                        np.abs(executed_high_actions - raw_high_actions),
+                        axis=-1,
+                        keepdims=True,
+                    )
+                    > 1e-5
+                ).astype(np.float32)
+                intervention_mask *= active_agent_mask.reshape(self.n_agents, 1)
                 if hasattr(self.env, "get_high_level_mode_training_mask"):
                     high_mode_train_mask = self.env.get_high_level_mode_training_mask()
                 else:
@@ -570,6 +635,7 @@ class RolloutWorker:
                     "u": np.asarray(high_actions, dtype=np.float32).reshape(
                         self.n_agents, high_action_dim
                     ),
+                    "u_raw": raw_high_actions.copy(),
                     "avail_u": np.asarray(high_avail, dtype=np.float32).copy(),
                     "active_mask": active_agent_mask.reshape(
                         self.n_agents, 1
@@ -583,18 +649,28 @@ class RolloutWorker:
                     "energy_order_mask": np.asarray(
                         high_energy_order_mask, dtype=np.float32
                     ).reshape(self.n_agents, 1),
-                    "energy_consequence_start": (
-                        self.env.get_high_level_energy_consequences()
-                        if hasattr(self.env, "get_high_level_energy_consequences")
-                        else np.zeros((self.n_agents, 5), dtype=np.float32)
-                    ),
-                    "summary_start": _summary_snapshot(self.env),
                     "subgoals": (
                         self.env.get_current_subgoals()
                         if hasattr(self.env, "get_current_subgoals")
                         else None
                     ),
                     "subgoal_test": subgoal_test.reshape(self.n_agents, 1),
+                    "intervention_mask": intervention_mask.copy(),
+                    "duration": 0,
+                    "start_energy": _agent_energy_ratios().copy(),
+                    "start_completed_orders": _agent_completed_counts().copy(),
+                    "start_positions": (
+                        self.env.get_agent_positions()
+                        if hasattr(self.env, "get_agent_positions")
+                        else np.zeros((self.n_agents, 2), dtype=np.float32)
+                    ),
+                    "task_targets": (
+                        self.env.get_current_task_targets()
+                        if hasattr(self.env, "get_current_task_targets")
+                        else None
+                    ),
+                    "segment_o": [],
+                    "segment_u": [],
                 }
                 current_high_reward = np.zeros(self.n_agents, dtype=np.float32)
 
@@ -684,6 +760,14 @@ class RolloutWorker:
                 dtype=np.float32,
             ).reshape(self.n_agents, 1)
             guard_flags *= active_agent_mask.reshape(self.n_agents, 1)
+
+            if level_training and current_high_transition is not None:
+                current_high_transition.setdefault("segment_o", []).append(
+                    raw_obs.copy()
+                )
+                current_high_transition.setdefault("segment_u", []).append(
+                    np.asarray(actions, dtype=np.int64).reshape(self.n_agents, 1)
+                )
 
             reward, terminated, info = self.env.step(actions)
             log_reward = float(np.asarray(reward, dtype=np.float32).mean())
@@ -784,7 +868,12 @@ class RolloutWorker:
                         * float(np.mean(reward_values))
                         * active_agent_mask
                     )
-                current_high_reward += high_step_reward.astype(np.float32)
+                duration = int(current_high_transition.get("duration", 0))
+                current_high_reward += (
+                    (float(self.args.gamma) ** duration)
+                    * high_step_reward.astype(np.float32)
+                )
+                current_high_transition["duration"] = duration + 1
 
             if (
                 level_training
@@ -849,35 +938,32 @@ class RolloutWorker:
             high_o.append(current_high_transition["o"])
             high_s.append(current_high_transition["s"])
             high_u.append(current_high_transition["u"])
+            high_u_raw.append(current_high_transition["u_raw"])
             high_avail_u.append(current_high_transition["avail_u"])
             high_active_masks.append(current_high_transition["active_mask"])
             high_mode_train_masks.append(current_high_transition["mode_train_mask"])
+            high_intervention_masks.append(current_high_transition["intervention_mask"])
+            high_durations.append([float(max(1, current_high_transition["duration"]))])
+            high_hiro_u.append(_build_hiro_corrected_action(current_high_transition))
+            segment_o, segment_mask = _pad_segment_array(
+                current_high_transition.get("segment_o", []),
+                (self.n_agents, self.obs_shape),
+                dtype=np.float32,
+            )
+            segment_u, _ = _pad_segment_array(
+                current_high_transition.get("segment_u", []),
+                (self.n_agents, 1),
+                dtype=np.int64,
+            )
+            high_low_o.append(segment_o)
+            high_low_u.append(segment_u)
+            high_low_mask.append(segment_mask)
             high_energy_margins.append(current_high_transition["energy_margin"])
             high_energy_order_masks.append(current_high_transition["energy_order_mask"])
-            high_energy_consequences.append(
-                _build_energy_consequence_target(
-                    current_high_transition.get(
-                        "energy_consequence_start",
-                        np.zeros((self.n_agents, 5), dtype=np.float32),
-                    ),
-                    (
-                        self.env.get_high_level_energy_consequences()
-                        if hasattr(self.env, "get_high_level_energy_consequences")
-                        else np.zeros((self.n_agents, 5), dtype=np.float32)
-                    ),
-                    current_high_transition["u"],
-                    high_reward=high_reward,
-                    start_summary=current_high_transition.get("summary_start", {}),
-                    end_summary=_summary_snapshot(self.env),
-                    utility_target_enabled=getattr(
-                        self.args, "hrl_ecf_utility_target_enabled", True
-                    ),
-                    charge_margin=getattr(
-                        self.args, "hrl_ecf_utility_charge_margin", 0.03
-                    ),
-                    reward_threshold=getattr(
-                        self.args, "hrl_ecf_utility_reward_threshold", 0.0
-                    ),
+            high_ecm_targets.append(
+                _build_high_ecm_target(
+                    current_high_transition,
+                    terminated_flag=bool(terminated or step >= self.episode_limit),
                 )
             )
             high_r.append(high_reward)
@@ -936,13 +1022,22 @@ class RolloutWorker:
             high_obs_shape = int(getattr(self.args, "high_level_obs_shape", 0))
             high_state_shape = int(getattr(self.args, "high_level_state_shape", 0))
             high_n_actions = int(getattr(self.args, "high_level_n_actions", 0))
+            high_mode_n_actions = int(
+                getattr(self.args, "high_level_mode_n_actions", high_n_actions)
+            )
             for _ in range(len(high_o), self.episode_limit):
                 high_o.append(np.zeros((self.n_agents, high_obs_shape), dtype=np.float32))
                 high_s.append(np.zeros(high_state_shape, dtype=np.float32))
                 high_u.append(np.zeros((self.n_agents, high_n_actions), dtype=np.float32))
+                high_u_raw.append(
+                    np.zeros((self.n_agents, high_n_actions), dtype=np.float32)
+                )
+                high_hiro_u.append(
+                    np.zeros((self.n_agents, high_n_actions), dtype=np.float32)
+                )
                 high_r.append(np.zeros(self.n_agents, dtype=np.float32))
                 high_avail_u.append(
-                    np.zeros((self.n_agents, high_n_actions), dtype=np.float32)
+                    np.zeros((self.n_agents, high_mode_n_actions), dtype=np.float32)
                 )
                 high_o_next.append(
                     np.zeros((self.n_agents, high_obs_shape), dtype=np.float32)
@@ -954,14 +1049,30 @@ class RolloutWorker:
                 high_mode_train_masks.append(
                     np.zeros((self.n_agents, 1), dtype=np.float32)
                 )
+                high_intervention_masks.append(
+                    np.zeros((self.n_agents, 1), dtype=np.float32)
+                )
+                high_durations.append([1.0])
                 high_energy_margins.append(
                     np.zeros((self.n_agents, 1), dtype=np.float32)
                 )
                 high_energy_order_masks.append(
                     np.zeros((self.n_agents, 1), dtype=np.float32)
                 )
-                high_energy_consequences.append(
-                    np.zeros((self.n_agents, 5), dtype=np.float32)
+                high_ecm_targets.append(
+                    np.zeros((self.n_agents, high_ecm_target_dim), dtype=np.float32)
+                )
+                high_low_o.append(
+                    np.zeros(
+                        (meta_period, self.n_agents, self.obs_shape),
+                        dtype=np.float32,
+                    )
+                )
+                high_low_u.append(
+                    np.zeros((meta_period, self.n_agents, 1), dtype=np.int64)
+                )
+                high_low_mask.append(
+                    np.zeros((meta_period, self.n_agents, 1), dtype=np.float32)
                 )
                 high_padded.append([1.0])
                 high_terminate.append([1.0])
@@ -989,15 +1100,22 @@ class RolloutWorker:
                 high_o=high_o.copy(),
                 high_s=high_s.copy(),
                 high_u=high_u.copy(),
+                high_u_raw=high_u_raw.copy(),
+                high_hiro_u=high_hiro_u.copy(),
                 high_r=high_r.copy(),
                 high_avail_u=high_avail_u.copy(),
                 high_o_next=high_o_next.copy(),
                 high_s_next=high_s_next.copy(),
                 high_agent_active_mask=high_active_masks.copy(),
                 high_mode_train_mask=high_mode_train_masks.copy(),
+                high_intervention_mask=high_intervention_masks.copy(),
+                high_duration=high_durations.copy(),
                 high_energy_margin=high_energy_margins.copy(),
                 high_energy_order_mask=high_energy_order_masks.copy(),
-                high_energy_consequence=high_energy_consequences.copy(),
+                high_ecm_target=high_ecm_targets.copy(),
+                high_low_o=high_low_o.copy(),
+                high_low_u=high_low_u.copy(),
+                high_low_mask=high_low_mask.copy(),
                 high_padded=high_padded.copy(),
                 high_terminated=high_terminate.copy(),
             )
