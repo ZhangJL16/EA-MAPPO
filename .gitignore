@@ -22,6 +22,7 @@ __pycache__/
 result/
 model/
 replay/
+replay_gifs/*.gif
 logs/
 train_logs/
 test_result/
@@ -60,3 +61,8 @@ ref_code/*
 !ref_code/Hierarchical-Actor-Critic-HAC-PyTorch/**
 ref_code/Hierarchical-Actor-Critic-HAC-PyTorch/preTrained/
 ref_code/Hierarchical-Actor-Critic-HAC-PyTorch/gif/
+
+# Local cleanup/reference artifacts
+.cleanup_trash/
+ref_article/*.pdf
+ref_article/*.pdf:Zone.Identifier
