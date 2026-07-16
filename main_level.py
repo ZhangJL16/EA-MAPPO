@@ -175,14 +175,20 @@ def build_env(args, algs):
         "UAVEnergyDeliveryLevel",
         "UAVEnergyDeliveryLevel2D",
         "UAVEnergyDeliveryLevel3D",
+        "UAVEnergyDeliveryHierarchical",
+        "UAVEnergyDeliveryHierarchical2D",
+        "UAVEnergyDeliveryHierarchical3D",
     }:
         try:
-            from envs.UAVEnergyDeliveryLevel import UAVEnvDiscreteWrapper
+            from envs.UAVEnergyDeliveryHierarchical import UAVEnvDiscreteWrapper
         except ImportError as exc:
             raise ImportError(
-                "Map 'UAVEnergyDeliveryLevel' requires local module envs.UAVEnergyDeliveryLevel."
+                "Hierarchical UAV energy delivery maps require envs.UAVEnergyDeliveryHierarchical."
             ) from exc
-        dim_actions = 3 if args.map == "UAVEnergyDeliveryLevel3D" else 2
+        dim_actions = 3 if args.map in {
+            "UAVEnergyDeliveryLevel3D",
+            "UAVEnergyDeliveryHierarchical3D",
+        } else 2
         return UAVEnvDiscreteWrapper(
             dim_actions=dim_actions,
             num_hunters=int(getattr(args, "uav_n_agents", 4)),
@@ -212,17 +218,9 @@ def build_env(args, algs):
                 getattr(args, "hrl_charge_dense_reward_scale", 1.0)
             ),
             high_goal_style=str(getattr(args, "hrl_high_goal_style", "line")),
+            high_mode_policy=str(getattr(args, "hrl_high_mode_policy", "hybrid")),
             high_lateral_scale=float(getattr(args, "hrl_high_lateral_scale", 0.35)),
             auction_enabled=bool(getattr(args, "hrl_auction_enabled", True)),
-            fixed_charge_threshold_enabled=bool(
-                getattr(args, "hrl_fixed_charge_threshold_enabled", False)
-            ),
-            fixed_charge_threshold=float(
-                getattr(args, "hrl_fixed_charge_threshold", 0.35)
-            ),
-            fixed_charge_release_threshold=float(
-                getattr(args, "hrl_fixed_charge_release_threshold", 0.65)
-            ),
         )
 
     if args.map in {

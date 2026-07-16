@@ -244,7 +244,6 @@ ALL_METHODS=(
   ours_wo_safety_layer
   ours_wo_auction_module
   ours_wo_high_level_temporal_abstraction
-  ours_with_fixed_charging_threshold
   ours_full
 )
 
@@ -269,7 +268,6 @@ script_for_method() {
     ours_wo_safety_layer) echo "scripts/UAVEnergyDeliveryLevel/comparisons/train_ours_wo_safety_layer.sh" ;;
     ours_wo_auction_module) echo "scripts/UAVEnergyDeliveryLevel/comparisons/train_ours_wo_auction_module.sh" ;;
     ours_wo_high_level_temporal_abstraction) echo "scripts/UAVEnergyDeliveryLevel/comparisons/train_ours_wo_high_level_temporal_abstraction.sh" ;;
-    ours_with_fixed_charging_threshold) echo "scripts/UAVEnergyDeliveryLevel/comparisons/train_ours_with_fixed_charging_threshold.sh" ;;
     ours_full) echo "scripts/UAVEnergyDeliveryLevel/comparisons/train_ours_full.sh" ;;
     *) return 1 ;;
   esac

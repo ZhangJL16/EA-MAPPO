@@ -221,28 +221,12 @@ def parse_args():
         help="Scale for low-level HRL intrinsic rewards",
     )
     parser.add_argument(
-        "--hrl-intrinsic-distance-weight",
-        "--hrl_intrinsic_distance_weight",
-        dest="hrl_intrinsic_distance_weight",
-        type=float,
-        default=0.05,
-        help="Distance penalty weight in the low-level intrinsic reward",
-    )
-    parser.add_argument(
         "--hrl-intrinsic-success-bonus",
         "--hrl_intrinsic_success_bonus",
         dest="hrl_intrinsic_success_bonus",
         type=float,
         default=1.0,
         help="Success bonus in the low-level intrinsic reward",
-    )
-    parser.add_argument(
-        "--hrl-delivery-intrinsic-progress-bonus",
-        "--hrl_delivery_intrinsic_progress_bonus",
-        dest="hrl_delivery_intrinsic_progress_bonus",
-        type=float,
-        default=0.0,
-        help="Extra intrinsic reward multiplier for delivery progress",
     )
     parser.add_argument(
         "--hrl-intrinsic-collision-penalty",
@@ -261,36 +245,12 @@ def parse_args():
         help="Override high-level progress scalar for order-mode subgoals",
     )
     parser.add_argument(
-        "--hrl-energy-shield-enabled",
-        "--hrl_energy_shield_enabled",
-        dest="hrl_energy_shield_enabled",
-        type=str2bool,
-        default=False,
-        help="Enable hard high-level energy feasibility shield",
-    )
-    parser.add_argument(
         "--hrl-energy-margin-reserve-ratio",
         "--hrl_energy_margin_reserve_ratio",
         dest="hrl_energy_margin_reserve_ratio",
         type=float,
         default=0.05,
         help="Normalized energy reserve after completing an order and returning",
-    )
-    parser.add_argument(
-        "--hrl-energy-margin-loss-coef",
-        "--hrl_energy_margin_loss_coef",
-        dest="hrl_energy_margin_loss_coef",
-        type=float,
-        default=0.0,
-        help="High-level energy feasibility loss coefficient",
-    )
-    parser.add_argument(
-        "--hrl-energy-margin-charge-beta",
-        "--hrl_energy_margin_charge_beta",
-        dest="hrl_energy_margin_charge_beta",
-        type=float,
-        default=0.5,
-        help="Relative penalty for charging when order is energy-feasible",
     )
     parser.add_argument(
         "--hrl-charge-queue-enabled",
@@ -321,7 +281,7 @@ def parse_args():
         "--hrl_charge_dense_reward_scale",
         dest="hrl_charge_dense_reward_scale",
         type=float,
-        default=1.0,
+        default=0.0,
         help="Dense goal-shaping scale when current high-level target is charging",
     )
     parser.add_argument(
@@ -402,15 +362,10 @@ def make_base_args(cli_args):
         hmappo_meta_period=cli_args.hmappo_meta_period,
         hrl_reachable_subgoal_scale=cli_args.hrl_reachable_subgoal_scale,
         hrl_intrinsic_reward_scale=cli_args.hrl_intrinsic_reward_scale,
-        hrl_intrinsic_distance_weight=cli_args.hrl_intrinsic_distance_weight,
         hrl_intrinsic_success_bonus=cli_args.hrl_intrinsic_success_bonus,
-        hrl_delivery_intrinsic_progress_bonus=cli_args.hrl_delivery_intrinsic_progress_bonus,
         hrl_intrinsic_collision_penalty=cli_args.hrl_intrinsic_collision_penalty,
         hrl_order_progress_override=cli_args.hrl_order_progress_override,
-        hrl_energy_shield_enabled=cli_args.hrl_energy_shield_enabled,
         hrl_energy_margin_reserve_ratio=cli_args.hrl_energy_margin_reserve_ratio,
-        hrl_energy_margin_loss_coef=cli_args.hrl_energy_margin_loss_coef,
-        hrl_energy_margin_charge_beta=cli_args.hrl_energy_margin_charge_beta,
         hrl_charge_queue_enabled=cli_args.hrl_charge_queue_enabled,
         hrl_charge_queue_radius=cli_args.hrl_charge_queue_radius,
         hrl_charge_mode_fraction=cli_args.hrl_charge_mode_fraction,
@@ -693,19 +648,12 @@ def run_episode(env, agents, args, cli_args, episode_idx):
         env.set_hrl_parameters(
             reachable_subgoal_scale=getattr(args, "hrl_reachable_subgoal_scale", None),
             intrinsic_reward_scale=getattr(args, "hrl_intrinsic_reward_scale", None),
-            intrinsic_distance_weight=getattr(args, "hrl_intrinsic_distance_weight", None),
             intrinsic_success_bonus=getattr(args, "hrl_intrinsic_success_bonus", None),
-            delivery_intrinsic_progress_bonus=getattr(
-                args, "hrl_delivery_intrinsic_progress_bonus", None
-            ),
             intrinsic_collision_penalty=getattr(
                 args, "hrl_intrinsic_collision_penalty", None
             ),
             order_progress_override=getattr(
                 args, "hrl_order_progress_override", None
-            ),
-            energy_shield_enabled=getattr(
-                args, "hrl_energy_shield_enabled", None
             ),
             energy_margin_reserve_ratio=getattr(
                 args, "hrl_energy_margin_reserve_ratio", None

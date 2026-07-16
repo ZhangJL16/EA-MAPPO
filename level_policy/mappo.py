@@ -3,10 +3,7 @@ import os
 
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 from torch.distributions import Categorical, Normal
-
-from level_policy.energy_consequence_model import EnergyConsequenceModel
 
 POLICY_SCOPE = "level_policy"
 
@@ -97,17 +94,7 @@ class MAPPO:
         )
         self.high_obs_shape = int(getattr(args, "high_level_obs_shape", 0))
         self.high_state_shape = int(getattr(args, "high_level_state_shape", 0))
-        self.ecm_enabled = bool(getattr(args, "hrl_ecm_enabled", False))
-        self.ecm_actor_input_enabled = bool(
-            getattr(args, "hrl_ecm_actor_input_enabled", False)
-        )
-        self.ecm_output_dim = 6
-        self.ecm_feature_dim = self.ecm_output_dim
-        self.high_actor_obs_shape = self.high_obs_shape + (
-            2 * self.ecm_feature_dim
-            if self.ecm_enabled and self.ecm_actor_input_enabled
-            else 0
-        )
+        self.high_actor_obs_shape = self.high_obs_shape
         self.last_train_metrics = {}
         if self.high_n_actions <= 0 or self.high_obs_shape <= 0 or self.high_state_shape <= 0:
             raise ValueError("Level MAPPO requires high-level env_info fields.")
@@ -164,17 +151,6 @@ class MAPPO:
                 for _ in range(self.n_agents)
             ]
         ).to(self.device)
-        self.energy_consequence_models = nn.ModuleList(
-            [
-                EnergyConsequenceModel(
-                    self.high_obs_shape,
-                    self.high_n_actions,
-                    int(getattr(args, "hrl_ecm_hidden_dim", 128)),
-                    self.ecm_output_dim,
-                )
-                for _ in range(self.n_agents)
-            ]
-        ).to(self.device) if self.ecm_enabled else None
         self.low_actor_optimizers = [
             torch.optim.Adam(actor.parameters(), lr=args.lr_actor)
             for actor in self.low_actors
@@ -191,18 +167,6 @@ class MAPPO:
             torch.optim.Adam(critic.parameters(), lr=high_lr_critic)
             for critic in self.high_critics
         ]
-        self.ecm_optimizers = (
-            [
-                torch.optim.Adam(
-                    model.parameters(),
-                    lr=float(getattr(args, "hrl_ecm_lr", 3e-4)),
-                )
-                for model in self.energy_consequence_models
-            ]
-            if self.ecm_enabled
-            else None
-        )
-
         self.model_dir = args.model_dir + "/" + args.alg + "/" + args.map
         self.eval_hidden = None
 
@@ -225,82 +189,6 @@ class MAPPO:
         mean, std = network(observation)
         return Normal(mean, std)
 
-    def _canonical_high_candidate_actions(self, observation, mode_id):
-        batch_size = observation.size(0)
-        action = torch.zeros(
-            (batch_size, self.high_n_actions),
-            dtype=observation.dtype,
-            device=observation.device,
-        )
-        if self.high_n_actions > 0:
-            action[:, 0] = float(mode_id)
-        if self.high_n_actions > 1:
-            action[:, 1] = 1.0
-        if self.high_n_actions > 2:
-            action[:, 2] = 0.0
-        return action
-
-    def _ecm_prediction_features(self, prediction):
-        delta_energy = torch.tanh(prediction[:, 0:1])
-        next_energy = torch.sigmoid(prediction[:, 1:2])
-        margin = torch.tanh(prediction[:, 2:3])
-        duration = torch.sigmoid(prediction[:, 3:4])
-        probabilities = torch.sigmoid(prediction[:, 4:6])
-        return torch.cat(
-            [delta_energy, next_energy, margin, duration, probabilities],
-            dim=-1,
-        )
-
-    def _augment_high_obs_with_ecm(self, observation, agent_idx):
-        if (
-            not self.ecm_enabled
-            or not self.ecm_actor_input_enabled
-            or self.energy_consequence_models is None
-            or agent_idx is None
-            or observation.size(-1) == self.high_actor_obs_shape
-        ):
-            return observation
-        ecm = self.energy_consequence_models[agent_idx]
-        with torch.no_grad():
-            charge_action = self._canonical_high_candidate_actions(
-                observation, mode_id=0
-            )
-            order_action = self._canonical_high_candidate_actions(
-                observation, mode_id=1
-            )
-            charge_features = self._ecm_prediction_features(
-                ecm(observation, charge_action)
-            )
-            order_features = self._ecm_prediction_features(
-                ecm(observation, order_action)
-            )
-        return torch.cat(
-            [observation, charge_features.detach(), order_features.detach()],
-            dim=-1,
-        )
-
-    def _ecm_mode_risk(self, observation, agent_idx):
-        if (
-            not self.ecm_enabled
-            or self.energy_consequence_models is None
-            or agent_idx is None
-            or observation.size(-1) != self.high_obs_shape
-        ):
-            return None
-        ecm = self.energy_consequence_models[agent_idx]
-        with torch.no_grad():
-            charge_action = self._canonical_high_candidate_actions(
-                observation, mode_id=0
-            )
-            order_action = self._canonical_high_candidate_actions(
-                observation, mode_id=1
-            )
-            charge_pred = ecm(observation, charge_action)
-            order_pred = ecm(observation, order_action)
-            charge_violation = torch.sigmoid(charge_pred[:, 5:6])
-            order_violation = torch.sigmoid(order_pred[:, 5:6])
-            return torch.cat([charge_violation, order_violation], dim=-1).detach()
-
     def _hybrid_high_dist(
         self,
         network,
@@ -309,8 +197,7 @@ class MAPPO:
         return_aux=False,
         mode_avail=None,
     ):
-        actor_observation = self._augment_high_obs_with_ecm(observation, agent_idx)
-        mode_logits, mean, std, h = network(actor_observation)
+        mode_logits, mean, std, h = network(observation)
         adjusted_logits = mode_logits
         if mode_avail is not None and mode_avail.numel() > 0:
             mode_avail = mode_avail[:, : self.high_mode_n_actions]
@@ -476,23 +363,8 @@ class MAPPO:
                 state_dim=self.low_state_shape,
                 guard_key="guard_applied",
             )
-        if (
-            not freeze_low
-            and "hindsight_o" in batch
-            and getattr(self.args, "hrl_hindsight_aux_coef", 0.0) > 0.0
-        ):
-            self._learn_hindsight_aux(batch)
-
         if "high_o" not in batch or freeze_high:
             return
-
-        ecm_interval = max(1, int(getattr(self.args, "hrl_ecm_update_interval", 1)))
-        if (
-            self.ecm_enabled
-            and "high_ecm_target" in batch
-            and (int(train_step) % ecm_interval == 0)
-        ):
-            self._learn_energy_consequence_models(batch)
 
         learn_high = (
             self._learn_hybrid_high_level
@@ -500,12 +372,6 @@ class MAPPO:
             else self._learn_continuous_level
         )
         high_action_key = "high_u"
-        if (
-            bool(getattr(self.args, "hrl_hiro_correction_enabled", False))
-            and "high_hiro_u" in batch
-        ):
-            high_action_key = "high_hiro_u"
-            self.last_train_metrics["hiro_correction_enabled"] = 1.0
         learn_high(
             batch=batch,
             actors=self.high_actors,
@@ -531,161 +397,6 @@ class MAPPO:
             duration_key="high_duration",
             intervention_key="high_intervention_mask",
         )
-
-    def _learn_hindsight_aux(self, batch):
-        coef = float(getattr(self.args, "hrl_hindsight_aux_coef", 0.0))
-        if coef <= 0.0:
-            return
-
-        obs = batch["hindsight_o"]
-        actions = batch["u"].squeeze(-1)
-        avail_actions = batch["avail_u"]
-        mask = 1 - batch["padded"].squeeze(-1)
-        active_mask = batch.get("agent_active_mask", None)
-        if active_mask is None:
-            active_mask = torch.ones(
-                (*mask.shape, self.n_agents, 1),
-                dtype=mask.dtype,
-                device=self.device,
-            )
-        active_mask = active_mask.squeeze(-1)
-        hindsight_mask = batch.get("hindsight_mask", None)
-        if hindsight_mask is None:
-            hindsight_mask = torch.ones(
-                (*mask.shape, self.n_agents, 1),
-                dtype=mask.dtype,
-                device=self.device,
-            )
-        hindsight_mask = hindsight_mask.squeeze(-1)
-
-        episode_num = obs.size(0)
-        time_len = obs.size(1)
-        for agent_idx in range(self.n_agents):
-            actor_states = obs[:, :, agent_idx, :].reshape(
-                episode_num * time_len, -1
-            )
-            agent_actions = actions[:, :, agent_idx].reshape(-1)
-            agent_avail = avail_actions[:, :, agent_idx, :].reshape(
-                -1, self.low_n_actions
-            )
-            agent_mask = mask * active_mask[:, :, agent_idx] * hindsight_mask[:, :, agent_idx]
-            flat_mask = agent_mask.reshape(-1) > 0
-            if torch.sum(flat_mask) <= 0:
-                continue
-
-            valid_states = actor_states[flat_mask]
-            valid_actions = agent_actions[flat_mask]
-            valid_avail = agent_avail[flat_mask]
-            batch_size = min(getattr(self.args, "batch_size", 64), valid_states.size(0))
-            permutation = torch.randperm(valid_states.size(0), device=self.device)
-            for start in range(0, valid_states.size(0), batch_size):
-                indices = permutation[start : start + batch_size]
-                dist = self._masked_categorical(
-                    self.low_actors[agent_idx](valid_states[indices]),
-                    valid_avail[indices],
-                )
-                aux_loss = -dist.log_prob(valid_actions[indices]).mean() * coef
-                self.low_actor_optimizers[agent_idx].zero_grad()
-                aux_loss.backward()
-                torch.nn.utils.clip_grad_norm_(
-                    self.low_actors[agent_idx].parameters(),
-                    self.args.grad_norm_clip,
-                )
-                self.low_actor_optimizers[agent_idx].step()
-
-    def _learn_energy_consequence_models(self, batch):
-        if (
-            not self.ecm_enabled
-            or self.energy_consequence_models is None
-            or self.ecm_optimizers is None
-        ):
-            return
-        obs = batch["high_o"]
-        actions = batch["high_u"]
-        targets = batch.get("high_ecm_target", None)
-        if targets is None:
-            return
-        padded = batch["high_padded"].squeeze(-1)
-        mask = 1.0 - padded
-        active_mask = batch.get("high_agent_active_mask", None)
-        if active_mask is None:
-            active_mask = torch.ones(
-                (*mask.shape, self.n_agents, 1),
-                dtype=mask.dtype,
-                device=self.device,
-            )
-        active_mask = active_mask.squeeze(-1)
-        episode_num = obs.size(0)
-        time_len = obs.size(1)
-        epochs = max(1, int(getattr(self.args, "hrl_ecm_train_epochs", 1)))
-        loss_coef = float(getattr(self.args, "hrl_ecm_loss_coef", 1.0))
-        batch_size = int(getattr(self.args, "batch_size", 64))
-        metric_loss = 0.0
-        metric_reg = 0.0
-        metric_cls = 0.0
-        metric_count = 0
-
-        for agent_idx in range(self.n_agents):
-            agent_obs = obs[:, :, agent_idx, :].reshape(
-                episode_num * time_len, self.high_obs_shape
-            )
-            agent_actions = actions[:, :, agent_idx, :].reshape(
-                episode_num * time_len, self.high_n_actions
-            )
-            agent_targets = targets[:, :, agent_idx, :].reshape(
-                episode_num * time_len, self.ecm_output_dim
-            )
-            agent_mask = (mask * active_mask[:, :, agent_idx]).reshape(-1) > 0
-            if torch.sum(agent_mask) <= 0:
-                continue
-            valid_obs = torch.nan_to_num(
-                agent_obs[agent_mask], nan=0.0, posinf=1.0, neginf=-1.0
-            )
-            valid_actions = torch.nan_to_num(
-                agent_actions[agent_mask], nan=0.0, posinf=1.0, neginf=-1.0
-            )
-            valid_targets = torch.nan_to_num(
-                agent_targets[agent_mask], nan=0.0, posinf=1.0, neginf=-1.0
-            )
-            valid_targets[:, 0] = torch.clamp(valid_targets[:, 0], -1.0, 1.0)
-            valid_targets[:, 1] = torch.clamp(valid_targets[:, 1], 0.0, 1.0)
-            valid_targets[:, 2] = torch.clamp(valid_targets[:, 2], -1.0, 1.0)
-            valid_targets[:, 3] = torch.clamp(valid_targets[:, 3], 0.0, 1.0)
-            valid_targets[:, 4:6] = torch.clamp(valid_targets[:, 4:6], 0.0, 1.0)
-            n_valid = valid_obs.size(0)
-            step_batch = min(batch_size, n_valid)
-            for _ in range(epochs):
-                permutation = torch.randperm(n_valid, device=self.device)
-                for start in range(0, n_valid, step_batch):
-                    indices = permutation[start : start + step_batch]
-                    prediction = self.energy_consequence_models[agent_idx](
-                        valid_obs[indices], valid_actions[indices]
-                    )
-                    reg_loss = F.mse_loss(
-                        prediction[:, :4], valid_targets[indices, :4]
-                    )
-                    cls_loss = F.binary_cross_entropy_with_logits(
-                        prediction[:, 4:6], valid_targets[indices, 4:6]
-                    )
-                    loss = loss_coef * (reg_loss + cls_loss)
-                    if not torch.isfinite(loss):
-                        continue
-                    self.ecm_optimizers[agent_idx].zero_grad()
-                    loss.backward()
-                    torch.nn.utils.clip_grad_norm_(
-                        self.energy_consequence_models[agent_idx].parameters(),
-                        self.args.grad_norm_clip,
-                    )
-                    self.ecm_optimizers[agent_idx].step()
-                    metric_loss += float(loss.detach().cpu())
-                    metric_reg += float(reg_loss.detach().cpu())
-                    metric_cls += float(cls_loss.detach().cpu())
-                    metric_count += 1
-
-        if metric_count > 0:
-            self.last_train_metrics["ecm_loss"] = metric_loss / metric_count
-            self.last_train_metrics["ecm_reg_loss"] = metric_reg / metric_count
-            self.last_train_metrics["ecm_cls_loss"] = metric_cls / metric_count
 
     def _learn_hybrid_high_level(
         self,
@@ -713,11 +424,11 @@ class MAPPO:
         duration_key=None,
         intervention_key=None,
     ):
-        del action_dim
+        del action_dim, next_obs_key
+        del energy_margin_key, energy_order_mask_key
         states = batch[state_key]
         next_states = batch[next_state_key]
         obs = batch[obs_key]
-        next_obs = batch.get(next_obs_key, None)
         actions = batch[action_key]
         avail_actions = batch.get(avail_key, None)
         terminated = batch[terminated_key].squeeze(-1)
@@ -760,50 +471,17 @@ class MAPPO:
         rewards = batch[reward_key]
         if rewards.size(-1) == 1:
             rewards = rewards.expand(-1, -1, self.n_agents)
-        energy_margins = (
-            batch.get(energy_margin_key, None) if energy_margin_key is not None else None
-        )
-        energy_order_masks = (
-            batch.get(energy_order_mask_key, None)
-            if energy_order_mask_key is not None
-            else None
-        )
-        energy_loss_coef = float(
-            getattr(self.args, "hrl_energy_margin_loss_coef", 0.0)
-        )
-        use_energy_loss = energy_loss_coef > 0.0 and energy_margins is not None
-        use_energy_aux = use_energy_loss and energy_margins is not None
-        ecm_policy_loss_coef = float(
-            getattr(self.args, "hrl_ecm_policy_loss_coef", 0.0)
-        )
-        use_ecm_policy_loss = (
-            self.ecm_enabled
-            and ecm_policy_loss_coef > 0.0
-            and self.energy_consequence_models is not None
-        )
-        ecm_policy_loss_sum = 0.0
-        ecm_policy_loss_count = 0
 
         episode_num = states.size(0)
         time_len = states.size(1)
         flat_states = states.reshape(episode_num * time_len, -1)
-        if next_obs is None:
-            next_obs = obs
 
         for agent_idx in range(self.n_agents):
             actor_states = obs[:, :, agent_idx, :].reshape(
                 episode_num * time_len, obs_dim
             )
-            next_actor_states = next_obs[:, :, agent_idx, :].reshape(
-                episode_num * time_len, obs_dim
-            )
             actor_states = torch.nan_to_num(actor_states, nan=0.0, posinf=1.0, neginf=-1.0)
-            next_actor_states = torch.nan_to_num(
-                next_actor_states, nan=0.0, posinf=1.0, neginf=-1.0
-            )
-            actor_policy_states = self._augment_high_obs_with_ecm(
-                actor_states, agent_idx
-            )
+            actor_policy_states = actor_states
             agent_actions = actions[:, :, agent_idx, :].reshape(-1, self.high_n_actions)
             agent_actions = torch.nan_to_num(
                 agent_actions, nan=0.0, posinf=1.0, neginf=-1.0
@@ -863,36 +541,11 @@ class MAPPO:
             valid_returns = returns.reshape(-1)[flat_agent_mask]
             valid_actor_states_pg = actor_policy_states[flat_actor_mask]
             valid_avail_pg = agent_avail_actions[flat_actor_mask]
-            valid_next_actor_states_pg = next_actor_states[flat_actor_mask]
             valid_modes_pg = mode_actions[flat_actor_mask]
             valid_continuous_pg = continuous_actions[flat_actor_mask]
             valid_advantages_pg = advantages.reshape(-1)[flat_actor_mask]
             valid_old_log_probs_pg = old_log_probs[flat_actor_mask]
             valid_mode_mask_pg = flat_mode_mask[flat_actor_mask]
-            if use_ecm_policy_loss:
-                valid_ecm_mode_risk_pg = self._ecm_mode_risk(
-                    actor_states[flat_actor_mask], agent_idx
-                )
-            else:
-                valid_ecm_mode_risk_pg = None
-            if use_energy_aux:
-                agent_energy_margins = energy_margins[:, :, agent_idx, 0].reshape(-1)
-                valid_energy_margins_pg = agent_energy_margins[flat_actor_mask]
-                if energy_order_masks is not None:
-                    agent_energy_order_masks = energy_order_masks[
-                        :, :, agent_idx, 0
-                    ].reshape(-1)
-                    valid_energy_order_masks_pg = agent_energy_order_masks[
-                        flat_actor_mask
-                    ]
-                else:
-                    valid_energy_order_masks_pg = torch.ones_like(
-                        valid_energy_margins_pg
-                    )
-            else:
-                valid_energy_margins_pg = None
-                valid_energy_order_masks_pg = None
-
             if valid_states.size(0) == 0:
                 continue
 
@@ -940,49 +593,6 @@ class MAPPO:
                         actor_loss -= self.args.entropy_coef * entropy
                         actor_loss = actor_loss.mean()
 
-                        if valid_energy_margins_pg is not None:
-                            margin = valid_energy_margins_pg[indices]
-                            order_mask = valid_energy_order_masks_pg[indices]
-                            p_charge = mode_dist.probs[:, 0].clamp(1e-6, 1.0 - 1e-6)
-                            if use_energy_loss:
-                                beta = float(
-                                    getattr(
-                                        self.args,
-                                        "hrl_energy_margin_charge_beta",
-                                        0.5,
-                                    )
-                                )
-                                p_order = 1.0 - p_charge
-                                unsafe_order_weight = torch.relu(-margin)
-                                feasible_order_weight = torch.relu(margin)
-                                energy_terms = (
-                                    unsafe_order_weight * p_order
-                                    + beta * feasible_order_weight * p_charge
-                                )
-                                energy_terms = energy_terms * order_mask * mode_mask
-                                denom = (order_mask * mode_mask).sum().clamp_min(1.0)
-                                energy_loss = energy_terms.sum() / denom
-                                actor_loss = actor_loss + energy_loss_coef * energy_loss
-
-                        if valid_ecm_mode_risk_pg is not None:
-                            mode_risk = valid_ecm_mode_risk_pg[indices]
-                            if mode_risk.size(-1) >= self.high_mode_n_actions:
-                                probs = mode_dist.probs[
-                                    :, : self.high_mode_n_actions
-                                ]
-                                risk_terms = (probs * mode_risk).sum(dim=-1)
-                                risk_terms = risk_terms * mode_mask
-                                denom = mode_mask.sum().clamp_min(1.0)
-                                ecm_policy_loss = risk_terms.sum() / denom
-                                actor_loss = (
-                                    actor_loss
-                                    + ecm_policy_loss_coef * ecm_policy_loss
-                                )
-                                ecm_policy_loss_sum += float(
-                                    ecm_policy_loss.detach().cpu()
-                                )
-                                ecm_policy_loss_count += 1
-
                         if not torch.isfinite(actor_loss):
                             continue
                         actor_optimizers[agent_idx].zero_grad()
@@ -1022,11 +632,6 @@ class MAPPO:
                         continue
                     critic_optimizers[agent_idx].step()
 
-        if ecm_policy_loss_count > 0:
-            self.last_train_metrics["ecm_policy_loss"] = (
-                ecm_policy_loss_sum / ecm_policy_loss_count
-            )
-
     def _learn_continuous_level(
         self,
         batch,
@@ -1050,7 +655,10 @@ class MAPPO:
         mode_mask_key=None,
         **unused_kwargs,
     ):
-        del mode_mask_key, unused_kwargs
+        del mode_mask_key
+        del energy_margin_key, energy_order_mask_key
+        duration_key = unused_kwargs.get("duration_key", None)
+        intervention_key = unused_kwargs.get("intervention_key", None)
         states = batch[state_key]
         next_states = batch[next_state_key]
         obs = batch[obs_key]
@@ -1065,27 +673,26 @@ class MAPPO:
                 device=self.device,
             )
         active_mask = active_mask.squeeze(-1)
+        intervention_mask = (
+            batch.get(intervention_key, None) if intervention_key is not None else None
+        )
+        if intervention_mask is None:
+            intervention_mask = torch.zeros(
+                (*mask.shape, self.n_agents, 1),
+                dtype=mask.dtype,
+                device=self.device,
+            )
+        intervention_mask = intervention_mask.squeeze(-1).clamp(0.0, 1.0)
+        durations = batch.get(duration_key, None) if duration_key is not None else None
+        if durations is None:
+            durations = torch.ones(
+                (*mask.shape, 1), dtype=mask.dtype, device=self.device
+            )
+        durations = durations.squeeze(-1)
 
         rewards = batch[reward_key]
         if rewards.size(-1) == 1:
             rewards = rewards.expand(-1, -1, self.n_agents)
-        energy_margins = (
-            batch.get(energy_margin_key, None) if energy_margin_key is not None else None
-        )
-        energy_order_masks = (
-            batch.get(energy_order_mask_key, None)
-            if energy_order_mask_key is not None
-            else None
-        )
-        energy_loss_coef = float(
-            getattr(self.args, "hrl_energy_margin_loss_coef", 0.0)
-        )
-        use_energy_loss = (
-            energy_loss_coef > 0.0
-            and action_dim in (1, 2)
-            and energy_margins is not None
-        )
-
         episode_num = states.size(0)
         time_len = states.size(1)
         flat_states = states.reshape(episode_num * time_len, -1)
@@ -1097,7 +704,9 @@ class MAPPO:
             agent_actions = actions[:, :, agent_idx, :].reshape(-1, action_dim)
             agent_rewards = rewards[:, :, agent_idx]
             agent_mask = mask * active_mask[:, :, agent_idx]
+            agent_actor_mask = agent_mask * (1.0 - intervention_mask[:, :, agent_idx])
             flat_agent_mask = agent_mask.reshape(-1) > 0
+            flat_actor_mask = agent_actor_mask.reshape(-1) > 0
 
             with torch.no_grad():
                 values = critics[agent_idx](states.reshape(-1, state_dim)).reshape(
@@ -1106,36 +715,23 @@ class MAPPO:
                 next_values = critics[agent_idx](
                     next_states.reshape(-1, state_dim)
                 ).reshape(episode_num, time_len)
-                advantages, returns = self._compute_advantages(
-                    agent_rewards, values, next_values, terminated, agent_mask
+                advantages, returns = self._compute_smdp_advantages(
+                    agent_rewards,
+                    values,
+                    next_values,
+                    terminated,
+                    agent_mask,
+                    durations,
                 )
                 old_dist = self._gaussian_dist(actors[agent_idx], actor_states)
                 old_log_probs = old_dist.log_prob(agent_actions).sum(dim=-1)
 
             valid_states = flat_states[flat_agent_mask]
             valid_returns = returns.reshape(-1)[flat_agent_mask]
-            valid_actor_states_pg = actor_states[flat_agent_mask]
-            valid_actions_pg = agent_actions[flat_agent_mask]
-            valid_advantages_pg = advantages.reshape(-1)[flat_agent_mask]
-            valid_old_log_probs_pg = old_log_probs[flat_agent_mask]
-            if use_energy_loss:
-                agent_energy_margins = energy_margins[:, :, agent_idx, 0].reshape(-1)
-                valid_energy_margins_pg = agent_energy_margins[flat_agent_mask]
-                if energy_order_masks is not None:
-                    agent_energy_order_masks = energy_order_masks[
-                        :, :, agent_idx, 0
-                    ].reshape(-1)
-                    valid_energy_order_masks_pg = agent_energy_order_masks[
-                        flat_agent_mask
-                    ]
-                else:
-                    valid_energy_order_masks_pg = torch.ones_like(
-                        valid_energy_margins_pg
-                    )
-            else:
-                valid_energy_margins_pg = None
-                valid_energy_order_masks_pg = None
-
+            valid_actor_states_pg = actor_states[flat_actor_mask]
+            valid_actions_pg = agent_actions[flat_actor_mask]
+            valid_advantages_pg = advantages.reshape(-1)[flat_actor_mask]
+            valid_old_log_probs_pg = old_log_probs[flat_actor_mask]
             if valid_states.size(0) == 0:
                 continue
 
@@ -1165,42 +761,6 @@ class MAPPO:
                         actor_loss = -torch.min(surrogate_1, surrogate_2)
                         actor_loss -= self.args.entropy_coef * entropy
                         actor_loss = actor_loss.mean()
-                        if valid_energy_margins_pg is not None:
-                            margin = valid_energy_margins_pg[indices]
-                            order_mask = valid_energy_order_masks_pg[indices]
-                            beta = float(
-                                getattr(
-                                    self.args,
-                                    "hrl_energy_margin_charge_beta",
-                                    0.5,
-                                )
-                            )
-                            charge_fraction = float(
-                                getattr(self.args, "hrl_charge_mode_fraction", 0.5)
-                            )
-                            charge_fraction = max(0.01, min(0.99, charge_fraction))
-                            charge_threshold = -1.0 + 2.0 * charge_fraction
-                            if action_dim >= 2:
-                                mode_dist = Normal(dist.loc[:, 0], dist.scale[:, 0])
-                                p_charge = mode_dist.cdf(
-                                    torch.full_like(mode_dist.loc, charge_threshold)
-                                )
-                            else:
-                                p_charge = dist.cdf(
-                                    torch.full_like(dist.loc, charge_threshold)
-                                ).squeeze(-1)
-                            p_order = 1.0 - p_charge
-                            unsafe_order_weight = torch.relu(-margin)
-                            feasible_order_weight = torch.relu(margin)
-                            energy_terms = (
-                                unsafe_order_weight * p_order
-                                + beta * feasible_order_weight * p_charge
-                            )
-                            energy_terms = energy_terms * order_mask
-                            denom = order_mask.sum().clamp_min(1.0)
-                            energy_loss = energy_terms.sum() / denom
-                            actor_loss = actor_loss + energy_loss_coef * energy_loss
-
                         actor_optimizers[agent_idx].zero_grad()
                         actor_loss.backward()
                         torch.nn.utils.clip_grad_norm_(
@@ -1443,15 +1003,6 @@ class MAPPO:
             ("high", self.high_actors, self.high_critics),
         ):
             self._load_level_models(level, actors, critics)
-        if self.ecm_enabled and self.energy_consequence_models is not None:
-            for agent_idx in range(self.n_agents):
-                model_path = self._latest_paths(
-                    "high_ecm", "model", agent_idx
-                )
-                if model_path is None:
-                    continue
-                state = torch.load(model_path, map_location=self.device)
-                self.energy_consequence_models[agent_idx].load_state_dict(state)
 
     def save_model(self, train_step):
         num = str(train_step // max(self.args.save_cycle, 1))
@@ -1469,13 +1020,4 @@ class MAPPO:
                     torch.save(
                         critics[agent_idx].state_dict(),
                         self._model_filename(level, "critic", agent_idx, prefix=prefix),
-                    )
-        if self.ecm_enabled and self.energy_consequence_models is not None:
-            for agent_idx in range(self.n_agents):
-                for prefix in (f"{num}_", ""):
-                    torch.save(
-                        self.energy_consequence_models[agent_idx].state_dict(),
-                        self._model_filename(
-                            "high_ecm", "model", agent_idx, prefix=prefix
-                        ),
                     )

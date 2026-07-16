@@ -39,7 +39,6 @@ def parse_args():
     parser.add_argument("--max_active_orders", type=int, default=8)
     parser.add_argument("--energy_decay", type=float, default=None)
     parser.add_argument("--charging_rate", type=float, default=None)
-    parser.add_argument("--ecf_logit_bias_coef", type=float, default=None)
     parser.add_argument("--frame_stride", type=int, default=2)
     parser.add_argument("--duration_ms", type=int, default=90)
     parser.add_argument("--cuda", default="True")
@@ -66,6 +65,8 @@ def build_hmappo_args(script_args):
         str(script_args.max_active_orders),
         "--hmappo_meta_period",
         "5",
+        "--hrl_high_mode_policy",
+        "continuous",
         "--hmappo_pretrained_low_model_dir",
         "",
         "--hmappo_freeze_low_level",
@@ -74,30 +75,14 @@ def build_hmappo_args(script_args):
         "False",
         "--hrl_meta_update_on_subgoal_done",
         "False",
-        "--hrl_order_progress_override",
-        "0.65",
-        "--hrl_delivery_intrinsic_progress_bonus",
-        "0.0",
         "--hrl_intrinsic_collision_penalty",
         "0.8",
-        "--hrl_charge_dense_reward_scale",
-        "0.0",
-        "--hrl_energy_shield_enabled",
-        "True",
         "--hrl_energy_margin_reserve_ratio",
         "0.08",
-        "--hrl_energy_margin_loss_coef",
-        "0.2",
-        "--hrl_energy_margin_charge_beta",
-        "0.2",
         "--hrl_charge_queue_enabled",
         "True",
-        "--hrl_charge_queue_radius",
-        "0.24",
         "--hrl_safe_action_guard_enabled",
         "True",
-        "--hrl_safe_action_guard_margin",
-        "0.04",
         "--load_model",
         "True",
         "--model_dir",
@@ -117,8 +102,6 @@ def build_hmappo_args(script_args):
         sys.argv.extend(["--uav_energy_decay", str(script_args.energy_decay)])
     if script_args.charging_rate is not None:
         sys.argv.extend(["--uav_charging_rate", str(script_args.charging_rate)])
-    if script_args.ecf_logit_bias_coef is not None:
-        sys.argv.extend(["--hrl_ecf_logit_bias_coef", str(script_args.ecf_logit_bias_coef)])
     try:
         args = get_common_args()
     finally:
@@ -168,16 +151,11 @@ def maybe_set_hrl_parameters(env, args):
         env.set_hrl_parameters(
             reachable_subgoal_scale=getattr(args, "hrl_reachable_subgoal_scale", None),
             intrinsic_reward_scale=getattr(args, "hrl_intrinsic_reward_scale", None),
-            intrinsic_distance_weight=getattr(args, "hrl_intrinsic_distance_weight", None),
             intrinsic_success_bonus=getattr(args, "hrl_intrinsic_success_bonus", None),
-            delivery_intrinsic_progress_bonus=getattr(
-                args, "hrl_delivery_intrinsic_progress_bonus", None
-            ),
             intrinsic_collision_penalty=getattr(args, "hrl_intrinsic_collision_penalty", None),
             high_goal_style=getattr(args, "hrl_high_goal_style", None),
             high_lateral_scale=getattr(args, "hrl_high_lateral_scale", None),
             order_progress_override=getattr(args, "hrl_order_progress_override", None),
-            energy_shield_enabled=getattr(args, "hrl_energy_shield_enabled", None),
             energy_margin_reserve_ratio=getattr(args, "hrl_energy_margin_reserve_ratio", None),
             charge_energy_threshold=getattr(args, "hrl_charge_energy_threshold", None),
             charge_release_threshold=getattr(args, "hrl_charge_release_threshold", None),

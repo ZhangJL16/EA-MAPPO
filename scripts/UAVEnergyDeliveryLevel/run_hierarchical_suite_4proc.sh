@@ -52,8 +52,7 @@ Default methods, in order:
   current_hmappo, hsd, hmappo_basic, hmappo_wo_energy_aware_design,
   ours_wo_energy_constraint, ours_wo_charging_resource_modeling,
   ours_wo_safety_layer, ours_wo_auction_module,
-  ours_wo_high_level_temporal_abstraction,
-  ours_with_fixed_charging_threshold
+  ours_wo_high_level_temporal_abstraction
 
 Examples:
   scripts/UAVEnergyDeliveryLevel/run_hierarchical_suite_4proc.sh
@@ -230,7 +229,6 @@ ALL_METHODS=(
   ours_wo_safety_layer
   ours_wo_auction_module
   ours_wo_high_level_temporal_abstraction
-  ours_with_fixed_charging_threshold
 )
 
 script_for_method() {
@@ -244,7 +242,6 @@ script_for_method() {
     ours_wo_safety_layer) echo "scripts/UAVEnergyDeliveryLevel/comparisons/train_ours_wo_safety_layer.sh" ;;
     ours_wo_auction_module) echo "scripts/UAVEnergyDeliveryLevel/comparisons/train_ours_wo_auction_module.sh" ;;
     ours_wo_high_level_temporal_abstraction) echo "scripts/UAVEnergyDeliveryLevel/comparisons/train_ours_wo_high_level_temporal_abstraction.sh" ;;
-    ours_with_fixed_charging_threshold) echo "scripts/UAVEnergyDeliveryLevel/comparisons/train_ours_with_fixed_charging_threshold.sh" ;;
     *) return 1 ;;
   esac
 }

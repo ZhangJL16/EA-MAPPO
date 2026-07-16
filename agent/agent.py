@@ -65,6 +65,18 @@ class Agents:
             from policy.ippo import IPPO
 
             self.policy = IPPO(args)
+        elif args.alg == "official_mappo":
+            if getattr(args, "use_level_policy", False):
+                raise ValueError("official_mappo is only implemented for flat MAPPO.")
+            from policy.official_mappo import OfficialMAPPO
+
+            self.policy = OfficialMAPPO(args)
+        elif args.alg == "official_hmappo":
+            if not getattr(args, "use_level_policy", False):
+                raise ValueError("official_hmappo requires level-policy training.")
+            from level_policy.official_hmappo import OfficialHMAPPO
+
+            self.policy = OfficialHMAPPO(args)
         elif args.alg.find("mappo_lagrangian") > -1:
             if getattr(args, "use_level_policy", False):
                 raise ValueError("mappo_lagrangian is only implemented for flat MAPPO.")

@@ -37,7 +37,6 @@ Set `DRY_RUN=1` to print the command without launching training.
 | Ours w/o Safety Layer | `train_ours_wo_safety_layer.sh` | current H-MAPPO with safety guard disabled |
 | Ours w/o Auction Module | `train_ours_wo_auction_module.sh` | current H-MAPPO with auction disabled and local greedy order selection |
 | Ours w/o High-level Temporal Abstraction | `train_ours_wo_high_level_temporal_abstraction.sh` | current H-MAPPO with `hmappo_meta_period=1` |
-| Ours with Fixed Charging Threshold | `train_ours_with_fixed_charging_threshold.sh` | current H-MAPPO with fixed energy-threshold charge/order mode |
 | Ours Full | `train_ours_full.sh` | current full method |
 
 ## Notes

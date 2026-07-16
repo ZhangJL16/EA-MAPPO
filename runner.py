@@ -165,10 +165,6 @@ UAV_DELIVERY_DIAGNOSTIC_KEYS = [
     "low_energy_budget_enabled",
     "low_energy_step_ratio_mean",
     "low_energy_budget_overuse_mean",
-    "ecm_loss",
-    "ecm_reg_loss",
-    "ecm_cls_loss",
-    "ecm_policy_loss",
 ]
 
 UAV_DELIVERY_CSV_COLUMNS = (

@@ -528,6 +528,22 @@ class UAVEnv:
             if self.orders[order_id].status == DeliveryOrder.ACTIVE
         ]
 
+    def _order_target(self, order):
+        if order.status in (DeliveryOrder.ACTIVE, DeliveryOrder.ASSIGNED):
+            return order.pickup_pos.copy()
+        if order.status == DeliveryOrder.PICKED:
+            return order.dropoff_pos.copy()
+        return None
+
+    def _nearest_available_order(self, agent):
+        available_orders = self._available_orders()
+        if not available_orders:
+            return None
+        return min(
+            available_orders,
+            key=lambda order: float(np.linalg.norm(order.pickup_pos - agent.pos)),
+        )
+
     def _set_agent_idle(self, agent):
         agent.assigned_order_id = None
         agent.carrying_order = False
@@ -543,20 +559,24 @@ class UAVEnv:
         agent.reached = False
         agent.goal = order.pickup_pos.copy()
 
+    def _mark_order_picked(self, agent, order, update_goal=True):
+        order.status = DeliveryOrder.PICKED
+        agent.carrying_order = True
+        if update_goal:
+            agent.goal = order.dropoff_pos.copy()
+        return self.pickup_reward
+
+    def _mark_order_completed(self, agent, order):
+        order.status = DeliveryOrder.COMPLETED
+        order.assigned_agent = None
+        self._remove_active_order(order.order_id)
+        self.completed_order_count += 1
+        agent.completed_orders += 1
+        self._set_agent_idle(agent)
+        return self.delivery_reward
+
     def _assign_orders(self):
         self._activate_orders()
-        for agent in self.agents:
-            if agent.assigned_order_id is not None:
-                continue
-            available_orders = self._available_orders()
-            if not available_orders:
-                self._set_agent_idle(agent)
-                continue
-            nearest_order = min(
-                available_orders,
-                key=lambda order: float(np.linalg.norm(order.pickup_pos - agent.pos)),
-            )
-            self._assign_order_to_agent(agent, nearest_order)
         self._sync_goals_from_orders()
 
     def _remove_active_order(self, order_id):
@@ -570,25 +590,33 @@ class UAVEnv:
 
         order = self.orders[agent.assigned_order_id]
         if order.status == DeliveryOrder.ASSIGNED:
-            order.status = DeliveryOrder.PICKED
-            agent.carrying_order = True
-            agent.goal = order.dropoff_pos.copy()
-            return self.pickup_reward
+            return self._mark_order_picked(agent, order, update_goal=True)
 
         if order.status == DeliveryOrder.PICKED:
-            order.status = DeliveryOrder.COMPLETED
-            order.assigned_agent = None
-            self._remove_active_order(order.order_id)
-            self.completed_order_count += 1
-            agent.completed_orders += 1
-            self._set_agent_idle(agent)
-            return self.delivery_reward
+            return self._mark_order_completed(agent, order)
 
         return 0.0
 
     def get_active_agent_mask(self):
         return np.asarray(
             [1.0 if agent.has_energy() else 0.0 for agent in self.agents],
+            dtype=np.float32,
+        )
+
+    def get_agent_positions(self):
+        return np.stack([agent.pos.copy() for agent in self.agents], axis=0).astype(
+            np.float32
+        )
+
+    def get_agent_energy_ratios(self):
+        return np.asarray(
+            [[agent.energy / (agent.initial_energy + eps)] for agent in self.agents],
+            dtype=np.float32,
+        )
+
+    def get_agent_completed_order_counts(self):
+        return np.asarray(
+            [[float(agent.completed_orders)] for agent in self.agents],
             dtype=np.float32,
         )
 
@@ -640,6 +668,17 @@ class UAVEnv:
     def _distance_to_charging_station(self, agent):
         return float(
             np.min(np.linalg.norm(self.charging_station_positions - agent.pos, axis=1))
+        )
+
+    def _distance_to_nearest_charging_station_from_pos(self, pos):
+        return float(
+            np.min(
+                np.linalg.norm(
+                    self.charging_station_positions
+                    - np.asarray(pos, dtype=np.float32)[: self.dim_actions],
+                    axis=1,
+                )
+            )
         )
 
     def _consume_step_energy(self, powered_mask):
@@ -1125,8 +1164,6 @@ class UAVEnv:
             rewards[idx] -= 0.01
             rewards[idx] -= obstacle_penalty * float(obstacle_collisions[idx])
             rewards[idx] -= agent_penalty * float(agent_collisions[idx])
-            rewards[idx] -= 0.2 * self.reward_safe_value[idx]
-            rewards[idx] -= 0.3 * min(current_dist, 1.0)
 
             order_reward = self._advance_order_if_reached(agent, current_dist)
             if order_reward > 0.0:

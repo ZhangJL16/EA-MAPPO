@@ -58,22 +58,17 @@ def get_common_args():
     parser.add_argument('--high_critic_hidden_dim', type=int, default=None, help='hidden dimension for hierarchical high-level critic')
     parser.add_argument('--hrl_use_intrinsic_reward', type=_str2bool, default=True, help='use subgoal intrinsic rewards for the low-level policy in HMAPPO')
     parser.add_argument('--hrl_intrinsic_reward_scale', type=float, default=1.0, help='scale for low-level HRL intrinsic rewards')
-    parser.add_argument('--hrl_intrinsic_distance_weight', type=float, default=0.05, help='distance penalty weight in the low-level intrinsic reward')
     parser.add_argument('--hrl_intrinsic_success_bonus', type=float, default=1.0, help='success bonus in the low-level intrinsic reward')
-    parser.add_argument('--hrl_delivery_intrinsic_progress_bonus', type=float, default=0.0, help='extra low-level intrinsic reward multiplier for positive progress while carrying an order to dropoff')
     parser.add_argument('--hrl_intrinsic_collision_penalty', type=float, default=0.0, help='low-level intrinsic penalty for a collision on the current environment step')
     parser.add_argument('--hrl_low_energy_budget_enabled', type=_str2bool, default=False, help='condition low-level observations/rewards on the high-level segment energy budget')
     parser.add_argument('--hrl_low_energy_budget_min_ratio', type=float, default=0.0, help='minimum high-level segment energy budget as a fraction of UAV battery capacity')
     parser.add_argument('--hrl_low_energy_budget_max_ratio', type=float, default=0.08, help='maximum high-level segment energy budget as a fraction of UAV battery capacity')
     parser.add_argument('--hrl_low_energy_budget_overuse_coef', type=float, default=2.0, help='low-level intrinsic penalty coefficient for exceeding the allocated segment energy budget')
     parser.add_argument('--hrl_high_goal_style', type=str, default='line', choices=['line_lateral', 'target_relative', 'free_relative', 'line'], help='high-level continuous action semantics: legacy line progress, line progress plus bounded lateral residual, target-conditioned HIRO goal, or free relative dx/dy goal')
+    parser.add_argument('--hrl_high_mode_policy', type=str, default='hybrid', choices=['hybrid', 'continuous'], help='high-level mode policy: hybrid uses categorical charge/order, continuous uses a Gaussian scalar thresholded by charge_mode_fraction')
     parser.add_argument('--hrl_high_lateral_scale', type=float, default=0.35, help='maximum lateral residual as a fraction of the reachable high-level subgoal radius for line_lateral/target_relative goals')
-    parser.add_argument('--hrl_hiro_correction_enabled', type=_str2bool, default=False, help='relabel high-level continuous goals with achieved segment displacement before high-level PPO updates')
     parser.add_argument('--hrl_order_progress_override', type=float, default=None, help='legacy line-goal only: override high-level progress scalar for order-mode subgoals; disabled when unset')
-    parser.add_argument('--hrl_hindsight_goal', type=_str2bool, default=True, help='enable achieved-goal hindsight auxiliary training for the low-level HMAPPO actor')
-    parser.add_argument('--hrl_hindsight_aux_coef', type=float, default=0.2, help='coefficient for the low-level achieved-goal hindsight auxiliary loss')
-    parser.add_argument('--hrl_subgoal_testing_rate', type=float, default=0.2, help='probability of marking a high-level subgoal as a feasibility test')
-    parser.add_argument('--hrl_subgoal_failure_penalty', type=float, default=5.0, help='high-level penalty when a tested subgoal is not reached')
+    parser.add_argument('--hrl_depleted_terminal_cost_coef', type=float, default=0.0, help='terminal high-level cost coefficient applied per agent that ends an episode with depleted battery')
     parser.add_argument('--hrl_reachable_subgoal_scale', type=float, default=1.0, help='scale applied to the reachable local subgoal radius')
     parser.add_argument('--hrl_oracle_high_level', type=_str2bool, default=False, help='use oracle order-seeking high-level actions for low-level pretraining')
     parser.add_argument('--hmappo_freeze_high_level', type=_str2bool, default=False, help='skip high-level policy updates in HMAPPO')
@@ -83,36 +78,14 @@ def get_common_args():
     parser.add_argument('--hrl_safe_action_guard_enabled', type=_str2bool, default=False, help='enable a SCOPE-style deterministic low-level safety action replacement for local UAV HMAPPO')
     parser.add_argument('--hrl_safe_action_guard_margin', type=float, default=0.04, help='extra collision prediction margin used by the low-level safety action replacement')
     parser.add_argument('--hrl_safe_action_guard_horizon', type=int, default=4, help='number of future low-level steps checked by the deterministic safety action replacement')
-    parser.add_argument('--hrl_off_policy_correction', type=_str2bool, default=False, help='HIRO-style off-policy correction; incompatible with on-policy HMAPPO')
-    parser.add_argument('--hrl_energy_margin_loss_coef', type=float, default=0.0, help='coefficient for the high-level energy feasibility action loss')
-    parser.add_argument('--hrl_ecm_enabled', type=_str2bool, default=False, help='enable action-conditioned Energy Consequence Model training')
-    parser.add_argument('--hrl_ecm_actor_input_enabled', type=_str2bool, default=False, help='append ECM candidate predictions to high-level actor inputs')
-    parser.add_argument('--hrl_ecm_policy_loss_coef', type=float, default=0.0, help='coefficient for ECM predicted-risk regularization of high-level mode probabilities')
-    parser.add_argument('--hrl_ecm_loss_coef', type=float, default=1.0, help='supervised loss coefficient for the Energy Consequence Model')
-    parser.add_argument('--hrl_ecm_lr', type=float, default=3e-4, help='learning rate for the Energy Consequence Model')
-    parser.add_argument('--hrl_ecm_hidden_dim', type=int, default=128, help='hidden dimension for the Energy Consequence Model')
-    parser.add_argument('--hrl_ecm_train_epochs', type=int, default=1, help='number of supervised ECM updates per PPO update')
-    parser.add_argument('--hrl_ecm_update_interval', type=int, default=1, help='train ECM once every N PPO updates')
-    parser.add_argument('--hrl_ecf_enabled', type=_str2bool, default=False, help='deprecated no-op; embedded ECF loss has been removed')
-    parser.add_argument('--hrl_ecf_consequence_loss_coef', type=float, default=0.0, help='deprecated no-op; embedded ECF loss has been removed')
-    parser.add_argument('--hrl_ecf_feas_loss_coef', type=float, default=0.0, help='deprecated no-op; embedded ECF loss has been removed')
-    parser.add_argument('--hrl_ecf_policy_loss_coef', type=float, default=0.0, help='deprecated no-op; embedded ECF loss has been removed')
-    parser.add_argument('--hrl_ecf_charge_need_loss_coef', type=float, default=0.0, help='deprecated no-op; embedded ECF charge-need loss has been removed')
-    parser.add_argument('--hrl_ecf_charge_need_margin', type=float, default=0.05, help='deprecated no-op; embedded ECF charge-need loss has been removed')
-    parser.add_argument('--hrl_ecf_logit_bias_coef', type=float, default=0.0, help='deprecated no-op; embedded ECF logit bias has been removed')
-    parser.add_argument('--hrl_energy_shield_enabled', type=_str2bool, default=False, help='enable a hard high-level energy feasibility shield for charge/order mode selection')
-    parser.add_argument('--hrl_energy_margin_reserve_ratio', type=float, default=0.05, help='normalized energy reserve kept after completing an order and returning to the charging station')
-    parser.add_argument('--hrl_energy_margin_charge_beta', type=float, default=0.5, help='relative penalty for charging when the current order is energy-feasible')
+    parser.add_argument('--hrl_energy_margin_reserve_ratio', type=float, default=0.05, help='reserve ratio used only for selected-order energy margin observation/diagnostics')
     parser.add_argument('--hrl_auction_enabled', type=_str2bool, default=True, help='enable auction-based order pre-assignment in UAVEnergyDeliveryLevel')
-    parser.add_argument('--hrl_fixed_charge_threshold_enabled', type=_str2bool, default=False, help='replace learned high-level charge/order mode with fixed energy thresholds')
-    parser.add_argument('--hrl_fixed_charge_threshold', type=float, default=0.35, help='energy ratio below which fixed-threshold H-MAPPO chooses charging')
-    parser.add_argument('--hrl_fixed_charge_release_threshold', type=float, default=0.65, help='energy ratio above which fixed-threshold H-MAPPO releases charging')
     parser.add_argument('--hrl_charge_energy_threshold', type=float, default=0.35, help='energy ratio below which agents with no current order fall back to charging')
     parser.add_argument('--hrl_charge_release_threshold', type=float, default=0.65, help='energy ratio at which an ongoing charge option is released')
     parser.add_argument('--hrl_charge_queue_enabled', type=_str2bool, default=False, help='spread charging subgoals across capacity-aware dock and waiting slots')
     parser.add_argument('--hrl_charge_queue_radius', type=float, default=0.24, help='radius of the charging waiting ring when charge queue is enabled')
     parser.add_argument('--hrl_charge_mode_fraction', type=float, default=0.5, help='fraction of the high-level mode interval reserved for charging; 0.25 means charge:order = 1:3')
-    parser.add_argument('--hrl_charge_dense_reward_scale', type=float, default=1.0, help='scale for dense goal-shaping rewards when the current high-level target is charging')
+    parser.add_argument('--hrl_charge_dense_reward_scale', type=float, default=0.0, help='scale for dense goal-shaping rewards when the current high-level target is charging')
     parser.add_argument(
         '--experiment_device',
         type=str,
@@ -347,13 +320,6 @@ def get_g2anet_args(args):
 
 def get_mappo_args(args):
     """MAPPO 算法的超参数"""
-    if (
-        getattr(args, "hrl_off_policy_correction", False)
-        and getattr(args, "alg", "").lower().find("mappo") > -1
-    ):
-        raise ValueError(
-            "HIRO-style off-policy correction is incompatible with on-policy MAPPO/HMAPPO."
-        )
     args.rnn_hidden_dim = 64
     args.actor_hidden_dim = 128
     args.critic_hidden_dim = 128
