@@ -98,6 +98,7 @@ class UAVAgent:
     ):
         self.number = number
         self.pos = np.asarray(pos, dtype=np.float32)
+        self.spawn_pos = np.asarray(pos, dtype=np.float32)
         self.prev_pos = np.asarray(pos, dtype=np.float32)
         self.last_pos = np.asarray(pos, dtype=np.float32)
         self.goal = np.asarray(pos, dtype=np.float32)
@@ -238,6 +239,14 @@ class UAVEnv:
         self.max_active_orders = min(int(max_active_orders), self.total_orders)
         self.pickup_reward = float(pickup_reward)
         self.delivery_reward = float(delivery_reward)
+        self.depleted_penalty = -float(
+            10.0
+            * (
+                self.total_orders * (self.pickup_reward + self.delivery_reward)
+                + 5.0
+                + float(episode_limit)
+            )
+        )
         self.initial_energy = float(initial_energy)
         self.energy_depletion_fraction = float(energy_depletion_fraction)
         if energy_decay_per_step is None:
@@ -304,11 +313,16 @@ class UAVEnv:
         self._render_fig = None
         self._render_has_shown = False
 
+        self.nearest_agent_count = 2
+        self.nearest_agent_feature_dim = self.nearest_agent_count * (
+            self.dim_actions * 2 + 1
+        )
         obs_dim = (
             2 * self.dim_actions
             + self.num_lasers
             + (self.dim_actions + 1)
             + 1
+            + self.nearest_agent_feature_dim
         )
         self.action_space = {
             f"agent_{i}": spaces.Box(
@@ -547,10 +561,14 @@ class UAVEnv:
         )
 
     def _set_agent_idle(self, agent):
-        self._deactivate_agent(agent, reason="completed", release_order=False)
+        agent.assigned_order_id = None
+        agent.carrying_order = False
+        agent.reached = True
+        agent.vel[:] = 0.0
+        agent.goal = agent.pos.copy()
 
     def _agent_is_active(self, agent):
-        return bool(getattr(agent, "active", True)) and agent.has_energy()
+        return bool(getattr(agent, "active", True))
 
     def _deactivate_agent(self, agent, reason, release_order=True):
         if release_order and agent.assigned_order_id is not None:
@@ -568,9 +586,38 @@ class UAVEnv:
         agent.goal = agent.pos.copy()
 
     def _deactivate_depleted_agents(self):
+        penalties = np.zeros(self.num_agents, dtype=np.float32)
         for agent in self.agents:
             if getattr(agent, "active", True) and not agent.has_energy():
-                self._deactivate_agent(agent, reason="depleted", release_order=True)
+                penalties[agent.number] = self._reset_depleted_agent(agent)
+        return penalties
+
+    def _reset_depleted_agent(self, agent):
+        if agent.assigned_order_id is not None:
+            order = self.orders[agent.assigned_order_id]
+            if order.status != DeliveryOrder.COMPLETED:
+                order.status = DeliveryOrder.ACTIVE
+                order.assigned_agent = None
+        agent.assigned_order_id = None
+        agent.carrying_order = False
+        agent.energy = float(agent.initial_energy)
+        agent.active = True
+        agent.exit_reason = "depleted_reset"
+        agent.reached = False
+        agent.collided = False
+        agent.prev_collided = False
+        agent.pos = agent.spawn_pos.copy()
+        agent.prev_pos = agent.spawn_pos.copy()
+        agent.last_pos = agent.spawn_pos.copy()
+        agent.vel[:] = 0.0
+        nearest_order = self._nearest_available_order(agent)
+        if nearest_order is not None:
+            agent.goal = nearest_order.pickup_pos.copy()
+        else:
+            agent.goal = agent.pos.copy()
+            agent.reached = True
+        self.agent_paths[agent.number] = [agent.pos.copy()]
+        return float(self.depleted_penalty)
 
     def _assign_order_to_agent(self, agent, order):
         if not self._agent_is_active(agent):
@@ -596,7 +643,11 @@ class UAVEnv:
         self._remove_active_order(order.order_id)
         self.completed_order_count += 1
         agent.completed_orders += 1
-        self._set_agent_idle(agent)
+        agent.assigned_order_id = None
+        agent.carrying_order = False
+        agent.reached = True
+        agent.vel[:] = 0.0
+        agent.goal = agent.pos.copy()
         return self.delivery_reward
 
     def _assign_orders(self):
@@ -609,15 +660,40 @@ class UAVEnv:
         ]
 
     def _advance_order_if_reached(self, agent, current_dist):
-        if agent.assigned_order_id is None or current_dist > self.goal_tolerance:
+        del current_dist
+        if not self._agent_is_active(agent):
             return 0.0
-
-        order = self.orders[agent.assigned_order_id]
-        if order.status == DeliveryOrder.ASSIGNED:
+        if agent.assigned_order_id is not None:
+            order = self.orders[agent.assigned_order_id]
+        else:
+            order = None
+        if (
+            order is not None
+            and order.status == DeliveryOrder.ASSIGNED
+            and np.linalg.norm(agent.pos - order.pickup_pos) <= self.goal_tolerance
+        ):
             return self._mark_order_picked(agent, order, update_goal=True)
 
-        if order.status == DeliveryOrder.PICKED:
+        if (
+            order is not None
+            and order.status == DeliveryOrder.PICKED
+            and np.linalg.norm(agent.pos - order.dropoff_pos) <= self.goal_tolerance
+        ):
             return self._mark_order_completed(agent, order)
+
+        if agent.assigned_order_id is None and not agent.carrying_order:
+            candidates = [
+                order
+                for order in self._available_orders()
+                if np.linalg.norm(agent.pos - order.pickup_pos) <= self.goal_tolerance
+            ]
+            if candidates:
+                order = min(
+                    candidates,
+                    key=lambda item: float(np.linalg.norm(agent.pos - item.pickup_pos)),
+                )
+                if self._assign_order_to_agent(agent, order):
+                    return self._mark_order_picked(agent, order, update_goal=True)
 
         return 0.0
 
@@ -648,6 +724,34 @@ class UAVEnv:
             ],
             dtype=np.float32,
         )
+
+    def _nearest_agent_features(self, agent):
+        features = np.zeros(self.nearest_agent_feature_dim, dtype=np.float32)
+        if not self._agent_is_active(agent):
+            return features
+        scale = self._space_scale() + eps
+        max_dist = float(np.linalg.norm(self._space_scale()) + eps)
+        neighbors = []
+        for other in self.agents:
+            if other is agent or not self._agent_is_active(other):
+                continue
+            rel_pos = other.pos - agent.pos
+            dist = float(np.linalg.norm(rel_pos))
+            rel_vel = other.vel - agent.vel
+            neighbors.append((dist, rel_pos, rel_vel))
+        neighbors.sort(key=lambda item: item[0])
+        slot_dim = self.dim_actions * 2 + 1
+        for slot_idx, (dist, rel_pos, rel_vel) in enumerate(
+            neighbors[: self.nearest_agent_count]
+        ):
+            start = slot_idx * slot_dim
+            features[start : start + self.dim_actions] = rel_pos / scale
+            vel_start = start + self.dim_actions
+            features[vel_start : vel_start + self.dim_actions] = rel_vel / (
+                self.v_max + eps
+            )
+            features[start + 2 * self.dim_actions] = dist / max_dist
+        return features
 
     def get_agent_completed_order_counts(self):
         return np.asarray(
@@ -1174,7 +1278,8 @@ class UAVEnv:
             agent.pos = agent.prev_pos.copy()
 
         self._consume_step_energy(powered_mask)
-        self._deactivate_depleted_agents()
+        depleted_penalties = self._deactivate_depleted_agents()
+        rewards += depleted_penalties
         self._charge_agents_at_station()
         self.update_lasers()
 
@@ -1307,6 +1412,7 @@ class UAVEnv:
                     np.asarray(agent.lasers, dtype=np.float32),
                     self._goal_features(agent),
                     energy,
+                    self._nearest_agent_features(agent),
                 ]
             )
             observations.append(obs.astype(np.float32))
@@ -1984,8 +2090,9 @@ class UAVEnvDiscreteWrapper:
         self.dim_actions = dim_actions
         self.episode_limit = episode_limit
         self.n_agents = self.env.num_agents
-        self.discrete_actions = self._build_discrete_actions()
-        self.n_actions = len(self.discrete_actions)
+        self.low_action_type = "continuous"
+        self.action_dim = self.dim_actions
+        self.n_actions = self.action_dim
         self._episode_steps = 0
         self._last_obs = None
         self._last_reward = 0.0
@@ -2003,10 +2110,16 @@ class UAVEnvDiscreteWrapper:
         return discrete_actions
 
     def get_noop_action(self):
-        for idx, action in enumerate(self.discrete_actions):
-            if np.linalg.norm(action) <= eps:
-                return idx
-        return 0
+        return np.zeros(self.action_dim, dtype=np.float32)
+
+    def _continuous_agent_action(self, action, is_active=True):
+        if not is_active:
+            return np.zeros(self.action_dim, dtype=np.float32)
+        action = np.asarray(action, dtype=np.float32).reshape(-1)
+        if action.size < self.action_dim:
+            action = np.pad(action, (0, self.action_dim - action.size))
+        action = np.clip(action[: self.action_dim], -1.0, 1.0)
+        return action.astype(np.float32) * float(self.env.a_max)
 
     def reset(self, seed=None):
         self._episode_steps = 0
@@ -2020,12 +2133,10 @@ class UAVEnvDiscreteWrapper:
 
     def step(self, actions):
         active_mask = self.get_active_agent_mask()
-        noop_action = self.get_noop_action()
-        actions = [
-            int(action) if active_mask[idx] > 0.0 else noop_action
+        agent_actions = [
+            self._continuous_agent_action(action, active_mask[idx] > 0.0)
             for idx, action in enumerate(actions)
         ]
-        agent_actions = [self.discrete_actions[int(action)] for action in actions]
         self._last_obs, rewards, dones, safe_value = self.env.step(agent_actions)
         self._episode_steps += 1
         active_count = float(np.sum(active_mask))
@@ -2055,16 +2166,23 @@ class UAVEnvDiscreteWrapper:
         return reward, terminated, self._last_info
 
     def estimate_joint_short_risk(self, actions):
-        agent_actions = [self.discrete_actions[int(action)] for action in actions]
+        active_mask = self.get_active_agent_mask()
+        agent_actions = [
+            self._continuous_agent_action(action, active_mask[idx] > 0.0)
+            for idx, action in enumerate(actions)
+        ]
         return self.env.estimate_joint_risk(agent_actions)
 
     def estimate_joint_short_risk_batch(self, actions_batch):
         actions_batch = np.asarray(actions_batch)
-        if actions_batch.ndim != 2:
-            raise ValueError("actions_batch must have shape (batch, n_agents)")
+        if actions_batch.ndim != 3:
+            raise ValueError("actions_batch must have shape (batch, n_agents, action_dim)")
         agent_actions_batch = np.asarray(
             [
-                [self.discrete_actions[int(action)] for action in joint_actions]
+                [
+                    self._continuous_agent_action(action, True)
+                    for action in joint_actions
+                ]
                 for joint_actions in actions_batch
             ],
             dtype=np.float32,
@@ -2072,7 +2190,11 @@ class UAVEnvDiscreteWrapper:
         return self.env.estimate_joint_risk_batch(agent_actions_batch)
 
     def estimate_joint_collision_flags(self, actions):
-        agent_actions = [self.discrete_actions[int(action)] for action in actions]
+        active_mask = self.get_active_agent_mask()
+        agent_actions = [
+            self._continuous_agent_action(action, active_mask[idx] > 0.0)
+            for idx, action in enumerate(actions)
+        ]
         return self.env.predict_joint_collision_flags(agent_actions)
 
     def get_env_info(self):
@@ -2081,6 +2203,8 @@ class UAVEnvDiscreteWrapper:
         state = self.get_state()
         return {
             "n_actions": self.n_actions,
+            "low_action_type": self.low_action_type,
+            "low_action_dim": self.action_dim,
             "n_agents": self.n_agents,
             "state_shape": int(state.shape[0]),
             "obs_shape": int(obs.shape[-1]),
@@ -2103,11 +2227,8 @@ class UAVEnvDiscreteWrapper:
         return self.env.get_msg()
 
     def get_avail_agent_actions(self, agent_id):
-        if self.get_active_agent_mask()[agent_id] > 0.0:
-            return np.ones(self.n_actions, dtype=np.float32)
-        avail = np.zeros(self.n_actions, dtype=np.float32)
-        avail[self.get_noop_action()] = 1.0
-        return avail
+        del agent_id
+        return np.ones(self.n_actions, dtype=np.float32)
 
     def get_active_agent_mask(self):
         return self.env.get_active_agent_mask()

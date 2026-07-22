@@ -110,7 +110,7 @@ def _get_env_msg(env, args, n_agents):
 
 def _get_noop_action(env, n_actions):
     if hasattr(env, "get_noop_action"):
-        return int(env.get_noop_action())
+        return env.get_noop_action()
     return min(int(n_actions) - 1, max(0, int(n_actions) // 2))
 
 
@@ -233,6 +233,9 @@ class RolloutWorker:
             [],
         )
         self._reset_env_for_episode(evaluate, episode_num)
+        low_action_type = getattr(self.args, "low_action_type", "discrete")
+        low_continuous = low_action_type == "continuous"
+        low_action_dim = int(getattr(self.args, "low_action_dim", self.args.n_actions))
         if hasattr(self.agents, "reset_episode_state"):
             self.agents.reset_episode_state()
         level_training = bool(
@@ -546,7 +549,7 @@ class RolloutWorker:
             for agent_id in range(self.n_agents):
                 avail_action = self.env.get_avail_agent_actions(agent_id)
                 if active_agent_mask[agent_id] <= 0.0:
-                    action = noop_action
+                    action = np.asarray(noop_action, dtype=np.float32).copy() if low_continuous else noop_action
                 elif self.args.alg == "maven":
                     action = self.agents.choose_action(
                         obs[agent_id],
@@ -570,10 +573,17 @@ class RolloutWorker:
                         timestep_max=self.args.n_steps,
                         msg=None if msg is None else msg[agent_id],
                     )
-                # generate onehot vector of th action
-                action_onehot = np.zeros(self.args.n_actions)
-                action_onehot[action] = 1
-                actions.append(np.int_(action))
+                if low_continuous:
+                    action = np.asarray(action, dtype=np.float32).reshape(-1)
+                    if action.size < low_action_dim:
+                        action = np.pad(action, (0, low_action_dim - action.size))
+                    action = np.clip(action[:low_action_dim], -1.0, 1.0).astype(np.float32)
+                    action_onehot = action.copy()
+                    actions.append(action)
+                else:
+                    action_onehot = np.zeros(self.args.n_actions)
+                    action_onehot[action] = 1
+                    actions.append(np.int_(action))
                 actions_onehot.append(action_onehot)
                 avail_actions.append(avail_action)
                 last_action[agent_id] = action_onehot
@@ -585,18 +595,19 @@ class RolloutWorker:
                     base_actions=actions,
                 )
                 if revised_actions is not None:
-                    actions = [int(action) for action in revised_actions]
-                    actions = [
-                        action if active_agent_mask[agent_id] > 0.0 else noop_action
-                        for agent_id, action in enumerate(actions)
-                    ]
-                    actions_onehot = []
-                    for action in actions:
-                        action_onehot = np.zeros(self.args.n_actions)
-                        action_onehot[action] = 1
-                        actions_onehot.append(action_onehot)
-                    for agent_id in range(self.n_agents):
-                        last_action[agent_id] = actions_onehot[agent_id]
+                    if not low_continuous:
+                        actions = [int(action) for action in revised_actions]
+                        actions = [
+                            action if active_agent_mask[agent_id] > 0.0 else noop_action
+                            for agent_id, action in enumerate(actions)
+                        ]
+                        actions_onehot = []
+                        for action in actions:
+                            action_onehot = np.zeros(self.args.n_actions)
+                            action_onehot[action] = 1
+                            actions_onehot.append(action_onehot)
+                        for agent_id in range(self.n_agents):
+                            last_action[agent_id] = actions_onehot[agent_id]
             guard_flags = np.asarray(
                 getattr(self.agents, "last_guard_applied", [0 for _ in range(self.n_agents)]),
                 dtype=np.float32,
@@ -678,18 +689,8 @@ class RolloutWorker:
             external_reward_for_high = np.asarray(
                 reward_for_batch, dtype=np.float32
             ).copy()
-            reward_terms = info.get("per_agent_reward_terms", None)
-            if level_training and isinstance(reward_terms, dict) and reward_terms:
-                task_event_reward = np.zeros(self.n_agents, dtype=np.float32)
-                for term_name in ("pickup", "delivery", "all_orders_completed"):
-                    if term_name not in reward_terms:
-                        continue
-                    term_values = np.asarray(
-                        reward_terms[term_name], dtype=np.float32
-                    ).reshape(-1)
-                    if term_values.size == self.n_agents:
-                        task_event_reward += term_values
-                external_reward_for_high = task_event_reward
+            if level_training:
+                external_reward_for_high = np.zeros(self.n_agents, dtype=np.float32)
             if level_training and current_high_transition is not None:
                 reward_values = np.asarray(
                     external_reward_for_high, dtype=np.float32
@@ -712,7 +713,10 @@ class RolloutWorker:
             o.append(obs)
             o_raw.append(raw_obs)
             s.append(state)
-            u.append(np.reshape(actions, [self.n_agents, 1]))
+            if low_continuous:
+                u.append(np.asarray(actions, dtype=np.float32).reshape(self.n_agents, low_action_dim))
+            else:
+                u.append(np.reshape(actions, [self.n_agents, 1]))
             u_onehot.append(actions_onehot)
             avail_u.append(avail_actions)
             active_masks.append(active_agent_mask.reshape(self.n_agents, 1).copy())
@@ -782,7 +786,7 @@ class RolloutWorker:
         for i in range(step, self.episode_limit):
             o.append(np.zeros((self.n_agents, self.obs_shape)))
             o_raw.append(np.zeros((self.n_agents, getattr(self.args, "raw_obs_shape", self.obs_shape))))
-            u.append(np.zeros([self.n_agents, 1]))
+            u.append(np.zeros((self.n_agents, low_action_dim if low_continuous else 1)))
             s.append(np.zeros(self.state_shape))
             r.append(np.zeros_like(reward_template))
             if use_constraint_cost:
@@ -969,6 +973,9 @@ class CommRolloutWorker:
             [],
         )
         self._reset_env_for_episode(evaluate, episode_num)
+        low_action_type = getattr(self.args, "low_action_type", "discrete")
+        low_continuous = low_action_type == "continuous"
+        low_action_dim = int(getattr(self.args, "low_action_dim", self.args.n_actions))
         terminated = False
         win_tag = False
         step = 0
@@ -980,6 +987,7 @@ class CommRolloutWorker:
             epsilon = (
                 epsilon - self.anneal_epsilon if epsilon > self.min_epsilon else epsilon
             )
+        reward_template = np.zeros((1,), dtype=np.float32)
         while not terminated and step < self.episode_limit:
             active_agent_mask = _get_active_agent_mask(self.env, self.n_agents)
             noop_action = _get_noop_action(self.env, self.n_actions)
@@ -998,16 +1006,28 @@ class CommRolloutWorker:
             for agent_id in range(self.n_agents):
                 avail_action = self.env.get_avail_agent_actions(agent_id)
                 if active_agent_mask[agent_id] <= 0.0:
-                    action = noop_action
+                    action = (
+                        np.asarray(noop_action, dtype=np.float32).copy()
+                        if low_continuous
+                        else noop_action
+                    )
                 else:
                     action = self.agents.choose_action(
                         weights[agent_id], avail_action, epsilon, step, self.args.n_steps
                     )
 
-                # generate onehot vector of th action
-                action_onehot = np.zeros(self.args.n_actions)
-                action_onehot[action] = 1
-                actions.append(np.int_(action))
+                if low_continuous:
+                    action = np.asarray(action, dtype=np.float32).reshape(-1)
+                    if action.size < low_action_dim:
+                        action = np.pad(action, (0, low_action_dim - action.size))
+                    action = np.clip(action[:low_action_dim], -1.0, 1.0).astype(np.float32)
+                    action_onehot = action.copy()
+                    actions.append(action)
+                else:
+                    # generate onehot vector of the action
+                    action_onehot = np.zeros(self.args.n_actions)
+                    action_onehot[action] = 1
+                    actions.append(np.int_(action))
                 actions_onehot.append(action_onehot)
                 avail_actions.append(avail_action)
                 last_action[agent_id] = action_onehot
@@ -1016,11 +1036,19 @@ class CommRolloutWorker:
             win_tag = terminated and info.get("battle_won", False)
             o.append(obs)
             s.append(state)
-            u.append(np.reshape(actions, [self.n_agents, 1]))
+            if low_continuous:
+                u.append(
+                    np.asarray(actions, dtype=np.float32).reshape(
+                        self.n_agents, low_action_dim
+                    )
+                )
+            else:
+                u.append(np.reshape(actions, [self.n_agents, 1]))
             u_onehot.append(actions_onehot)
             avail_u.append(avail_actions)
             active_masks.append(active_agent_mask.reshape(self.n_agents, 1).copy())
             r.append([reward])
+            reward_template = np.array([reward], dtype=np.float32)
             terminate.append([terminated])
             padded.append([0.0])
             episode_reward += reward
@@ -1052,7 +1080,7 @@ class CommRolloutWorker:
         # if step < self.episode_limit，padding
         for i in range(step, self.episode_limit):
             o.append(np.zeros((self.n_agents, self.obs_shape)))
-            u.append(np.zeros([self.n_agents, 1]))
+            u.append(np.zeros((self.n_agents, low_action_dim if low_continuous else 1)))
             s.append(np.zeros(self.state_shape))
             r.append(np.zeros_like(reward_template))
             o_next.append(np.zeros((self.n_agents, self.obs_shape)))

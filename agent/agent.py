@@ -570,6 +570,9 @@ class Agents:
         return 0.0
 
     def revise_safe_actions(self, observations, avail_actions, base_actions):
+        if getattr(self.args, "low_action_type", "discrete") == "continuous":
+            self.last_guard_applied = [0.0 for _ in range(self.n_agents)]
+            return None
         guard_flags = np.zeros(self.n_agents, dtype=np.float32)
         revised_actions = [int(action) for action in base_actions]
 

@@ -388,6 +388,8 @@ if __name__ == "__main__":
         env_info = env.get_env_info()
 
         args.n_actions = env_info["n_actions"]
+        args.low_action_type = env_info.get("low_action_type", "discrete")
+        args.low_action_dim = env_info.get("low_action_dim", args.n_actions)
         args.n_agents = env_info["n_agents"]
         args.state_shape = env_info["state_shape"]
         args.obs_shape = env_info["obs_shape"]

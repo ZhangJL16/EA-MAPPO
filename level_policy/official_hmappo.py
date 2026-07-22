@@ -27,6 +27,9 @@ class OfficialHMAPPO(MAPPO):
         self.args = args
         self.n_agents = args.n_agents
         self.low_n_actions = args.n_actions
+        self.low_action_type = getattr(args, "low_action_type", "discrete")
+        self.low_continuous = self.low_action_type == "continuous"
+        self.low_action_dim = int(getattr(args, "low_action_dim", self.low_n_actions))
         self.low_obs_shape = args.obs_shape
         self.low_state_shape = args.state_shape
         self.high_n_actions = int(getattr(args, "high_level_n_actions", 0))
@@ -58,9 +61,11 @@ class OfficialHMAPPO(MAPPO):
         high_lr_actor = getattr(args, "high_lr_actor", args.lr_actor)
         high_lr_critic = getattr(args, "high_lr_critic", args.lr_critic)
 
-        self.low_actor = DiscreteActorNetwork(
+        low_actor_cls = GaussianActorNetwork if self.low_continuous else DiscreteActorNetwork
+        low_actor_action_dim = self.low_action_dim if self.low_continuous else self.low_n_actions
+        self.low_actor = low_actor_cls(
             self.low_obs_shape,
-            self.low_n_actions,
+            low_actor_action_dim,
             actor_hidden_dim,
         ).to(self.device)
         self.low_critic = CriticNetwork(self.low_state_shape, critic_hidden_dim).to(
@@ -123,6 +128,11 @@ class OfficialHMAPPO(MAPPO):
             dtype=torch.float32,
             device=self.device,
         ).unsqueeze(0)
+        if self.low_continuous:
+            dist = self._gaussian_dist(self.low_actor, obs)
+            action = dist.mean if evaluate else dist.sample()
+            action = torch.clamp(action, -1.0, 1.0)
+            return action.squeeze(0).detach().cpu().numpy().astype("float32")
         avail = torch.tensor(
             avail_actions,
             dtype=torch.float32,
@@ -239,7 +249,10 @@ class OfficialHMAPPO(MAPPO):
         self.last_train_metrics = {}
         batch = self._prepare_batch(batch)
         if not bool(getattr(self.args, "hmappo_freeze_low_level", False)):
-            self._learn_shared_low_level(batch)
+            if self.low_continuous:
+                self._learn_shared_continuous_low_level(batch)
+            else:
+                self._learn_shared_low_level(batch)
         if (
             not self.high_level_enabled
             or "high_o" not in batch
@@ -326,6 +339,78 @@ class OfficialHMAPPO(MAPPO):
             old_log_probs=old_log_probs,
             flat_agent_mask=flat_agent_mask,
             flat_actor_mask=flat_actor_mask,
+            metric_prefix="official_hmappo_low",
+        )
+
+    def _learn_shared_continuous_low_level(self, batch):
+        states = batch["s"]
+        next_states = batch["s_next"]
+        obs = batch["o"]
+        actions = batch["u"]
+        terminated = batch["terminated"].squeeze(-1)
+        mask = 1.0 - batch["padded"].squeeze(-1)
+        active_mask = batch.get("agent_active_mask", None)
+        if active_mask is None:
+            active_mask = torch.ones(
+                (*mask.shape, self.n_agents, 1),
+                dtype=mask.dtype,
+                device=self.device,
+            )
+        active_mask = active_mask.squeeze(-1)
+        guard_applied = batch.get("guard_applied", None)
+        if guard_applied is not None:
+            guard_applied = guard_applied.squeeze(-1)
+        rewards = batch["r"]
+        if rewards.size(-1) == 1:
+            rewards = rewards.expand(-1, -1, self.n_agents)
+
+        episode_num = states.size(0)
+        time_len = states.size(1)
+        agent_mask = mask.unsqueeze(-1) * active_mask
+        flat_obs = obs.reshape(episode_num * time_len * self.n_agents, -1)
+        flat_actions = actions.reshape(-1, self.low_action_dim)
+        flat_states = self._expand_states_for_agents(states, self.low_state_shape)
+        flat_next_states = self._expand_states_for_agents(next_states, self.low_state_shape)
+
+        with torch.no_grad():
+            values = self.low_critic(flat_states).reshape(
+                episode_num,
+                time_len,
+                self.n_agents,
+            )
+            next_values = self.low_critic(flat_next_states).reshape(
+                episode_num,
+                time_len,
+                self.n_agents,
+            )
+            advantages, returns = self._compute_multiagent_advantages(
+                rewards,
+                values,
+                next_values,
+                terminated,
+                agent_mask,
+            )
+            old_dist = self._gaussian_dist(self.low_actor, flat_obs)
+            old_log_probs = old_dist.log_prob(flat_actions).sum(dim=-1)
+
+        flat_agent_mask = agent_mask.reshape(-1) > 0
+        if guard_applied is not None:
+            actor_mask = agent_mask * (1.0 - guard_applied)
+        else:
+            actor_mask = agent_mask
+        self._ppo_update_gaussian(
+            actor=self.low_actor,
+            critic=self.low_critic,
+            actor_optimizer=self.low_actor_optimizer,
+            critic_optimizer=self.low_critic_optimizer,
+            flat_obs=flat_obs,
+            flat_actions=flat_actions,
+            flat_states=flat_states,
+            advantages=advantages.reshape(-1),
+            returns=returns.reshape(-1),
+            old_log_probs=old_log_probs,
+            flat_agent_mask=flat_agent_mask,
+            flat_actor_mask=actor_mask.reshape(-1) > 0,
             metric_prefix="official_hmappo_low",
         )
 

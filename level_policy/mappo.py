@@ -85,6 +85,9 @@ class MAPPO:
         self.args = args
         self.n_agents = args.n_agents
         self.low_n_actions = args.n_actions
+        self.low_action_type = getattr(args, "low_action_type", "discrete")
+        self.low_continuous = self.low_action_type == "continuous"
+        self.low_action_dim = int(getattr(args, "low_action_dim", self.low_n_actions))
         self.low_obs_shape = args.obs_shape
         self.low_state_shape = args.state_shape
         self.high_n_actions = int(getattr(args, "high_level_n_actions", 0))
@@ -116,10 +119,12 @@ class MAPPO:
         high_lr_actor = getattr(args, "high_lr_actor", args.lr_actor)
         high_lr_critic = getattr(args, "high_lr_critic", args.lr_critic)
 
+        low_actor_cls = GaussianActorNetwork if self.low_continuous else DiscreteActorNetwork
+        low_actor_action_dim = self.low_action_dim if self.low_continuous else self.low_n_actions
         self.low_actors = nn.ModuleList(
             [
-                DiscreteActorNetwork(
-                    self.low_obs_shape, self.low_n_actions, actor_hidden_dim
+                low_actor_cls(
+                    self.low_obs_shape, low_actor_action_dim, actor_hidden_dim
                 )
                 for _ in range(self.n_agents)
             ]
@@ -247,6 +252,14 @@ class MAPPO:
 
     @torch.no_grad()
     def choose_action(self, observation, agent_idx, avail_actions, evaluate=False):
+        if self.low_continuous:
+            obs = torch.tensor(
+                observation, dtype=torch.float32, device=self.device
+            ).unsqueeze(0)
+            dist = self._gaussian_dist(self.low_actors[agent_idx], obs)
+            action = dist.mean if evaluate else dist.sample()
+            action = torch.clamp(action, -1.0, 1.0)
+            return action.squeeze(0).detach().cpu().numpy().astype("float32")
         return self._choose_from_network(
             self.low_actors[agent_idx], observation, avail_actions, evaluate
         )
@@ -293,7 +306,7 @@ class MAPPO:
     def _prepare_batch(self, batch):
         tensor_batch = {}
         for key, value in batch.items():
-            if key == "u":
+            if key == "u" and not self.low_continuous:
                 tensor_batch[key] = torch.tensor(
                     value, dtype=torch.long, device=self.device
                 )
@@ -361,26 +374,47 @@ class MAPPO:
         freeze_low = bool(getattr(self.args, "hmappo_freeze_low_level", False))
         freeze_high = bool(getattr(self.args, "hmappo_freeze_high_level", False))
         if not freeze_low:
-            self._learn_level(
-                batch=batch,
-                actors=self.low_actors,
-                critics=self.low_critics,
-                actor_optimizers=self.low_actor_optimizers,
-                critic_optimizers=self.low_critic_optimizers,
-                obs_key="o",
-                state_key="s",
-                next_state_key="s_next",
-                action_key="u",
-                avail_key="avail_u",
-                reward_key="r",
-                padded_key="padded",
-                terminated_key="terminated",
-                active_key="agent_active_mask",
-                action_dim=self.low_n_actions,
-                obs_dim=self.low_obs_shape,
-                state_dim=self.low_state_shape,
-                guard_key="guard_applied",
-            )
+            if self.low_continuous:
+                self._learn_continuous_level(
+                    batch=batch,
+                    actors=self.low_actors,
+                    critics=self.low_critics,
+                    actor_optimizers=self.low_actor_optimizers,
+                    critic_optimizers=self.low_critic_optimizers,
+                    obs_key="o",
+                    state_key="s",
+                    next_state_key="s_next",
+                    action_key="u",
+                    reward_key="r",
+                    padded_key="padded",
+                    terminated_key="terminated",
+                    active_key="agent_active_mask",
+                    action_dim=self.low_action_dim,
+                    obs_dim=self.low_obs_shape,
+                    state_dim=self.low_state_shape,
+                    intervention_key="guard_applied",
+                )
+            else:
+                self._learn_level(
+                    batch=batch,
+                    actors=self.low_actors,
+                    critics=self.low_critics,
+                    actor_optimizers=self.low_actor_optimizers,
+                    critic_optimizers=self.low_critic_optimizers,
+                    obs_key="o",
+                    state_key="s",
+                    next_state_key="s_next",
+                    action_key="u",
+                    avail_key="avail_u",
+                    reward_key="r",
+                    padded_key="padded",
+                    terminated_key="terminated",
+                    active_key="agent_active_mask",
+                    action_dim=self.low_n_actions,
+                    obs_dim=self.low_obs_shape,
+                    state_dim=self.low_state_shape,
+                    guard_key="guard_applied",
+                )
         if not self.high_level_enabled or "high_o" not in batch or freeze_high:
             return
 

@@ -6,6 +6,13 @@ class ReplayBuffer:
     def __init__(self, args):
         self.args = args
         self.n_actions = self.args.n_actions
+        self.low_action_type = getattr(self.args, "low_action_type", "discrete")
+        self.u_shape = (
+            int(getattr(self.args, "low_action_dim", self.n_actions))
+            if self.low_action_type == "continuous"
+            else 1
+        )
+        self.u_dtype = np.float32 if self.low_action_type == "continuous" else np.int64
         self.n_agents = self.args.n_agents
         self.state_shape = self.args.state_shape
         self.obs_shape = self.args.obs_shape
@@ -25,7 +32,7 @@ class ReplayBuffer:
         # create the buffer to store info
         self.buffers = {
             'o': np.empty([self.size, self.episode_limit, self.n_agents, self.obs_shape], dtype=np.float32),
-            'u': np.empty([self.size, self.episode_limit, self.n_agents, 1], dtype=np.int64),
+            'u': np.empty([self.size, self.episode_limit, self.n_agents, self.u_shape], dtype=self.u_dtype),
             's': np.empty([self.size, self.episode_limit, self.state_shape], dtype=np.float32),
             'r': np.empty([self.size, self.episode_limit, 1], dtype=np.float32),
             'o_next': np.empty([self.size, self.episode_limit, self.n_agents, self.obs_shape], dtype=np.float32),

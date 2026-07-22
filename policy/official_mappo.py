@@ -1,9 +1,10 @@
 import glob
 import os
 
+import numpy as np
 import torch
 import torch.nn as nn
-from torch.distributions import Categorical
+from torch.distributions import Categorical, Normal
 
 
 class SharedDiscreteActor(nn.Module):
@@ -19,6 +20,25 @@ class SharedDiscreteActor(nn.Module):
 
     def forward(self, obs):
         return self.logits(self.net(obs))
+
+
+class SharedGaussianActor(nn.Module):
+    def __init__(self, input_dims, action_dim, hidden_dim=128):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(input_dims, hidden_dim),
+            nn.Tanh(),
+            nn.Linear(hidden_dim, hidden_dim),
+            nn.Tanh(),
+        )
+        self.mean = nn.Linear(hidden_dim, action_dim)
+        self.log_std = nn.Parameter(torch.zeros(action_dim))
+
+    def forward(self, obs):
+        mean = torch.tanh(self.mean(self.net(obs)))
+        log_std = torch.clamp(self.log_std, -5.0, 2.0)
+        std = torch.exp(log_std).expand_as(mean)
+        return mean, std
 
 
 class SharedCentralCritic(nn.Module):
@@ -47,6 +67,9 @@ class OfficialMAPPO:
 
     def __init__(self, args):
         self.n_actions = args.n_actions
+        self.action_type = getattr(args, "low_action_type", "discrete")
+        self.continuous_action = self.action_type == "continuous"
+        self.action_dim = int(getattr(args, "low_action_dim", self.n_actions))
         self.n_agents = args.n_agents
         self.state_shape = args.state_shape
         self.obs_shape = args.obs_shape
@@ -59,9 +82,11 @@ class OfficialMAPPO:
 
         actor_hidden_dim = getattr(args, "actor_hidden_dim", 128)
         critic_hidden_dim = getattr(args, "critic_hidden_dim", 128)
-        self.actor = SharedDiscreteActor(
+        actor_cls = SharedGaussianActor if self.continuous_action else SharedDiscreteActor
+        actor_action_dim = self.action_dim if self.continuous_action else self.n_actions
+        self.actor = actor_cls(
             self.obs_shape,
-            self.n_actions,
+            actor_action_dim,
             actor_hidden_dim,
         ).to(self.device)
         self.critic = SharedCentralCritic(
@@ -97,6 +122,10 @@ class OfficialMAPPO:
         masked_logits = logits.masked_fill(avail_actions <= 0, -1e10)
         return Categorical(logits=masked_logits)
 
+    def _gaussian_dist(self, obs):
+        mean, std = self.actor(obs)
+        return Normal(mean, std)
+
     @torch.no_grad()
     def choose_action(self, observation, agent_idx, avail_actions, evaluate=False):
         del agent_idx
@@ -105,6 +134,11 @@ class OfficialMAPPO:
             dtype=torch.float32,
             device=self.device,
         ).unsqueeze(0)
+        if self.continuous_action:
+            dist = self._gaussian_dist(obs)
+            action = dist.mean if evaluate else dist.sample()
+            action = torch.clamp(action, -1.0, 1.0)
+            return action.squeeze(0).detach().cpu().numpy().astype("float32")
         avail = torch.tensor(
             avail_actions,
             dtype=torch.float32,
@@ -120,7 +154,7 @@ class OfficialMAPPO:
     def _prepare_batch(self, batch):
         tensor_batch = {}
         for key, value in batch.items():
-            if key == "u":
+            if key == "u" and not self.continuous_action:
                 tensor_batch[key] = torch.tensor(
                     value,
                     dtype=torch.long,
@@ -169,7 +203,7 @@ class OfficialMAPPO:
         states = batch["s"]
         next_states = batch["s_next"]
         obs = batch["o"]
-        actions = batch["u"].squeeze(-1)
+        actions = batch["u"] if self.continuous_action else batch["u"].squeeze(-1)
         avail_actions = batch["avail_u"]
         terminated = batch["terminated"].squeeze(-1)
         mask = 1.0 - batch["padded"].squeeze(-1)
@@ -195,7 +229,10 @@ class OfficialMAPPO:
         agent_mask = mask.unsqueeze(-1) * active_mask
 
         flat_obs = obs.reshape(episode_num * time_len * self.n_agents, -1)
-        flat_actions = actions.reshape(-1)
+        if self.continuous_action:
+            flat_actions = actions.reshape(-1, self.action_dim)
+        else:
+            flat_actions = actions.reshape(-1)
         flat_avail = avail_actions.reshape(-1, self.n_actions)
         flat_states = (
             states.unsqueeze(2)
@@ -226,8 +263,12 @@ class OfficialMAPPO:
                 terminated,
                 agent_mask,
             )
-            old_dist = self._masked_categorical(self.actor(flat_obs), flat_avail)
-            old_log_probs = old_dist.log_prob(flat_actions)
+            if self.continuous_action:
+                old_dist = self._gaussian_dist(flat_obs)
+                old_log_probs = old_dist.log_prob(flat_actions).sum(dim=-1)
+            else:
+                old_dist = self._masked_categorical(self.actor(flat_obs), flat_avail)
+                old_log_probs = old_dist.log_prob(flat_actions)
 
         flat_agent_mask = agent_mask.reshape(-1) > 0
         if guard_applied is not None:
@@ -242,9 +283,10 @@ class OfficialMAPPO:
 
         valid_actor_obs = flat_obs[flat_actor_mask]
         valid_actor_actions = flat_actions[flat_actor_mask]
-        valid_actor_avail = flat_avail[flat_actor_mask]
         valid_actor_advantages = advantages.reshape(-1)[flat_actor_mask]
         valid_actor_old_log_probs = old_log_probs[flat_actor_mask]
+        if not self.continuous_action:
+            valid_actor_avail = flat_avail[flat_actor_mask]
 
         if valid_states.size(0) == 0:
             self.last_train_metrics = {}
@@ -264,11 +306,19 @@ class OfficialMAPPO:
                 )
                 for start in range(0, valid_actor_obs.size(0), actor_batch_size):
                     indices = actor_permutation[start : start + actor_batch_size]
-                    dist = self._masked_categorical(
-                        self.actor(valid_actor_obs[indices]),
-                        valid_actor_avail[indices],
-                    )
-                    new_log_probs = dist.log_prob(valid_actor_actions[indices])
+                    if self.continuous_action:
+                        dist = self._gaussian_dist(valid_actor_obs[indices])
+                        new_log_probs = dist.log_prob(
+                            valid_actor_actions[indices]
+                        ).sum(dim=-1)
+                        entropy = dist.entropy().sum(dim=-1)
+                    else:
+                        dist = self._masked_categorical(
+                            self.actor(valid_actor_obs[indices]),
+                            valid_actor_avail[indices],
+                        )
+                        new_log_probs = dist.log_prob(valid_actor_actions[indices])
+                        entropy = dist.entropy()
                     ratio = torch.exp(
                         new_log_probs - valid_actor_old_log_probs[indices]
                     )
@@ -279,7 +329,6 @@ class OfficialMAPPO:
                     )
                     surrogate_1 = ratio * valid_actor_advantages[indices]
                     surrogate_2 = clipped_ratio * valid_actor_advantages[indices]
-                    entropy = dist.entropy()
                     actor_loss = -torch.min(surrogate_1, surrogate_2)
                     actor_loss -= self.args.entropy_coef * entropy
                     actor_loss = actor_loss.mean()

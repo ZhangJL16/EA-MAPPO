@@ -345,27 +345,7 @@ class HierarchicalUAVEnv(UAVEnv):
         return self._agent_is_active(agent) and not agent.reached
 
     def _advance_order_if_reached(self, agent, current_dist=None):
-        if (
-            agent.current_task_type != TASK_ORDER
-            or agent.assigned_order_id is None
-        ):
-            return 0.0
-
-        order = self.orders[agent.assigned_order_id]
-        if order.status == DeliveryOrder.ASSIGNED:
-            if np.linalg.norm(agent.pos - order.pickup_pos) > self.goal_tolerance:
-                return 0.0
-            reward = self._mark_order_picked(agent, order, update_goal=False)
-            agent.task_target = order.dropoff_pos.copy()
-            agent.reached = True
-            return reward
-
-        if order.status == DeliveryOrder.PICKED:
-            if np.linalg.norm(agent.pos - order.dropoff_pos) > self.goal_tolerance:
-                return 0.0
-            return self._mark_order_completed(agent, order)
-
-        return 0.0
+        return super()._advance_order_if_reached(agent, current_dist)
 
     def _consume_step_energy(self, powered_mask, actions=None):
         self._last_step_energy_ratio = np.zeros(self.num_agents, dtype=np.float32)
@@ -448,7 +428,8 @@ class HierarchicalUAVEnv(UAVEnv):
             agent.pos = agent.prev_pos.copy()
 
         self._consume_step_energy(powered_mask, actions)
-        self._deactivate_depleted_agents()
+        depleted_penalties = self._deactivate_depleted_agents()
+        rewards += depleted_penalties
         self._charge_agents_at_station()
         self.update_lasers()
 
@@ -506,13 +487,9 @@ class HierarchicalUAVEnv(UAVEnv):
                 elif prev_status == DeliveryOrder.PICKED:
                     reward_terms["delivery"][idx] = order_reward
                 rewards[idx] += order_reward
-            elif agent.reached and agent.assigned_order_id is None:
-                self._deactivate_agent(agent, reason="target_completed", release_order=False)
-
             agent.prev_collided = agent.collided
             agent.collided = obstacle_collisions[idx] or agent_collisions[idx]
-            if self._agent_is_active(agent):
-                self.agent_paths[idx].append(agent.pos.copy())
+            self.agent_paths[idx].append(agent.pos.copy())
 
         self._activate_orders()
         delivery_done = self._all_orders_completed()
@@ -643,8 +620,9 @@ class UAVEnvDiscreteWrapper(BaseUAVEnvDiscreteWrapper):
         self.dim_actions = dim_actions
         self.episode_limit = episode_limit
         self.n_agents = self.env.num_agents
-        self.discrete_actions = self._build_discrete_actions()
-        self.n_actions = len(self.discrete_actions)
+        self.low_action_type = "continuous"
+        self.action_dim = self.dim_actions
+        self.n_actions = self.action_dim
         self._episode_steps = 0
         self._last_obs = None
         self._last_reward = 0.0
