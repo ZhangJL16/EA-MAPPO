@@ -388,20 +388,7 @@ class RolloutWorker:
         while not terminated and step < self.episode_limit:
             active_agent_mask = _get_active_agent_mask(self.env, self.n_agents)
             noop_action = _get_noop_action(self.env, self.n_actions)
-            subgoal_success = np.zeros(self.n_agents, dtype=np.float32)
-            if (
-                level_training
-                and current_high_transition is not None
-                and getattr(self.args, "hrl_meta_update_on_subgoal_done", True)
-                and hasattr(self.env, "get_subgoal_success_mask")
-            ):
-                subgoal_success = self.env.get_subgoal_success_mask(
-                    current_high_transition.get("subgoals")
-                )
-            force_meta_update = bool(
-                np.any(subgoal_success * active_agent_mask > 0.0)
-            )
-            if level_training and (step % meta_period == 0 or force_meta_update):
+            if level_training and step % meta_period == 0:
                 if current_high_transition is not None:
                     high_reward = current_high_reward.copy()
                     high_o.append(current_high_transition["o"])
@@ -526,11 +513,6 @@ class RolloutWorker:
                     "energy_order_mask": np.asarray(
                         high_energy_order_mask, dtype=np.float32
                     ).reshape(self.n_agents, 1),
-                    "subgoals": (
-                        self.env.get_current_subgoals()
-                        if hasattr(self.env, "get_current_subgoals")
-                        else None
-                    ),
                     "start_positions": (
                         self.env.get_agent_positions()
                         if hasattr(self.env, "get_agent_positions")
@@ -560,13 +542,6 @@ class RolloutWorker:
             else:
                 msg = _get_env_msg(self.env, self.args, self.n_agents)
             state = self.env.get_state()
-            prev_subgoal_distances = None
-            if (
-                level_training
-                and getattr(self.args, "hrl_use_intrinsic_reward", True)
-                and hasattr(self.env, "get_subgoal_distances")
-            ):
-                prev_subgoal_distances = self.env.get_subgoal_distances()
             actions, avail_actions, actions_onehot = [], [], []
             for agent_id in range(self.n_agents):
                 avail_action = self.env.get_avail_agent_actions(agent_id)
@@ -715,18 +690,6 @@ class RolloutWorker:
                     if term_values.size == self.n_agents:
                         task_event_reward += term_values
                 external_reward_for_high = task_event_reward
-            if (
-                level_training
-                and getattr(self.args, "hrl_use_intrinsic_reward", True)
-                and hasattr(self.env, "compute_intrinsic_rewards")
-                and prev_subgoal_distances is not None
-            ):
-                reward_for_batch = self.env.compute_intrinsic_rewards(
-                    prev_subgoal_distances
-                )
-                reward_for_batch = np.asarray(reward_for_batch, dtype=np.float32)
-                reward_for_batch *= active_agent_mask
-
             if level_training and current_high_transition is not None:
                 reward_values = np.asarray(
                     external_reward_for_high, dtype=np.float32

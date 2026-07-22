@@ -117,6 +117,8 @@ class UAVAgent:
         self.completed_orders = 0
         self.initial_energy = float(initial_energy)
         self.energy = float(initial_energy)
+        self.active = True
+        self.exit_reason = None
 
     def has_energy(self):
         return self.energy > eps
@@ -276,7 +278,7 @@ class UAVEnv:
         self.safe_radius = 0.05
         self.risk_warning_margin = 0.06
         self.guard_prediction_margin = 0.04
-        self.velocity_reward_weight = 0.9
+        self.velocity_reward_weight = 0.1
         self.obstacle_collision_penalty = 1.2
         self.agent_collision_penalty = 1.5
         self.repeat_collision_scale = 0.35
@@ -545,19 +547,41 @@ class UAVEnv:
         )
 
     def _set_agent_idle(self, agent):
+        self._deactivate_agent(agent, reason="completed", release_order=False)
+
+    def _agent_is_active(self, agent):
+        return bool(getattr(agent, "active", True)) and agent.has_energy()
+
+    def _deactivate_agent(self, agent, reason, release_order=True):
+        if release_order and agent.assigned_order_id is not None:
+            order = self.orders[agent.assigned_order_id]
+            if order.status != DeliveryOrder.COMPLETED:
+                order.status = DeliveryOrder.ACTIVE
+                order.assigned_agent = None
         agent.assigned_order_id = None
         agent.carrying_order = False
+        agent.active = False
+        agent.exit_reason = str(reason)
         agent.reached = True
         agent.vel[:] = 0.0
+        agent.prev_pos = agent.pos.copy()
         agent.goal = agent.pos.copy()
 
+    def _deactivate_depleted_agents(self):
+        for agent in self.agents:
+            if getattr(agent, "active", True) and not agent.has_energy():
+                self._deactivate_agent(agent, reason="depleted", release_order=True)
+
     def _assign_order_to_agent(self, agent, order):
+        if not self._agent_is_active(agent):
+            return False
         order.status = DeliveryOrder.ASSIGNED
         order.assigned_agent = agent.number
         agent.assigned_order_id = order.order_id
         agent.carrying_order = False
         agent.reached = False
         agent.goal = order.pickup_pos.copy()
+        return True
 
     def _mark_order_picked(self, agent, order, update_goal=True):
         order.status = DeliveryOrder.PICKED
@@ -599,18 +623,29 @@ class UAVEnv:
 
     def get_active_agent_mask(self):
         return np.asarray(
-            [1.0 if agent.has_energy() else 0.0 for agent in self.agents],
+            [1.0 if self._agent_is_active(agent) else 0.0 for agent in self.agents],
             dtype=np.float32,
         )
 
     def get_agent_positions(self):
-        return np.stack([agent.pos.copy() for agent in self.agents], axis=0).astype(
-            np.float32
-        )
+        positions = []
+        for agent in self.agents:
+            if self._agent_is_active(agent):
+                positions.append(agent.pos.copy())
+            else:
+                positions.append(np.zeros(self.dim_actions, dtype=np.float32))
+        return np.stack(positions, axis=0).astype(np.float32)
 
     def get_agent_energy_ratios(self):
         return np.asarray(
-            [[agent.energy / (agent.initial_energy + eps)] for agent in self.agents],
+            [
+                [
+                    agent.energy / (agent.initial_energy + eps)
+                    if self._agent_is_active(agent)
+                    else 0.0
+                ]
+                for agent in self.agents
+            ],
             dtype=np.float32,
         )
 
@@ -695,7 +730,8 @@ class UAVEnv:
             candidates = [
                 agent
                 for agent in self.agents
-                if np.linalg.norm(agent.pos - station_pos) <= self.charging_radius
+                if self._agent_is_active(agent)
+                and np.linalg.norm(agent.pos - station_pos) <= self.charging_radius
                 and agent.energy < agent.initial_energy
             ]
             candidates.sort(
@@ -822,7 +858,11 @@ class UAVEnv:
     def _resolve_agent_collisions(self):
         collided = [False] * self.num_agents
         for i in range(self.num_agents):
+            if not self._agent_is_active(self.agents[i]):
+                continue
             for j in range(i + 1, self.num_agents):
+                if not self._agent_is_active(self.agents[j]):
+                    continue
                 delta = self.agents[i].prev_pos - self.agents[j].prev_pos
                 dist = np.linalg.norm(delta)
                 collision_min_dist = (
@@ -849,8 +889,8 @@ class UAVEnv:
                         dist = 1.0
                     direction = delta / dist
                     overlap = collision_min_dist - dist
-                    i_powered = self.agents[i].has_energy()
-                    j_powered = self.agents[j].has_energy()
+                    i_powered = self._agent_is_active(self.agents[i])
+                    j_powered = self._agent_is_active(self.agents[j])
                     if i_powered and j_powered:
                         self.agents[i].prev_pos += direction * (overlap / 2.0 + eps)
                         self.agents[j].prev_pos -= direction * (overlap / 2.0 + eps)
@@ -895,7 +935,10 @@ class UAVEnv:
         safe_radii = np.asarray(
             [agent.safe_radius for agent in self.agents], dtype=np.float32
         )
-        reached = np.asarray([agent.reached for agent in self.agents], dtype=bool)
+        reached = np.asarray(
+            [agent.reached or not self._agent_is_active(agent) for agent in self.agents],
+            dtype=bool,
+        )
         agent_a_max = np.asarray([agent.a_max for agent in self.agents], dtype=np.float32)
         agent_v_max = np.asarray([agent.v_max for agent in self.agents], dtype=np.float32)
         boundaries = np.asarray(
@@ -1024,7 +1067,7 @@ class UAVEnv:
 
         predicted_pos = []
         for agent, action in zip(self.agents, actions):
-            if agent.reached or not agent.has_energy():
+            if agent.reached or not self._agent_is_active(agent):
                 predicted_pos.append(agent.pos.copy())
                 continue
             pred_pos, _ = self._predict_agent_kinematics(agent, action)
@@ -1034,7 +1077,7 @@ class UAVEnv:
 
         boundaries = [self.length, self.width, self.height][: self.dim_actions]
         for idx, (agent, pos) in enumerate(zip(self.agents, predicted_pos)):
-            if agent.reached:
+            if agent.reached or not self._agent_is_active(agent):
                 continue
             guard_clearance = agent.safe_radius + self.guard_prediction_margin
             for dim, boundary in enumerate(boundaries):
@@ -1046,7 +1089,7 @@ class UAVEnv:
                     break
 
         for idx, (agent, pos) in enumerate(zip(self.agents, predicted_pos)):
-            if agent.reached:
+            if agent.reached or not self._agent_is_active(agent):
                 continue
             for obstacle in self.obstacles:
                 delta_xy = pos[:2] - obstacle.pos
@@ -1059,10 +1102,10 @@ class UAVEnv:
                     break
 
         for i in range(self.num_agents):
-            if self.agents[i].reached:
+            if self.agents[i].reached or not self._agent_is_active(self.agents[i]):
                 continue
             for j in range(i + 1, self.num_agents):
-                if self.agents[j].reached:
+                if self.agents[j].reached or not self._agent_is_active(self.agents[j]):
                     continue
                 dist = np.linalg.norm(predicted_pos[i] - predicted_pos[j])
                 collision_min_dist = (
@@ -1086,8 +1129,7 @@ class UAVEnv:
         self.safe_value = np.zeros(self.num_agents, dtype=np.float32)
         self.reward_safe_value = np.zeros(self.num_agents, dtype=np.float32)
         powered_mask = np.asarray(
-            [agent.has_energy() for agent in self.agents],
-            dtype=bool,
+            [self._agent_is_active(agent) for agent in self.agents], dtype=bool
         )
 
         prev_dists = np.array([self._distance_to_goal(agent) for agent in self.agents], dtype=np.float32)
@@ -1132,15 +1174,15 @@ class UAVEnv:
             agent.pos = agent.prev_pos.copy()
 
         self._consume_step_energy(powered_mask)
+        self._deactivate_depleted_agents()
         self._charge_agents_at_station()
         self.update_lasers()
 
         for idx, agent in enumerate(self.agents):
-            if not powered_mask[idx]:
+            if not powered_mask[idx] or not self._agent_is_active(agent):
                 agent.vel[:] = 0.0
                 agent.prev_collided = agent.collided
                 agent.collided = obstacle_collisions[idx] or agent_collisions[idx]
-                self.agent_paths[idx].append(agent.pos.copy())
                 continue
 
             current_dist = self._distance_to_goal(agent)
@@ -1172,11 +1214,12 @@ class UAVEnv:
 
             agent.prev_collided = agent.collided
             agent.collided = obstacle_collisions[idx] or agent_collisions[idx]
-            self.agent_paths[idx].append(agent.pos.copy())
+            if self._agent_is_active(agent):
+                self.agent_paths[idx].append(agent.pos.copy())
 
         self._assign_orders()
         delivery_done = self._all_orders_completed()
-        dones = [agent.reached for agent in self.agents]
+        dones = [not self._agent_is_active(agent) for agent in self.agents]
 
         obstacle_collision_total = float(
             np.sum(np.asarray(obstacle_collisions, dtype=bool))
@@ -1189,7 +1232,7 @@ class UAVEnv:
         self.collision_count += obstacle_collision_total + agent_collision_total
 
         if delivery_done:
-            rewards += 5.0
+            rewards += 5.0 * self.get_active_agent_mask()
 
         return self.get_obs(), rewards, dones, self.safe_value.copy()
 
@@ -1199,7 +1242,8 @@ class UAVEnv:
         return np.concatenate([delta / (self._space_scale() + eps), np.array([distance], dtype=np.float32)])
 
     def _message_from_sender(self, receiver, sender):
-        del receiver
+        if not self._agent_is_active(receiver) or not self._agent_is_active(sender):
+            return np.zeros(self.msg_shape, dtype=np.float32)
         scale = self._space_scale() + eps
         goal_delta = (sender.goal - sender.pos) / scale
         velocity = sender.vel / (sender.v_max + eps)
@@ -1247,6 +1291,11 @@ class UAVEnv:
         observations = []
         scale = self._space_scale() + eps
         for agent in self.agents:
+            if not self._agent_is_active(agent):
+                observations.append(
+                    np.zeros(self.observation_space[f"agent_{agent.number}"].shape, dtype=np.float32)
+                )
+                continue
             own = np.concatenate([agent.pos / scale, agent.vel / (agent.v_max + eps)])
             energy = np.array(
                 [agent.energy / (agent.initial_energy + eps)],
@@ -1267,6 +1316,13 @@ class UAVEnv:
         parts = []
         scale = self._space_scale() + eps
         for agent in self.agents:
+            if not self._agent_is_active(agent):
+                parts.append(np.zeros(self.dim_actions, dtype=np.float32))
+                parts.append(np.zeros(self.dim_actions, dtype=np.float32))
+                parts.append(np.zeros(self.dim_actions, dtype=np.float32))
+                parts.append(np.array([1.0], dtype=np.float32))
+                parts.append(np.array([0.0], dtype=np.float32))
+                continue
             parts.append(agent.pos / scale)
             parts.append(agent.vel / (agent.v_max + eps))
             parts.append(agent.goal / scale)
@@ -1284,6 +1340,9 @@ class UAVEnv:
 
     def update_lasers(self):
         for agent in self.agents:
+            if not self._agent_is_active(agent):
+                agent.lasers = np.full(agent.num_lasers, agent.l_sensor, dtype=np.float32)
+                continue
             current_lasers = np.full(agent.num_lasers, agent.l_sensor, dtype=np.float32)
             for obstacle in self.obstacles:
                 radius = obstacle.radius + agent.safe_radius
@@ -1309,7 +1368,10 @@ class UAVEnv:
         picked_orders = sum(
             1 for order in self.orders if order.status == DeliveryOrder.PICKED
         )
-        healthy_agents = float(np.sum([not agent.collided for agent in self.agents]))
+        active_agents = float(np.sum([self._agent_is_active(agent) for agent in self.agents]))
+        healthy_agents = float(
+            np.sum([self._agent_is_active(agent) and not agent.collided for agent in self.agents])
+        )
         powered_agents = float(np.sum([agent.has_energy() for agent in self.agents]))
         mean_energy = (
             float(np.mean([agent.energy for agent in self.agents]))
@@ -1332,9 +1394,10 @@ class UAVEnv:
             "available_orders": float(available_orders),
             "picked_orders": float(picked_orders),
             "idle_agents": float(
-                np.sum([agent.assigned_order_id is None for agent in self.agents])
+                0.0
             ),
             "healthy_agents": healthy_agents,
+            "active_agents": active_agents,
             "powered_agents": powered_agents,
             "depleted_agents": float(self.num_agents - powered_agents),
             "mean_energy": mean_energy,
@@ -1388,6 +1451,8 @@ class UAVEnv:
                     "vel": agent.vel.copy(),
                     "lasers": agent.lasers.copy(),
                     "reached": bool(agent.reached),
+                    "active": bool(getattr(agent, "active", True)),
+                    "exit_reason": getattr(agent, "exit_reason", None),
                     "collided": bool(agent.collided),
                     "prev_collided": bool(agent.prev_collided),
                     "assigned_order_id": agent.assigned_order_id,
@@ -1448,6 +1513,8 @@ class UAVEnv:
             agent.vel = state["vel"].copy()
             agent.lasers = state["lasers"].copy()
             agent.reached = bool(state["reached"])
+            agent.active = bool(state.get("active", True))
+            agent.exit_reason = state.get("exit_reason", None)
             agent.collided = bool(state["collided"])
             agent.prev_collided = bool(state["prev_collided"])
             agent.assigned_order_id = state.get("assigned_order_id")
@@ -1645,6 +1712,8 @@ class UAVEnv:
             dropoff_labeled = True
 
         for idx, agent in enumerate(self.agents):
+            if not self._agent_is_active(agent):
+                continue
             color = self._agent_color(idx)
             trajectory = self._agent_trajectory(idx, agent)
             if len(trajectory) > 1:
@@ -1728,6 +1797,8 @@ class UAVEnv:
             dropoff_labeled = True
 
         for idx, agent in enumerate(self.agents):
+            if not self._agent_is_active(agent):
+                continue
             color = self._agent_color(idx)
             trajectory = self._agent_trajectory(idx, agent)
             if len(trajectory) > 1:
