@@ -185,10 +185,10 @@ def build_env(args, algs):
             raise ImportError(
                 "Hierarchical UAV energy delivery maps require envs.UAVEnergyDeliveryHierarchical."
             ) from exc
-        dim_actions = 3 if args.map in {
-            "UAVEnergyDeliveryLevel3D",
-            "UAVEnergyDeliveryHierarchical3D",
-        } else 2
+        dim_actions = 2 if args.map in {
+            "UAVEnergyDeliveryLevel2D",
+            "UAVEnergyDeliveryHierarchical2D",
+        } else 3
         return UAVEnvDiscreteWrapper(
             dim_actions=dim_actions,
             num_hunters=int(getattr(args, "uav_n_agents", 4)),
@@ -234,7 +234,7 @@ def build_env(args, algs):
             raise ImportError(
                 "Map 'UAVEnergyDelivery' requires local module envs.UAVEnergyDelivery."
             ) from exc
-        dim_actions = 3 if args.map == "UAVEnergyDelivery3D" else 2
+        dim_actions = 2 if args.map == "UAVEnergyDelivery2D" else 3
         return UAVEnvDiscreteWrapper(
             dim_actions=dim_actions,
             num_hunters=int(getattr(args, "uav_n_agents", 4)),

@@ -27,7 +27,6 @@ append_default_arg DEFAULT_ARGS --hmappo_pretrained_low_model_dir "$PRETRAINED_L
 append_default_arg DEFAULT_ARGS --hmappo_freeze_low_level False "${USER_ARGS[@]}"
 append_default_arg DEFAULT_ARGS --hmappo_freeze_high_level False "${USER_ARGS[@]}"
 append_default_arg DEFAULT_ARGS --hrl_meta_update_on_subgoal_done False "${USER_ARGS[@]}"
-append_default_arg DEFAULT_ARGS --hrl_intrinsic_collision_penalty 0.8 "${USER_ARGS[@]}"
 append_default_arg DEFAULT_ARGS --hrl_charge_queue_enabled True "${USER_ARGS[@]}"
 append_default_arg DEFAULT_ARGS --hrl_safe_action_guard_enabled True "${USER_ARGS[@]}"
 append_default_arg DEFAULT_ARGS --n_steps 120000 "${USER_ARGS[@]}"

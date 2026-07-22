@@ -1,6 +1,7 @@
 import glob
 import os
 
+import numpy as np
 import torch
 import torch.nn as nn
 from torch.distributions import Categorical, Normal
@@ -38,8 +39,11 @@ class OfficialHMAPPO(MAPPO):
         self.high_state_shape = int(getattr(args, "high_level_state_shape", 0))
         self.high_actor_obs_shape = self.high_obs_shape
         self.last_train_metrics = {}
-        if self.high_n_actions <= 0 or self.high_obs_shape <= 0 or self.high_state_shape <= 0:
-            raise ValueError("OfficialHMAPPO requires high-level env_info fields.")
+        self.high_level_enabled = (
+            self.high_n_actions > 0
+            and self.high_obs_shape > 0
+            and self.high_state_shape > 0
+        )
 
         self.device = torch.device(
             f"cuda:{getattr(self.args, 'gpu_id', 0)}"
@@ -62,23 +66,27 @@ class OfficialHMAPPO(MAPPO):
         self.low_critic = CriticNetwork(self.low_state_shape, critic_hidden_dim).to(
             self.device
         )
-        if self.use_hybrid_high_policy:
-            self.high_actor = HybridHighActorNetwork(
-                self.high_actor_obs_shape,
-                self.high_mode_n_actions,
-                self.high_continuous_dim,
-                high_actor_hidden_dim,
+        if self.high_level_enabled:
+            if self.use_hybrid_high_policy:
+                self.high_actor = HybridHighActorNetwork(
+                    self.high_actor_obs_shape,
+                    self.high_mode_n_actions,
+                    self.high_continuous_dim,
+                    high_actor_hidden_dim,
+                ).to(self.device)
+            else:
+                self.high_actor = GaussianActorNetwork(
+                    self.high_actor_obs_shape,
+                    self.high_n_actions,
+                    high_actor_hidden_dim,
+                ).to(self.device)
+            self.high_critic = CriticNetwork(
+                self.high_state_shape,
+                high_critic_hidden_dim,
             ).to(self.device)
         else:
-            self.high_actor = GaussianActorNetwork(
-                self.high_actor_obs_shape,
-                self.high_n_actions,
-                high_actor_hidden_dim,
-            ).to(self.device)
-        self.high_critic = CriticNetwork(
-            self.high_state_shape,
-            high_critic_hidden_dim,
-        ).to(self.device)
+            self.high_actor = None
+            self.high_critic = None
 
         self.low_actor_optimizer = torch.optim.Adam(
             self.low_actor.parameters(),
@@ -88,13 +96,15 @@ class OfficialHMAPPO(MAPPO):
             self.low_critic.parameters(),
             lr=args.lr_critic,
         )
-        self.high_actor_optimizer = torch.optim.Adam(
-            self.high_actor.parameters(),
-            lr=high_lr_actor,
+        self.high_actor_optimizer = (
+            torch.optim.Adam(self.high_actor.parameters(), lr=high_lr_actor)
+            if self.high_level_enabled
+            else None
         )
-        self.high_critic_optimizer = torch.optim.Adam(
-            self.high_critic.parameters(),
-            lr=high_lr_critic,
+        self.high_critic_optimizer = (
+            torch.optim.Adam(self.high_critic.parameters(), lr=high_lr_critic)
+            if self.high_level_enabled
+            else None
         )
         self.model_dir = args.model_dir + "/" + args.alg + "/" + args.map
         self.eval_hidden = None
@@ -136,6 +146,8 @@ class OfficialHMAPPO(MAPPO):
         evaluate=False,
     ):
         del agent_idx
+        if not self.high_level_enabled:
+            return np.zeros((0,), dtype=np.float32)
         obs = torch.tensor(
             observation,
             dtype=torch.float32,
@@ -228,7 +240,11 @@ class OfficialHMAPPO(MAPPO):
         batch = self._prepare_batch(batch)
         if not bool(getattr(self.args, "hmappo_freeze_low_level", False)):
             self._learn_shared_low_level(batch)
-        if "high_o" not in batch or bool(getattr(self.args, "hmappo_freeze_high_level", False)):
+        if (
+            not self.high_level_enabled
+            or "high_o" not in batch
+            or bool(getattr(self.args, "hmappo_freeze_high_level", False))
+        ):
             return
 
         high_action_key = "high_u"
@@ -883,7 +899,8 @@ class OfficialHMAPPO(MAPPO):
 
     def _load_models(self):
         self._load_level_shared("low", self.low_actor, self.low_critic)
-        self._load_level_shared("high", self.high_actor, self.high_critic)
+        if self.high_level_enabled:
+            self._load_level_shared("high", self.high_actor, self.high_critic)
 
     def save_model(self, train_step):
         num = str(train_step // max(self.args.save_cycle, 1))
@@ -897,11 +914,12 @@ class OfficialHMAPPO(MAPPO):
                 self.low_critic.state_dict(),
                 self._shared_filename("low", "critic", prefix=prefix),
             )
-            torch.save(
-                self.high_actor.state_dict(),
-                self._shared_filename("high", "actor", prefix=prefix),
-            )
-            torch.save(
-                self.high_critic.state_dict(),
-                self._shared_filename("high", "critic", prefix=prefix),
-            )
+            if self.high_level_enabled:
+                torch.save(
+                    self.high_actor.state_dict(),
+                    self._shared_filename("high", "actor", prefix=prefix),
+                )
+                torch.save(
+                    self.high_critic.state_dict(),
+                    self._shared_filename("high", "critic", prefix=prefix),
+                )

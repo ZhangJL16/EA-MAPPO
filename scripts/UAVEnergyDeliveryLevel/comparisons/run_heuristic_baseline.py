@@ -13,6 +13,7 @@ if str(REPO_ROOT) not in sys.path:
 from envs.UAVEnergyDeliveryHierarchical import (
     DeliveryOrder,
     TASK_CHARGE,
+    TASK_ORDER,
     UAVEnvDiscreteWrapper,
 )
 
@@ -108,12 +109,20 @@ def update_assignments(env, method, charge_threshold, release_threshold, reserve
     base._activate_orders()
 
     if method == "auction_threshold_charge":
-        high_actions = []
         for agent in base.agents:
+            if not agent.has_energy():
+                continue
             ratio = agent.energy / max(agent.initial_energy, 1e-6)
-            mode = 0.0 if ratio <= charge_threshold else 1.0
-            high_actions.append(np.array([mode, 1.0], dtype=np.float32))
-        env.apply_high_level_actions(high_actions)
+            if ratio <= charge_threshold:
+                base._set_agent_charging(agent)
+                continue
+            order = base._select_order_for_agent(agent)
+            if order is not None and agent.assigned_order_id is None:
+                base._assign_order_to_agent(agent, order)
+            target = base._task_target_for_agent(agent)
+            if target is not None:
+                agent.task_target = target.copy()
+                base._set_agent_subgoal(agent, target, TASK_ORDER)
         return
 
     claimed = set()
@@ -168,7 +177,7 @@ def choose_low_action(env, agent_id):
 
 def run_episode(args, episode_idx):
     env = UAVEnvDiscreteWrapper(
-        dim_actions=2,
+        dim_actions=3,
         num_hunters=args.uav_n_agents,
         episode_limit=args.episode_limit,
         total_orders=args.uav_total_orders,

@@ -1,6 +1,7 @@
 import glob
 import os
 
+import numpy as np
 import torch
 import torch.nn as nn
 from torch.distributions import Categorical, Normal
@@ -96,8 +97,11 @@ class MAPPO:
         self.high_state_shape = int(getattr(args, "high_level_state_shape", 0))
         self.high_actor_obs_shape = self.high_obs_shape
         self.last_train_metrics = {}
-        if self.high_n_actions <= 0 or self.high_obs_shape <= 0 or self.high_state_shape <= 0:
-            raise ValueError("Level MAPPO requires high-level env_info fields.")
+        self.high_level_enabled = (
+            self.high_n_actions > 0
+            and self.high_obs_shape > 0
+            and self.high_state_shape > 0
+        )
 
         self.device = torch.device(
             f"cuda:{getattr(self.args, 'gpu_id', 0)}"
@@ -126,31 +130,35 @@ class MAPPO:
                 for _ in range(self.n_agents)
             ]
         ).to(self.device)
-        self.high_actors = nn.ModuleList(
-            [
-                (
-                    HybridHighActorNetwork(
-                        self.high_actor_obs_shape,
-                        self.high_mode_n_actions,
-                        self.high_continuous_dim,
-                        high_actor_hidden_dim,
+        if self.high_level_enabled:
+            self.high_actors = nn.ModuleList(
+                [
+                    (
+                        HybridHighActorNetwork(
+                            self.high_actor_obs_shape,
+                            self.high_mode_n_actions,
+                            self.high_continuous_dim,
+                            high_actor_hidden_dim,
+                        )
+                        if self.use_hybrid_high_policy
+                        else GaussianActorNetwork(
+                            self.high_actor_obs_shape,
+                            self.high_n_actions,
+                            high_actor_hidden_dim,
+                        )
                     )
-                    if self.use_hybrid_high_policy
-                    else GaussianActorNetwork(
-                        self.high_actor_obs_shape,
-                        self.high_n_actions,
-                        high_actor_hidden_dim,
-                    )
-                )
-                for _ in range(self.n_agents)
-            ]
-        ).to(self.device)
-        self.high_critics = nn.ModuleList(
-            [
-                CriticNetwork(self.high_state_shape, high_critic_hidden_dim)
-                for _ in range(self.n_agents)
-            ]
-        ).to(self.device)
+                    for _ in range(self.n_agents)
+                ]
+            ).to(self.device)
+            self.high_critics = nn.ModuleList(
+                [
+                    CriticNetwork(self.high_state_shape, high_critic_hidden_dim)
+                    for _ in range(self.n_agents)
+                ]
+            ).to(self.device)
+        else:
+            self.high_actors = nn.ModuleList().to(self.device)
+            self.high_critics = nn.ModuleList().to(self.device)
         self.low_actor_optimizers = [
             torch.optim.Adam(actor.parameters(), lr=args.lr_actor)
             for actor in self.low_actors
@@ -159,14 +167,22 @@ class MAPPO:
             torch.optim.Adam(critic.parameters(), lr=args.lr_critic)
             for critic in self.low_critics
         ]
-        self.high_actor_optimizers = [
-            torch.optim.Adam(actor.parameters(), lr=high_lr_actor)
-            for actor in self.high_actors
-        ]
-        self.high_critic_optimizers = [
-            torch.optim.Adam(critic.parameters(), lr=high_lr_critic)
-            for critic in self.high_critics
-        ]
+        self.high_actor_optimizers = (
+            [
+                torch.optim.Adam(actor.parameters(), lr=high_lr_actor)
+                for actor in self.high_actors
+            ]
+            if self.high_level_enabled
+            else []
+        )
+        self.high_critic_optimizers = (
+            [
+                torch.optim.Adam(critic.parameters(), lr=high_lr_critic)
+                for critic in self.high_critics
+            ]
+            if self.high_level_enabled
+            else []
+        )
         self.model_dir = args.model_dir + "/" + args.alg + "/" + args.map
         self.eval_hidden = None
 
@@ -239,6 +255,8 @@ class MAPPO:
     def choose_high_level_action(
         self, observation, agent_idx, avail_actions=None, evaluate=False
     ):
+        if not self.high_level_enabled:
+            return np.zeros((0,), dtype=np.float32)
         obs = torch.tensor(
             observation, dtype=torch.float32, device=self.device
         ).unsqueeze(0)
@@ -363,7 +381,7 @@ class MAPPO:
                 state_dim=self.low_state_shape,
                 guard_key="guard_applied",
             )
-        if "high_o" not in batch or freeze_high:
+        if not self.high_level_enabled or "high_o" not in batch or freeze_high:
             return
 
         learn_high = (
@@ -998,19 +1016,19 @@ class MAPPO:
         )
 
     def _load_models(self):
-        for level, actors, critics in (
-            ("low", self.low_actors, self.low_critics),
-            ("high", self.high_actors, self.high_critics),
-        ):
+        levels = [("low", self.low_actors, self.low_critics)]
+        if self.high_level_enabled:
+            levels.append(("high", self.high_actors, self.high_critics))
+        for level, actors, critics in levels:
             self._load_level_models(level, actors, critics)
 
     def save_model(self, train_step):
         num = str(train_step // max(self.args.save_cycle, 1))
         os.makedirs(self.model_dir, exist_ok=True)
-        for level, actors, critics in (
-            ("low", self.low_actors, self.low_critics),
-            ("high", self.high_actors, self.high_critics),
-        ):
+        levels = [("low", self.low_actors, self.low_critics)]
+        if self.high_level_enabled:
+            levels.append(("high", self.high_actors, self.high_critics))
+        for level, actors, critics in levels:
             for agent_idx in range(self.n_agents):
                 for prefix in (f"{num}_", ""):
                     torch.save(

@@ -94,9 +94,6 @@ UAV_DELIVERY_CSV_COLUMNS = [
     "powered_agents",
     "depleted_agents",
     "mean_energy",
-    "low_energy_budget_enabled",
-    "low_energy_step_ratio_mean",
-    "low_energy_budget_overuse_mean",
     "charging_agents",
     "mean_goal_distance",
     "healthy_agents",
@@ -162,9 +159,6 @@ UAV_DELIVERY_DIAGNOSTIC_KEYS = [
     "order_collision_rate",
     "charge_collision_rate",
     "idle_collision_rate",
-    "low_energy_budget_enabled",
-    "low_energy_step_ratio_mean",
-    "low_energy_budget_overuse_mean",
 ]
 
 UAV_DELIVERY_CSV_COLUMNS = (
@@ -654,9 +648,6 @@ class Runner:
             self._delivery_summary_float(summary, "powered_agents"),
             self._delivery_summary_float(summary, "depleted_agents"),
             self._delivery_summary_float(summary, "mean_energy"),
-            self._delivery_summary_float(summary, "low_energy_budget_enabled"),
-            self._delivery_summary_float(summary, "low_energy_step_ratio_mean"),
-            self._delivery_summary_float(summary, "low_energy_budget_overuse_mean"),
             self._delivery_summary_float(summary, "charging_agents"),
             self._delivery_summary_float(summary, "mean_goal_distance"),
             self._delivery_summary_float(summary, "healthy_agents"),

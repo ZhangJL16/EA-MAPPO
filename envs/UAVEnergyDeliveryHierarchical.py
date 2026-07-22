@@ -25,12 +25,11 @@ HIGH_MODE_ORDER = 1
 
 
 class HierarchicalUAVEnv(UAVEnv):
-    """H-MAPPO adapter over the flat UAVEnergyDelivery environment.
+    """Adapter over the flat UAVEnergyDelivery environment.
 
-    The base geometry, order sampling, charging, collision handling, energy
-    accounting, and environment reward terms come from UAVEnergyDelivery.py.
-    This class only adds high-level subgoal control and low-level intrinsic
-    rewards needed by hierarchical training.
+    The current high-level interface is intentionally empty. The base geometry,
+    order sampling, charging, collision handling, energy accounting, and
+    environment reward terms come from UAVEnergyDelivery.py.
     """
 
     def __init__(
@@ -96,18 +95,13 @@ class HierarchicalUAVEnv(UAVEnv):
         self.charge_mode_threshold = -1.0 + 2.0 * self.charge_mode_fraction
         self.charge_mode_center = -1.0 + self.charge_mode_fraction
         self.order_mode_center = self.charge_mode_fraction
-        self.high_level_mode_n_actions = 2 if self.high_mode_policy == "hybrid" else 1
-        self.high_level_n_actions = 3
+        self.high_level_mode_n_actions = 0
+        self.high_level_n_actions = 0
         self.low_task_shape = 0
 
         self.reachable_subgoal_scale = 1.0
         self.intrinsic_reward_scale = 1.0
         self.intrinsic_success_bonus = 1.0
-        self.intrinsic_collision_penalty = 0.0
-        self.low_energy_budget_enabled = False
-        self.low_energy_budget_min_ratio = 0.0
-        self.low_energy_budget_max_ratio = 0.08
-        self.low_energy_budget_overuse_coef = 2.0
         self.order_progress_override = None
         self.energy_margin_reserve_ratio = 0.05
         self.charge_energy_threshold = 0.35
@@ -120,7 +114,6 @@ class HierarchicalUAVEnv(UAVEnv):
             (self.num_agents, 1), dtype=np.float32
         )
         self._last_step_energy_ratio = np.zeros(self.num_agents, dtype=np.float32)
-        self._last_budget_overuse_ratio = np.zeros(self.num_agents, dtype=np.float32)
         self._last_reward_terms = {}
         self._init_hierarchical_agent_state()
 
@@ -131,9 +124,6 @@ class HierarchicalUAVEnv(UAVEnv):
             agent.task_target = agent.pos.copy()
             agent.subgoal = agent.pos.copy()
             agent.original_subgoal = agent.pos.copy()
-            agent.high_energy_budget_ratio = 0.0
-            agent.high_energy_budget_remaining = 0.0
-            agent.high_energy_budget_steps_remaining = 0
 
     def set_meta_period(self, meta_period):
         self.meta_period = max(1, int(meta_period))
@@ -143,11 +133,6 @@ class HierarchicalUAVEnv(UAVEnv):
         reachable_subgoal_scale=None,
         intrinsic_reward_scale=None,
         intrinsic_success_bonus=None,
-        intrinsic_collision_penalty=None,
-        low_energy_budget_enabled=None,
-        low_energy_budget_min_ratio=None,
-        low_energy_budget_max_ratio=None,
-        low_energy_budget_overuse_coef=None,
         high_goal_style=None,
         high_lateral_scale=None,
         order_progress_override=None,
@@ -163,24 +148,6 @@ class HierarchicalUAVEnv(UAVEnv):
             self.intrinsic_reward_scale = float(intrinsic_reward_scale)
         if intrinsic_success_bonus is not None:
             self.intrinsic_success_bonus = float(intrinsic_success_bonus)
-        if intrinsic_collision_penalty is not None:
-            self.intrinsic_collision_penalty = float(intrinsic_collision_penalty)
-        if low_energy_budget_enabled is not None:
-            self.low_energy_budget_enabled = bool(low_energy_budget_enabled)
-        if low_energy_budget_min_ratio is not None:
-            self.low_energy_budget_min_ratio = float(
-                np.clip(low_energy_budget_min_ratio, 0.0, 1.0)
-            )
-        if low_energy_budget_max_ratio is not None:
-            self.low_energy_budget_max_ratio = float(
-                np.clip(low_energy_budget_max_ratio, 0.0, 1.0)
-            )
-        if self.low_energy_budget_max_ratio < self.low_energy_budget_min_ratio:
-            self.low_energy_budget_max_ratio = self.low_energy_budget_min_ratio
-        if low_energy_budget_overuse_coef is not None:
-            self.low_energy_budget_overuse_coef = float(
-                max(0.0, low_energy_budget_overuse_coef)
-            )
         if high_goal_style is not None:
             self.high_goal_style = str(high_goal_style)
         if high_lateral_scale is not None:
@@ -213,7 +180,6 @@ class HierarchicalUAVEnv(UAVEnv):
             (self.num_agents, 1), dtype=np.float32
         )
         self._last_step_energy_ratio = np.zeros(self.num_agents, dtype=np.float32)
-        self._last_budget_overuse_ratio = np.zeros(self.num_agents, dtype=np.float32)
         self._last_reward_terms = {}
         return obs
 
@@ -329,15 +295,6 @@ class HierarchicalUAVEnv(UAVEnv):
         )
         return True
 
-    def _set_agent_energy_budget(self, agent, scalar):
-        fraction = 0.5 * (float(np.clip(scalar, -1.0, 1.0)) + 1.0)
-        budget_ratio = self.low_energy_budget_min_ratio + fraction * (
-            self.low_energy_budget_max_ratio - self.low_energy_budget_min_ratio
-        )
-        agent.high_energy_budget_ratio = float(budget_ratio)
-        agent.high_energy_budget_remaining = float(budget_ratio * agent.initial_energy)
-        agent.high_energy_budget_steps_remaining = int(max(1, self.meta_period))
-
     def _subgoal_on_line(self, agent, target, progress_scalar):
         target = np.asarray(target, dtype=np.float32)[: self.dim_actions]
         to_target = target - agent.pos
@@ -355,78 +312,27 @@ class HierarchicalUAVEnv(UAVEnv):
         direction = to_target / (target_dist + eps)
         return self._clip_position_to_bounds(agent.pos + direction * progress)
 
-    def _parse_high_level_action(self, action):
+    def _subgoal_from_relative_action(self, agent, action):
         action = np.asarray(action, dtype=np.float32).reshape(-1)
-        if self.high_level_mode_n_actions > 1:
-            mode_id = int(np.clip(np.rint(action[0]), 0, self.high_level_mode_n_actions - 1))
-            progress = float(action[1]) if action.size > 1 else 0.0
-            budget = float(action[2]) if action.size > 2 else 0.0
-        else:
-            mode_scalar = float(action[0]) if action.size > 0 else 0.0
-            mode_id = HIGH_MODE_CHARGE if mode_scalar < self.charge_mode_threshold else HIGH_MODE_ORDER
-            progress = float(action[1]) if action.size > 1 else 0.0
-            budget = float(action[2]) if action.size > 2 else 0.0
-        return mode_id, progress, budget
+        relative = np.zeros(self.dim_actions, dtype=np.float32)
+        used_dim = min(self.dim_actions, action.size)
+        if used_dim > 0:
+            relative[:used_dim] = np.clip(action[:used_dim], -1.0, 1.0)
+        norm = float(np.linalg.norm(relative))
+        if norm > 1.0:
+            relative = relative / (norm + eps)
+        max_dist = self._max_reachable_subgoal_distance(agent)
+        return self._clip_position_to_bounds(agent.pos + relative * max_dist)
 
     def prepare_high_level_decision(self):
-        self._activate_orders()
         return {}
 
     def apply_high_level_actions(self, actions):
-        actions = np.asarray(actions, dtype=np.float32)
-        if actions.ndim == 1:
-            actions = actions.reshape(self.num_agents, -1)
-        if actions.shape[-1] < self.high_level_n_actions:
-            pad_width = self.high_level_n_actions - actions.shape[-1]
-            actions = np.pad(actions, ((0, 0), (0, pad_width))).astype(np.float32)
-        actions = actions[:, : self.high_level_n_actions].reshape(
-            self.num_agents, self.high_level_n_actions
+        del actions
+        self._last_high_mode_train_mask = np.zeros(
+            (self.num_agents, 1), dtype=np.float32
         )
-        self._activate_orders()
-        mode_train_mask = np.zeros((self.num_agents, 1), dtype=np.float32)
-
-        for agent_idx, action in enumerate(actions):
-            agent = self.agents[agent_idx]
-            if not agent.has_energy():
-                self._set_agent_idle(agent)
-                continue
-            mode_id, progress_scalar, budget_scalar = self._parse_high_level_action(action)
-            self._set_agent_energy_budget(agent, budget_scalar)
-
-            if mode_id == HIGH_MODE_CHARGE:
-                target = self._nearest_charging_station_pos(agent.pos)
-                self._set_agent_charging(agent)
-                self._set_agent_subgoal(agent, self._subgoal_on_line(agent, target, progress_scalar), TASK_CHARGE)
-                mode_train_mask[agent_idx, 0] = 1.0
-                continue
-
-            order = self._select_order_for_agent(agent)
-            if order is None:
-                self._set_agent_idle(agent)
-                mode_train_mask[agent_idx, 0] = 1.0
-                continue
-            if agent.assigned_order_id is None:
-                self._assign_order_to_agent(agent, order)
-            target = self._task_target_for_agent(agent)
-            if target is None:
-                self._set_agent_idle(agent)
-                mode_train_mask[agent_idx, 0] = 1.0
-                continue
-            if (
-                self.order_progress_override is not None
-                and order.status in (DeliveryOrder.ASSIGNED, DeliveryOrder.PICKED)
-            ):
-                progress_scalar = self.order_progress_override
-            agent.task_target = target.copy()
-            self._set_agent_subgoal(
-                agent,
-                self._subgoal_on_line(agent, target, progress_scalar),
-                TASK_ORDER,
-            )
-            mode_train_mask[agent_idx, 0] = 1.0
-
-        self._last_high_mode_train_mask = mode_train_mask
-        return actions.copy()
+        return np.zeros((self.num_agents, 0), dtype=np.float32)
 
     def _agent_has_motion_task(self, agent):
         return agent.current_task_type in (TASK_ORDER, TASK_CHARGE)
@@ -456,7 +362,6 @@ class HierarchicalUAVEnv(UAVEnv):
 
     def _consume_step_energy(self, powered_mask, actions=None):
         self._last_step_energy_ratio = np.zeros(self.num_agents, dtype=np.float32)
-        self._last_budget_overuse_ratio = np.zeros(self.num_agents, dtype=np.float32)
         for agent_idx, (is_powered, agent) in enumerate(zip(powered_mask, self.agents)):
             if not is_powered:
                 continue
@@ -464,19 +369,6 @@ class HierarchicalUAVEnv(UAVEnv):
             self._last_step_energy_ratio[agent_idx] = step_energy / (
                 agent.initial_energy + eps
             )
-            if self.low_energy_budget_enabled:
-                remaining = float(
-                    max(0.0, getattr(agent, "high_energy_budget_remaining", 0.0))
-                )
-                steps_remaining = int(
-                    max(1, getattr(agent, "high_energy_budget_steps_remaining", 1))
-                )
-                allowance = remaining / float(steps_remaining)
-                self._last_budget_overuse_ratio[agent_idx] = max(
-                    0.0, step_energy - allowance
-                ) / (agent.initial_energy + eps)
-                agent.high_energy_budget_remaining = max(0.0, remaining - step_energy)
-                agent.high_energy_budget_steps_remaining = max(0, steps_remaining - 1)
             agent.consume_energy(step_energy)
 
     def step(self, actions):
@@ -630,83 +522,21 @@ class HierarchicalUAVEnv(UAVEnv):
         return self.get_obs(), rewards, dones, self.safe_value.copy()
 
     def get_obs(self):
-        observations = super().get_obs()
-        budget_features = []
-        for agent in self.agents:
-            budget_remaining = float(
-                getattr(agent, "high_energy_budget_remaining", 0.0)
-                / (agent.initial_energy + eps)
-            )
-            budget_steps = float(
-                getattr(agent, "high_energy_budget_steps_remaining", 0)
-                / float(max(1, self.meta_period))
-            )
-            budget_features.append(
-                [
-                    np.clip(budget_remaining, 0.0, 1.0),
-                    np.clip(budget_steps, 0.0, 1.0),
-                ]
-            )
-        return np.concatenate(
-            [observations, np.asarray(budget_features, dtype=np.float32)], axis=-1
-        ).astype(np.float32)
+        return super().get_obs()
 
     def _high_level_agent_obs(self, agent):
-        scale = self._space_scale() + eps
-        base = np.concatenate([agent.pos / scale, agent.vel / (agent.v_max + eps)])
-        energy = np.array([agent.energy / (agent.initial_energy + eps)], dtype=np.float32)
-        task_onehot = np.zeros(3, dtype=np.float32)
-        task_onehot[int(getattr(agent, "current_task_type", TASK_IDLE))] = 1.0
-        station = self._nearest_charging_station_pos(agent.pos)
-        station_delta = (station - agent.pos) / scale
-        station_dist = np.array(
-            [np.linalg.norm(station - agent.pos) / (np.linalg.norm(scale) + eps)],
-            dtype=np.float32,
-        )
-        target = self._task_target_for_agent(agent)
-        if target is None:
-            order_delta = np.zeros(self.dim_actions, dtype=np.float32)
-            order_dist = np.array([1.0], dtype=np.float32)
-            has_order = np.array([0.0], dtype=np.float32)
-        else:
-            order_delta = (target - agent.pos) / scale
-            order_dist = np.array(
-                [np.linalg.norm(target - agent.pos) / (np.linalg.norm(scale) + eps)],
-                dtype=np.float32,
-            )
-            has_order = np.array([1.0], dtype=np.float32)
-        return np.concatenate(
-            [
-                base.astype(np.float32),
-                energy,
-                task_onehot,
-                station_delta.astype(np.float32),
-                station_dist,
-                order_delta.astype(np.float32),
-                order_dist,
-                has_order,
-            ]
-        ).astype(np.float32)
+        del agent
+        return np.zeros((0,), dtype=np.float32)
 
     def get_high_level_obs(self):
-        return np.stack(
-            [self._high_level_agent_obs(agent) for agent in self.agents], axis=0
-        ).astype(np.float32)
+        return np.zeros((self.num_agents, 0), dtype=np.float32)
 
     def get_high_level_state(self):
-        return np.concatenate(
-            [
-                self.get_state(),
-                self.get_high_level_obs().reshape(-1),
-            ]
-        ).astype(np.float32)
+        return np.zeros((0,), dtype=np.float32)
 
     def get_high_level_avail_agent_actions(self, agent_id):
         agent = self.agents[int(agent_id)]
         avail = np.zeros(self.high_level_mode_n_actions, dtype=np.float32)
-        if not agent.has_energy():
-            return avail
-        avail[:] = 1.0
         return avail
 
     def get_high_level_avail_actions(self):
@@ -716,108 +546,31 @@ class HierarchicalUAVEnv(UAVEnv):
         )
 
     def get_high_level_energy_margins(self):
-        margins = []
-        for agent in self.agents:
-            order = self._select_order_for_agent(agent)
-            if order is None:
-                margins.append([0.0])
-                continue
-            target = order.dropoff_pos if order.status == DeliveryOrder.PICKED else order.pickup_pos
-            dist = np.linalg.norm(agent.pos - target)
-            dist += self._distance_to_nearest_charging_station_from_pos(target)
-            est_steps = dist / (agent.v_max * self.time_step + eps)
-            required = est_steps * self.energy_decay_per_step
-            reserve = self.energy_margin_reserve_ratio * agent.initial_energy
-            margins.append([(agent.energy - required - reserve) / (agent.initial_energy + eps)])
-        return np.asarray(margins, dtype=np.float32)
+        return np.zeros((self.num_agents, 1), dtype=np.float32)
 
     def get_high_level_energy_order_masks(self):
-        return np.asarray(
-            [[1.0 if self._select_order_for_agent(agent) is not None else 0.0] for agent in self.agents],
-            dtype=np.float32,
-        )
+        return np.zeros((self.num_agents, 1), dtype=np.float32)
 
     def get_high_level_mode_training_mask(self):
         return np.asarray(self._last_high_mode_train_mask, dtype=np.float32).copy()
 
     def get_current_subgoals(self):
-        return np.stack([agent.subgoal.copy() for agent in self.agents], axis=0).astype(
-            np.float32
-        )
+        return self.get_agent_positions()
 
-    def get_current_task_targets(self):
-        targets = []
-        for agent in self.agents:
-            target = getattr(agent, "task_target", None)
-            if target is None:
-                target = getattr(agent, "subgoal", agent.pos)
-            targets.append(np.asarray(target, dtype=np.float32)[: self.dim_actions])
-        return np.stack(targets, axis=0).astype(np.float32)
+    def get_oracle_high_level_actions(self):
+        return np.zeros((self.num_agents, 0), dtype=np.float32)
 
     def relabel_high_level_actions_with_achieved(
         self,
         start_positions,
         end_positions,
         actions,
-        task_targets=None,
         active_mask=None,
     ):
-        """Map achieved low-level endpoints back to equivalent high-level progress.
-
-        This is the on-policy analogue of HAC hindsight action relabeling: keep
-        the executed high-level mode/budget fixed, but train the continuous
-        progress component using the position the low level actually reached.
-        """
-        actions = np.asarray(actions, dtype=np.float32).copy()
+        del start_positions, end_positions, active_mask
+        actions = np.asarray(actions, dtype=np.float32)
         if actions.ndim == 1:
             actions = actions.reshape(self.num_agents, -1)
-        if actions.shape[-1] < 2:
-            return actions.astype(np.float32)
-
-        start_positions = np.asarray(start_positions, dtype=np.float32).reshape(
-            self.num_agents, self.dim_actions
-        )
-        end_positions = np.asarray(end_positions, dtype=np.float32).reshape(
-            self.num_agents, self.dim_actions
-        )
-        if task_targets is None:
-            task_targets = self.get_current_task_targets()
-        task_targets = np.asarray(task_targets, dtype=np.float32).reshape(
-            self.num_agents, self.dim_actions
-        )
-        if active_mask is None:
-            active_values = np.ones(self.num_agents, dtype=np.float32)
-        else:
-            active_values = np.asarray(active_mask, dtype=np.float32).reshape(-1)
-
-        for agent_idx, agent in enumerate(self.agents):
-            if active_values[agent_idx] <= 0.0:
-                continue
-            start = start_positions[agent_idx]
-            end = end_positions[agent_idx]
-            target = task_targets[agent_idx]
-            to_target = target - start
-            target_dist = float(np.linalg.norm(to_target))
-            if target_dist <= eps:
-                continue
-
-            max_dist = self._max_reachable_subgoal_distance(agent)
-            line_length = min(target_dist, max_dist)
-            if line_length <= eps:
-                continue
-            min_progress = min(line_length, self.min_subgoal_progress)
-            direction = to_target / (target_dist + eps)
-            achieved_progress = float(np.dot(end - start, direction))
-            achieved_progress = float(np.clip(achieved_progress, 0.0, line_length))
-
-            if line_length > min_progress + eps:
-                fraction = (achieved_progress - min_progress) / (
-                    line_length - min_progress
-                )
-                fraction = float(np.clip(fraction, 0.0, 1.0))
-            else:
-                fraction = 1.0
-            actions[agent_idx, 1] = 2.0 * fraction - 1.0
         return actions.astype(np.float32)
 
     def get_subgoal_distances(self, targets=None):
@@ -834,25 +587,8 @@ class HierarchicalUAVEnv(UAVEnv):
         return (distances <= self.goal_tolerance).astype(np.float32)
 
     def compute_intrinsic_rewards(self, prev_distances=None, targets=None):
-        distances = self.get_subgoal_distances(targets)
-        if prev_distances is None:
-            progress = np.zeros_like(distances, dtype=np.float32)
-        else:
-            prev_distances = np.asarray(prev_distances, dtype=np.float32).reshape(-1)
-            progress = prev_distances - distances
-        rewards = progress
-        rewards += self.intrinsic_success_bonus * self.get_subgoal_success_mask(targets)
-        if self.intrinsic_collision_penalty > 0.0:
-            collision_mask = np.asarray(
-                [float(agent.collided) for agent in self.agents], dtype=np.float32
-            )
-            rewards -= self.intrinsic_collision_penalty * collision_mask
-        if self.low_energy_budget_enabled and self.low_energy_budget_overuse_coef > 0.0:
-            rewards -= (
-                self.low_energy_budget_overuse_coef
-                * np.asarray(self._last_budget_overuse_ratio, dtype=np.float32)
-            )
-        return (self.intrinsic_reward_scale * rewards).astype(np.float32)
+        del prev_distances, targets
+        return np.zeros(self.num_agents, dtype=np.float32)
 
     def relabel_observations_with_subgoals(self, observations, subgoals):
         return np.asarray(observations, dtype=np.float32).copy()

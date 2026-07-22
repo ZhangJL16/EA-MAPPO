@@ -239,6 +239,9 @@ class RolloutWorker:
             getattr(self.args, "is_level_training", False)
             and hasattr(self.env, "get_high_level_obs")
             and hasattr(self.env, "apply_high_level_actions")
+            and int(getattr(self.args, "high_level_n_actions", 0)) > 0
+            and int(getattr(self.args, "high_level_obs_shape", 0)) > 0
+            and int(getattr(self.args, "high_level_state_shape", 0)) > 0
         )
         meta_period = max(1, int(getattr(self.args, "hmappo_meta_period", 5)))
         if level_training and hasattr(self.env, "set_meta_period"):
@@ -253,21 +256,6 @@ class RolloutWorker:
                 ),
                 intrinsic_success_bonus=getattr(
                     self.args, "hrl_intrinsic_success_bonus", None
-                ),
-                intrinsic_collision_penalty=getattr(
-                    self.args, "hrl_intrinsic_collision_penalty", None
-                ),
-                low_energy_budget_enabled=getattr(
-                    self.args, "hrl_low_energy_budget_enabled", None
-                ),
-                low_energy_budget_min_ratio=getattr(
-                    self.args, "hrl_low_energy_budget_min_ratio", None
-                ),
-                low_energy_budget_max_ratio=getattr(
-                    self.args, "hrl_low_energy_budget_max_ratio", None
-                ),
-                low_energy_budget_overuse_coef=getattr(
-                    self.args, "hrl_low_energy_budget_overuse_coef", None
                 ),
                 high_goal_style=getattr(self.args, "hrl_high_goal_style", None),
                 high_lateral_scale=getattr(
@@ -299,20 +287,8 @@ class RolloutWorker:
         high_mode_train_masks = []
         high_intervention_masks = []
         high_durations = []
-        high_low_o = []
-        high_low_u = []
-        high_low_mask = []
         current_high_transition = None
         current_high_reward = np.zeros(self.n_agents, dtype=np.float32)
-
-        def _pad_segment_array(values, shape, dtype=np.float32):
-            padded = np.zeros((meta_period, *shape), dtype=dtype)
-            mask_values = np.zeros((meta_period, self.n_agents, 1), dtype=np.float32)
-            count = min(len(values), meta_period)
-            if count > 0:
-                padded[:count] = np.asarray(values[:count], dtype=dtype)
-                mask_values[:count] = 1.0
-            return padded, mask_values
 
         def _agent_energy_ratios():
             if hasattr(self.env, "get_agent_energy_ratios"):
@@ -354,7 +330,6 @@ class RolloutWorker:
                 high_transition.get("start_positions"),
                 self.env.get_agent_positions(),
                 action,
-                task_targets=high_transition.get("task_targets"),
                 active_mask=high_transition.get("active_mask"),
             )
         terminated = False
@@ -444,19 +419,6 @@ class RolloutWorker:
                     high_durations.append(
                         [float(max(1, current_high_transition["duration"]))]
                     )
-                    segment_o, segment_mask = _pad_segment_array(
-                        current_high_transition.get("segment_o", []),
-                        (self.n_agents, self.obs_shape),
-                        dtype=np.float32,
-                    )
-                    segment_u, _ = _pad_segment_array(
-                        current_high_transition.get("segment_u", []),
-                        (self.n_agents, 1),
-                        dtype=np.int64,
-                    )
-                    high_low_o.append(segment_o)
-                    high_low_u.append(segment_u)
-                    high_low_mask.append(segment_mask)
                     high_energy_margins.append(current_high_transition["energy_margin"])
                     high_energy_order_masks.append(
                         current_high_transition["energy_order_mask"]
@@ -497,17 +459,22 @@ class RolloutWorker:
                 use_oracle_high_level = bool(
                     getattr(self.args, "hrl_oracle_high_level", False)
                 )
+                oracle_high_actions = None
+                if use_oracle_high_level and hasattr(
+                    self.env, "get_oracle_high_level_actions"
+                ):
+                    oracle_high_actions = np.asarray(
+                        self.env.get_oracle_high_level_actions(),
+                        dtype=np.float32,
+                    ).reshape(self.n_agents, high_action_dim)
                 for agent_id in range(self.n_agents):
                     if active_agent_mask[agent_id] <= 0.0:
                         high_action = np.zeros(high_action_dim, dtype=np.float32)
                     elif use_oracle_high_level:
-                        high_action = np.zeros(high_action_dim, dtype=np.float32)
-                        if high_action_dim >= 1:
-                            high_action[0] = 1.0
-                        if high_action_dim >= 2:
-                            high_action[1] = 1.0
-                        if high_action_dim >= 3:
-                            high_action[2] = 0.0
+                        if oracle_high_actions is None:
+                            high_action = np.zeros(high_action_dim, dtype=np.float32)
+                        else:
+                            high_action = oracle_high_actions[agent_id]
                     else:
                         high_action = self.agents.choose_high_level_action(
                             high_obs[agent_id],
@@ -569,15 +536,8 @@ class RolloutWorker:
                         if hasattr(self.env, "get_agent_positions")
                         else None
                     ),
-                    "task_targets": (
-                        self.env.get_current_task_targets()
-                        if hasattr(self.env, "get_current_task_targets")
-                        else None
-                    ),
                     "intervention_mask": intervention_mask.copy(),
                     "duration": 0,
-                    "segment_o": [],
-                    "segment_u": [],
                 }
                 current_high_reward = np.zeros(self.n_agents, dtype=np.float32)
 
@@ -667,14 +627,6 @@ class RolloutWorker:
                 dtype=np.float32,
             ).reshape(self.n_agents, 1)
             guard_flags *= active_agent_mask.reshape(self.n_agents, 1)
-
-            if level_training and current_high_transition is not None:
-                current_high_transition.setdefault("segment_o", []).append(
-                    raw_obs.copy()
-                )
-                current_high_transition.setdefault("segment_u", []).append(
-                    np.asarray(actions, dtype=np.int64).reshape(self.n_agents, 1)
-                )
 
             reward, terminated, info = self.env.step(actions)
             log_reward = float(np.asarray(reward, dtype=np.float32).mean())
@@ -837,19 +789,6 @@ class RolloutWorker:
             high_mode_train_masks.append(current_high_transition["mode_train_mask"])
             high_intervention_masks.append(current_high_transition["intervention_mask"])
             high_durations.append([float(max(1, current_high_transition["duration"]))])
-            segment_o, segment_mask = _pad_segment_array(
-                current_high_transition.get("segment_o", []),
-                (self.n_agents, self.obs_shape),
-                dtype=np.float32,
-            )
-            segment_u, _ = _pad_segment_array(
-                current_high_transition.get("segment_u", []),
-                (self.n_agents, 1),
-                dtype=np.int64,
-            )
-            high_low_o.append(segment_o)
-            high_low_u.append(segment_u)
-            high_low_mask.append(segment_mask)
             high_energy_margins.append(current_high_transition["energy_margin"])
             high_energy_order_masks.append(current_high_transition["energy_order_mask"])
             high_r.append(high_reward)
@@ -935,18 +874,6 @@ class RolloutWorker:
                 high_energy_order_masks.append(
                     np.zeros((self.n_agents, 1), dtype=np.float32)
                 )
-                high_low_o.append(
-                    np.zeros(
-                        (meta_period, self.n_agents, self.obs_shape),
-                        dtype=np.float32,
-                    )
-                )
-                high_low_u.append(
-                    np.zeros((meta_period, self.n_agents, 1), dtype=np.int64)
-                )
-                high_low_mask.append(
-                    np.zeros((meta_period, self.n_agents, 1), dtype=np.float32)
-                )
                 high_padded.append([1.0])
                 high_terminate.append([1.0])
 
@@ -984,9 +911,6 @@ class RolloutWorker:
                 high_duration=high_durations.copy(),
                 high_energy_margin=high_energy_margins.copy(),
                 high_energy_order_mask=high_energy_order_masks.copy(),
-                high_low_o=high_low_o.copy(),
-                high_low_u=high_low_u.copy(),
-                high_low_mask=high_low_mask.copy(),
                 high_padded=high_padded.copy(),
                 high_terminated=high_terminate.copy(),
             )
