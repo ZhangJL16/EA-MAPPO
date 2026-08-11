@@ -39,6 +39,7 @@ def make_energy_environment(args, *, max_episode_steps: int | None = None) -> Pe
         charging_velocity_limit=tuple(args.charging_velocity_limit),
         initial_energy_fraction_min=args.initial_energy_fraction_min,
         initial_energy_fraction_max=args.initial_energy_fraction_max,
+        flight_energy_multiplier=getattr(args, "flight_energy_multiplier", 1.0),
     )
     return PersistentEnergyNavigationEnv(
         args.scenario,
@@ -55,6 +56,7 @@ class EnergyMetricsCallback(NavigationMetricsCallback):
     def __init__(self, args, output_dir: Path) -> None:
         super().__init__(args, output_dir)
         self.total_flight_energy = 0.0
+        self.total_base_flight_energy = 0.0
         self.total_charge_received = 0.0
         self.minimum_soc_global = 1.0
         self.soc_sum_global = 0.0
@@ -79,6 +81,8 @@ class EnergyMetricsCallback(NavigationMetricsCallback):
         tasks_between = [record["tasks_between_charges"] for record in self.charging_session_records]
         base["energy_metrics"] = {
             "total_flight_energy": self.total_flight_energy,
+            "total_base_flight_energy": self.total_base_flight_energy,
+            "flight_energy_multiplier": getattr(self.args, "flight_energy_multiplier", 1.0),
             "total_charge_received": self.total_charge_received,
             "energy_per_completed_task": (
                 self.total_flight_energy / self.global_tasks_completed
@@ -112,6 +116,7 @@ class EnergyMetricsCallback(NavigationMetricsCallback):
     def _on_step(self) -> bool:
         info = self.locals["infos"][0]
         self.total_flight_energy += float(info["flight_energy_used"])
+        self.total_base_flight_energy += float(info.get("base_flight_energy", info["flight_energy_used"]))
         self.total_charge_received += float(info["gross_charge_received"])
         soc = float(info["state_of_charge"])
         self.minimum_soc_global = min(self.minimum_soc_global, soc)
@@ -172,11 +177,27 @@ def evaluate_energy_model(
     *,
     evaluation_mode: str,
     soc_group: str,
+    execution_mode: str = "POLICY_ONLY",
+    certificate_artifact: Path | None = None,
 ) -> dict[str, Any]:
     if evaluation_mode not in {"deterministic", "stochastic"}:
         raise ValueError("energy evaluation mode must be deterministic or stochastic")
     if soc_group not in {"full", "low_soc"}:
         raise ValueError("unknown SOC evaluation group")
+    if execution_mode not in {"POLICY_ONLY", "SYSTEM_WITH_KAPPA"}:
+        raise ValueError("unknown energy execution mode")
+    if execution_mode == "SYSTEM_WITH_KAPPA" and certificate_artifact is None:
+        raise ValueError("SYSTEM_WITH_KAPPA requires a certificate artifact")
+    certificate_oracle = None
+    if certificate_artifact is not None:
+        from scripts.sb3_recovery_teacher import CertifiedRecoveryOracle
+
+        certificate_oracle = CertifiedRecoveryOracle(
+            args.scenario,
+            getattr(args, "flight_energy_multiplier", 1.0),
+            certificate_artifact,
+        )
+    oracle = certificate_oracle if execution_mode == "SYSTEM_WITH_KAPPA" else None
     torch_state = torch.random.get_rng_state()
     numpy_state = np.random.get_state()
     cuda_states = torch.cuda.get_rng_state_all() if torch.cuda.is_available() else None
@@ -194,24 +215,103 @@ def evaluate_energy_model(
                 if soc_group == "full"
                 else {"initial_energy_fraction_range": [0.30, 0.45]}
             )
+            if certificate_oracle is not None:
+                certified_start = certificate_oracle.atlas.sample_initial_state(
+                    heldout_seed,
+                    environment.energy_navigation_config.battery_capacity,
+                )
+                reset_options |= {
+                    "start_position": certified_start.position,
+                    "start_velocity": certified_start.velocity,
+                }
             observation, reset_info = environment.reset(seed=heldout_seed, options=reset_options)
+            if oracle is not None:
+                oracle.reset()
             total_return = 0.0
             completed_records = []
             charge_records = []
             stranding_events = []
             signed_velocity_sum = 0.0
+            system_recovering = False
+            kappa_intervention_count = 0
+            kappa_recovery_success_count = 0
+            charger_hold_steps = 0
+            policy_departure_count = 0
+            recovery_was_at_station = False
+            system_failure = None
             for evaluation_step in range(1, args.evaluation_steps + 1):
                 action, _ = model.predict(
                     observation,
                     deterministic=evaluation_mode == "deterministic",
                 )
+                action = np.asarray(action, dtype=np.float32)
+                if oracle is not None:
+                    recovery_context = None
+                    support_selected = False
+                    departure_support_selected = False
+                    try:
+                        at_charger = environment._charging_admissible(
+                            environment.state.position, environment.state.velocity
+                        )
+                        if at_charger:
+                            departure_allowed = oracle.departure_allowed(environment)
+                            mapped = oracle.certified_support_action(
+                                environment,
+                                action,
+                                charging_state=True,
+                                charging_support_required=not departure_allowed,
+                            )
+                            if mapped is None:
+                                action = oracle.hold_action(environment)
+                                charger_hold_steps += 1
+                            else:
+                                action, recovery_context = mapped
+                                support_selected = True
+                                departure_support_selected = departure_allowed
+                        elif system_recovering:
+                            action, recovery_context = oracle.recovery_action(environment)
+                        else:
+                            mapped = oracle.certified_support_action(
+                                environment,
+                                action,
+                                charging_state=False,
+                                charging_support_required=False,
+                            )
+                            if mapped is None:
+                                oracle.begin_recovery()
+                                system_recovering = True
+                                action, recovery_context = oracle.recovery_action(environment)
+                                kappa_intervention_count += 1
+                            else:
+                                action, recovery_context = mapped
+                                support_selected = True
+                    except RuntimeError as error:
+                        system_failure = str(error)
+                        break
                 observation, reward, terminated, truncated, info = environment.step(action)
+                if oracle is not None and recovery_context is not None:
+                    if support_selected:
+                        oracle.commit_policy(recovery_context)
+                    else:
+                        oracle.commit_recovery(recovery_context)
+                if oracle is not None and departure_support_selected and not environment._charging_admissible(
+                    environment.state.position,
+                    environment.state.velocity,
+                ):
+                    oracle.end_recovery()
+                    system_recovering = False
+                    policy_departure_count += 1
                 if terminated:
                     raise RuntimeError("finite-energy environment terminated unexpectedly")
                 if not np.isfinite(reward) or not np.all(np.isfinite(observation)):
                     raise FloatingPointError("nonfinite finite-energy evaluation transition")
                 total_return += float(reward)
                 signed_velocity_sum += float(info["signed_velocity_toward_goal"])
+                if system_recovering and info["charging"] and not recovery_was_at_station:
+                    kappa_recovery_success_count += 1
+                    recovery_was_at_station = True
+                if not system_recovering:
+                    recovery_was_at_station = False
                 for record in info["goal_attempt_records"]:
                     if record["completed"]:
                         completed_records.append(
@@ -234,6 +334,7 @@ def evaluate_energy_model(
                 "actual_checkpoint_step": actual_step,
                 "evaluation_mode": evaluation_mode,
                 "soc_group": soc_group,
+                "execution_mode": execution_mode,
                 "initial_soc": reset_info["initial_soc"],
                 "steps": steps,
                 "tasks_completed": environment.tasks_completed,
@@ -273,6 +374,15 @@ def evaluate_energy_model(
                 "stranded": len(stranding_events) > 0,
                 "charging_sessions": charge_records,
                 "stranding_events": stranding_events,
+                "policy_return_to_station_count": environment.station_visit_count if execution_mode == "POLICY_ONLY" else 0,
+                "policy_successful_charge_cycles": len(successful) if execution_mode == "POLICY_ONLY" else 0,
+                "policy_departure_count": len(departed) if execution_mode == "POLICY_ONLY" else policy_departure_count,
+                "policy_resume_original_goal_count": len(resumed) if execution_mode == "POLICY_ONLY" else 0,
+                "kappa_intervention_count": kappa_intervention_count,
+                "kappa_recovery_success_count": kappa_recovery_success_count,
+                "charger_hold_steps": charger_hold_steps,
+                "system_recovery_cycle_success_rate": kappa_recovery_success_count / max(1, kappa_intervention_count),
+                "system_failure": system_failure,
             })
             environment.close()
     finally:
@@ -297,6 +407,7 @@ def evaluate_energy_model(
         "actual_checkpoint_step": actual_step,
         "evaluation_mode": evaluation_mode,
         "soc_group": soc_group,
+        "execution_mode": execution_mode,
         "heldout_environment_seeds": list(args.heldout_seeds),
         "seed_results": rows,
         "aggregate": {
@@ -324,5 +435,17 @@ def evaluate_energy_model(
                 if total_tasks > 0
                 else None
             ),
+            "policy_return_to_station_count": sum(row["policy_return_to_station_count"] for row in rows),
+            "policy_successful_charge_cycles": sum(row["policy_successful_charge_cycles"] for row in rows),
+            "policy_departure_count": sum(row["policy_departure_count"] for row in rows),
+            "policy_resume_original_goal_count": sum(row["policy_resume_original_goal_count"] for row in rows),
+            "kappa_intervention_count": sum(row["kappa_intervention_count"] for row in rows),
+            "kappa_recovery_success_count": sum(row["kappa_recovery_success_count"] for row in rows),
+            "charger_hold_steps": sum(row["charger_hold_steps"] for row in rows),
+            "system_recovery_cycle_success_rate": (
+                sum(row["kappa_recovery_success_count"] for row in rows)
+                / max(1, sum(row["kappa_intervention_count"] for row in rows))
+            ),
+            "system_failure_count": sum(row["system_failure"] is not None for row in rows),
         },
     }

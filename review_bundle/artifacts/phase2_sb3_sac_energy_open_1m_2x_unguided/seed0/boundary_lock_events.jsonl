@@ -1,0 +1,2 @@
+{"boundary_axes": [2], "consecutive_boundary_contacts": 101, "episode_step": 143, "event": "BOUNDARY_LOCK_EVENT", "position": [0.8262934077681925, 3.1197534068346, 0.05], "training_seed": 0, "training_step": 50143}
+{"boundary_axes": [2], "consecutive_boundary_contacts": 101, "episode_step": 207, "event": "BOUNDARY_LOCK_EVENT", "position": [0.2791518359001714, 3.3698128937416296, 1.95], "training_seed": 0, "training_step": 75207}

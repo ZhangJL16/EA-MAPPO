@@ -30,53 +30,12 @@ def _copy_reference_results(source_root: Path, target_root: Path, scenarios, met
                 target.parent.mkdir(parents=True, exist_ok=True)
                 with source.open(encoding="utf-8") as handle:
                     evaluation = list(csv.DictReader(handle))
-                episode_path = source.parent / "episode_metrics.csv"
-                trajectory_path = source.parent / "trajectory_diagnostics.csv"
-                episodes = []
-                trajectory_by_episode: dict[int, list[dict]] = {}
-                if episode_path.exists():
-                    with episode_path.open(encoding="utf-8") as handle:
-                        episodes = list(csv.DictReader(handle))
-                if trajectory_path.exists():
-                    with trajectory_path.open(encoding="utf-8") as handle:
-                        for row in csv.DictReader(handle):
-                            trajectory_by_episode.setdefault(int(row["episode_id"]), []).append(row)
-                for index, row in enumerate(evaluation):
-                    if episodes:
-                        episode = episodes[index % len(episodes)]
-                        for key in (
-                            "mission_completion_steps", "task_completion_steps", "outbound_path_length",
-                            "return_path_length", "total_path_length", "terminal_energy",
-                            "minimum_distance_to_task", "outbound_fallback_rate", "return_fallback_rate",
-                        ):
-                            if key in episode:
-                                row[key] = episode[key]
-                        row["outbound_intervention_rate"] = episode.get("outbound_fallback_rate", "")
-                        row["return_handoff_rate"] = episode.get("return_fallback_rate", "")
-                        if row.get("return_success") == "1":
-                            row["mission_completion_steps"] = episode.get("episode_length", "")
-                        if episode.get("terminal_energy") not in (None, ""):
-                            initial_energy = 5.5 if scenario == "mission_energy_tight" else 30.0
-                            row["total_energy_consumed"] = initial_energy - float(episode["terminal_energy"])
-                    trajectory = trajectory_by_episode.get(index % max(1, len(trajectory_by_episode)), [])
-                    residuals = []
-                    centers = []
-                    ratios = []
-                    for item in trajectory:
-                        if item.get("fallback_reason"):
-                            continue
-                        candidate_text, center_text = item.get("candidate_action"), item.get("zonotope_center")
-                        if not candidate_text or not center_text:
-                            continue
-                        candidate = np.asarray(json.loads(candidate_text), dtype=np.float64)
-                        center = np.asarray(json.loads(center_text), dtype=np.float64)
-                        residual = float(np.linalg.norm(candidate - center))
-                        center_norm = float(np.linalg.norm(center))
-                        residuals.append(residual); centers.append(center_norm); ratios.append(residual / max(center_norm, 1e-12))
-                    row["mean_residual_norm"] = float(np.mean(residuals)) if residuals else ""
-                    row["mean_center_norm"] = float(np.mean(centers)) if centers else ""
-                    row["mean_residual_to_center_ratio"] = float(np.mean(ratios)) if ratios else ""
-                    row["metric_source"] = "evaluation outcomes plus matching checked-in training trajectory diagnostics"
+                for row in evaluation:
+                    # Evaluation episodes and training episodes are not paired.
+                    # Never modulo-join or overwrite evaluation outcomes with
+                    # training diagnostics; analyze the two tables separately.
+                    row["metric_source"] = "unaltered checked-in evaluation_metrics.csv"
+                    row["training_diagnostic_source"] = str(source.parent / "trajectory_diagnostics.csv")
                 write_csv(target, evaluation)
 
 
@@ -161,12 +120,15 @@ def main() -> None:
         )
     ]
     write_csv(paper / "rl_contribution_bootstrap.csv", bootstrap)
-    gate = {
-        "RL_CONTRIBUTION_GATE": "PASS" if all(
+    completeness = all(
             any(row["scenario"] == scenario and row["method"] == method for row in summaries)
             for scenario in args.scenarios
             for method in ("center_only", "random_generator", "generator_sac")
-        ) else "FAIL",
+        )
+    gate = {
+        "RL_ABLATION_ARTIFACT_GATE": "PASS" if completeness else "FAIL",
+        "claim_supported": False,
+        "claim_status": "requires matched non-saturated rerun; artifact presence is not contribution evidence",
         "scenarios": args.scenarios,
         "seeds": args.seeds,
         "episodes_per_seed": args.episodes,

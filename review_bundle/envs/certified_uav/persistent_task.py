@@ -532,8 +532,10 @@ class PersistentGoalWrapper(gym.Wrapper):
         }
         if self.mode == PersistentMissionMode.TASK_RL:
             events = self.manager.advance(self.plant.state.position, self.episode_step)
-        elif self.mode == PersistentMissionMode.BACKUP_RECOVERY and telemetry.terminal_admissible:
-            self.enter_charging(voluntary=False)
+        # A BACKUP_RECOVERY endpoint is not allowed to choose the hybrid mode
+        # from geometric terminal overlap.  The persistent certified wrapper
+        # performs KAPPA-ARRIVE only after the hash-bound committed child is
+        # level zero and the live station-hold certificate is rechecked.
         if terminated or info.get("failure_reason"):
             self.mode = PersistentMissionMode.FAILURE
             self.phase = self.mode

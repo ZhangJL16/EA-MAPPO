@@ -40,6 +40,7 @@ class EnergyNavigationConfig:
     charging_velocity_limit: tuple[float, float, float] = (0.05, 0.05, 0.04)
     initial_energy_fraction_min: float = 0.30
     initial_energy_fraction_max: float = 1.00
+    flight_energy_multiplier: float = 1.0
 
     def __post_init__(self) -> None:
         if not np.isfinite(self.battery_capacity) or self.battery_capacity <= 0.0:
@@ -53,6 +54,8 @@ class EnergyNavigationConfig:
             raise ValueError("charging velocity limits must be positive")
         if not 0.0 <= self.initial_energy_fraction_min <= self.initial_energy_fraction_max <= 1.0:
             raise ValueError("initial energy fractions must lie in [0, 1]")
+        if not np.isfinite(self.flight_energy_multiplier) or self.flight_energy_multiplier <= 0.0:
+            raise ValueError("flight_energy_multiplier must be finite and positive")
 
 
 class PersistentNavigationEnv(gym.Env[np.ndarray, np.ndarray]):
@@ -604,6 +607,9 @@ class PersistentNavigationEnv(gym.Env[np.ndarray, np.ndarray]):
             "velocity_saturation_rate": self.velocity_saturation_count / self.episode_step,
             "energy_usage": energy_usage,
             "flight_energy_used": float(transition["flight_energy_used"]),
+            "base_flight_energy": float(transition.get("base_flight_energy", transition["flight_energy_used"])),
+            "flight_energy_multiplier": float(transition.get("flight_energy_multiplier", 1.0)),
+            "actual_flight_energy": float(transition.get("actual_flight_energy", transition["flight_energy_used"])),
             "gross_charge_received": float(transition["gross_charge_received"]),
             "net_energy_change": float(transition["net_energy_change"]),
             "charging": bool(transition["charging"]),
@@ -635,6 +641,11 @@ class PersistentEnergyNavigationEnv(PersistentNavigationEnv):
             navigation_energy_capacity=self.energy_navigation_config.battery_capacity,
             **kwargs,
         )
+        self.energy_model = EnergyModel(
+            SimulationEnergyConfig(
+                flight_energy_multiplier=self.energy_navigation_config.flight_energy_multiplier
+            )
+        )
         self.station_visit_count = 0
         self.charging_session_count = 0
         self.successful_charging_session_count = 0
@@ -648,6 +659,7 @@ class PersistentEnergyNavigationEnv(PersistentNavigationEnv):
         self._energy_stranded_active = False
         self._active_charging_session: dict[str, Any] | None = None
         self._tasks_since_last_charge = 0
+        self.cumulative_base_flight_energy = 0.0
 
     @property
     def _energy_observation_capacity(self) -> float:
@@ -707,11 +719,18 @@ class PersistentEnergyNavigationEnv(PersistentNavigationEnv):
             flight_energy_demand = 0.0
         else:
             transition = self._integrate_motion(state_before, physical_action)
+            base_flight_energy = self.energy_model.base_realized_cost(
+                state_before,
+                physical_action,
+                self.config.dt,
+            )
             flight_energy_demand = self.energy_model.realized_cost(
                 state_before,
                 physical_action,
                 self.config.dt,
             )
+        if state_before.energy <= 0.0:
+            base_flight_energy = 0.0
         flight_energy_used = min(state_before.energy, flight_energy_demand)
         energy_after_flight = max(0.0, state_before.energy - flight_energy_used)
         charging = self._charging_admissible(
@@ -736,6 +755,9 @@ class PersistentEnergyNavigationEnv(PersistentNavigationEnv):
             "energy_usage": flight_energy_used,
             "flight_energy_used": flight_energy_used,
             "flight_energy_demand": flight_energy_demand,
+            "base_flight_energy": base_flight_energy,
+            "flight_energy_multiplier": self.energy_navigation_config.flight_energy_multiplier,
+            "actual_flight_energy": flight_energy_used,
             "energy_after_flight": energy_after_flight,
             "gross_charge_received": gross_charge_received,
             "net_energy_change": energy_after - state_before.energy,
@@ -766,6 +788,7 @@ class PersistentEnergyNavigationEnv(PersistentNavigationEnv):
         self._energy_stranded_active = False
         self._active_charging_session = None
         self._tasks_since_last_charge = 0
+        self.cumulative_base_flight_energy = 0.0
         info |= {
             "initial_energy": self.state.energy,
             "initial_soc": initial_soc,
@@ -798,6 +821,7 @@ class PersistentEnergyNavigationEnv(PersistentNavigationEnv):
 
     def step(self, action: np.ndarray):
         observation, reward, terminated, truncated, info = super().step(action)
+        self.cumulative_base_flight_energy += float(info["base_flight_energy"])
         soc = self.state.energy / self.energy_navigation_config.battery_capacity
         self.minimum_soc = min(self.minimum_soc, soc)
         self.soc_sum += soc
@@ -880,6 +904,11 @@ class PersistentEnergyNavigationEnv(PersistentNavigationEnv):
             "stranding_event": stranding_event,
             "energy_stranded_now": stranding_event is not None,
             "energy_mode": "finite_charging",
+            "base_flight_energy": float(info["base_flight_energy"]),
+            "flight_energy_multiplier": self.energy_navigation_config.flight_energy_multiplier,
+            "actual_flight_energy": float(info["actual_flight_energy"]),
+            "cumulative_actual_flight_energy": self.cumulative_energy_usage,
+            "cumulative_base_flight_energy": self.cumulative_base_flight_energy,
         }
         return observation, reward, terminated, truncated, info
 

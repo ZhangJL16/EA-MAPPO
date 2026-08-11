@@ -86,7 +86,7 @@ class TemperatureCoordinateTests(unittest.TestCase):
         )
 
     def test_temperature_coordinate_config(self):
-        self.assertEqual(GeneratorSACConfig().temperature_coordinate, "physical")
+        self.assertEqual(GeneratorSACConfig().temperature_coordinate, "normalized")
         self.assertEqual(GeneratorSACConfig(temperature_coordinate="normalized").temperature_coordinate, "normalized")
         with self.assertRaises(ValueError):
             GeneratorSACConfig(temperature_coordinate="invalid")

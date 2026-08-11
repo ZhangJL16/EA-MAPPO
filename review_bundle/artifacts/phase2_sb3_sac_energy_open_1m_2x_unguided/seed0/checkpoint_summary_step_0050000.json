@@ -1,0 +1,103 @@
+{
+  "action_max": [
+    0.9999935626983643,
+    0.999755859375,
+    0.9998401403427124
+  ],
+  "action_mean": [
+    -0.11803510500073433,
+    -0.04801949110150337,
+    0.15375052636504175
+  ],
+  "action_mean_abs": [
+    0.5649350780832767,
+    0.5842557076227665,
+    0.5481936205780507
+  ],
+  "action_min": [
+    -0.9996200203895569,
+    -0.9999872446060181,
+    -0.999668538570404
+  ],
+  "action_rms": [
+    0.6395409651679751,
+    0.6578161830999198,
+    0.6214205331503306
+  ],
+  "actual_training_step": 50000,
+  "boundary_collision_count": 723,
+  "boundary_collision_rate": 0.01446,
+  "boundary_lock_event_count": 0,
+  "collision_count": 723,
+  "collision_rate": 0.01446,
+  "current_episode_return": 0.0,
+  "energy_metrics": {
+    "charging_session_count": 0,
+    "charging_visit_rate_per_1000_steps": 0.0,
+    "energy_per_completed_task": null,
+    "energy_stranded_count": 10,
+    "flight_energy_multiplier": 2.0,
+    "mean_charge_duration_seconds": null,
+    "mean_charge_duration_steps": null,
+    "mean_soc": 0.06372882430362929,
+    "mean_soc_at_charge_entry": null,
+    "mean_soc_at_departure": null,
+    "mean_tasks_between_charges": null,
+    "minimum_soc": 0.0,
+    "station_visit_count": 0,
+    "stranded_episode_count": 10,
+    "stranded_episode_rate": 1.0,
+    "stranding_rate_per_1000_steps": 0.2,
+    "successful_charge_rate": 0.0,
+    "successful_charging_session_count": 0,
+    "successful_resume_count": 0,
+    "task_resume_success_rate": 0.0,
+    "total_base_flight_energy": 104.04774563570386,
+    "total_charge_received": 0.0,
+    "total_flight_energy": 207.96875489700935,
+    "voluntary_charging_session_count": 0
+  },
+  "energy_usage": 207.96875489700935,
+  "episode_index": 10,
+  "goal_initial_distances": {
+    "mean_initial_goal_distance": 2.245865519532278,
+    "mean_initial_xy_distance": 2.066908617871352,
+    "mean_initial_z_distance": 0.6278955962216374
+  },
+  "goal_latency": {
+    "completed_goal_count": 0,
+    "mean_steps_per_completed_goal": null,
+    "median_steps_per_completed_goal": null,
+    "p25_steps_per_completed_goal": null,
+    "p75_steps_per_completed_goal": null
+  },
+  "last_10000_tasks_per_1000_steps": 0.0,
+  "last_50000_tasks_per_1000_steps": 0.0,
+  "maximum_consecutive_boundary_contacts": 70,
+  "mean_goal_distance": 2.3106939719542603,
+  "mean_goal_progress": -6.259650258425671e-06,
+  "mean_signed_velocity_toward_goal": 8.354769024171164e-05,
+  "minimum_goal_distance": 0.4323812258414006,
+  "requested_checkpoint_step": 50000,
+  "reward_component_totals": {
+    "backup_intervention_event_cost": 0.0,
+    "collision_penalty": -867.60000000001,
+    "distance_potential_shaping": -69.8749999999874,
+    "energy_cost": -2.0796875489701043,
+    "signed_velocity_toward_goal_reward": 0.41773845120853065,
+    "task_completion_reward": 0.0,
+    "time_cost": -499.99999999969026
+  },
+  "sb3_train_metrics": {
+    "train/actor_loss": -9.128133773803711,
+    "train/critic_loss": 0.024412546306848526,
+    "train/ent_coef": 0.012079961597919464,
+    "train/ent_coef_loss": -0.7992827892303467,
+    "train/learning_rate": 0.0003,
+    "train/n_updates": 45000
+  },
+  "tasks_completed": 0,
+  "tasks_per_1000_steps": 0.0,
+  "velocity_saturation_count": 1395,
+  "velocity_saturation_rate": 0.0279
+}

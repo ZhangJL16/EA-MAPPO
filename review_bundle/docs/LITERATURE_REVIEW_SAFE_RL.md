@@ -1,5 +1,7 @@
 # Literature Review: Safe Continuous-Control RL for Persistent UAV Missions
 
+> Theory-status note (2026-08-11): this document supplies literature positioning, not a safety proof. `docs/theory/PAPER_THEOREM.md` is the canonical theorem; `docs/theory/THEOREM_LEDGER.md` and `docs/theory/OPEN_THEORY_ISSUES.md` control proof status and non-claims. Any older action-level or unstopped-recovery shorthand here must be read through those definitions.
+
 ## Scope and evidence policy
 
 This review prioritizes official proceedings, publisher pages, and author manuscripts. “Paper finding” summarizes what the cited work establishes. “Project interpretation” is our scoped comparison to Generator-SAC and is not attributed to the paper. The review does not claim that any cited method solves the present persistent charging problem under the same assumptions.

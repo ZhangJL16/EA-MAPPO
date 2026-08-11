@@ -83,6 +83,36 @@ class StochasticKappaAndOptimizationTests(unittest.TestCase):
         self.environment.task_env.phase = self.environment.task_env.mode
         self.environment._context_cache_key = None
 
+    def _set_positive_rank_kappa_witness(self):
+        cell = min(
+            (
+                item
+                for item in self.environment.atlas.manifest.cells
+                if item.level >= 20
+                and item.hash_valid
+                and item.complete_successor_containment
+            ),
+            key=lambda item: (item.level, item.cell_id),
+        )
+        self.environment.plant.state = UAVPhysicalState(
+            np.asarray(cell.reference_position, dtype=np.float64),
+            np.asarray(cell.reference_velocity, dtype=np.float64),
+            30.0,
+            0.0,
+        )
+        self.environment.plant.failure_reason = None
+        self.environment.plant.last_lidar = self.environment.plant.lidar_model.measure(
+            self.environment.plant.state,
+            self.environment.plant.world,
+            self.environment.plant.np_random,
+        )
+        self.environment.task_env.mode = PersistentMissionMode.BACKUP_RECOVERY
+        self.environment.task_env.phase = self.environment.task_env.mode
+        self.environment.atlas.recovery_active = True
+        self.environment.atlas.active_cell_id = cell.cell_id
+        self.environment._context_cache_key = None
+        return cell
+
     def test_invalid_kappa_failure_category_is_recorded(self):
         self.environment.plant.state = UAVPhysicalState(
             np.array((0.2851090968, 0.5, 1.0)), np.array((-0.0377, 0.0, 0.0)), 5.3, 0.0
@@ -98,11 +128,12 @@ class StochasticKappaAndOptimizationTests(unittest.TestCase):
         traces = []
         for _ in range(2):
             self.environment.reset(seed=1)
-            self._set_charging_witness()
+            self._set_positive_rank_kappa_witness()
             trace = []
             for _ in range(12):
                 _, _, terminated, truncated, info = self.environment.step(np.zeros(3))
                 self.assertFalse(terminated or truncated)
+                self.assertEqual(info.get("command_source"), "kappa")
                 self.assertNotEqual(info.get("backup_reason"), "KAPPA_CERTIFICATE_INVALID")
                 trace.append(np.concatenate((self.environment.plant.state.position, self.environment.plant.state.velocity)))
             traces.append(np.stack(trace))
@@ -111,11 +142,21 @@ class StochasticKappaAndOptimizationTests(unittest.TestCase):
     def test_kappa_remains_valid_across_random_recovery_boundary(self):
         rng = np.random.default_rng(7)
         for _ in range(5):
-            self._set_charging_witness()
-            self.environment.plant.state.velocity = np.array((-0.04, 0.0, 0.0)) + rng.uniform(-0.001, 0.001, 3)
+            self.environment.reset(seed=1)
+            cell = self._set_positive_rank_kappa_witness()
+            self.environment.plant.state.velocity = (
+                np.asarray(cell.reference_velocity, dtype=np.float64)
+                + rng.uniform(-1e-4, 1e-4, 3)
+            )
+            self.environment.plant.last_lidar = self.environment.plant.lidar_model.measure(
+                self.environment.plant.state,
+                self.environment.plant.world,
+                self.environment.plant.np_random,
+            )
             for _ in range(8):
                 _, _, terminated, truncated, info = self.environment.step(np.zeros(3))
                 self.assertFalse(terminated or truncated)
+                self.assertEqual(info.get("command_source"), "kappa")
                 self.assertIsNone(info["action_context"].get("kappa_validation_failure_category"))
 
     def test_terminal_hold_certificate_binds_nonzero_hold(self):

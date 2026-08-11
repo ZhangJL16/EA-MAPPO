@@ -7,14 +7,16 @@ from dataclasses import fields
 import numpy as np
 
 from cert_runtime.generator_sac import GeneratorTransition, PersistentGeneratorSAC
+from cert_runtime.persistent_authority import ExecutionAuthority
 from cert_runtime.types import Interval3, Zonotope3
 from envs.certified_uav import PersistentGoalCertificateManifest, PersistentMissionMode, make_persistent_uav_env
 from envs.certified_uav.recoverability import RecoverabilityVerifier
 
 
 class _EnvelopeBuilder:
-    def __init__(self, energy_low: float = 8.0) -> None:
+    def __init__(self, energy_low: float = 8.0, energy_prefix_low: float | None = None) -> None:
         self.energy_low = energy_low
+        self.energy_prefix_low = energy_low if energy_prefix_low is None else energy_prefix_low
         self.dynamics = SimpleNamespace(version="dynamics-v1")
         self.energy = SimpleNamespace(version="energy-v1")
 
@@ -22,6 +24,8 @@ class _EnvelopeBuilder:
         del state, action_set
         return SimpleNamespace(
             energy_low=self.energy_low,
+            energy_prefix_low=self.energy_prefix_low,
+            swept_position=Interval3((0.0, 0.0, 0.0), (0.1, 0.1, 0.1)),
             velocity=Interval3((-0.1, -0.1, -0.1), (0.1, 0.1, 0.1)),
             dynamics_bound_version="dynamics-v1",
             energy_bound_version="energy-v1",
@@ -32,6 +36,7 @@ class _EnvelopeBuilder:
         return SimpleNamespace(
             position=Interval3((0.0, 0.0, 0.0), (0.1, 0.1, 0.1)),
             velocity=Interval3((-0.01, -0.01, -0.01), (0.01, 0.01, 0.01)),
+            energy_low=self.energy_low,
         )
 
 
@@ -39,6 +44,7 @@ class _Provider:
     energy_reserve = 1.0
 
     def __init__(self) -> None:
+        self.current_tube_ok = True
         self.target = SimpleNamespace(
             cell_id="lower-cell",
             energy_upper=5.0,
@@ -64,6 +70,10 @@ class _Provider:
         del state, action_set, target
         return self.geometry_ok
 
+    def complete_swept_tube_slack(self, swept_position):
+        del swept_position
+        return 0.1 if self.current_tube_ok else -1.0
+
     @staticmethod
     def _versions():
         return ("geometry-v1", "dynamics-v1", "tracking-v1", "energy-v1", "terminal-v1", "kappa-v1")
@@ -75,6 +85,9 @@ def _fixture(energy_low: float = 8.0):
         config=SimpleNamespace(
             a_max=np.ones(3),
             minimum_generator_sigma=0.05,
+            body_radius=0.05,
+            geometry_margin=0.02,
+            world_size=np.ones(3) * 4.0,
         ),
         calibration=SimpleNamespace(
             dynamics=SimpleNamespace(version="dynamics-v1"),
@@ -131,6 +144,8 @@ class RecoverabilitySemanticsTests(unittest.TestCase):
         verifier, _, _, state, context = _fixture()
         result = verifier.certify_action_set(state, context.closure.zonotope_certificate.zonotope, context)
         self.assertTrue(result.verified)
+        self.assertTrue(result.current_swept_tube_inclusion)
+        self.assertTrue(result.within_step_energy_prefix_inclusion)
         self.assertTrue(result.collision_successor_inclusion)
         self.assertTrue(result.energy_successor_inclusion)
 
@@ -154,6 +169,32 @@ class RecoverabilitySemanticsTests(unittest.TestCase):
         self.assertFalse(energy_failure.verified)
         self.assertFalse(energy_failure.energy_successor_inclusion)
 
+    def test_endpoint_safe_support_with_unsafe_current_tube_is_rejected(self):
+        verifier, _, provider, state, context = _fixture()
+        provider.current_tube_ok = False
+        result = verifier.certify_action_set(
+            state,
+            context.closure.zonotope_certificate.zonotope,
+            context,
+        )
+        self.assertFalse(result.verified)
+        self.assertFalse(result.current_swept_tube_inclusion)
+        self.assertTrue(result.collision_successor_inclusion)
+        self.assertEqual(result.reason, "CURRENT_SWEPT_TUBE_EXCLUSION")
+
+    def test_endpoint_energy_safe_with_unsafe_prefix_is_rejected(self):
+        verifier, _, _, state, context = _fixture()
+        verifier.runtime.envelope_builder.energy_prefix_low = -0.01
+        result = verifier.certify_action_set(
+            state,
+            context.closure.zonotope_certificate.zonotope,
+            context,
+        )
+        self.assertFalse(result.verified)
+        self.assertTrue(result.energy_successor_inclusion)
+        self.assertFalse(result.within_step_energy_prefix_inclusion)
+        self.assertEqual(result.reason, "WITHIN_STEP_ENERGY_PREFIX_EXCLUSION")
+
     def test_recursive_recoverability_two_steps(self):
         verifier, _, _, state, context = _fixture()
         action_set = context.closure.zonotope_certificate.zonotope
@@ -175,11 +216,44 @@ class RecoverabilitySemanticsTests(unittest.TestCase):
         runtime.envelope_builder.propagate_point_action = lambda state, action: SimpleNamespace(
             position=Interval3((0.9, 0.0, 0.0), (1.1, 0.1, 0.1)),
             velocity=Interval3((-0.01, -0.01, -0.01), (0.01, 0.01, 0.01)),
+            energy_low=runtime.envelope_builder.energy_low,
         )
         self.assertFalse(verifier.successor_stays_in_charging_set(state, np.array([0.1, 0.0, 0.0])))
 
 
 class SinglePolicyAuthorityTests(unittest.TestCase):
+    def test_departure_gate_uses_certificate_energy_lower_bound(self):
+        environment = make_persistent_uav_env("persistent_open.json")
+        environment.certificate_provider = SimpleNamespace(gate_pass=True)
+        environment._departure_required = lambda: 4.4
+        environment.runtime._certificate_state = lambda: SimpleNamespace(
+            energy=5.0,
+            energy_error_radius=0.2,
+        )
+        result = environment._departure_gate()
+        self.assertFalse(result.allowed)
+        self.assertEqual(result.reason, "INSUFFICIENT_DEPARTURE_ENERGY")
+
+    def test_complete_swept_tube_rejects_thin_gap_between_safe_endpoints(self):
+        environment = make_persistent_uav_env("persistent_open.json")
+        environment.reset(seed=0)
+        persistent_provider = environment.certificate_provider
+        provider = persistent_provider.providers[persistent_provider.active_edge_id]
+        provider.free_boxes = (
+            np.array((0.0, 0.0, 1.0, 4.0), dtype=np.float64),
+            np.array((1.1, 0.0, 4.0, 4.0), dtype=np.float64),
+        )
+        provider.occupied_boxes = ()
+        margin = environment.runtime.config.body_radius + environment.runtime.config.geometry_margin
+        left_low = np.array((0.8 - margin, 1.0 - margin))
+        left_high = np.array((0.8 + margin, 1.0 + margin))
+        right_low = np.array((1.3 - margin, 1.0 - margin))
+        right_high = np.array((1.3 + margin, 1.0 + margin))
+        self.assertTrue(provider._rectangle_covered_by_free_union(left_low, left_high)[0])
+        self.assertTrue(provider._rectangle_covered_by_free_union(right_low, right_high)[0])
+        swept = Interval3((0.8, 1.0, 1.0), (1.3, 1.0, 1.0))
+        self.assertLess(provider.complete_swept_tube_slack(swept), 0.0)
+
     def test_main_path_has_one_three_dimensional_policy_and_neutral_center(self):
         environment = make_persistent_uav_env("persistent_open.json")
         self.assertEqual(environment.trainable_policy_count, 1)
@@ -207,6 +281,7 @@ class SinglePolicyAuthorityTests(unittest.TestCase):
             "recoverable_set_member": True,
             "generator_available": True,
             "recoverability_action_verified": True,
+            "recovery_level": 1,
         }
         environment.task_env.energy_margin = environment.charging.config.forced_return_margin
         self.assertEqual(environment._backup_reason(valid), "ENERGY_MARGIN_BACKUP_SWITCH")
@@ -224,10 +299,32 @@ class SinglePolicyAuthorityTests(unittest.TestCase):
             "generator_available": False,
             "generator_status": "NO_GENERATOR_SET",
             "recoverability_action_verified": None,
+            "recovery_level": 1,
         }
         self.assertEqual(environment._backup_reason(no_generator), "NO_GENERATOR_SET")
         invalid = dict(no_generator, certificate_valid=False, failure_reason="VERSION_MISMATCH")
         self.assertEqual(environment._backup_reason(invalid), "VERSION_MISMATCH")
+
+    def test_fail_closed_runtime_record_is_not_relabelled_as_kappa(self):
+        environment = make_persistent_uav_env("persistent_open.json")
+        environment.reset(seed=0)
+        context = environment._refresh_context()
+        environment._last_authority_decision = SimpleNamespace(
+            authority=ExecutionAuthority.FAIL_CLOSED,
+            reason="KAPPA_CERTIFICATE_INVALID",
+            generator_executable=False,
+            kappa_required=False,
+            departure_allowed=False,
+            charging_restriction=False,
+            station_hold_required=False,
+        )
+        environment._refresh_context = lambda: context
+        _, _, terminated, _, info = environment.step(np.zeros(3))
+        self.assertTrue(terminated)
+        self.assertEqual(info["execution_authority"], ExecutionAuthority.FAIL_CLOSED.value)
+        self.assertFalse(info["backup_triggered"])
+        self.assertEqual(info["persistent_metrics"]["fail_closed_steps"], 1)
+        self.assertEqual(info["persistent_metrics"]["kappa_backup_steps"], 0)
 
     def test_policy_output_shape_is_strict(self):
         environment = make_persistent_uav_env("persistent_open.json")

@@ -35,6 +35,7 @@ class RecoverabilityAtlasManifest:
     dynamics_version: str
     tracking_version: str
     energy_version: str
+    flight_energy_multiplier: float
     terminal_version: str
     kappa_version: str
     number_of_cells: int
@@ -106,7 +107,14 @@ class TerminalRecoveryCertificate:
 
     @property
     def valid(self) -> bool:
-        return bool(self.terminal and self.level == 0 and self.successor is None and self.certificate_hash == self.expected_hash)
+        return bool(
+            self.terminal
+            and self.level == 0
+            and self.successor is None
+            and np.isfinite(self.recovery_energy_upper)
+            and self.recovery_energy_upper == 0.0
+            and self.certificate_hash == self.expected_hash
+        )
 
 
 class CertifiedRecoverabilityAtlas(MultiStepSyntheticMissionCertificateProvider):
@@ -166,6 +174,7 @@ class CertifiedRecoverabilityAtlas(MultiStepSyntheticMissionCertificateProvider)
             "recoverable_set_version": RECOVERABLE_SET_VERSION,
             "recoverability_action_rule_version": RECOVERABILITY_ACTION_RULE_VERSION,
             "versions": versions,
+            "flight_energy_multiplier": runtime.flight_energy_multiplier,
             "calibration_hashes": tuple(runtime.calibration.fingerprints),
             "free_boxes": tuple(tuple(float(value) for value in box) for box in self.free_boxes),
             "occupied_boxes": tuple(tuple(float(value) for value in box) for box in self.occupied_boxes),
@@ -192,6 +201,7 @@ class CertifiedRecoverabilityAtlas(MultiStepSyntheticMissionCertificateProvider)
             dynamics_version=versions[1],
             tracking_version=versions[2],
             energy_version=versions[3],
+            flight_energy_multiplier=runtime.flight_energy_multiplier,
             terminal_version=versions[4],
             kappa_version=versions[5],
             number_of_cells=len(self.manifest.cells),
@@ -490,7 +500,22 @@ class CertifiedRecoverabilityAtlas(MultiStepSyntheticMissionCertificateProvider)
         self.charging_support_required = bool(required)
 
     def evaluate(self, state, timestamp: float | None = None) -> MissionActionContext:
-        terminal_complete = self._terminal_certificate_valid_for_state(state)
+        active_committed = (
+            None
+            if self.active_cell_id is None
+            else self._cells_by_id.get(self.active_cell_id)
+        )
+        # A geometric terminal overlap cannot erase a committed positive-rank
+        # child.  Only an uncommitted terminal state or the exact committed
+        # level-zero child may consume the terminal shortcut.
+        terminal_commitment_compatible = bool(
+            self.active_cell_id is None
+            or (active_committed is not None and active_committed.level == 0)
+        )
+        terminal_complete = bool(
+            terminal_commitment_compatible
+            and self._terminal_certificate_valid_for_state(state)
+        )
         if terminal_complete:
             self.recovery_active = False
             self.active_cell_id = None
@@ -613,6 +638,9 @@ class CertifiedRecoverabilityAtlas(MultiStepSyntheticMissionCertificateProvider)
         if not self._terminal_certificate_valid_for_state(state):
             return None
         return self._terminal_hold_action(state)
+
+    def certified_station_hold_action_is_valid(self, state, action: np.ndarray) -> bool:
+        return self.verifier.certified_station_hold_action_is_valid(state, action)
 
     def required_departure_energy(self, task=None) -> float:
         del task

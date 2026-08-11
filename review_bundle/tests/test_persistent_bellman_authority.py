@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import replace
 from types import SimpleNamespace
 import unittest
 
@@ -34,6 +35,7 @@ def authority_input(**updates) -> PersistentAuthorityInput:
         "departure_allowed": True,
         "charging_support_verified": False,
         "station_hold_valid": False,
+        "recovery_level": 1,
     }
     values.update(updates)
     return PersistentAuthorityInput(**values)
@@ -95,6 +97,12 @@ def persistent_transition(
         next_departure_allowed=True,
         next_charging_state=authority == ExecutionAuthority.CHARGER_CONSTRAINED,
         next_charging_restriction=authority == ExecutionAuthority.CHARGER_CONSTRAINED,
+        next_charging_support_verified=(
+            authority == ExecutionAuthority.CHARGER_CONSTRAINED and generator_executable
+        ),
+        next_station_hold_valid=(
+            authority == ExecutionAuthority.CHARGER_CONSTRAINED and not generator_executable
+        ),
         next_authority_action=kappa,
     )
 
@@ -129,12 +137,52 @@ class PersistentBellmanAuthorityTests(unittest.TestCase):
         self.assertEqual(self.agent.generator_log_density_calls, before)
         self.assertEqual(counts["kappa_target_count"], 1)
 
+    def test_current_kappa_atom_must_match_certified_executed_action(self):
+        transition = persistent_transition(
+            ExecutionAuthority.KAPPA_BACKUP,
+            generator_executable=False,
+            backup_required=True,
+        )
+        malformed = replace(
+            transition,
+            execution_authority=ExecutionAuthority.KAPPA_BACKUP.value,
+            accepted=False,
+            u=None,
+            eta=None,
+            c=None,
+            G=None,
+            candidate_action=None,
+            executed_action=np.zeros(3, dtype=np.float32),
+        )
+        with self.assertRaisesRegex(ValueError, "must equal kappa_action"):
+            self.agent.observe(malformed)
+
+    def test_next_kappa_atom_requires_valid_recovery_certificate(self):
+        transition = persistent_transition(
+            ExecutionAuthority.KAPPA_BACKUP,
+            generator_executable=False,
+            backup_required=True,
+        )
+        with self.assertRaisesRegex(ValueError, "valid recovery certificate"):
+            self.agent.observe(replace(transition, next_certificate_valid=False))
+
     def test_next_interior_state_uses_generator_branch(self):
         transition = persistent_transition(ExecutionAuthority.RL_GENERATOR, generator_executable=True)
         before = self.agent.generator_log_density_calls
         _, counts = self.agent.bellman_target([transition])
         self.assertEqual(counts["generator_target_count"], 1)
         self.assertEqual(self.agent.generator_log_density_calls - before, 1)
+
+    def test_transition_rejects_nonfinite_or_singular_generator_contracts(self):
+        transition = persistent_transition(ExecutionAuthority.RL_GENERATOR, generator_executable=True)
+        with self.assertRaisesRegex(ValueError, "G must be invertible"):
+            replace(transition, G=np.zeros((3, 3), dtype=np.float32))
+        with self.assertRaisesRegex(ValueError, "next_G must be invertible"):
+            replace(transition, next_G=np.zeros((3, 3), dtype=np.float32))
+        invalid_action = transition.executed_action.copy()
+        invalid_action[1] = np.nan
+        with self.assertRaisesRegex(ValueError, "executed_action must be a finite vector"):
+            replace(transition, executed_action=invalid_action)
 
     def test_next_policy_authority_failure_uses_kappa_branch(self):
         decision = PersistentExecutionAuthority.evaluate(authority_input(policy_authority_pass=False))
@@ -162,6 +210,39 @@ class PersistentBellmanAuthorityTests(unittest.TestCase):
         self.assertEqual(counts["charger_atomic_target_count"], 0)
         self.assertEqual(self.agent.generator_log_density_calls - before, 1)
 
+    def test_closed_charger_hold_uses_atomic_target_without_density(self):
+        transition = persistent_transition(
+            ExecutionAuthority.CHARGER_CONSTRAINED,
+            generator_executable=False,
+        )
+        first, second = _CaptureQ(), _CaptureQ()
+        self.agent.target_critic_1, self.agent.target_critic_2 = first, second
+        before = self.agent.generator_log_density_calls
+        _, counts = self.agent.bellman_target([transition])
+        np.testing.assert_allclose(first.actions.cpu().numpy()[0], transition.next_authority_action)
+        self.assertEqual(self.agent.generator_log_density_calls, before)
+        self.assertEqual(counts["charger_atomic_target_count"], 1)
+
+    def test_fail_closed_has_no_bootstrap_or_generator_density(self):
+        transition = persistent_transition(
+            ExecutionAuthority.FAIL_CLOSED,
+            generator_executable=False,
+        )
+        before = self.agent.generator_log_density_calls
+        target, counts = self.agent.bellman_target([transition])
+        self.assertAlmostEqual(float(target[0]), transition.reward)
+        self.assertEqual(self.agent.generator_log_density_calls, before)
+        self.assertEqual(counts["fail_closed_target_count"], 1)
+
+    def test_charger_atomic_target_rejects_missing_hold_validity(self):
+        transition = persistent_transition(
+            ExecutionAuthority.CHARGER_CONSTRAINED,
+            generator_executable=False,
+        )
+        transition = replace(transition, next_station_hold_valid=False)
+        with self.assertRaisesRegex(ValueError, "valid certified hold"):
+            self.agent.bellman_target([transition])
+
     def test_actor_target_matches_runtime_execution_authority(self):
         decision = PersistentExecutionAuthority.evaluate(authority_input(energy_margin=1.0))
         transition = persistent_transition(
@@ -174,6 +255,53 @@ class PersistentBellmanAuthorityTests(unittest.TestCase):
         self.assertEqual(counts["generator_target_count"], 0)
         self.assertEqual(counts["kappa_target_count"], 1)
 
+    def test_open_charger_without_departure_support_fails_closed(self):
+        decision = PersistentExecutionAuthority.evaluate(authority_input(
+            persistent_mode="CHARGING_RL",
+            charging_state=True,
+            departure_allowed=True,
+            generator_available=False,
+            recoverability_action_verified=False,
+            policy_authority_pass=False,
+            station_hold_valid=True,
+        ))
+        self.assertEqual(decision.authority, ExecutionAuthority.FAIL_CLOSED)
+        self.assertEqual(decision.reason, "NO_DEPARTURE_GENERATOR_SET")
+        self.assertFalse(decision.kappa_required)
+        self.assertFalse(decision.station_hold_required)
+
+    def test_open_charger_state_failure_never_routes_to_kappa(self):
+        decision = PersistentExecutionAuthority.evaluate(authority_input(
+            persistent_mode="CHARGING_RL",
+            charging_state=True,
+            departure_allowed=True,
+            recoverable_set_member=False,
+        ))
+        self.assertEqual(decision.authority, ExecutionAuthority.FAIL_CLOSED)
+        self.assertEqual(decision.reason, "RECOVERABLE_SET_CERTIFICATE_INVALID")
+        self.assertFalse(decision.kappa_required)
+
+    def test_closed_charger_state_failure_never_routes_to_kappa(self):
+        decision = PersistentExecutionAuthority.evaluate(authority_input(
+            persistent_mode="CHARGING_RL",
+            charging_state=True,
+            departure_allowed=False,
+            persistent_certificate_valid=False,
+            station_hold_valid=True,
+        ))
+        self.assertEqual(decision.authority, ExecutionAuthority.FAIL_CLOSED)
+        self.assertEqual(decision.reason, "PERSISTENT_CERTIFICATE_GATE_FAILED")
+        self.assertFalse(decision.kappa_required)
+
+    def test_normal_zero_rank_refusal_has_no_fictitious_kappa_action(self):
+        decision = PersistentExecutionAuthority.evaluate(authority_input(
+            recovery_level=0,
+            generator_available=False,
+        ))
+        self.assertEqual(decision.authority, ExecutionAuthority.FAIL_CLOSED)
+        self.assertEqual(decision.reason, "ZERO_RANK_RECOVERY_ACTION_UNDEFINED")
+        self.assertFalse(decision.kappa_required)
+
 
 class ChargingSupportTests(unittest.TestCase):
     def _fixture(self):
@@ -181,6 +309,7 @@ class ChargingSupportTests(unittest.TestCase):
             dynamics_bound_version = "dynamics-v1"
             energy_bound_version = "energy-v1"
             energy_low = 20.0
+            energy_prefix_low = 20.0
             velocity = Interval3((-0.01, -0.01, -0.01), (0.01, 0.01, 0.01))
 
             def __init__(self, action_set):
@@ -189,6 +318,7 @@ class ChargingSupportTests(unittest.TestCase):
                     tuple(0.5 + np.asarray(bounds.low)),
                     tuple(0.5 + np.asarray(bounds.high)),
                 )
+                self.swept_position = self.position
 
         class Builder:
             dynamics = SimpleNamespace(version="dynamics-v1")
@@ -217,6 +347,7 @@ class ChargingSupportTests(unittest.TestCase):
             energy_reserve=1.0,
             _target_root=lambda index: target,
             _candidate_successor_in_root=lambda state, action_set, selected: True,
+            complete_swept_tube_slack=lambda swept_position: 0.1,
             _versions=lambda: ("geometry-v1", "dynamics-v1", "tracking-v1", "energy-v1", "terminal-v1", "kappa-v1"),
         )
         terminal = SimpleNamespace(
@@ -276,6 +407,7 @@ class ChargingSupportTests(unittest.TestCase):
             persistent_mode="CHARGING_RL",
             charging_state=True,
             departure_allowed=True,
+            energy_margin=0.1,
         ))
         self.assertEqual(decision.authority, ExecutionAuthority.RL_GENERATOR)
         self.assertTrue(decision.generator_executable)

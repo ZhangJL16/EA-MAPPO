@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import unittest
+from dataclasses import replace
 
 import numpy as np
 
@@ -93,6 +94,12 @@ class PersistentAuthorityDomainTests(unittest.TestCase):
         self.assertEqual(certificate.level, 0)
         self.assertIsNone(certificate.successor)
         self.assertEqual(certificate.recovery_energy_upper, 0.0)
+
+    def test_terminal_certificate_rejects_nonzero_recovery_energy(self):
+        certificate = self.atlas.terminal_recovery_certificate
+        malformed = replace(certificate, recovery_energy_upper=1.0, certificate_hash="")
+        malformed = replace(malformed, certificate_hash=malformed.expected_hash)
+        self.assertFalse(malformed.valid)
 
     def test_station_terminal_energy_is_finite(self):
         self.environment.plant.state = UAVPhysicalState(

@@ -1,0 +1,38 @@
+{
+  "audit_skill": "proof-checker",
+  "verdict": "PASS",
+  "reason_code": "all_proofs_complete",
+  "summary": "The canonical covered regenerative-recoverability theorem passes all internal proof obligations conditional on explicitly imported physical premises.",
+  "audited_input_hashes": {
+    "PAPER_THEOREM.md": "sha256:ad03bf671e62aacdc893135a196f1bb0c771a1e4f61f44213212f937fcc2f081",
+    "PROOF_SKELETON.md": "sha256:d3cb55b19c244d0c8d4dd386fe3286a16a86dfbb51157d1885598f35c2ff05c3",
+    "CLAIM_DEPENDENCY_GRAPH.md": "sha256:4947e234dc13ae884a768b4fc5d5fa67d1fedab6969fe30369aaeff831c570a4",
+    "ASSUMPTION_LEDGER.md": "sha256:687d017d59c59e3ab27b791cd7ae2d35b0f6934544a8a72e5a2e4f290623c394",
+    "THEOREM_LEDGER.md": "sha256:16dfcd9959705a4cc8ee8e96b7218c6b85dbec0c62426acef67bd3d06fb31800"
+  },
+  "trace_path": null,
+  "thread_id": "/root/round8_final_hash_proof_audit",
+  "executor_model": "codex-gpt-5.6-sol",
+  "executor_family": "openai",
+  "reviewer_model": "gpt-5.6-sol",
+  "reviewer_family": "openai",
+  "review_independence": "same-family",
+  "acceptance_status": "provisional",
+  "reviewer_reasoning": "ultra",
+  "generated_at": "2026-08-11T12:03:11Z",
+  "details": {
+    "theorems_audited": 1,
+    "issues": [],
+    "acceptance_gate": "PASS",
+    "severity_counts": {
+      "fatal": 0,
+      "critical": 0,
+      "major": 0,
+      "minor": 0
+    },
+    "current_hash_closure": true,
+    "adversarial_shard_corroborated": true,
+    "physical_calibration": "NOT_ESTABLISHED",
+    "report_pdf": "UNAVAILABLE_NO_LATEX_COMPILER"
+  }
+}

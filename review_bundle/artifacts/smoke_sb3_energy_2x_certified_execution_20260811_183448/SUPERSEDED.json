@@ -1,0 +1,6 @@
+{
+  "status": "SUPERSEDED_IMPLEMENTATION_SMOKE",
+  "reason": "SHIELD_ONLY_REJECTION_DID_NOT_PROVIDE_CERTIFIED_ACTION_SUPPORT",
+  "replacement": "artifacts/smoke_sb3_energy_2x_certified_support_20260811_184126",
+  "learnability_conclusion_allowed": false
+}

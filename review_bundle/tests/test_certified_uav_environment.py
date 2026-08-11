@@ -258,9 +258,13 @@ class RuntimeAndScenarioTests(unittest.TestCase):
             return original(observation)
 
         runtime.actor.sample_u = mutating_actor
-        _, _, _, _, info = runtime.step(np.zeros(3))
+        _, _, terminated, _, info = runtime.step(np.zeros(3))
         self.assertFalse(info["accepted"])
-        self.assertEqual(info["fallback_reason"], "CERTIFIER_EXCEPTION")
+        self.assertTrue(terminated)
+        self.assertEqual(info["fallback_reason"], "CERTIFICATE_VERSION_CHANGED")
+        self.assertEqual(info["command_source"], "uncertified_emergency_brake")
+        self.assertFalse(info["covered_at_publication"])
+        self.assertIsNone(runtime.replay.records[-1].recovery_certificate_hash)
 
     def test_replay_and_calibration_log_separate_actions_and_versions(self):
         runtime = make_certified_uav_env(timing_mode="functional")

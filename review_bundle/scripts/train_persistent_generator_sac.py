@@ -31,7 +31,7 @@ from cert_runtime.experiment_metrics import (
     write_jsonl,
 )
 from envs.certified_uav import make_persistent_uav_env, make_random_persistent_uav_env
-from persistent_generator_common import transition_from_cycle
+from persistent_generator_common import successor_context_for_transition, transition_from_cycle
 
 
 def main() -> None:
@@ -45,7 +45,11 @@ def main() -> None:
     parser.add_argument("--device", default="cpu")
     parser.add_argument("--output-dir", default="artifacts/persistent_generator_sac")
     parser.add_argument("--log-interval", type=int, default=500)
-    parser.add_argument("--temperature-coordinate", choices=("physical", "normalized"), default="physical")
+    parser.add_argument(
+        "--temperature-coordinate",
+        choices=("physical", "normalized"),
+        default=GeneratorSACConfig().temperature_coordinate,
+    )
     parser.add_argument("--goal-exposure-reset-steps", type=int, default=0)
     args = parser.parse_args()
     if args.log_interval <= 0:
@@ -165,7 +169,6 @@ def main() -> None:
         mode_before = environment.task_env.mode.name
         actor_u = rng.normal(size=3) if step < args.warmup_steps else agent.select_u(observation)
         certificate_state_before = environment.runtime._certificate_state()
-        candidate_action = environment._candidate_from_context(actor_u, context)
         next_observation, reward, terminated, truncated, info = environment.step(actor_u)
         step_number = step + 1
         collector_boundary = goal_exposure_reset_boundary(
@@ -191,6 +194,9 @@ def main() -> None:
         episode_metrics.observe(reward, info, delta)
         interval_metrics.observe(reward, info, delta)
         telemetry = info["telemetry"]
+        publication_context = dict(context)
+        if isinstance(info.get("action_context"), dict):
+            publication_context.update(info["action_context"])
         trajectory_records.append({
             "step": step + 1,
             "episode_id": episode_id,
@@ -235,41 +241,41 @@ def main() -> None:
             "reward_components": info.get("reward_components"),
             "actor_u": np.asarray(actor_u, dtype=float).tolist(),
             "actor_eta": np.tanh(np.asarray(actor_u, dtype=float)).tolist(),
-            "generator_center": None if context.get("c") is None else np.asarray(context["c"], dtype=float).tolist(),
-            "generator_matrix": None if context.get("G") is None else np.asarray(context["G"], dtype=float).tolist(),
-            "candidate_action": None if candidate_action is None else np.asarray(candidate_action, dtype=float).tolist(),
+            "generator_center": None if publication_context.get("c") is None else np.asarray(publication_context["c"], dtype=float).tolist(),
+            "generator_matrix": None if publication_context.get("G") is None else np.asarray(publication_context["G"], dtype=float).tolist(),
+            "candidate_action": None if telemetry.action_trace.candidate is None else np.asarray(telemetry.action_trace.candidate, dtype=float).tolist(),
             "executed_action": np.asarray(info.get("critic_action", telemetry.action_trace.published), dtype=float).tolist(),
             "measured_action": np.asarray(telemetry.action_trace.measured, dtype=float).tolist(),
-            "generator_available": bool(context.get("generator_available", False)),
-            "generator_executable": bool(context.get("generator_executable", False)),
-            "recoverable_set_member": context.get("recoverable_set_member"),
-            "rl_authority_set_member": context.get("rl_authority_set_member"),
-            "recoverability_action_verified": context.get("recoverability_action_verified"),
-            "continuation_action_verified": context.get("continuation_action_verified"),
-            "kappa_valid": bool(context.get("certificate_valid", False) and context.get("kappa") is not None),
-            "kappa_cell_id": context.get("recovery_cell_id"),
-            "kappa_level": context.get("recovery_level"),
-            "kappa_certificate_hash": context.get("recovery_hash"),
-            "kappa_action": None if context.get("kappa") is None else np.asarray(context["kappa"], dtype=float).tolist(),
-            "kappa_validation_failure_category": context.get("kappa_validation_failure_category"),
-            "kappa_validation_failure_detail": context.get("kappa_validation_failure_detail"),
-            "continuation_target_cell_id": context.get("continuation_target_cell_id"),
-            "terminal_recovery_certificate_hash": context.get("terminal_recovery_certificate_hash"),
+            "generator_available": bool(publication_context.get("generator_available", False)),
+            "generator_executable": bool(publication_context.get("generator_executable", False)),
+            "recoverable_set_member": publication_context.get("recoverable_set_member"),
+            "rl_authority_set_member": publication_context.get("rl_authority_set_member"),
+            "recoverability_action_verified": publication_context.get("recoverability_action_verified"),
+            "continuation_action_verified": publication_context.get("continuation_action_verified"),
+            "kappa_valid": bool(publication_context.get("certificate_valid", False) and publication_context.get("kappa") is not None),
+            "kappa_cell_id": publication_context.get("recovery_cell_id"),
+            "kappa_level": publication_context.get("recovery_level"),
+            "kappa_certificate_hash": publication_context.get("recovery_hash"),
+            "kappa_action": None if publication_context.get("kappa") is None else np.asarray(publication_context["kappa"], dtype=float).tolist(),
+            "kappa_validation_failure_category": publication_context.get("kappa_validation_failure_category"),
+            "kappa_validation_failure_detail": publication_context.get("kappa_validation_failure_detail"),
+            "continuation_target_cell_id": publication_context.get("continuation_target_cell_id"),
+            "terminal_recovery_certificate_hash": publication_context.get("terminal_recovery_certificate_hash"),
             "terminal_admissible": bool(telemetry.terminal_admissible),
-            "departure_allowed": context.get("departure_allowed"),
-            "station_hold_valid": context.get("station_hold_valid"),
-            "charging_support_verified": context.get("charging_support_verified"),
+            "departure_allowed": publication_context.get("departure_allowed"),
+            "station_hold_valid": publication_context.get("station_hold_valid"),
+            "charging_support_verified": publication_context.get("charging_support_verified"),
             "command_source": info.get("command_source"),
             "fallback_reason": info.get("fallback_reason"),
-            "atlas_hash": context.get("atlas_hash"),
-            "certificate_valid": bool(context.get("certificate_valid", False)),
-            "persistent_certificate_valid": bool(context.get("persistent_certificate_valid", False)),
-            "certificate_epoch": context.get("certificate_epoch"),
-            "geometry_version": context.get("geometry_version"),
-            "dynamics_version": context.get("dynamics_version"),
-            "tracking_version": context.get("tracking_version"),
-            "energy_version": context.get("energy_version"),
-            "terminal_version": context.get("terminal_version"),
+            "atlas_hash": publication_context.get("atlas_hash"),
+            "certificate_valid": bool(publication_context.get("certificate_valid", False)),
+            "persistent_certificate_valid": bool(publication_context.get("persistent_certificate_valid", False)),
+            "certificate_epoch": publication_context.get("certificate_epoch"),
+            "geometry_version": publication_context.get("geometry_version"),
+            "dynamics_version": publication_context.get("dynamics_version"),
+            "tracking_version": publication_context.get("tracking_version"),
+            "energy_version": publication_context.get("energy_version"),
+            "terminal_version": publication_context.get("terminal_version"),
             "terminated": bool(terminated),
             "truncated": bool(truncated),
             "failure_reason": info.get("failure_reason"),
@@ -277,7 +283,7 @@ def main() -> None:
             "collector_boundary": collector_boundary,
             "current_goal_age_steps": goal_exposure.current_goal_age_steps,
         })
-        next_context = None if terminated or truncated else environment._refresh_context()
+        next_context = successor_context_for_transition(environment, terminated=terminated)
         if (
             info.get("accepted")
             and next_context is not None

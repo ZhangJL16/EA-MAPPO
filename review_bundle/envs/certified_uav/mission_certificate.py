@@ -206,6 +206,7 @@ class MissionActionContext:
     recovery_level: int | None = None
     root_index: int | None = None
     task_successor_cell_id: str | None = None
+    recovery_successor_level: int | None = None
 
     @property
     def generator_available(self) -> bool:
@@ -280,6 +281,8 @@ class MultiStepSyntheticMissionCertificateProvider:
         self.version = "multi-step-synthetic-mission-certificate-v2"
         self.expiry = 1.0e9
         self._matrix, self._matrix_inverse, self._contraction = self._lyapunov_geometry()
+        self._construction_versions = self._versions()
+        self._construction_fingerprints = tuple(runtime.calibration.fingerprints)
         key = certificate_hash(
             {
                 "scenario": runtime.scenario.name,
@@ -288,7 +291,9 @@ class MultiStepSyntheticMissionCertificateProvider:
                     tuple(runtime.config.v_max), tuple(runtime.config.a_max), runtime.config.dt,
                     runtime.config.total_latency, tuple(runtime.config.tracking_error_bound),
                 ),
-                "versions": tuple(runtime.calibration.versions),
+                "versions": self._construction_versions,
+                "calibration_hashes": self._construction_fingerprints,
+                "flight_energy_multiplier": runtime.flight_energy_multiplier,
                 "provider": self.version,
                 "provider_type": type(self).__qualname__,
             }
@@ -320,7 +325,42 @@ class MultiStepSyntheticMissionCertificateProvider:
 
     @property
     def gate_pass(self) -> bool:
-        return bool(self.manifest.gate_pass and self._manifest_hash_valid)
+        return bool(
+            self.manifest.gate_pass
+            and self._manifest_hash_valid
+            and self._versions() == self._construction_versions
+            and tuple(self.runtime.calibration.fingerprints) == self._construction_fingerprints
+        )
+
+    def _cell_dependencies_current(
+        self,
+        cell: MissionRecoveryCellCertificate,
+        state: CertificateState,
+    ) -> bool:
+        live_versions = self._versions()
+        cell_versions = (
+            cell.geometry_version,
+            cell.dynamics_version,
+            cell.tracking_version,
+            cell.energy_version,
+            cell.terminal_version,
+            cell.kappa_version,
+        )
+        live_fingerprints = tuple(self.runtime.calibration.fingerprints)
+        state_dependencies = dict(state.bound_versions)
+        return bool(
+            cell_versions == self._construction_versions == live_versions
+            and live_fingerprints == self._construction_fingerprints
+            and state_dependencies.get("dynamics") == live_versions[1]
+            and state_dependencies.get("tracking") == live_versions[2]
+            and state_dependencies.get("energy") == live_versions[3]
+            and state_dependencies.get("terminal") == live_versions[4]
+            and state_dependencies.get("kappa") == self.runtime.recovery_policy.config.parameter_version
+            and all(
+                state_dependencies.get(name) == value
+                for name, value in live_fingerprints
+            )
+        )
 
     def _lyapunov_geometry(self) -> tuple[np.ndarray, np.ndarray, float]:
         dt = self.runtime.config.dt
@@ -546,6 +586,42 @@ class MultiStepSyntheticMissionCertificateProvider:
         )
         return float(min(free_slack, world_slack, altitude_slack))
 
+    def complete_swept_tube_slack(self, swept_position: Interval3) -> float:
+        """Verify the complete one-step position hull against FREE geometry.
+
+        ``swept_position`` already contains initial-state, endpoint, dynamics,
+        tracking, timing, and numerical interval uncertainty.  This method adds
+        the physical footprint and declared geometry margin before checking the
+        entire horizontal rectangle, world bounds, altitude bounds, and every
+        declared occupied box.  Endpoint membership alone is insufficient.
+        """
+
+        margin = self.runtime.config.body_radius + self.runtime.config.geometry_margin
+        low = np.asarray(swept_position.low, dtype=np.float64)
+        high = np.asarray(swept_position.high, dtype=np.float64)
+        horizontal_low = low[:2] - margin
+        horizontal_high = high[:2] + margin
+        free_covered, free_slack = self._rectangle_covered_by_free_union(
+            horizontal_low,
+            horizontal_high,
+        )
+        if not free_covered:
+            return -1.0
+        if any(
+            np.all(horizontal_high >= box[:2]) and np.all(horizontal_low <= box[2:])
+            for box in self.occupied_boxes
+        ):
+            return -1.0
+        world_slack = min(
+            *(horizontal_low),
+            *(self.runtime.config.world_size[:2] - horizontal_high),
+        )
+        altitude_slack = min(
+            low[2] - margin,
+            self.runtime.config.world_size[2] - high[2] - margin,
+        )
+        return float(min(free_slack, world_slack, altitude_slack))
+
     def _action_deviation(self, radius: float) -> float:
         gain = np.array((-self.position_gain, -self.velocity_gain))
         return float(radius * np.sqrt(gain @ self._matrix_inverse @ gain))
@@ -698,12 +774,15 @@ class MultiStepSyntheticMissionCertificateProvider:
 
     def _versions(self) -> tuple[str, str, str, str, str, str]:
         return (
-            f"mission-geometry-{self.runtime.scenario.name}-v2",
+            f"mission-geometry-{self.runtime.scenario.name}-v2-map-{self.runtime.geometry.version}",
             self.runtime.calibration.dynamics.version,
             self.runtime.calibration.tracking.version,
             self.runtime.calibration.energy.version,
             self.runtime.calibration.terminal.version,
-            f"mission-kappa-{self.runtime.scenario.name}-v2",
+            (
+                f"mission-kappa-{self.runtime.scenario.name}-v2-"
+                f"{self.runtime.recovery_policy.config.parameter_version}"
+            ),
         )
 
     def _build_coverage_reference(self) -> tuple[_ReferenceState, ...]:
@@ -1049,6 +1128,10 @@ class MultiStepSyntheticMissionCertificateProvider:
         )
         if not np.all(np.isfinite(endpoints)):
             return "NO_GENERATOR_SET_NUMERICAL", "NONFINITE_SUCCESSOR_ENVELOPE"
+        if self.complete_swept_tube_slack(envelope.swept_position) < -1e-12:
+            return "NO_GENERATOR_SET_COLLISION", "CURRENT_COMPLETE_SWEPT_TUBE"
+        if envelope.energy_prefix_low < -1e-12:
+            return "NO_GENERATOR_SET_ENERGY", "WITHIN_STEP_ENERGY_PREFIX"
         if not target.state_bounds.velocity.contains_box(envelope.velocity, 1e-12):
             return "NO_GENERATOR_SET_VELOCITY", "SUCCESSOR_VELOCITY"
         if envelope.energy_low < target.state_bounds.energy.low - 1e-12:
@@ -1084,6 +1167,7 @@ class MultiStepSyntheticMissionCertificateProvider:
         recovery_valid = bool(
             cell.complete_successor_containment
             and cell.hash_valid
+            and self._cell_dependencies_current(cell, state)
             and now <= cell.expiry
             and state.energy - state.energy_error_radius >= required
             and np.all(action >= np.asarray(cell.action_low) - 1e-12)
@@ -1148,6 +1232,7 @@ class MultiStepSyntheticMissionCertificateProvider:
             cell.level,
             root_index,
             None if task_target is None else task_target.cell_id,
+            cell.successor_level,
         )
         self.last_context = context
         return context
@@ -1161,6 +1246,74 @@ class MultiStepSyntheticMissionCertificateProvider:
             return
         self.recovery_active = True
         self.active_cell_id = context.successor_cell_id
+
+    def recovery_commitment_state(self) -> dict[str, Any]:
+        active = (
+            None
+            if self.active_cell_id is None
+            else self._cells_by_id.get(self.active_cell_id)
+        )
+        return {
+            "recovery_active": bool(self.recovery_active),
+            "active_recovery_cell_id": self.active_cell_id,
+            "active_recovery_level": None if active is None else active.level,
+            "active_recovery_hash": (
+                None if active is None else active.recovery_certificate_hash
+            ),
+        }
+
+    def committed_recovery_successor_is_valid(
+        self,
+        state: CertificateState,
+        context: MissionActionContext | None = None,
+    ) -> bool:
+        """Verify the realized state against the published hash-bound child.
+
+        Minimum-rank geometric overlap is deliberately insufficient: the current
+        recovery certificate, its declared child, the committed atlas state, and
+        the realized successor must all agree.
+        """
+
+        selected = self.last_context if context is None else context
+        if selected is None or not selected.recovery.certified:
+            return False
+        current = self._cells_by_id.get(selected.recovery_cell_id)
+        successor = self._cells_by_id.get(selected.successor_cell_id)
+        if current is None or successor is None:
+            return False
+        return bool(
+            selected.recovery.certificate_hash == current.recovery_certificate_hash
+            and current.hash_valid
+            and current.level > 0
+            and current.successor_target_cell == successor.cell_id
+            and current.successor_level == successor.level
+            and selected.recovery_successor_level == successor.level
+            and successor.level < current.level
+            and successor.hash_valid
+            and successor.recovery_certificate_hash in current.dependency_hashes
+            and self.active_cell_id == successor.cell_id
+            and self._cell_dependencies_current(successor, state)
+            and state.timestamp <= successor.expiry
+            and self._cell_contains_state(successor, state)
+        )
+
+    def committed_recovery_successor_is_terminal(
+        self,
+        state: CertificateState,
+        context: MissionActionContext | None = None,
+    ) -> bool:
+        """Verify that the committed child is the certified level-zero terminal."""
+
+        selected = self.last_context if context is None else context
+        if not self.committed_recovery_successor_is_valid(state, selected):
+            return False
+        successor = self._cells_by_id.get(selected.successor_cell_id)
+        return bool(
+            successor is not None
+            and successor.level == 0
+            and successor.successor_target_cell is None
+            and successor.successor_level is None
+        )
 
     def validation_report(self) -> dict[str, Any]:
         cells = self.manifest.cells

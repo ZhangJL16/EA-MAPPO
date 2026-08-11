@@ -391,7 +391,7 @@ def run_experiment(config: ExperimentConfig) -> dict:
                 scenario_id=scenario_definition.name,
                 scenario_family=str(scenario_definition.mission_config.get("scenario_family", _scenario_label(config.scenario))),
                 scenario_hash=_scenario_hash(config.scenario),
-                certificate_manifest_hash=str(current_context["certificate_epoch"]),
+                certificate_manifest_hash=current_context.get("certificate_manifest_hash"),
             )
             agent.observe(transition)
             current_context = next_context

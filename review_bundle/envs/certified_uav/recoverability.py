@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
 
 RECOVERABLE_SET_VERSION = "recoverable-set-v1"
-RECOVERABILITY_ACTION_RULE_VERSION = "recoverability-action-rule-v1"
+RECOVERABILITY_ACTION_RULE_VERSION = "recoverability-action-rule-v2"
 
 
 @dataclass(frozen=True, slots=True)
@@ -41,6 +41,8 @@ class RecoverabilityActionCertificate:
     successor_energy_lower: float
     successor_required_energy: float
     actuator_inclusion: bool
+    current_swept_tube_inclusion: bool
+    within_step_energy_prefix_inclusion: bool
     collision_successor_inclusion: bool
     velocity_successor_inclusion: bool
     energy_successor_inclusion: bool
@@ -125,7 +127,7 @@ class RecoverabilityVerifier:
         if target is None:
             successor_energy_lower = float("-inf")
             successor_required = float("inf")
-            collision = velocity = energy = versions = False
+            current_tube = energy_prefix = collision = velocity = energy = versions = False
         else:
             envelope = self.runtime.envelope_builder.propagate_zonotope(state, action_set)
             successor_energy_lower = float(envelope.energy_low)
@@ -134,6 +136,10 @@ class RecoverabilityVerifier:
                 + self.runtime.scenario.terminal.minimum_energy
                 + self.provider.energy_reserve
             )
+            current_tube = bool(
+                self.provider.complete_swept_tube_slack(envelope.swept_position) >= -1e-12
+            )
+            energy_prefix = bool(envelope.energy_prefix_low >= -1e-12)
             collision = bool(
                 target.hash_valid
                 and target.complete_successor_containment
@@ -156,13 +162,24 @@ class RecoverabilityVerifier:
                 and envelope.dynamics_bound_version == self.runtime.envelope_builder.dynamics.version
                 and envelope.energy_bound_version == self.runtime.envelope_builder.energy.version
             )
-        verified = bool(current.recoverable and actuator and collision and velocity and energy and versions)
+        verified = bool(
+            current.recoverable
+            and actuator
+            and current_tube
+            and energy_prefix
+            and collision
+            and velocity
+            and energy
+            and versions
+        )
         reason = "VERIFIED_A_REC" if verified else next(
             name
             for name, condition in (
                 ("CURRENT_STATE_NOT_RECOVERABLE", current.recoverable),
                 ("NO_RECOVERABLE_SUCCESSOR_CELL", target is not None),
                 ("ACTUATOR_SET_EXCLUSION", actuator),
+                ("CURRENT_SWEPT_TUBE_EXCLUSION", current_tube),
+                ("WITHIN_STEP_ENERGY_PREFIX_EXCLUSION", energy_prefix),
                 ("COLLISION_SUCCESSOR_EXCLUSION", collision),
                 ("VELOCITY_SUCCESSOR_EXCLUSION", velocity),
                 ("ENERGY_SUCCESSOR_EXCLUSION", energy),
@@ -177,7 +194,15 @@ class RecoverabilityVerifier:
             "target": None if target is None else target.recovery_certificate_hash,
             "energy_lower": successor_energy_lower,
             "energy_required": successor_required,
-            "checks": (actuator, collision, velocity, energy, versions),
+            "checks": (
+                actuator,
+                current_tube,
+                energy_prefix,
+                collision,
+                velocity,
+                energy,
+                versions,
+            ),
             "rule": RECOVERABILITY_ACTION_RULE_VERSION,
         }
         return RecoverabilityActionCertificate(
@@ -188,6 +213,8 @@ class RecoverabilityVerifier:
             successor_energy_lower,
             successor_required,
             actuator,
+            current_tube,
+            energy_prefix,
             collision,
             velocity,
             energy,
@@ -216,6 +243,7 @@ class RecoverabilityVerifier:
             and np.all(np.asarray(envelope.position.high) <= terminal.position_high + 1e-12)
             and np.all(np.asarray(envelope.velocity.low) >= -terminal.velocity_abs_max - 1e-12)
             and np.all(np.asarray(envelope.velocity.high) <= terminal.velocity_abs_max + 1e-12)
+            and envelope.energy_low >= terminal.minimum_energy - 1e-12
         )
 
     def action_set_stays_in_charging_set(self, state: CertificateState, action_set: Zonotope3) -> bool:
@@ -271,9 +299,81 @@ class RecoverabilityVerifier:
         action = self.certified_station_hold_action(state)
         return bool(
             action is not None
-            and
-            self.runtime.scenario.terminal.is_charge_admissible(self.runtime.plant.state)
-            and self.successor_stays_in_charging_set(state, action)
+            and self.certified_station_hold_action_is_valid(state, action)
+        )
+
+    def certified_station_hold_action_is_valid(
+        self,
+        state: CertificateState,
+        action: np.ndarray,
+    ) -> bool:
+        """Verify the exact physical HOLD command, not a recomputed proposal."""
+
+        selected = np.asarray(action, dtype=np.float64)
+        if (
+            selected.shape != (3,)
+            or not np.all(np.isfinite(selected))
+            or np.any(np.abs(selected) > self.runtime.config.a_max + 1e-12)
+            or not self.provider.gate_pass
+            or not self.runtime.scenario.terminal.is_charge_admissible(
+                self.runtime.plant.state
+            )
+        ):
+            return False
+        terminal = self.runtime.scenario.terminal
+        current_uncertainty_in_charging_set = bool(
+            np.all(
+                np.asarray(state.position, dtype=np.float64)
+                - np.asarray(state.position_error_radius, dtype=np.float64)
+                >= terminal.position_low - 1e-12
+            )
+            and np.all(
+                np.asarray(state.position, dtype=np.float64)
+                + np.asarray(state.position_error_radius, dtype=np.float64)
+                <= terminal.position_high + 1e-12
+            )
+            and np.all(
+                np.abs(np.asarray(state.velocity, dtype=np.float64))
+                + np.asarray(state.velocity_error_radius, dtype=np.float64)
+                <= terminal.velocity_abs_max + 1e-12
+            )
+            and float(state.energy) - float(state.energy_error_radius)
+            >= terminal.minimum_energy - 1e-12
+        )
+        if not current_uncertainty_in_charging_set:
+            return False
+        try:
+            envelope = self.runtime.envelope_builder.propagate_point_action(
+                state,
+                tuple(float(value) for value in selected),
+            )
+        except (ArithmeticError, ValueError, OverflowError):
+            return False
+        expected_versions = self.provider._versions()
+        versions = bool(
+            state.bound_versions.get("dynamics")
+            == self.runtime.calibration.dynamics.version
+            and state.bound_versions.get("tracking")
+            == self.runtime.calibration.tracking.version
+            and state.bound_versions.get("energy")
+            == self.runtime.calibration.energy.version
+            and state.bound_versions.get("terminal")
+            == self.runtime.calibration.terminal.version
+            and envelope.dynamics_bound_version
+            == self.runtime.envelope_builder.dynamics.version
+            and envelope.energy_bound_version
+            == self.runtime.envelope_builder.energy.version
+            and expected_versions[1] == self.runtime.calibration.dynamics.version
+            and expected_versions[2] == self.runtime.calibration.tracking.version
+            and expected_versions[3] == self.runtime.calibration.energy.version
+            and expected_versions[4] == self.runtime.calibration.terminal.version
+        )
+        return bool(
+            versions
+            and self.provider.complete_swept_tube_slack(envelope.swept_position)
+            >= -1e-12
+            and envelope.energy_prefix_low >= -1e-12
+            and self._envelope_stays_in_charging_set(envelope)
         )
 
     def certified_station_hold_action(self, state: CertificateState) -> np.ndarray | None:

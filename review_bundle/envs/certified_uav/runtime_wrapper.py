@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from contextlib import contextmanager
 from math import ceil
+from threading import RLock
 from time import monotonic
 from typing import Any, Sequence
 
@@ -42,6 +44,7 @@ from cert_runtime import (
     ZonotopeConstructor,
 )
 from cert_runtime.recovery import RecoveryDecision
+from cert_runtime.certificates import certificate_hash
 from cert_runtime.trainer import CertificateEpoch
 from cert_runtime.watchdog import PublishedCommand
 
@@ -78,6 +81,7 @@ class RuntimeCyclePreparation:
     closure_result: Any
     recovery: Any
     failure_reason: str | None
+    mission_context: Any = None
 
 
 def _operating_point(config: CertifiedUAVConfig, state) -> dict[str, float | str]:
@@ -91,7 +95,13 @@ def _operating_point(config: CertifiedUAVConfig, state) -> dict[str, float | str
     }
 
 
-def _build_synthetic_calibration(config: CertifiedUAVConfig, scenario: ScenarioDefinition):
+def _build_synthetic_calibration(
+    config: CertifiedUAVConfig,
+    scenario: ScenarioDefinition,
+    flight_energy_multiplier: float = 1.0,
+):
+    if not np.isfinite(flight_energy_multiplier) or flight_energy_multiplier <= 0.0:
+        raise ValueError("flight_energy_multiplier must be finite and positive")
     contracts, reports = build_synthetic_calibration_bundle()
     _, _, _, energy, _ = contracts
     mission_bounds = scenario.mission_config.get("certificate_bounds", {})
@@ -195,9 +205,14 @@ def _build_synthetic_calibration(config: CertifiedUAVConfig, scenario: ScenarioD
         wind_acceleration_radius=tuple(mission_bounds.get("wind_acceleration_radius", (0.001, 0.001, 0.001))),
     )
     if scenario.mission_config.get("enabled", False):
+        energy_version = (
+            "synthetic-mission-energy-v2"
+            if flight_energy_multiplier == 1.0
+            else f"synthetic-mission-energy-v2-x{flight_energy_multiplier:.6g}"
+        )
         energy_metadata = synthetic_metadata(
             f"{scenario.name}-energy-evidence",
-            "synthetic-mission-energy-v2",
+            energy_version,
         )
         energy_samples = tuple(
             EnergySample(
@@ -208,7 +223,7 @@ def _build_synthetic_calibration(config: CertifiedUAVConfig, scenario: ScenarioD
                 20.0,
                 0.1,
                 0.1,
-                0.013,
+                0.013 * flight_energy_multiplier,
                 (0.1, 0.1, 0.0),
                 (0.05, 0.05, 0.0),
                 True,
@@ -222,15 +237,19 @@ def _build_synthetic_calibration(config: CertifiedUAVConfig, scenario: ScenarioD
         energy, energy_report = build_energy_contract(
             energy_samples,
             energy_metadata,
-            "synthetic-mission-energy-v2",
-            avionics_cost=0.006,
-            hover_cost=0.004,
-            velocity_coefficients=(0.001, 0.001, 0.001),
-            action_coefficients=(0.001, 0.001, 0.0015),
-            communication_cost=0.001,
-            computation_cost=0.001,
-            measurement_error=0.0005,
-            underestimation_margin=0.001,
+            energy_version,
+            avionics_cost=0.006 * flight_energy_multiplier,
+            hover_cost=0.004 * flight_energy_multiplier,
+            velocity_coefficients=tuple(0.001 * flight_energy_multiplier for _ in range(3)),
+            action_coefficients=(
+                0.001 * flight_energy_multiplier,
+                0.001 * flight_energy_multiplier,
+                0.0015 * flight_energy_multiplier,
+            ),
+            communication_cost=0.001 * flight_energy_multiplier,
+            computation_cost=0.001 * flight_energy_multiplier,
+            measurement_error=0.0005 * flight_energy_multiplier,
+            underestimation_margin=0.001 * flight_energy_multiplier,
         )
         reports = reports + (energy_report,)
     terminal_metadata = synthetic_metadata("cert-uav-terminal-evidence", scenario.terminal.version)
@@ -268,6 +287,7 @@ class CertifiedRuntimeWrapper(gym.Env[np.ndarray, np.ndarray]):
         freeze_certificate_epoch: bool = False,
         generator_center_mode: str = "task_oriented",
         timing_mode: str = "wall_clock",
+        flight_energy_multiplier: float = 1.0,
     ) -> None:
         super().__init__()
         self.task_env = task_env
@@ -280,10 +300,16 @@ class CertifiedRuntimeWrapper(gym.Env[np.ndarray, np.ndarray]):
         if timing_mode not in {"wall_clock", "functional"}:
             raise ValueError("timing_mode must be 'wall_clock' or 'functional'")
         self.timing_mode = timing_mode
+        self.flight_energy_multiplier = float(flight_energy_multiplier)
+        self._certificate_state_lock = RLock()
         self.rebuild_certificate_objects_on_reset = True
         self.action_space = gym.spaces.Box(np.full(3, -10.0, dtype=np.float32), np.full(3, 10.0, dtype=np.float32), dtype=np.float32)
         self.observation_space = task_env.observation_space
-        self.calibration, self.calibration_reports = _build_synthetic_calibration(self.config, self.scenario)
+        self.calibration, self.calibration_reports = _build_synthetic_calibration(
+            self.config,
+            self.scenario,
+            self.flight_energy_multiplier,
+        )
         self.plant.calibration_versions.update(dict(self.calibration.versions))
         self.plant.lidar_model.sensor_version = self.calibration.sensor.version
         self.actor = ProvidedActor()
@@ -397,8 +423,30 @@ class CertifiedRuntimeWrapper(gym.Env[np.ndarray, np.ndarray]):
             )
         return tuple(cells)
 
+    @contextmanager
+    def certificate_state_transaction(self):
+        """Serialize certificate readback with command or hybrid-state commit."""
+
+        with self._certificate_state_lock:
+            yield
+
     def _certificate_state(self) -> CertificateState:
+        with self._certificate_state_lock:
+            return self._certificate_state_unlocked()
+
+    def _certificate_state_unlocked(self) -> CertificateState:
         state = self.plant.state
+        explicit_task_state = {
+            "scenario": self.scenario.name,
+            "mission_phase": self.task_env.phase.name,
+        }
+        commitment_provider = getattr(
+            self.mission_provider,
+            "recovery_commitment_state",
+            None,
+        )
+        if commitment_provider is not None:
+            explicit_task_state.update(commitment_provider())
         certificate_state = CertificateState(
             tuple(float(value) for value in state.position),
             tuple(float(value) for value in state.velocity),
@@ -406,13 +454,11 @@ class CertifiedRuntimeWrapper(gym.Env[np.ndarray, np.ndarray]):
             tuple(float(value) for value in self.scenario.station_position),
             self.geometry,
             self.corridor,
-            explicit_task_state={
-                "scenario": self.scenario.name,
-                "mission_phase": self.task_env.phase.name,
-            },
+            explicit_task_state=explicit_task_state,
             position_error_radius=self.calibration.dynamics.initial_position_radius,
             velocity_error_radius=self.calibration.dynamics.initial_velocity_radius,
             energy_error_radius=self.calibration.energy.measurement_error,
+            timestamp=float(state.timestamp),
         )
         certificate_state.bound_versions = dict(self.calibration.versions + self.calibration.fingerprints) | {
             "kappa": self.recovery_policy.config.parameter_version,
@@ -436,7 +482,14 @@ class CertifiedRuntimeWrapper(gym.Env[np.ndarray, np.ndarray]):
             if context.recovery.certified and self.mission_provider.gate_pass
             else context.closure.status
         )
-        preparation = RuntimeCyclePreparation(state, observation, context.closure, context.recovery, failure)
+        preparation = RuntimeCyclePreparation(
+            state,
+            observation,
+            context.closure,
+            context.recovery,
+            failure,
+            context,
+        )
         self.last_preparation = preparation
         self._prepare_stage_timings = {name: 0.0 for name in ("T_sensor", "T_update", "T_snapshot", "T_corridor", "T_energy", "T_set")}
         return preparation
@@ -480,6 +533,10 @@ class CertifiedRuntimeWrapper(gym.Env[np.ndarray, np.ndarray]):
         return result
 
     def prepare_certificate_cycle(self) -> RuntimeCyclePreparation:
+        with self._certificate_state_lock:
+            return self._prepare_certificate_cycle_unlocked()
+
+    def _prepare_certificate_cycle_unlocked(self) -> RuntimeCyclePreparation:
         if self.mission_provider is not None:
             return self._mission_preparation()
         prepare_timings: dict[str, float] = {}
@@ -560,13 +617,14 @@ class CertifiedRuntimeWrapper(gym.Env[np.ndarray, np.ndarray]):
         if rebuilt:
             self._build_certificate_objects()
         if (rebuilt or not self.rebuild_certificate_objects_on_reset) and not self.plant.scenario_consistency_failures and self.config.certified_sensing_valid:
-            for packet in self.plant.synthetic_bootstrap_lidar_packets():
-                self.geometry.update_lidar(
-                    (float(packet.pose_position[0]), float(packet.pose_position[1])),
-                    packet.to_certificate_rays("bootstrap"),
-                    self.sensor_bounds,
-                    packet.timestamp,
-                )
+            with self._certificate_state_lock:
+                for packet in self.plant.synthetic_bootstrap_lidar_packets():
+                    self.geometry.update_lidar(
+                        (float(packet.pose_position[0]), float(packet.pose_position[1])),
+                        packet.to_certificate_rays("bootstrap"),
+                        self.sensor_bounds,
+                        packet.timestamp,
+                    )
         if self.mission_provider is not None:
             self.mission_provider.reset()
         preparation = self.prepare_certificate_cycle()
@@ -579,27 +637,42 @@ class CertifiedRuntimeWrapper(gym.Env[np.ndarray, np.ndarray]):
             "synthetic_certificate_evidence": True,
         }
 
-    def step(self, actor_output: np.ndarray):
+    def step(self, actor_output: np.ndarray, *, allow_kappa_fallback: bool = True):
         total_started = monotonic()
         timings: dict[str, float] = {}
         stage_started = monotonic()
         pre_state = self._certificate_state()
         pre_snapshot = pre_state.snapshot()
-        pre_recovery = (
-            self.mission_provider.evaluate(pre_state, self.plant.state.timestamp).recovery
+        pre_context = (
+            self.mission_provider.evaluate(pre_state, self.plant.state.timestamp)
             if self.mission_provider is not None
+            else None
+        )
+        pre_recovery = (
+            pre_context.recovery
+            if pre_context is not None
             else self.runtime_certifier.recovery_decision(pre_state, self.plant.state.timestamp)
+        )
+        preview_recovery_covered = bool(
+            allow_kappa_fallback
+            and pre_recovery.certified
+            and self._kappa_publication_eligible(pre_state, pre_context)
         )
         pre_fallback = (
             pre_recovery.action
-            if self.mission_provider is not None or pre_recovery.certified
+            if preview_recovery_covered
             else self.recovery_policy.emergency_brake(pre_state.velocity)
         )
         timings["T_kappa"] = monotonic() - stage_started
-        publisher = AtomicCommandPublisher()
+        publisher = AtomicCommandPublisher(self._certificate_state_lock)
         self.last_publisher = publisher
         publisher.stage_default(
-            PublishedCommand(pre_fallback, "kappa", "STAGED_BEFORE_CERTIFICATION", pre_snapshot.certificate_version)
+            PublishedCommand(
+                pre_fallback,
+                "kappa" if preview_recovery_covered else "uncertified_emergency_brake",
+                "STAGED_BEFORE_CERTIFICATION" if preview_recovery_covered else "RECOVERY_CERTIFICATE_INVALID",
+                pre_snapshot.certificate_version,
+            )
         )
         cycle_started = monotonic()
         preparation = self.prepare_certificate_cycle()
@@ -611,6 +684,14 @@ class CertifiedRuntimeWrapper(gym.Env[np.ndarray, np.ndarray]):
         self.current_epoch = CertificateEpoch.from_snapshot(snapshot)
         closure = preparation.closure_result
         recovery = preparation.recovery
+        prepared_kappa_fallback_allowed = bool(
+            allow_kappa_fallback
+            and preview_recovery_covered
+            and self._kappa_publication_eligible(
+                preparation.state,
+                preparation.mission_context,
+            )
+        )
         bundle_holder: dict[str, Any] = {}
         self.last_bundle = None
         cycle_deadline_missed = (
@@ -619,22 +700,78 @@ class CertifiedRuntimeWrapper(gym.Env[np.ndarray, np.ndarray]):
             and cycle_elapsed > self.config.certification_deadline
         )
         if cycle_deadline_missed or preparation.failure_reason is not None or recovery is None or not recovery.certified or closure is None or not closure.closed:
-            command_action = pre_fallback
-            command_source = "kappa"
-            command_reason = (
-                "CERTIFICATION_CYCLE_DEADLINE"
-                if cycle_deadline_missed
-                else preparation.failure_reason
-                or (closure.status if closure is not None and not closure.closed else None)
-                or (recovery.reason if recovery is not None else "CERTIFICATE_UNAVAILABLE")
+            live_snapshot = self._certificate_state().snapshot()
+            snapshot_unchanged = bool(
+                pre_snapshot == snapshot
+                and live_snapshot == snapshot
             )
-            publisher.publish_once(
-                PublishedCommand(pre_fallback, "kappa", command_reason, pre_snapshot.certificate_version)
+            publication_recovery_covered = bool(
+                prepared_kappa_fallback_allowed
+                and
+                not cycle_deadline_missed
+                and recovery is not None
+                and recovery.certified
+                and snapshot_unchanged
             )
+            if publication_recovery_covered:
+                command_action = recovery.action
+                command_source = "kappa"
+                command_reason = (
+                    preparation.failure_reason
+                    or (closure.status if closure is not None and not closure.closed else None)
+                    or "TASK_CERTIFICATE_UNAVAILABLE"
+                )
+                execution_recovery = recovery
+            else:
+                command_action = self.recovery_policy.emergency_brake(state.velocity)
+                command_source = "uncertified_emergency_brake"
+                # Preserve the concrete certificate failure for diagnostics
+                # while the source/coverage fields carry the authority
+                # semantics.  An uncovered command is still fail-closed and
+                # never certified kappa.
+                command_reason = (
+                    "CERTIFICATE_VERSION_CHANGED"
+                    if not snapshot_unchanged
+                    else "KAPPA_FALLBACK_DISALLOWED"
+                    if not prepared_kappa_fallback_allowed
+                    else preparation.failure_reason or "RECOVERY_CERTIFICATE_INVALID"
+                )
+                execution_recovery = RecoveryDecision(
+                    tuple(float(value) for value in command_action),
+                    False,
+                    None,
+                    command_reason,
+                )
+            proposed_command = PublishedCommand(
+                tuple(float(value) for value in command_action),
+                command_source,
+                command_reason,
+                snapshot.certificate_version,
+            )
+            if publication_recovery_covered:
+                published_command = publisher.compare_and_publish_once(
+                    proposed_command,
+                    snapshot,
+                    lambda: self._certificate_state().snapshot(),
+                    tuple(float(value) for value in self.recovery_policy.emergency_brake(state.velocity)),
+                )
+            else:
+                publisher.publish_once(proposed_command)
+                published_command = publisher.command
+            command_action = np.asarray(published_command.action, dtype=np.float64)
+            command_source = published_command.source
+            command_reason = published_command.reason
+            covered_at_publication = command_source == "kappa"
+            if not covered_at_publication:
+                execution_recovery = RecoveryDecision(
+                    tuple(float(value) for value in command_action),
+                    False,
+                    None,
+                    command_reason,
+                )
             nominal = None
             candidate = None
-            execution_snapshot = pre_snapshot
-            execution_recovery = pre_recovery
+            execution_snapshot = snapshot
         else:
             self.actor.set_output(actor_output)
 
@@ -657,8 +794,13 @@ class CertifiedRuntimeWrapper(gym.Env[np.ndarray, np.ndarray]):
                 snapshot,
                 recovery.action,
                 producer,
-                state.snapshot,
+                lambda: self._certificate_state().snapshot(),
                 publisher,
+                tuple(
+                    float(value)
+                    for value in self.recovery_policy.emergency_brake(state.velocity)
+                ),
+                prepared_kappa_fallback_allowed,
             )
             watchdog_elapsed = monotonic() - watchdog_started
             timings["T_publish"] = publisher.last_publish_elapsed
@@ -669,18 +811,34 @@ class CertifiedRuntimeWrapper(gym.Env[np.ndarray, np.ndarray]):
             command_action = command.action
             command_source = command.source
             command_reason = command.reason
+            covered_at_publication = command_source in {"task", "kappa"}
             self.last_bundle = bundle_holder.get("bundle")
             bundle = bundle_holder.get("bundle") if command.source == "task" else None
             nominal = np.asarray(bundle.nominal_u, dtype=np.float64) if bundle is not None else None
             candidate = np.asarray(bundle.final_action, dtype=np.float64) if bundle is not None else None
             execution_snapshot = snapshot
-            execution_recovery = recovery
+            execution_recovery = (
+                recovery
+                if covered_at_publication
+                else RecoveryDecision(
+                    tuple(float(value) for value in command_action),
+                    False,
+                    None,
+                    command_reason,
+                )
+            )
         plant_started = monotonic()
         mission_context = self.mission_provider.last_context if self.mission_provider is not None else None
-        if self.mission_provider is not None and command_source != "task" and execution_recovery.certified:
-            self.task_env.on_runtime_recovery(command_reason or "RUNTIME_FALLBACK")
+        if (
+            self.mission_provider is not None
+            and command_source == "kappa"
+            and covered_at_publication
+            and execution_recovery.certified
+        ):
+            with self._certificate_state_lock:
+                self.task_env.on_runtime_recovery(command_reason or "RUNTIME_FALLBACK")
         observation, reward, terminated, truncated, info = self.task_env.step(np.asarray(command_action, dtype=np.float64))
-        if self.mission_provider is not None and not execution_recovery.certified:
+        if not covered_at_publication:
             from .task_wrapper import MissionPhase, MissionTerminationReason
 
             terminated = True
@@ -693,7 +851,10 @@ class CertifiedRuntimeWrapper(gym.Env[np.ndarray, np.ndarray]):
             }
         timings["T_plant"] = monotonic() - plant_started
         measured = self.plant.last_telemetry.action_trace.measured
-        fallback_action = np.asarray(recovery.action if recovery is not None else command_action, dtype=np.float64)
+        fallback_action = np.asarray(
+            recovery.action if command_source == "task" and recovery is not None else command_action,
+            dtype=np.float64,
+        )
         trace = ActionTrace(
             nominal,
             candidate,
@@ -729,7 +890,11 @@ class CertifiedRuntimeWrapper(gym.Env[np.ndarray, np.ndarray]):
             tuple(float(value) for value in measured),
         )
         if self.mission_provider is not None and mission_context is not None:
-            self.mission_provider.commit_execution(mission_context, command_source == "task")
+            with self._certificate_state_lock:
+                if command_source == "task" and covered_at_publication:
+                    self.mission_provider.commit_execution(mission_context, True)
+                elif command_source == "kappa" and covered_at_publication:
+                    self.mission_provider.commit_execution(mission_context, False)
         timings["T_log"] = monotonic() - plant_started - timings["T_plant"]
         self.last_fallback_reason = trace.fallback_reason
         next_observation = self.task_env.build_observation(self._map_encoding(), self._corridor_encoding())
@@ -746,6 +911,8 @@ class CertifiedRuntimeWrapper(gym.Env[np.ndarray, np.ndarray]):
             "timing_mode": self.timing_mode,
             "candidate_bundle": self.last_bundle,
             "publication_count": publisher.publication_count,
+            "command_source": command_source,
+            "covered_at_publication": covered_at_publication,
             "action_context": self.action_context(preparation),
         }
         timings.setdefault("T_actor", 0.0)
@@ -764,20 +931,43 @@ class CertifiedRuntimeWrapper(gym.Env[np.ndarray, np.ndarray]):
         certificate = None if closure is None else closure.zonotope_certificate
         zonotope = None if certificate is None else certificate.zonotope
         recovery = selected.recovery
-        mission_context = self.mission_provider.last_context if self.mission_provider is not None else None
+        mission_context = (
+            selected.mission_context
+            if selected.mission_context is not None
+            else self.mission_provider.last_context
+            if self.mission_provider is not None
+            else None
+        )
         recoverable = getattr(self.mission_provider, "last_recoverable_set_certificate", None)
         recoverability_action = getattr(self.mission_provider, "last_recoverability_action_certificate", None)
+        runtime_epoch = None if self.current_epoch is None else self.current_epoch.epoch_id
+        mission_manifest_hash = (
+            None
+            if self.mission_provider is None
+            else self.mission_provider.manifest.manifest_hash
+        )
+        if runtime_epoch is not None and mission_manifest_hash is not None:
+            replay_epoch = certificate_hash({
+                "runtime_certificate_epoch": runtime_epoch,
+                "mission_manifest_hash": mission_manifest_hash,
+            })
+        else:
+            replay_epoch = runtime_epoch or mission_manifest_hash
+        station_hold_provider = getattr(self.mission_provider, "certified_station_hold_action", None)
+        station_hold_action = (
+            None
+            if station_hold_provider is None
+            else station_hold_provider(selected.state)
+        )
         return {
             "certificate_valid": bool(recovery is not None and recovery.certified),
             "generator_available": bool(certificate is not None and certificate.verified and zonotope is not None),
             "c": None if zonotope is None else np.asarray(zonotope.center, dtype=np.float32),
             "G": None if zonotope is None else np.asarray(zonotope.generators, dtype=np.float32),
             "kappa": None if recovery is None else np.asarray(recovery.action, dtype=np.float32),
-            "certificate_epoch": (
-                self.mission_provider.manifest.manifest_hash
-                if self.mission_provider is not None
-                else None if self.current_epoch is None else self.current_epoch.epoch_id
-            ),
+            "certificate_epoch": replay_epoch,
+            "runtime_certificate_epoch": runtime_epoch,
+            "certificate_manifest_hash": mission_manifest_hash,
             "certificate_version": selected.state.certificate_version,
             "geometry_version": self.geometry.version,
             "corridor_version": self.corridor.version,
@@ -795,11 +985,15 @@ class CertifiedRuntimeWrapper(gym.Env[np.ndarray, np.ndarray]):
             "recovery_energy_required": None if mission_context is None else mission_context.required_energy,
             "energy_margin": None if mission_context is None else mission_context.current_energy_margin,
             "recovery_cell_id": None if mission_context is None else mission_context.recovery_cell_id,
+            "recovery_successor_cell_id": None if mission_context is None else mission_context.successor_cell_id,
+            "recovery_successor_level": None if mission_context is None else mission_context.recovery_successor_level,
             "recoverability_successor_cell_id": None if mission_context is None else mission_context.task_successor_cell_id,
             "recoverable_set_member": None if recoverable is None else recoverable.recoverable,
             "recoverable_set_version": None if recoverable is None else recoverable.recoverable_set_version,
             "recoverable_set_hash": None if recoverable is None else recoverable.certificate_hash,
             "recoverability_action_verified": None if recoverability_action is None else recoverability_action.verified,
+            "current_swept_tube_inclusion": None if recoverability_action is None else recoverability_action.current_swept_tube_inclusion,
+            "within_step_energy_prefix_inclusion": None if recoverability_action is None else recoverability_action.within_step_energy_prefix_inclusion,
             "recoverability_action_rule_version": None if recoverability_action is None else recoverability_action.recoverability_action_rule_version,
             "recoverability_action_hash": None if recoverability_action is None else recoverability_action.certificate_hash,
             "successor_energy_lower": None if recoverability_action is None else recoverability_action.successor_energy_lower,
@@ -807,6 +1001,11 @@ class CertifiedRuntimeWrapper(gym.Env[np.ndarray, np.ndarray]):
             "charging_support_required": bool(getattr(self.mission_provider, "charging_support_required", False)),
             "charging_support_verified": bool(getattr(self.mission_provider, "last_charging_support_verified", False)),
             "charging_support_hash": getattr(self.mission_provider, "last_charging_support_hash", None),
+            "certified_station_hold_action": (
+                None
+                if station_hold_action is None
+                else np.asarray(station_hold_action, dtype=np.float32)
+            ),
             "rl_authority_set_member": bool(
                 self.mission_provider is not None
                 and mission_context is not None
@@ -843,6 +1042,27 @@ class CertifiedRuntimeWrapper(gym.Env[np.ndarray, np.ndarray]):
         self.current_epoch = CertificateEpoch.from_snapshot(preparation.state.snapshot())
         return self.action_context(preparation)
 
+    def _kappa_publication_eligible(self, state, mission_context) -> bool:
+        """Bind a covered kappa source to a fresh noncharging positive-rank node."""
+
+        if self.mission_provider is None:
+            return True
+        if mission_context is None:
+            return False
+        phase = str(state.explicit_task_state.get("mission_phase", ""))
+        level = getattr(mission_context, "recovery_level", None)
+        successor = getattr(mission_context, "successor_cell_id", None)
+        # Covered recovery is defined only for live operational flight phases.
+        # A terminal FAILURE/SUCCESS snapshot must never resurrect kappa merely
+        # because it still carries a positive-rank atlas node.
+        return bool(
+            phase in {"OUTBOUND", "RETURN", "TASK_RL", "BACKUP_RECOVERY"}
+            and level is not None
+            and int(level) > 0
+            and successor is not None
+            and mission_context.recovery.certified
+        )
+
     def step_nominal_action(self, nominal_action: np.ndarray):
         """B2 control: execute a nominal box action only when it belongs to C_run."""
 
@@ -850,11 +1070,27 @@ class CertifiedRuntimeWrapper(gym.Env[np.ndarray, np.ndarray]):
         pre_state = self._certificate_state()
         context = self.mission_provider.evaluate(pre_state, self.plant.state.timestamp) if self.mission_provider is not None else None
         recovery = context.recovery if context is not None else self.runtime_certifier.recovery_decision(pre_state, self.plant.state.timestamp)
-        fallback = np.asarray(recovery.action if recovery.certified else self.recovery_policy.emergency_brake(pre_state.velocity), dtype=np.float64)
-        publisher = AtomicCommandPublisher()
+        preview_covered = bool(
+            recovery.certified
+            and self._kappa_publication_eligible(pre_state, context)
+        )
+        fallback = np.asarray(
+            recovery.action
+            if preview_covered
+            else self.recovery_policy.emergency_brake(pre_state.velocity),
+            dtype=np.float64,
+        )
+        publisher = AtomicCommandPublisher(self._certificate_state_lock)
         self.last_publisher = publisher
         snapshot = pre_state.snapshot()
-        publisher.stage_default(PublishedCommand(tuple(fallback), "kappa", "STAGED_BEFORE_NOMINAL_CHECK", snapshot.certificate_version))
+        publisher.stage_default(
+            PublishedCommand(
+                tuple(fallback),
+                "kappa" if preview_covered else "uncertified_emergency_brake",
+                "STAGED_BEFORE_NOMINAL_CHECK" if preview_covered else "RECOVERY_CERTIFICATE_INVALID",
+                snapshot.certificate_version,
+            )
+        )
         certificate_started = monotonic()
         preparation = self.prepare_certificate_cycle()
         certificate_elapsed = monotonic() - certificate_started
@@ -866,7 +1102,12 @@ class CertifiedRuntimeWrapper(gym.Env[np.ndarray, np.ndarray]):
             self.mission_provider is not None
             and self.mission_provider.verify_task_action(preparation.state, selected)
         )
+        prepared_snapshot = preparation.state.snapshot()
+        live_snapshot = self._certificate_state().snapshot()
+        snapshot_unchanged = prepared_snapshot == snapshot and live_snapshot == snapshot
         accepted = bool(
+            snapshot_unchanged
+            and
             preparation.failure_reason is None
             and preparation.recovery is not None
             and preparation.recovery.certified
@@ -876,21 +1117,102 @@ class CertifiedRuntimeWrapper(gym.Env[np.ndarray, np.ndarray]):
                 else certificate is not None and certificate.verified and zonotope is not None and zonotope.contains(selected)
             )
         )
-        action = selected if accepted else fallback
-        reason = "VERIFIED_NOMINAL_MEMBERSHIP" if accepted else (preparation.failure_reason or "NOMINAL_OUTSIDE_CERTIFIED_SET")
+        recovery_covered_at_publication = bool(
+            snapshot_unchanged
+            and
+            preparation.recovery is not None
+            and preparation.recovery.certified
+            and preview_covered
+            and self._kappa_publication_eligible(
+                preparation.state,
+                preparation.mission_context,
+            )
+        )
+        if accepted:
+            action = selected
+            command_source = "task"
+            covered_at_publication = True
+        elif recovery_covered_at_publication:
+            action = np.asarray(preparation.recovery.action, dtype=np.float64)
+            command_source = "kappa"
+            covered_at_publication = True
+        else:
+            action = np.asarray(
+                self.recovery_policy.emergency_brake(preparation.state.velocity),
+                dtype=np.float64,
+            )
+            command_source = "uncertified_emergency_brake"
+            covered_at_publication = False
+        version_failure = None if snapshot_unchanged else "CERTIFICATE_VERSION_CHANGED"
+        reason = "VERIFIED_NOMINAL_MEMBERSHIP" if accepted else (
+            version_failure or preparation.failure_reason or "NOMINAL_OUTSIDE_CERTIFIED_SET"
+        )
+        if not covered_at_publication:
+            reason = version_failure or preparation.failure_reason or "RECOVERY_CERTIFICATE_INVALID"
         publish_started = monotonic()
-        publisher.publish_once(PublishedCommand(tuple(float(value) for value in action), "task" if accepted else "kappa", reason, snapshot.certificate_version))
+        proposed_command = PublishedCommand(
+            tuple(float(value) for value in action),
+            command_source,
+            reason,
+            snapshot.certificate_version,
+        )
+        if covered_at_publication:
+            published_command = publisher.compare_and_publish_once(
+                proposed_command,
+                snapshot,
+                lambda: self._certificate_state().snapshot(),
+                tuple(float(value) for value in self.recovery_policy.emergency_brake(preparation.state.velocity)),
+            )
+        else:
+            publisher.publish_once(proposed_command)
+            published_command = publisher.command
+        action = np.asarray(published_command.action, dtype=np.float64)
+        command_source = published_command.source
+        reason = published_command.reason
+        covered_at_publication = command_source in {"task", "kappa"}
+        accepted = bool(accepted and command_source == "task")
+        recovery_covered_at_publication = bool(
+            covered_at_publication
+            and preparation.recovery is not None
+            and preparation.recovery.certified
+        )
         publish_elapsed = monotonic() - publish_started
-        if self.mission_provider is not None and not accepted and preparation.recovery is not None and preparation.recovery.certified:
-            self.task_env.on_runtime_recovery(reason)
+        if self.mission_provider is not None and command_source == "kappa":
+            with self._certificate_state_lock:
+                self.task_env.on_runtime_recovery(reason)
         plant_started = monotonic()
         observation, reward, terminated, truncated, info = self.task_env.step(action)
         plant_elapsed = monotonic() - plant_started
+        if not covered_at_publication:
+            terminated = True
+            info = info | {
+                "failure_reason": reason.lower(),
+                "mission_termination_reason": reason,
+            }
         measured = self.plant.last_telemetry.action_trace.measured
-        trace = ActionTrace(selected, selected if accepted else None, fallback, action, measured, accepted, None if accepted else reason, str(snapshot.certificate_version))
+        final_fallback = np.asarray(
+            preparation.recovery.action
+            if recovery_covered_at_publication
+            else self.recovery_policy.emergency_brake(preparation.state.velocity),
+            dtype=np.float64,
+        )
+        trace = ActionTrace(
+            selected,
+            selected if accepted else None,
+            final_fallback,
+            action,
+            measured,
+            accepted,
+            None if accepted else reason,
+            str(snapshot.certificate_version),
+        )
         telemetry = self.plant.attach_runtime_trace(trace, str(snapshot.certificate_version), str(self.geometry.version), str(self.corridor.version))
         if self.mission_provider is not None and self.mission_provider.last_context is not None:
-            self.mission_provider.commit_execution(self.mission_provider.last_context, accepted)
+            with self._certificate_state_lock:
+                if command_source == "task":
+                    self.mission_provider.commit_execution(self.mission_provider.last_context, True)
+                elif command_source == "kappa":
+                    self.mission_provider.commit_execution(self.mission_provider.last_context, False)
         self.last_stage_timings = {
             "T_certificate": certificate_elapsed,
             "T_recheck": 0.0,
@@ -905,8 +1227,106 @@ class CertifiedRuntimeWrapper(gym.Env[np.ndarray, np.ndarray]):
             "critic_action": action.copy(),
             "certificate_epoch": CertificateEpoch.from_snapshot(preparation.state.snapshot()),
             "publication_count": publisher.publication_count,
+            "command_source": command_source,
+            "covered_at_publication": covered_at_publication,
             "action_context": self.action_context(preparation),
             "stage_timings": dict(self.last_stage_timings),
+        }
+
+    def step_fail_closed(self, reason: str = "RECOVERY_CERTIFICATE_INVALID"):
+        """Execute one explicitly uncertified emergency-brake bookkeeping step.
+
+        This path never evaluates or commits a recovery certificate.  It is
+        used only after execution authority has already resolved to
+        ``FAIL_CLOSED``; consequently a newly available kappa preview cannot
+        silently change the executed/recorded authority or advance the proof
+        chain.
+        """
+
+        total_started = monotonic()
+        state = self._certificate_state()
+        snapshot = state.snapshot()
+        task_observation = self.task_env.build_observation(
+            self._map_encoding(),
+            self._corridor_encoding(),
+        )
+        action = np.asarray(
+            self.recovery_policy.emergency_brake(state.velocity),
+            dtype=np.float64,
+        )
+        publisher = AtomicCommandPublisher(self._certificate_state_lock)
+        self.last_publisher = publisher
+        command = PublishedCommand(
+            tuple(float(value) for value in action),
+            "uncertified_emergency_brake",
+            reason,
+            snapshot.certificate_version,
+        )
+        publisher.stage_default(command)
+        publisher.publish_once(command)
+        plant_started = monotonic()
+        observation, reward, _, truncated, info = self.task_env.step(action)
+        plant_elapsed = monotonic() - plant_started
+        terminated = True
+        info = info | {
+            "failure_reason": "recovery_certificate_invalid",
+            "mission_termination_reason": reason,
+        }
+        measured = self.plant.last_telemetry.action_trace.measured
+        trace = ActionTrace(
+            None,
+            None,
+            action,
+            action,
+            measured,
+            False,
+            reason,
+            str(snapshot.certificate_version),
+        )
+        telemetry = self.plant.attach_runtime_trace(
+            trace,
+            str(snapshot.certificate_version),
+            str(self.geometry.version),
+            str(self.corridor.version),
+        )
+        recorded_recovery = RecoveryDecision(
+            tuple(float(value) for value in action),
+            False,
+            None,
+            reason,
+        )
+        self.runtime_certifier.record_published_command(
+            snapshot,
+            task_observation,
+            recorded_recovery,
+            tuple(float(value) for value in action),
+            "uncertified_emergency_brake",
+            reason,
+            self.plant.state.timestamp,
+            None,
+            tuple(float(value) for value in measured),
+        )
+        self.current_epoch = CertificateEpoch.from_snapshot(snapshot)
+        self.last_fallback_reason = reason
+        self.last_stage_timings = {
+            "T_certificate": 0.0,
+            "T_actor": 0.0,
+            "T_recheck": 0.0,
+            "T_publish": publisher.last_publish_elapsed,
+            "T_plant": plant_elapsed,
+            "T_total": monotonic() - total_started,
+        }
+        return observation, reward, terminated, truncated, info | {
+            "telemetry": telemetry,
+            "accepted": False,
+            "fallback_reason": reason,
+            "critic_action": action.copy(),
+            "certificate_epoch": self.current_epoch,
+            "publication_count": publisher.publication_count,
+            "action_context": self.action_context(),
+            "stage_timings": dict(self.last_stage_timings),
+            "command_source": "uncertified_emergency_brake",
+            "covered_at_publication": False,
         }
 
     def step_recovery(self, reason: str = "CERTIFIED_RECOVERY_REQUEST"):
@@ -919,41 +1339,94 @@ class CertifiedRuntimeWrapper(gym.Env[np.ndarray, np.ndarray]):
         total_started = monotonic()
         state = self._certificate_state()
         snapshot = state.snapshot()
-        pre_recovery = (
-            self.mission_provider.evaluate(state, self.plant.state.timestamp).recovery
+        pre_context = (
+            self.mission_provider.evaluate(state, self.plant.state.timestamp)
             if self.mission_provider is not None
+            else None
+        )
+        pre_recovery = (
+            pre_context.recovery
+            if pre_context is not None
             else self.runtime_certifier.recovery_decision(state, self.plant.state.timestamp)
         )
+        preview_covered = bool(
+            pre_recovery.certified
+            and self._kappa_publication_eligible(state, pre_context)
+        )
         staged_action = np.asarray(
-            pre_recovery.action if pre_recovery.certified else self.recovery_policy.emergency_brake(state.velocity),
+            pre_recovery.action if preview_covered else self.recovery_policy.emergency_brake(state.velocity),
             dtype=np.float64,
         )
-        publisher = AtomicCommandPublisher()
+        staged_source = "kappa" if preview_covered else "uncertified_emergency_brake"
+        staged_reason = reason if preview_covered else "RECOVERY_CERTIFICATE_INVALID"
+        publisher = AtomicCommandPublisher(self._certificate_state_lock)
         self.last_publisher = publisher
-        publisher.stage_default(PublishedCommand(tuple(staged_action), "kappa", reason, snapshot.certificate_version))
+        publisher.stage_default(
+            PublishedCommand(tuple(staged_action), staged_source, staged_reason, snapshot.certificate_version)
+        )
         certificate_started = monotonic()
         preparation = self.prepare_certificate_cycle()
         certificate_elapsed = monotonic() - certificate_started
         recovery = preparation.recovery
+        prepared_snapshot = preparation.state.snapshot()
+        live_snapshot = self._certificate_state().snapshot()
+        snapshot_unchanged = prepared_snapshot == snapshot and live_snapshot == snapshot
         certified = bool(
-            preparation.failure_reason is None
-            and recovery is not None
+            recovery is not None
             and recovery.certified
+            and snapshot_unchanged
+            and preview_covered
+            and self._kappa_publication_eligible(
+                preparation.state,
+                preparation.mission_context,
+            )
         )
         fallback = np.asarray(
             recovery.action if certified else self.recovery_policy.emergency_brake(state.velocity),
             dtype=np.float64,
         )
-        publisher.publish_once(PublishedCommand(tuple(fallback), "kappa", reason, snapshot.certificate_version))
-        self.task_env.on_runtime_recovery(reason)
+        command_source = "kappa" if certified else "uncertified_emergency_brake"
+        failure_category = (
+            "CERTIFICATE_VERSION_CHANGED"
+            if not snapshot_unchanged
+            else "KAPPA_SOURCE_OR_RANK_INVALID"
+            if recovery is not None and recovery.certified
+            else preparation.failure_reason or "RECOVERY_CERTIFICATE_INVALID"
+        )
+        command_reason = reason if certified else failure_category
+        proposed_command = PublishedCommand(
+            tuple(fallback),
+            command_source,
+            command_reason,
+            snapshot.certificate_version,
+        )
+        if certified:
+            published_command = publisher.compare_and_publish_once(
+                proposed_command,
+                snapshot,
+                lambda: self._certificate_state().snapshot(),
+                tuple(float(value) for value in self.recovery_policy.emergency_brake(state.velocity)),
+            )
+        else:
+            publisher.publish_once(proposed_command)
+            published_command = publisher.command
+        fallback = np.asarray(published_command.action, dtype=np.float64)
+        command_source = published_command.source
+        command_reason = published_command.reason
+        certified = command_source == "kappa"
+        if not certified:
+            failure_category = command_reason
+        if certified:
+            with self._certificate_state_lock:
+                self.task_env.on_runtime_recovery(reason)
         plant_started = monotonic()
         observation, reward, terminated, truncated, info = self.task_env.step(fallback)
         plant_elapsed = monotonic() - plant_started
         if not certified:
             terminated = True
             info = info | {
-                "failure_reason": "recovery_certificate_invalid",
-                "mission_termination_reason": "RECOVERY_CERTIFICATE_INVALID",
+                "failure_reason": failure_category.lower(),
+                "mission_termination_reason": failure_category,
             }
         measured = self.plant.last_telemetry.action_trace.measured
         trace = ActionTrace(
@@ -963,7 +1436,7 @@ class CertifiedRuntimeWrapper(gym.Env[np.ndarray, np.ndarray]):
             fallback,
             measured,
             False,
-            reason if certified else "RECOVERY_CERTIFICATE_INVALID",
+            reason if certified else failure_category,
             str(snapshot.certificate_version),
         )
         telemetry = self.plant.attach_runtime_trace(
@@ -972,8 +1445,9 @@ class CertifiedRuntimeWrapper(gym.Env[np.ndarray, np.ndarray]):
             str(self.geometry.version),
             str(self.corridor.version),
         )
-        if self.mission_provider is not None and self.mission_provider.last_context is not None:
-            self.mission_provider.commit_execution(self.mission_provider.last_context, False)
+        if certified and self.mission_provider is not None and self.mission_provider.last_context is not None:
+            with self._certificate_state_lock:
+                self.mission_provider.commit_execution(self.mission_provider.last_context, False)
         self.current_epoch = CertificateEpoch.from_snapshot(preparation.state.snapshot())
         self.last_fallback_reason = trace.fallback_reason
         self.last_stage_timings = {
@@ -993,7 +1467,8 @@ class CertifiedRuntimeWrapper(gym.Env[np.ndarray, np.ndarray]):
             "publication_count": publisher.publication_count,
             "action_context": self.action_context(preparation),
             "stage_timings": dict(self.last_stage_timings),
-            "command_source": "kappa",
+            "command_source": command_source,
+            "covered_at_publication": certified,
         }
 
     def export_calibration_record(self):

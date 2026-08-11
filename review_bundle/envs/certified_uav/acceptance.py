@@ -130,6 +130,8 @@ def run_acceptance_cycle(
         "a_candidate": None if record.candidate_action is None else list(record.candidate_action),
         "accepted": record.accepted,
         "fallback_reason": record.fallback_reason,
+        "command_source": info.get("command_source"),
+        "covered_at_publication": info.get("covered_at_publication"),
         "a_exec": list(record.executed_action),
         "a_measured": None if record.measured_tracking_action is None else list(record.measured_tracking_action),
         "state_after": _jsonable(telemetry.state_after),
@@ -154,8 +156,16 @@ def run_acceptance_cycle(
             raise AssertionError("accepted affine-tanh mapping mismatch")
         if not np.array_equal(np.asarray(output["a_exec"]), np.asarray(output["a_candidate"])):
             raise AssertionError("accepted action was not executed")
-    elif not np.array_equal(np.asarray(output["a_exec"]), np.asarray(output["kappa"])):
-        raise AssertionError("fallback did not execute kappa")
+    elif output["covered_at_publication"]:
+        if output["command_source"] != "kappa":
+            raise AssertionError("covered fallback was not published as kappa")
+        if not np.array_equal(np.asarray(output["a_exec"]), np.asarray(output["kappa"])):
+            raise AssertionError("covered fallback did not execute certified kappa")
+    else:
+        if output["command_source"] != "uncertified_emergency_brake":
+            raise AssertionError("uncovered fallback was not explicitly fail-closed")
+        if not output["terminated"]:
+            raise AssertionError("uncovered fallback did not terminate")
     if not output["plant_input_matches_exec"] or not output["published_once"]:
         raise AssertionError("execution publication invariant failed")
     if not np.isclose(output["energy_after"], output["energy_before"] - output["energy_cost"]):
@@ -169,7 +179,7 @@ SCENARIO_EXPECTATIONS = {
     "invalid_corridor": "INITIAL_STATE_OUTSIDE_CORRIDOR_SUFFIX",
     "insufficient_energy": "INSUFFICIENT_RECOVERY_RESERVE",
     "actor_nonfinite": "CERTIFIER_EXCEPTION",
-    "stale_certificate": "CERTIFIER_EXCEPTION",
+    "stale_certificate": "CERTIFICATE_VERSION_CHANGED",
     "watchdog_deadline": "WATCHDOG_DEADLINE",
     "insufficient_sensing": "INSUFFICIENT_SENSING_FOR_BRAKING_TUBE",
     "energy_contract_mismatch": "EnergyCalibrationContract-expired-or-out-of-domain",
@@ -191,6 +201,8 @@ def scenario_matrix(seed: int = 0) -> list[dict[str, Any]]:
                 "generator_available": trace["G"] is not None,
                 "accepted": trace["accepted"],
                 "executed_action": trace["a_exec"],
+                "command_source": trace["command_source"],
+                "covered_at_publication": trace["covered_at_publication"],
                 "expected_reason": expected,
                 "actual_reason": actual,
                 "pass": passed,

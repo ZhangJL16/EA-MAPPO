@@ -28,7 +28,7 @@ class GeneratorSACConfig:
     warmup_steps: int = 5_000
     updates_per_step: int = 1
     target_entropy: float = -3.0
-    temperature_coordinate: TemperatureCoordinate = "physical"
+    temperature_coordinate: TemperatureCoordinate = "normalized"
     hidden_dim: int = 128
     bootstrap_on_truncation: bool = True
     epoch_replay_policy: EpochReplayPolicy = "clear_on_change"
@@ -104,6 +104,8 @@ class GeneratorTransition:
     next_departure_allowed: bool | None = None
     next_charging_state: bool | None = None
     next_charging_restriction: bool | None = None
+    next_charging_support_verified: bool | None = None
+    next_station_hold_valid: bool | None = None
     next_authority_action: np.ndarray | None = None
     task_goal: np.ndarray | None = None
     collector_boundary: bool = False
@@ -111,27 +113,64 @@ class GeneratorTransition:
     def __post_init__(self) -> None:
         for name in ("observation", "next_observation", "u", "eta", "c", "G", "candidate_action", "kappa_action", "executed_action", "measured_action", "next_c", "next_G", "next_kappa", "next_authority_action", "task_goal"):
             object.__setattr__(self, name, _copy_array(getattr(self, name)))
-        if self.executed_action is None or self.executed_action.shape != (3,):
-            raise ValueError("executed_action must have shape (3,)")
-        if self.next_kappa is None or self.next_kappa.shape != (3,):
-            raise ValueError("next_kappa must have shape (3,)")
+        def require_vector(name: str, value: np.ndarray | None) -> None:
+            if value is None or value.shape != (3,) or not np.all(np.isfinite(value)):
+                raise ValueError(f"{name} must be a finite vector with shape (3,)")
+
+        def require_optional_vector(name: str, value: np.ndarray | None) -> None:
+            if value is not None:
+                require_vector(name, value)
+
+        def require_generator(name: str, value: np.ndarray | None) -> None:
+            if value is None or value.shape != (3, 3) or not np.all(np.isfinite(value)):
+                raise ValueError(f"{name} must be a finite matrix with shape (3,3)")
+            sign, logabsdet = np.linalg.slogdet(value.astype(np.float64))
+            if sign == 0.0 or not np.isfinite(logabsdet):
+                raise ValueError(f"{name} must be invertible")
+
+        for name in ("observation", "next_observation"):
+            value = getattr(self, name)
+            if value is None or value.ndim != 1 or value.size < 1 or not np.all(np.isfinite(value)):
+                raise ValueError(f"{name} must be a nonempty finite vector")
+        if self.observation.shape != self.next_observation.shape:
+            raise ValueError("observation and next_observation shapes must match")
+        for name in ("kappa_action", "executed_action", "measured_action", "next_kappa"):
+            require_vector(name, getattr(self, name))
+        for name in ("u", "eta", "c", "candidate_action", "next_c", "next_authority_action"):
+            require_optional_vector(name, getattr(self, name))
+        if self.G is not None:
+            require_generator("G", self.G)
+        if self.next_G is not None:
+            require_generator("next_G", self.next_G)
+        if not np.isfinite(self.reward):
+            raise ValueError("reward must be finite")
         if self.next_authority_action is None:
             object.__setattr__(self, "next_authority_action", self.next_kappa.copy())
-        elif self.next_authority_action.shape != (3,):
-            raise ValueError("next_authority_action must have shape (3,)")
         if self.accepted and (self.c is None or self.G is None or self.u is None):
             raise ValueError("accepted transition requires u,c,G")
+        if self.accepted:
+            require_generator("G", self.G)
+            require_vector("eta", self.eta)
+            require_vector("candidate_action", self.candidate_action)
+            if not np.allclose(self.eta, np.tanh(self.u), rtol=1e-5, atol=1e-6):
+                raise ValueError("accepted transition eta must equal tanh(u)")
+            mapped = self.c + self.G @ self.eta
+            if not np.allclose(self.candidate_action, mapped, rtol=1e-5, atol=1e-6):
+                raise ValueError("accepted transition candidate must use recorded c,G,u")
+            if not np.allclose(self.executed_action, self.candidate_action, rtol=1e-5, atol=1e-6):
+                raise ValueError("accepted transition executed action must equal its Generator candidate")
         if self.next_generator_available and (self.next_c is None or self.next_G is None):
             raise ValueError("generator-valid next state requires next c,G")
-        if (
-            self.certificate_manifest_hash is not None
-            and self.certificate_manifest_hash != self.certificate_epoch
-        ):
-            raise ValueError("scenario certificate manifest does not match certificate epoch")
+        if self.next_generator_available:
+            require_generator("next_G", self.next_G)
         if self.accepted and self.backup_triggered:
             raise ValueError("a transition cannot be both accepted and backup-controlled")
         if self.tasks_completed < 0:
             raise ValueError("tasks_completed must be nonnegative")
+        if self.task_goal is not None and (
+            self.task_goal.shape != (3,) or not np.all(np.isfinite(self.task_goal))
+        ):
+            raise ValueError("task_goal must be None or a finite vector with shape (3,)")
 
 
 class GeneratorReplayBuffer:
@@ -142,16 +181,20 @@ class GeneratorReplayBuffer:
         self.transitions: list[GeneratorTransition] = []
         self.active_epoch: str | None = None
         self.epoch_rejection_count = 0
+        self.scenario_manifests: dict[tuple[str | None, str | None], str] = {}
 
     def __len__(self) -> int:
         return len(self.transitions)
 
     def add(self, transition: GeneratorTransition) -> bool:
-        if (
-            transition.certificate_manifest_hash is not None
-            and transition.certificate_manifest_hash != transition.certificate_epoch
-        ):
-            raise ValueError("scenario/certificate manifest mismatch")
+        if transition.certificate_manifest_hash is not None:
+            scenario_key = (transition.scenario_id, transition.scenario_hash)
+            expected_manifest = self.scenario_manifests.setdefault(
+                scenario_key,
+                transition.certificate_manifest_hash,
+            )
+            if expected_manifest != transition.certificate_manifest_hash:
+                raise ValueError("scenario certificate manifest changed")
         epoch = transition.certificate_epoch
         if self.active_epoch is None:
             self.active_epoch = epoch
@@ -217,6 +260,8 @@ class GeneratorSAC:
         self.log_alpha = torch.tensor(0.0, device=self.device, requires_grad=True)
         self.alpha_optimizer = torch.optim.Adam([self.log_alpha], lr=self.config.alpha_lr)
         self.replay = GeneratorReplayBuffer(self.config.replay_capacity, self.config.epoch_replay_policy, seed)
+        self.proposal_rng = torch.Generator(device=self.device)
+        self.proposal_rng.manual_seed(int(seed) + 104_729)
         self.gradient_steps = 0
         self.generator_log_density_calls = 0
 
@@ -234,6 +279,23 @@ class GeneratorSAC:
             distribution = self.actor.distribution(tensor)
             u = distribution.mean if deterministic else distribution.sample()
         return u.cpu().numpy().astype(np.float64)
+
+    def sample_u_candidates(self, observation: np.ndarray, count: int) -> np.ndarray:
+        """Draw proposal-only latents without advancing the actor's main RNG."""
+
+        if count < 1:
+            raise ValueError("proposal candidate count must be positive")
+        with torch.no_grad():
+            tensor = torch.as_tensor(observation, dtype=torch.float32, device=self.device)
+            distribution = self.actor.distribution(tensor)
+            noise = torch.randn(
+                (int(count), self.action_dimension),
+                dtype=distribution.mean.dtype,
+                device=self.device,
+                generator=self.proposal_rng,
+            )
+            candidates = distribution.mean.unsqueeze(0) + distribution.stddev.unsqueeze(0) * noise
+        return candidates.cpu().numpy().astype(np.float64)
 
     def observe(self, transition: GeneratorTransition) -> bool:
         return self.replay.add(transition)
@@ -421,6 +483,7 @@ class GeneratorSAC:
             "actor": self.actor.state_dict(), "critic_1": self.critic_1.state_dict(), "critic_2": self.critic_2.state_dict(),
             "target_critic_1": self.target_critic_1.state_dict(), "target_critic_2": self.target_critic_2.state_dict(),
             "log_alpha": self.log_alpha.detach().cpu(), "config": self.config.__dict__.copy(), "gradient_steps": self.gradient_steps,
+            "proposal_rng_state": self.proposal_rng.get_state().cpu(),
         }
 
     def load_state_dict(self, state: dict[str, object]) -> None:
@@ -432,6 +495,8 @@ class GeneratorSAC:
         with torch.no_grad():
             self.log_alpha.copy_(torch.as_tensor(state["log_alpha"], device=self.device))
         self.gradient_steps = int(state.get("gradient_steps", 0))
+        if "proposal_rng_state" in state:
+            self.proposal_rng.set_state(torch.as_tensor(state["proposal_rng_state"], device="cpu"))
 
 
 class PersistentGeneratorSAC(GeneratorSAC):
@@ -444,6 +509,30 @@ class PersistentGeneratorSAC(GeneratorSAC):
 
     @staticmethod
     def _validate_persistent_transition(transition: GeneratorTransition) -> None:
+        if transition.execution_authority is not None:
+            try:
+                current_authority = ExecutionAuthority(transition.execution_authority)
+            except ValueError as error:
+                raise ValueError("unknown persistent execution authority") from error
+            if transition.accepted and current_authority not in {
+                ExecutionAuthority.RL_GENERATOR,
+                ExecutionAuthority.CHARGER_CONSTRAINED,
+            }:
+                raise ValueError("only continuous Generator authority may mark a transition accepted")
+            if not transition.accepted and current_authority == ExecutionAuthority.RL_GENERATOR:
+                raise ValueError("RL_GENERATOR transition must record accepted execution")
+            if current_authority == ExecutionAuthority.KAPPA_BACKUP:
+                if transition.accepted:
+                    raise ValueError("KAPPA_BACKUP transition cannot be accepted")
+                if not np.allclose(
+                    transition.executed_action,
+                    transition.kappa_action,
+                    atol=0.0,
+                    rtol=0.0,
+                ):
+                    raise ValueError("KAPPA_BACKUP executed action must equal kappa_action")
+                if transition.certificate_hashes[0] is None:
+                    raise ValueError("KAPPA_BACKUP transition requires a recovery certificate hash")
         if transition.next_execution_authority is None:
             raise ValueError("persistent transition requires next execution authority")
         try:
@@ -463,8 +552,26 @@ class PersistentGeneratorSAC(GeneratorSAC):
                     raise ValueError("persistent Generator authority lacks certified prerequisites")
             elif authority == ExecutionAuthority.RL_GENERATOR:
                 raise ValueError("RL_GENERATOR authority must be executable")
-        if authority == ExecutionAuthority.KAPPA_BACKUP and not transition.next_backup_required:
-            raise ValueError("KAPPA_BACKUP authority requires backup metadata")
+        if authority == ExecutionAuthority.CHARGER_CONSTRAINED:
+            if transition.next_charging_state is not True or transition.next_charging_restriction is not True:
+                raise ValueError("CHARGER_CONSTRAINED authority requires a closed charging-state gate")
+            if transition.next_generator_executable:
+                if transition.next_charging_support_verified is not True:
+                    raise ValueError("charger Generator branch requires verified charging support")
+            elif transition.next_station_hold_valid is not True:
+                raise ValueError("charger atomic branch requires a valid certified hold")
+        if authority == ExecutionAuthority.KAPPA_BACKUP:
+            if not transition.next_certificate_valid:
+                raise ValueError("KAPPA_BACKUP target requires a valid recovery certificate")
+            if not transition.next_backup_required:
+                raise ValueError("KAPPA_BACKUP authority requires backup metadata")
+            if transition.next_generator_executable:
+                raise ValueError("KAPPA_BACKUP authority cannot execute a Generator")
+            if not np.allclose(transition.next_authority_action, transition.next_kappa, atol=0.0, rtol=0.0):
+                raise ValueError("KAPPA_BACKUP target action must equal next_kappa")
+        if authority == ExecutionAuthority.FAIL_CLOSED:
+            if transition.next_generator_executable or transition.next_backup_required:
+                raise ValueError("FAIL_CLOSED cannot advertise Generator or kappa continuation")
 
     def observe(self, transition: GeneratorTransition) -> bool:
         self._validate_persistent_transition(transition)

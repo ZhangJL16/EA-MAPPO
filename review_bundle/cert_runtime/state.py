@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from math import isfinite
 from typing import Any
 
 from .corridor import ReturnCorridor
@@ -13,6 +14,7 @@ class CertificateStateSnapshot:
     position: Vec3
     velocity: Vec3
     energy: float
+    timestamp: float
     charging_position: Vec3
     certificate_version: tuple[int, int, int]
     local_geometry_digest: str
@@ -34,6 +36,7 @@ class CertificateState:
     velocity_error_radius: Vec3 = (0.0, 0.0, 0.0)
     energy_error_radius: float = 0.0
     bound_versions: dict[str, str] = field(default_factory=dict)
+    timestamp: float = 0.0
 
     def __post_init__(self) -> None:
         self.position = vec3(self.position)
@@ -41,6 +44,8 @@ class CertificateState:
         self.charging_position = vec3(self.charging_position)
         if self.energy < 0.0:
             raise ValueError("remaining energy must be nonnegative")
+        if not isfinite(self.timestamp) or self.timestamp < 0.0:
+            raise ValueError("certificate timestamp must be finite and nonnegative")
         if any(value < 0.0 for value in self.position_error_radius + self.velocity_error_radius):
             raise ValueError("state error radii must be nonnegative")
         if self.energy_error_radius < 0.0:
@@ -59,6 +64,7 @@ class CertificateState:
             self.position,
             self.velocity,
             self.energy,
+            self.timestamp,
             self.charging_position,
             self.certificate_version,
             self.local_geometry.certificate_digest(),

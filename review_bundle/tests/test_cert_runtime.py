@@ -37,6 +37,7 @@ from cert_runtime import (
     Zonotope3,
     ZonotopeConstructor,
 )
+from cert_runtime.watchdog import PublishedCommand
 
 
 class FixedActor:
@@ -484,6 +485,13 @@ class IntervalEnvelopeTests(unittest.TestCase):
         self.assertLess(envelope.energy_low, state.energy)
         self.assertGreaterEqual(envelope.energy_high, state.energy - state.energy_error_radius)
 
+    def test_energy_envelope_contains_negative_depletion_successor(self):
+        fixture = build_certified_fixture()
+        state = replace(fixture["state"], energy=0.01, energy_error_radius=0.0)
+        envelope = fixture["envelope"].propagate_point_action(state, (0.0, 0.0, 0.0))
+        self.assertLess(envelope.energy_low, 0.0)
+        self.assertGreaterEqual(envelope.energy_high, state.energy)
+
     def test_nan_and_infinity_fail_closed(self):
         with self.assertRaises(ValueError):
             Interval(float("nan"), 1.0)
@@ -739,8 +747,34 @@ class WatchdogTests(unittest.TestCase):
             return bundle
 
         command = watchdog.execute(snapshot, recovery.action, producer, lambda: state.certificate_version)
-        self.assertEqual(command.source, "kappa")
-        self.assertEqual(command.reason, "STALE_OR_INCOMPLETE_BUNDLE")
+        self.assertEqual(command.source, "uncertified_emergency_brake")
+        self.assertEqual(command.reason, "CERTIFICATE_VERSION_CHANGED")
+
+    def test_final_compare_and_publish_readback_catches_check_commit_drift(self):
+        fixture, state, snapshot, recovery, watchdog = self._watchdog_fixture()
+        callback_calls = 0
+
+        def current_snapshot():
+            nonlocal callback_calls
+            callback_calls += 1
+            # The ordinary watchdog freshness read is first.  Drift between
+            # that read and the compare-and-publish transaction must be seen by
+            # the transaction's own readback before register commitment.
+            if callback_calls == 2:
+                state.return_corridor.certificate_epoch += 1
+            return state.snapshot()
+
+        command = watchdog.execute(
+            snapshot,
+            recovery.action,
+            lambda: fixture["runtime"].prepare_candidate_bundle(state, [0.0], recovery, 10.0),
+            current_snapshot,
+            uncovered_action=tuple(-value for value in recovery.action),
+        )
+
+        self.assertGreaterEqual(callback_calls, 2)
+        self.assertEqual(command.source, "uncertified_emergency_brake")
+        self.assertEqual(command.reason, "CERTIFICATE_VERSION_CHANGED")
 
     def test_command_publication_occurs_only_once(self):
         fixture, state, snapshot, recovery, watchdog = self._watchdog_fixture()
@@ -756,6 +790,37 @@ class WatchdogTests(unittest.TestCase):
         self.assertEqual(publisher.staged_default.source, "kappa")
         self.assertEqual(publisher.publication_count, 1)
         self.assertFalse(publisher.publish_once(command))
+
+    def test_stale_stage_conflict_never_promotes_emergency_to_kappa(self):
+        fixture, state, snapshot, recovery, watchdog = self._watchdog_fixture()
+        publisher = AtomicCommandPublisher()
+        emergency = tuple(-value for value in recovery.action)
+        self.assertTrue(publisher.stage_default(PublishedCommand(
+            emergency,
+            "uncertified_emergency_brake",
+            "PREVIEW_UNCOVERED",
+            snapshot.certificate_version,
+        )))
+        producer_called = False
+
+        def producer():
+            nonlocal producer_called
+            producer_called = True
+            return fixture["runtime"].prepare_candidate_bundle(state, [0.0], recovery, 10.0)
+
+        command = watchdog.execute(
+            snapshot,
+            recovery.action,
+            producer,
+            lambda: (snapshot.certificate_version[0] + 1, *snapshot.certificate_version[1:]),
+            publisher,
+            emergency,
+        )
+        self.assertFalse(producer_called)
+        self.assertEqual(command.source, "uncertified_emergency_brake")
+        self.assertEqual(command.reason, "CERTIFICATE_VERSION_CHANGED")
+        self.assertEqual(command.action, emergency)
+        self.assertEqual(publisher.publication_count, 1)
 
     def test_wcet_without_hardware_evidence_is_blocked(self):
         contract = WCETContract(

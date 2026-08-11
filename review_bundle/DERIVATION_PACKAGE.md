@@ -1,5 +1,21 @@
 # Derivation Package
 
+> **2026-08-11 proof-audit override.** This package remains the derivation archive, but it is not the canonical accepted proof. Fresh audits refuted its former verbatim D10/L1/L7/T1/T7/T_AUTH3 chain. Because historical sections are retained for audit provenance, they are not all rewritten in place. `docs/theory/PAPER_THEOREM.md` is the only canonical theorem statement; `THEORY_MASTER.md`, `THEOREM_LEDGER.md`, `RED_TEAM_LOG.md`, and `OPEN_THEORY_ISSUES.md` control status and non-claims.
+
+The following corrections govern every historical formula below:
+
+| Historical shorthand | Controlling correction |
+| --- | --- |
+| Endpoint successor membership implies collision safety | Every covered branch requires a complete current swept-tube certificate inside a physically sound FREE set |
+| Clipped nonnegative energy envelope | True negative successors must remain in the outer envelope; executable branches instead certify a nonnegative lower-energy prefix |
+| `E^kappa` is the exact first-passage value | `J_cov^kappa` is the exact joint robust value only on recovery paths covered through arrival; finite node values `E_nu` are outward-rounded upper certificates |
+| Pointwise `A_rec(x)` and `C_run subset A_rec` | Runtime uses directly verified complete action sets: `C_run(x) in A_safe_set(x) subset A_rec_set(x)` |
+| State-dependent reserve is unchanged across recovery | The canonical theorem uses constant `m_e`; successor reserve growth would have to enter the recursion |
+| Atlas graph pruning equals state-level `R_RL` | Current pruning is only a topology/cell-ID candidate kernel; the optional energy-augmented full-support greatest fixed point is unimplemented |
+| Certificate expiry or publisher failure automatically transfers to certified `kappa` | Positive conclusions hold only for existing complete transitions before pathwise `tau_cov`; uncovered publication/hardware failure is outside the theorem |
+| Charger endpoint gain proves invariance, and full battery proves departure | Charge/hold requires complete tube and nonnegative energy-prefix certification into `G_ch`; departure also requires direct complete-support successor inclusion in `R` |
+| Runtime authority implies same-task resume | Pending task identity is an independent transition invariant and changes only on an explicit completed normal `RUN` |
+
 ## Target
 
 Determine whether a mathematically coherent unified constrained reinforcement-learning method can be built for persistent UAV missions with:
@@ -110,7 +126,7 @@ The assumptions below are requirements, not facts already established.
 | A2 | A calibrated, versioned one-step energy contract satisfies \(0\le c_{\rm real}(z^{\rm cert},a,w)\le \bar c(z^{\rm cert},a)\) throughout every certified state/action cell; interval evaluation uses the full cell and full action set. |
 | A3 | Collision certification is computed from explicit geometric sets. Any learned collision field is only a proposal; the theorem uses a verified lower envelope \(\underline B_{\rm geom}\) over the complete certified neighborhood and successor tube. |
 | A4 | Any learned recovery-energy field is only a proposal. The theorem uses a corridor-wise verified upper function \(\overline R^\kappa\) or an independently computed upper bound satisfying the residual recursion. |
-| A5 | Obstacles are static and vertically extruded. Unknown space is non-certifiable. A complete `SensorCalibrationContract` bounds pose, attitude/direction, range, beam width, synchronization, footprint, discretization, evidence age, and motion during delay. For every certified state, verified-free space contains the complete control-delay, reaction, braking, tracking-error, and estimation tube; otherwise no task action is certified. |
+| A5 | Obstacles are static and vertically extruded. Unknown space is non-certifiable. A complete `SensorCalibrationContract` bounds pose, attitude/direction, range, beam width, synchronization, footprint, discretization, evidence age, and motion during delay. A certificate-eligible return is nearest-obstacle complete over the contracted beam; any unmodeled false negative, occlusion, or material response reverts affected cells to UNKNOWN. For every certified state, verified-free space contains the complete current motion, control-delay, reaction, braking, tracking-error, and estimation tube; otherwise no task action is certified. |
 | A6 | The charging terminal set is collision-safe and is represented by a parameterized `TerminalCondition`: terminal position/altitude sets, velocity interval \(V_G\), minimum energy \(e_G\), and at least one verified hover/descent/docking continuation mode. |
 | A7 | The frozen recovery policy \(\kappa(z^{\rm cert})\) uses only explicit certificate-state variables. Every corridor state cell has a linked, hashed, versioned, unexpired complete-cell certificate proving actuator bounds, corridor/stopping-tube containment, velocity bounds, and the declared successor relation. A Boolean validity input is not evidence. |
 | A8 | The frozen recovery policy satisfies one explicitly declared progress premise. **A8-1:** every nonterminal successor obeys \(\ell(z^+)\le\ell(z)-1\). **A8-M:** for every admissible recovery trajectory starting from \(z\in K_i\setminus\mathcal G\), the stopping index \(\sigma_i:=\inf\{j\ge1:z_j\in\mathcal G\text{ or }\ell(z_j)<i\}\) satisfies \(1\le\sigma_i\le M\). T4a uses A8-1; T4b uses A8-M. |
@@ -130,6 +146,7 @@ The assumptions below are requirements, not facts already established.
 | A13e | The fail-safe-mixture derivation assumes a measurable acceptance event with probability \(\beta_\theta(z)\), a well-defined conditional generator-candidate law, and a separately certified deterministic fallback \(\kappa(z)\). Differentiability statements exclude \(\beta_\theta\in\{0,1\}\). |
 | A14 | \(\mathcal M^{\rm local}\) and \(\mathcal C^{\rm back}\) use finite explicit set representations with measurable, sound update correspondences. Verified-free, verified-obstacle, and unknown regions are disjoint; unknown space cannot be added to the corridor until reclassified as verified free. |
 | A15 | The feedforward task observation \(o^{\rm task}=\Omega_{\rm task}(z^{\rm cert},y)\) contains current LiDAR, a finite encoding of the local geometry crop, the return-corridor encoding, and task variables. Strict certificates never depend on CNN/MLP features. T9A's exact policy-improvement claim additionally requires the actor class conditioned on this explicit input to realize the stated optimizer. |
+| A16 | The executable recovery reserve is a constant \(m_{\rm res}\ge0\) over every linked recovery edge. A state-dependent reserve is permitted only if E3 propagates \(\overline R_i+m_i\ge\bar c_i+\sup_j(\overline R_j+m_j)\). |
 
 ## Notation
 
@@ -972,8 +989,10 @@ Let \(K_0,\dots,K_N\) be certified state neighborhoods induced by the ordered ce
 \[
 \mathcal C=\bigcup_{i=0}^N K_i,
 \qquad
-\ell(z)=\min\{i:z\in K_i\}.
+\ell(z,h)=\text{level carried by the selected valid recovery certificate }h.
 \]
+
+The cells may overlap, so rank is not inferred by taking the minimum set-membership index. Runtime selects one versioned chain/cell certificate `h`; every certified successor is linked to a certificate of strictly smaller level. Selection is deterministic and hash-bound within the certificate epoch.
 
 Define the recovery stopping time
 
@@ -1008,6 +1027,8 @@ Using a verified successor outer approximation and worst-case one-step energy co
 \mathcal A_{\rm cert}(z)=
 \left\{a\in\mathcal A:
 \begin{array}{l}
+\operatorname{Tube}_{\rm step}(z,a)\subseteq\mathcal F(z)
+\text{ for the complete current motion/tracking tube},\\
 \widehat{\operatorname{Post}}_{\rm cert}(z,a)\subseteq
 \mathcal C\cap\mathcal S_{\rm col}^{\rm cert},\\
 e-\bar c(z,a)\ge
@@ -1018,7 +1039,7 @@ e-\bar c(z,a)\ge
 \right\}.
 \]
 
-The first condition includes sound local-map and return-corridor updates and therefore excludes successors entering unknown space. The last condition is not circular because certification of \(\kappa\) on \(\mathcal C\) is established before task-action certification.
+The swept-tube condition excludes obstacle crossing even when the endpoint is safe. Successor inclusion includes sound local-map and return-corridor updates and therefore excludes successors entering unknown space. The last condition is a primitive rank-indexed recovery-cell certificate constructed before task-action certification; it is not recursively discharged by D10 itself.
 
 ### D11. Verified runtime action set
 
@@ -1151,7 +1172,7 @@ Let \([p],[v],[e]\) be initial certificate intervals, \([a]\) the exact coordina
 [a_{\rm all}]&=[a]\oplus[w_a],\\
 [p^+]&=[p]\oplus[\Delta][v]\oplus\tfrac12[\Delta]^2[a_{\rm all}]\oplus[w_p],\\
 [v^+]&=[v]\oplus[\Delta][a_{\rm all}]\oplus[w_v],\\
-[e^+]&=\bigl([e]\ominus[0,\bar c([a_{\rm all}])]\bigr)\cap[0,\infty).
+[e^+]&=[e]\ominus[0,\bar c([a_{\rm all}])].
 \end{aligned}
 \tag{L1.1}
 \]
@@ -1160,7 +1181,7 @@ If the true initial state, complete action set, control-cycle duration, tracking
 
 **Proof — structural induction over interval expressions.** Each primitive interval operation contains the corresponding real operation by directed rounding; Minkowski addition and interval multiplication preserve inclusion. Induction over (L1.1) gives physical-state containment. The version components are finite set ranges rather than floating-point quantities. Nonlinear residuals require a separately verified interval/Taylor/Lipschitz/branch-and-bound remainder; a point predictor is insufficient. \(\square\)
 
-The software arithmetic is implemented. Its use as a physical outer envelope is **blocked-by-calibration** until all real bounds are supplied.
+The software arithmetic is implemented without zero clipping, matching the plant's possibly negative terminal depletion successor. Its use as a physical outer envelope is **blocked-by-calibration** until all real bounds are supplied.
 
 ### L2. Explicit unknown-exclusion collision lemma
 
@@ -1197,7 +1218,7 @@ For the executable A8-1 profile, require each nonterminal certificate to prove
 \tag{L6.1}
 \]
 
-Then \(\ell(z^+)\le\ell(z)-1\) for every represented successor. A cell for which (L6.1) cannot be proved is uncertified. The prototype does not implement A8-M and does not replace (L6.1) with point samples.
+Then the linked successor certificate satisfies \(\ell(z^+,h^+)\le\ell(z,h)-1\) for every represented successor. This is descent of the selected proof object, not a minimum-membership rank over overlapping cells. A cell for which (L6.1) or the hash-bound successor selection cannot be proved is uncertified. The prototype does not implement A8-M and does not replace (L6.1) with point samples.
 
 ### L5. Certified recovery-action availability
 
@@ -1422,11 +1443,11 @@ The terminal requirement \(e_G\) is not hidden in \(R^\kappa\); it is added in D
 
 ### T1. Corridor-conditional joint forward invariance
 
-Assume \(z_0=z_0^{\rm cert}\in\mathcal S_{\rm joint}^{\rm cert}\), with a sound L0 local geometry partition and a proof-carrying return corridor. Suppose L1--L3, L5, and L7 hold and every runtime action satisfies T0. Then, for every admissible disturbance and explicit geometry/corridor-update sequence and every time for which the certificates and calibrated premises remain valid,
+Assume \(z_0=z_0^{\rm cert}\in\mathcal S_{\rm joint}^{\rm cert}\), with a sound L0 local geometry partition and a proof-carrying return corridor. Let \(\tau_{\rm valid}\) be the first certificate expiry, failed refresh, bound-version mismatch, or loss of a calibrated premise. Suppose L1--L3, L5, and L7 hold and every runtime action satisfies T0 before that stopping time. Then, for every admissible disturbance and explicit geometry/corridor-update sequence,
 
 \[
 z_t\in\mathcal S_{\rm joint}^{\rm cert}
-\quad\forall t\ge0.
+\quad\forall 0\le t<\tau_{\rm valid}.
 \]
 
 **Proof sketch — set containment and induction.** T0 gives \(a_t\in\mathcal A_{\rm cert}(z_t)\). D10 and L1 place every physical and set-update successor in the certified corridor; D4 and L3 keep the delay/braking tube in verified free space and exclude obstacle and unknown space; L7 preserves the terminal-aware energy margin. Version validity is checked before each command. These inclusions give the induction step on \(z^{\rm cert}\). Software membership alone is insufficient without L0--L1 and L7.
@@ -1574,7 +1595,7 @@ T_{\rm sensor}+T_{\rm update}+T_\kappa+T_{\rm set}+T_{\rm actor}+T_{\rm publish}
 
 Normal and restricted task actions use D12's generator and are executed only after T0 establishes membership in \(\mathcal A_{\rm cert}(z)\). The recovery guard triggers before the successor envelope can leave verified free geometry or invalidate \(\mathcal C^{\rm back}\). Guard evaluation, hysteresis, local-map update, mode-switch latency, computation delay, and tracking error are included in \(\widehat{\operatorname{Post}}_{\rm cert}\). The watchdog defaults to the already certified \(\kappa\); any generator-construction, inclusion, rank, numerical, exception, version, atomicity, or deadline failure leaves that fallback published.
 
-Then the switched trajectory remains in \(\mathcal S_{\rm joint}^{\rm cert}\) for all time. If recovery mode is triggered, T6 guarantees finite-time arrival in \(\mathcal G\) before collision or energy exhaustion.
+Then the switched trajectory remains in \(\mathcal S_{\rm joint}^{\rm cert}\) only up to \(\tau_{\rm valid}\). If recovery mode is triggered strictly before that stopping time and the recovery certificate remains valid through arrival, T6 guarantees finite-time arrival in \(\mathcal G\) before collision or energy exhaustion.
 
 **Proof sketch — mode-wise induction and case split.** T0 covers successful task actions and fallback. T1 provides the common invariant induction step in every mode. The verified guard and (T7.1) prevent an unprotected transition between modes, atomic one-shot publication prevents a late task overwrite, and T6 handles the recovery suffix. The Python watchdog verifies transition logic only; without hardware/RTOS WCET and atomic-I/O evidence, T7 is `blocked-by-deployment-evidence`.
 
@@ -2515,7 +2536,7 @@ With nonnegative calibrated energy coefficients \(q_i\), fixed/uncertainty cost 
 =c_f+c_u+\epsilon_e+\sum_iq_i
 \max\{|a_i^{\rm all,-}|,|a_i^{\rm all,+}|\},
 \qquad
-[e^+]=\left([e]\ominus[0,\bar c_{\rm step}]\right)\cap[0,\infty).
+[e^+]=[e]\ominus[0,\bar c_{\rm step}].
 \]
 
 The floating-point numerical budget is not an informal scalar added afterward: each elementary endpoint is enlarged by one representable number through `nextafter`, so the accumulated budget is the compositional interval width generated by the expression tree. The envelope also carries dynamics/energy-bound versions, geometry/corridor version ranges \([v,v+1]\), and a mandatory revalidation flag. This records that perception/corridor updates are part of the certificate-state transition. It does not by itself prove that every possible physical or set update lies in the modeled correspondence; that remains an A1/L0 calibration and verification obligation.
@@ -3416,10 +3437,17 @@ step. The theorem preserves the existence of a certified recovery option. It doe
 the learned policy itself reaches the terminal.
 
 Normal RL authority requires an interior energy margin. At the configured switching boundary, or
-after `NO_GENERATOR_SET`, evidence/version failure, deadline failure, or atomic publication failure,
-authority switches to frozen \(\kappa\). Since switching occurs from \(\mathcal R\), the existing
+after `NO_GENERATOR_SET`, evidence/version failure, or a task-worker deadline failure covered by an independent staged publisher,
+authority switches to frozen \(\kappa\). A publisher, bus, actuator, or watchdog failure is not a proved takeover; absent an independent hardware fail-safe it is `FAIL_CLOSED/UNRESOLVED`. When switching succeeds from \(\mathcal R\), the existing
 strict corridor descent, E3 recursion, and finite-time terminal-arrival theorem apply. An invalid
-\(\kappa\) certificate instead causes fail-closed termination.
+\(\kappa\) certificate instead causes fail-closed termination. In particular, a valid preview does
+not authorize a stale label: if the final publication-time coverage recheck fails after either an
+RL or kappa preview, runtime records the command as `uncertified_emergency_brake`, records
+`FAIL_CLOSED`, terminates, commits no recovery child, and supplies zero Bellman bootstrap. A
+preview already classified `FAIL_CLOSED` uses a dedicated path and cannot re-evaluate a newly valid
+kappa or advance its proof child. Mid-cycle certificate-version mutation likewise invalidates both
+the candidate and the old staged recovery label. This is bookkeeping correctness, not a safety
+guarantee for the emergency brake.
 
 Voluntary station approach while the margin remains interior is not recovery takeover: the
 Generator policy retains physical authority. Remaining inside the charge-admissible set applies
@@ -3450,6 +3478,13 @@ its continuous entropy. If it is `KAPPA_BACKUP`, the target action is exactly
 no Generator density, and `FAIL_CLOSED` has no bootstrap continuation. This aligns the engineering
 Bellman branch with actual publish authority; it does not add a convergence theorem and does not
 enter T_REC1/T_REC2's safety proof.
+
+The authority classifier is evaluated against the final published command and
+`covered_at_publication`. A preview decision of `RL_GENERATOR` or `KAPPA_BACKUP` is therefore
+insufficient to create a continuous task branch or deterministic \(\kappa\) atom. Only a finally
+covered published task/\(\kappa\) command receives the corresponding branch or commits the selected
+proof child; lost coverage maps to `FAIL_CLOSED` and no continuation. A certificate-version change
+during candidate construction is a lost-coverage case, not permission to reuse the staged κ label.
 
 `PERSISTENT_SAFETY_GATE` binds task, recovery, and departure routes using typed prerequisites.
 Shared dynamics, tracking, energy, terminal, recoverable-set/action-rule, and runtime versions must
@@ -3708,3 +3743,94 @@ critics, target critics, temperature, optimizers, gradient counter, or replay. T
 transition receives a distinct collector-boundary no-bootstrap mask, so the one-step Bellman target
 never uses the unrelated reset state. This changes data collection only; persistent evaluation and
 all task-independent safety definitions remain unchanged.
+
+## 2026-08-11 hybrid-arrival and publication-binding addendum
+
+### Target and status
+
+Target: reconcile the executable voluntary-arrival, charging/departure source,
+and runtime-to-replay branches with the canonical invariant.
+
+Status: **COHERENT AFTER REFRAMING; fresh proof audit pending.** The invariant
+object remains the task-indexed compatible hybrid domain `I(q)`, not a mode-free
+recoverable set and not a neural value.
+
+### Assumptions and notation
+
+- A physical `RUN` interval is already covered by a complete support in
+  `A_safe_set` and therefore has `x+ in R`.
+- `ArrivalClass_t(x+)` is checked against the realized successor snapshot and
+  takes values in `{NORMAL, ARRIVE, INVALID}`. `ARRIVE` implies
+  `x+ in G_charge` plus a valid station hold under the same live dependency
+  package; dependency drift/check failure is `INVALID` and ends hybrid
+  coverage.
+- The `Arrive_t` mode update has zero duration and zero energy gain.
+- Certified κ publication requires a non-charging source and selected rank
+  `r>0`.
+- Certificate validity compares construction/live versions, dependency
+  fingerprints, and publication time; snapshot equality alone is insufficient
+  for changes predating all snapshots.
+
+### Derivation map
+
+1. Complete `RUN` verification gives within-step safety and `x+ in R`.
+2. If `ArrivalClass_t(x+)=NORMAL`, the successor remains `I_N(q')`.
+3. If `ArrivalClass_t(x+)=ARRIVE`, then `x+ in R intersection G_charge`; a
+   zero-duration mode update gives `I_C(q')` without charging the flight.
+   If it is `INVALID`, command coverage still proves the physical RUN interval
+   but the hybrid covered prefix ends before a successor mode is published.
+4. For `I_C`, closed gate partitions to `CHARGE/HOLD`, open gate to `DEPART`;
+   missing support is outside the covered relation.
+5. For `I_N` or `I_B`, κ is defined only at positive selected rank. Rank zero
+   admits `RUN-N`, `RUN-ARRIVE`, or stopped-prefix semantics.
+6. Replay binds the accepted continuous branch to the actual publication
+   `c,G,u`, while its `next_observation` is rebuilt from the same successor
+   context used for the next Bellman authority.
+
+### Main derivation
+
+For the task update
+
+```text
+q' = Next(q)  if and only if the physical RUN completes q,
+q' = q        otherwise,
+```
+
+the normal branch is the disjoint union
+
+```text
+RUN-N:      (x,NORMAL,q) -> (x+,NORMAL,q'),
+            x+ in R and ArrivalClass_t(x+)=NORMAL;
+
+RUN-ARRIVE: (x,NORMAL,q) -> (x+,CHARGING,q'),
+            x+ in R intersection G_charge and ArrivalClass_t(x+)=ARRIVE.
+```
+
+No charge term is inserted into the RUN energy transition. A charge term first
+appears on the next physical interval, whose source is `CHARGING`. Thus the
+case split preserves the original swept-tube/energy proof and adds only a
+successor-mode membership proof. The charging source relation is
+
+```text
+gate closed -> verified CHARGE or HOLD;
+gate open   -> verified DEPART;
+otherwise   -> uncovered FAIL_CLOSED (no positive-theorem continuation).
+```
+
+Finally,
+
+```text
+KAPPA_BACKUP -> (source in {NORMAL,BACKUP}) and selected_rank > 0.
+```
+
+This condition removes both the charging-source κ self-loop and the fictitious
+rank-zero κ action. It is sufficient for the finite-rank induction; it is not a
+liveness guarantee.
+
+### Boundaries and non-claims
+
+The addendum does not prove that voluntary arrival occurs, that a departure
+support exists, that charging is physically calibrated, or that an uncovered
+emergency command is safe. It only closes the covered hybrid relation and its
+runtime/replay semantics. `docs/theory/PAPER_THEOREM.md` remains the canonical
+statement.

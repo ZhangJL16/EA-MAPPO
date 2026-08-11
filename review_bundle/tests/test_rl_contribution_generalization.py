@@ -90,13 +90,16 @@ class ScenarioFamilyTests(unittest.TestCase):
             self.assertEqual(record.scenario_hash, scenario_file_hash(record.path))
             runtime = make_certified_uav_env(record.path, timing_mode="functional")
             runtime.reset(seed=record.seed)
-            epoch = runtime.action_context()["certificate_epoch"]
+            context = runtime.action_context()
+            epoch = context["certificate_epoch"]
             item = transition(epoch=epoch)
             object.__setattr__(item, "scenario_id", record.scenario_id)
             object.__setattr__(item, "scenario_hash", record.scenario_hash)
-            object.__setattr__(item, "certificate_manifest_hash", epoch)
+            object.__setattr__(item, "certificate_manifest_hash", context["certificate_manifest_hash"])
             replay = GeneratorReplayBuffer(4, "group", seed=0)
             self.assertTrue(replay.add(item))
+            self.assertNotEqual(context["certificate_epoch"], context["certificate_manifest_hash"])
+            self.assertEqual(context["runtime_certificate_epoch"], runtime.current_epoch.epoch_id)
             with self.assertRaises(ValueError):
                 object.__setattr__(item, "certificate_manifest_hash", "wrong-manifest")
                 replay.add(item)

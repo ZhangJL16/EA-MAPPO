@@ -226,6 +226,7 @@ def make_random_persistent_uav_env(
     seed: int = 0,
     timing_mode: str = "functional",
     certificate_bundle: str | None = None,
+    flight_energy_multiplier: float = 1.0,
 ) -> RandomPersistentRuntimeWrapper:
     """Build the task-independent random-start/random-goal main environment.
 
@@ -247,7 +248,9 @@ def make_random_persistent_uav_env(
         configured,
         scenario,
         actuator_model=ActuatorTrackingModel(configured.tracking_error_bound),
-        energy_model=EnergyModel(SimulationEnergyConfig()),
+        energy_model=EnergyModel(
+            SimulationEnergyConfig(flight_energy_multiplier=flight_energy_multiplier)
+        ),
         lidar_model=HorizontalLidarModel(
             configured.num_lasers,
             configured.lidar_range,
@@ -265,7 +268,12 @@ def make_random_persistent_uav_env(
         task_reward=float(random_config.get("task_reward", 10.0)),
         battery_capacity=float(random_config.get("battery_capacity", 30.0)),
     )
-    runtime = CertifiedRuntimeWrapper(task, generator_center_mode="safety_neutral", timing_mode=timing_mode)
+    runtime = CertifiedRuntimeWrapper(
+        task,
+        generator_center_mode="safety_neutral",
+        timing_mode=timing_mode,
+        flight_energy_multiplier=flight_energy_multiplier,
+    )
     atlas = CertifiedRecoverabilityAtlas(runtime)
     task.attach_atlas(atlas)
     charging = ChargingConfig(

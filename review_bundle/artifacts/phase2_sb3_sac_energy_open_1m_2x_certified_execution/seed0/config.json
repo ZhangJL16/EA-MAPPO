@@ -1,0 +1,138 @@
+{
+  "action_space_high": [
+    1.0,
+    1.0,
+    1.0
+  ],
+  "action_space_low": [
+    -1.0,
+    -1.0,
+    -1.0
+  ],
+  "actor_parameter_devices": [
+    "cuda:0"
+  ],
+  "actor_supervised_warm_start": false,
+  "algorithm_class": "stable_baselines3.SAC",
+  "backup_intervention_cost": 0.1,
+  "battery_capacity": 30.0,
+  "certificate": {
+    "binding_hash": "d2a2a2c7c3df5e588fe3ca36ed466c39130a040785dbd0753ba73ef9350cdc58",
+    "energy_contract_hash": "81289bfd559060b86e8fd9c244f70e94ea306294496d6dbd446c19631c6fbf97",
+    "energy_version": "synthetic-mission-energy-v2-x2",
+    "flight_energy_multiplier": 2.0,
+    "gate_pass": true,
+    "kappa_version": "mission-kappa-random_persistent_open-v2",
+    "number_of_cells": 88593,
+    "recovery_atlas_hash": "a77e53d7fc4e34ec5e449e9b056ff1363b6de5247225827840ccaa7c0414bbad",
+    "recovery_manifest_hash": "6e836a00bc12f9b2603b6ff12a7b9ec2a21fdd198399f5584cf696aec577c7e7",
+    "scenario": "random_persistent_open",
+    "schema": "certified-recovery-atlas-energy-binding-v1",
+    "terminal_recovery_certificate_hash": "a66fbb1e625752418b8c940ab0edc886e2c1639a24e43b5a655e16dd3c1ec298"
+  },
+  "certificate_artifact": "/home/zjl/mappo/review_bundle/certificates/random_persistent_open_energy_x2_certified_execution.json",
+  "certified_action_adapter": "physical_action = c + G @ sac_action",
+  "certified_initial_state_distribution": "RECOVERY_ATLAS_RL_AUTHORITY_DOMAIN",
+  "charging_radius": 0.18,
+  "charging_rate": 2.0,
+  "charging_velocity_limit": [
+    0.05,
+    0.05,
+    0.04
+  ],
+  "checkpoint_steps": [
+    10000,
+    50000,
+    100000,
+    200000,
+    300000,
+    500000,
+    750000,
+    1000000
+  ],
+  "collision_penalty": 1.2,
+  "completion_reward": 10.0,
+  "critic_parameter_devices": [
+    "cuda:0"
+  ],
+  "critic_target_parameter_devices": [
+    "cuda:0"
+  ],
+  "cuda_visible_devices": "0",
+  "device": "cuda:0",
+  "distance_potential_scale": 0.25,
+  "dt": 0.2,
+  "energy_cost_weight": 0.01,
+  "energy_reward_uses_actual_flight_energy": true,
+  "environment_class": "CertifiedExecutionTrainingEnv[PersistentEnergyNavigationEnv]",
+  "evaluation_seed_base": 197000000,
+  "evaluation_steps": 5000,
+  "flight_energy_multiplier": 2.0,
+  "gamma": 0.99,
+  "goal_radius": 0.2,
+  "gymnasium_version": "1.2.3",
+  "heldout_seeds": [
+    100,
+    101,
+    102,
+    103,
+    104
+  ],
+  "initial_energy_fraction_max": 1.0,
+  "initial_energy_fraction_min": 0.3,
+  "initialization": "FROM_SCRATCH_NO_DEMONSTRATION",
+  "log_interval": 1000,
+  "max_episode_steps": 5000,
+  "minimum_goal_separation": 0.6,
+  "model_device": "cuda:0",
+  "numpy_version": "1.26.4",
+  "observation_dimension": 77,
+  "observation_fields": [
+    "absolute_position",
+    "velocity",
+    "absolute_goal_position",
+    "absolute_station_position",
+    "state_of_charge",
+    "lidar_distances",
+    "lidar_valid"
+  ],
+  "online_certified_execution": true,
+  "online_teacher_override": false,
+  "output_dir": "/home/zjl/mappo/review_bundle/artifacts/phase2_sb3_sac_energy_open_1m_2x_certified_execution/seed0",
+  "policy_parameter_devices": [
+    "cuda:0"
+  ],
+  "replay_action_semantics": "PROPOSED_NORMALIZED_CERTIFIED_SUPPORT_COORDINATE",
+  "requested_device": "cuda:0",
+  "sac_action_coordinate": "NORMALIZED_CERTIFIED_SUPPORT_COORDINATE",
+  "sac_hyperparameters": {
+    "batch_size": 256,
+    "buffer_size": 1000000,
+    "ent_coef": "auto",
+    "gamma": 0.99,
+    "gradient_steps": 1,
+    "learning_rate": 0.0003,
+    "learning_starts": 5000,
+    "target_entropy": "auto",
+    "tau": 0.005,
+    "train_freq": [
+      1,
+      "step"
+    ]
+  },
+  "sampling_margin": 0.2,
+  "scenario": "random_persistent_open.json",
+  "seed": 0,
+  "skip_evaluation": false,
+  "smoke": false,
+  "stable_baselines3_version": "2.8.0",
+  "standard_sac_learning_starts": 5000,
+  "started_at": "2026-08-11T11:14:45.263976+00:00",
+  "steps": 1000000,
+  "teacher_replay_prefill": false,
+  "time_cost": 0.01,
+  "torch_threads": 1,
+  "torch_version": "2.7.1+cu128",
+  "transition_reward_and_successor_semantics": "ACTUAL_EXECUTED_PHYSICAL_ACTION",
+  "velocity_reward_weight": 0.1
+}

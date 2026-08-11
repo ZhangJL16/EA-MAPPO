@@ -1,0 +1,100 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{amsmath,amssymb}
+\newcommand{\beforebox}[1]{\par\noindent\colorbox{red!12}{\parbox{0.94\linewidth}{#1}}\par}
+\newcommand{\afterbox}[1]{\par\noindent\colorbox{green!12}{\parbox{0.94\linewidth}{#1}}\par}
+\newcommand{\warningbox}[1]{\par\noindent\colorbox{yellow!18}{\parbox{0.94\linewidth}{#1}}\par}
+\title{Proof Audit Report: Covered Regenerative Recoverability}
+\author{Same-family provisional proof review}
+\date{11 August 2026}
+\begin{document}
+\maketitle
+
+\section{Verdict}
+The canonical theorem is internally \textbf{VERIFIED-CONDITIONAL}.  The final
+fresh review reports zero fatal, critical, major, or minor issues.  This is a
+same-family provisional semantic judgment and is not a physical calibration or
+hardware-safety judgment.
+
+\section{Issue overview}
+\begin{longtable}{p{0.12\linewidth}p{0.14\linewidth}p{0.22\linewidth}p{0.42\linewidth}}
+\toprule
+Round & Result & Repair strategy & Disposition \\
+\midrule
+1 & Fail & Weaken claim; strengthen assumptions; add derivations &
+1 fatal, 8 critical, 4 major, and 1 minor issue repaired \\
+2 & Fail & Close rank, support, horizon, and branch quantifiers &
+All remaining global gaps repaired in the canonical statement \\
+3 & Warn & Normalize types, symbols, and dependency arrows &
+Three minor notation issues repaired \\
+4 & Pass & Blind normalized review & Empty issue ledger \\
+5 & Pass & Round-5 hash closure audit & Empty issue ledger \\
+6 & Warn & Publication-authority current-hash audit & Two cosmetic documentation issues repaired \\
+7 & Pass & Final post-edit hash closure audit & Empty issue ledger; exact five-hash tuple bound \\
+8 & Pass & Provenance-stable final hash audit & Empty issue ledger; all five hashes stable before/after review \\
+\bottomrule
+\end{longtable}
+
+\section{Before and after logic chain}
+\beforebox{The historical chain used endpoint successor membership, clipped
+energy, an incompletely typed recovery level, action-level predecessor
+shorthand, and an overlong validity horizon.  Concrete one-dimensional and
+finite-graph counterexamples broke the collision, energy, and lifecycle
+claims.}
+
+\afterbox{The repaired chain is: primitive calibrated complete-step outer
+sets; a finite selected-child recovery DAG; a finite nonnegative stored energy
+supersolution; the recoverable set; directly verified complete action supports;
+and an exhaustive RUN/KAPPA/CHARGE/HOLD/DEPART relation.  Conclusions stop
+before the first uncovered existing transition.}
+
+\section{Key derivations}
+For a positive-rank recovery node $\nu$ and its selected child $\mu$,
+\[
+ d_0+\mathrm{tail}
+ \le \bar d_\nu+E_\mu
+ \le \bar d_\nu+\max_{\lambda\in\mathrm{Child}(\nu)}E_\lambda
+ \le E_\nu.
+\]
+Strong induction on the nonnegative selected rank therefore gives
+$J_{\mathrm{cov}}^\kappa\le E_\nu$ on paths covered through arrival.
+The executable reserve is preserved because
+\[
+ e^-(x^+)\ge e^-(x)-\bar d_\nu
+ \ge E_\nu+e_G+m_e-\bar d_\nu
+ \ge E_\mu+e_G+m_e.
+\]
+
+\section{Proof-obligation disposition}
+The typed symbols, closed quantifiers, complete support checks, selected-rank
+base and step, charging and departure branches, pending-task transition rule,
+and dependency DAG are discharged.  Physical outer-set soundness, true-FREE
+soundness, recovery-cost domination, charging-envelope soundness, complete
+interval publication, WCET, and hardware qualification remain assumptions or
+external evidence requirements.
+
+\section{Counterexample pass}
+The review attempted obstacle-crossing endpoints, clipped negative energy,
+state-dependent reserve growth, zero-cost loops, overlapping cells,
+safe-singleton/unsafe-support inheritance, endpoint-only charging, unsafe
+full-battery departure, task mutation, certificate truncation, and
+mode-incompatible initial states.  Each surviving historical counterexample
+caused a premise or conclusion repair; none survives the final displayed
+premises.  The final audit also tested a valid preview followed by
+publication-time coverage loss; the uncovered command lies outside the positive
+theorem and cannot inherit certified kappa authority.
+
+\warningbox{Software tests and synthetic numerical certificates are evidence
+for implementation semantics only.  They do not prove the imported physical
+premises.  Cross-family semantic review is also not present.}
+
+\section{Artifact status}
+This source was emitted by the proof-checker workflow.  No LaTeX engine
+(pdflatex, xelatex, tectonic, or latexmk) is installed in the execution
+environment, so a compiled PDF is not claimed.
+
+\end{document}

@@ -1,0 +1,10 @@
+{
+  "verdict": "PASS",
+  "review_independence": "same-family",
+  "acceptance_status": "provisional",
+  "blocking_issues": [],
+  "warnings": [],
+  "source": "PROOF_AUDIT.md",
+  "output": "PROOF_AUDIT.html",
+  "source_hash_match": true
+}

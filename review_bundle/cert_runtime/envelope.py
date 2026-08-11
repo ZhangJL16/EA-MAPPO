@@ -99,6 +99,8 @@ class SuccessorEnvelope:
     velocity: Interval3
     energy_low: float
     energy_high: float
+    swept_position: Interval3
+    energy_prefix_low: float
     geometry_version_range: tuple[int, int]
     corridor_version_range: tuple[int, int]
     requires_update_revalidation: bool
@@ -189,13 +191,36 @@ class SuccessorEnvelopeBuilder:
         acceleration_interval = Interval3.from_intervals(acceleration_components)
         energy_upper = self.energy.cost_upper(acceleration_interval, velocity_initial)
         energy_cost = Interval(0.0, energy_upper)
-        energy_raw = energy_initial - energy_cost
-        energy_successor = Interval(max(0.0, energy_raw.low), max(0.0, energy_raw.high))
+        # The plant terminates after depletion but does not saturate remaining
+        # energy at zero.  Preserve negative terminal successors so the outer
+        # envelope contains the actual plant transition.
+        energy_successor = energy_initial - energy_cost
+        position_successor = Interval3.from_intervals(position_components)
+        # The synthetic plant's collision contract is the complete straight
+        # segment from the uncertain initial position to the uncertain endpoint.
+        # Their componentwise hull therefore contains every such segment.
+        swept_position = Interval3(
+            tuple(
+                round_down(min(position_initial.low[index], position_successor.low[index]))
+                for index in range(3)
+            ),
+            tuple(
+                round_up(max(position_initial.high[index], position_successor.high[index]))
+                for index in range(3)
+            ),
+        )
+        # Energy expenditure is nonnegative under EnergyBounds and the plant
+        # deducts the realized cost monotonically over the step (atomically at
+        # its endpoint in the synthetic implementation).  The minimum over the
+        # complete prefix is consequently bounded by the endpoint lower bound.
+        energy_prefix_low = min(energy_initial.low, energy_successor.low)
         return SuccessorEnvelope(
-            Interval3.from_intervals(position_components),
+            position_successor,
             Interval3.from_intervals(velocity_components),
             energy_successor.low,
             energy_successor.high,
+            swept_position,
+            energy_prefix_low,
             (geometry_version, geometry_version + 1),
             (corridor_version, corridor_version + 1),
             True,

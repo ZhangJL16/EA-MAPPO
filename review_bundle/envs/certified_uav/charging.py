@@ -80,27 +80,64 @@ class ChargingDynamics:
             and plant.terminal.is_charge_admissible(plant.state)
         )
 
-    def step(self, plant: CertifiedSingleUAVPlantEnv, certificate_epoch: str) -> ChargingStepResult:
+    def step(
+        self,
+        plant: CertifiedSingleUAVPlantEnv,
+        certificate_epoch: str,
+        hold_action: np.ndarray | None = None,
+    ) -> ChargingStepResult:
         if not self.can_charge(plant):
             raise RuntimeError("CHARGING_NOT_ADMISSIBLE")
         before = plant.state.copy()
-        after_energy = min(self.config.battery_capacity, before.energy + self.config.gain_per_step(plant.config.dt))
+        if hold_action is None:
+            position = before.position.copy()
+            velocity = before.velocity.copy()
+            energy_before_charge = before.energy
+            energy_cost = 0.0
+            collision = False
+            published = np.zeros(3, dtype=np.float64)
+            measured = published.copy()
+            plant.step_count += 1
+            truncated = plant.step_count >= plant.config.episode_limit
+        else:
+            published = np.asarray(hold_action, dtype=np.float64)
+            _, _, terminated, truncated, info = plant.step(published)
+            motion_telemetry = info["telemetry"]
+            measured = motion_telemetry.action_trace.measured.copy()
+            position = plant.state.position.copy()
+            velocity = plant.state.velocity.copy()
+            energy_before_charge = plant.state.energy
+            energy_cost = motion_telemetry.energy_cost
+            collision = motion_telemetry.collision
+            if terminated or not self.can_charge(plant):
+                raise RuntimeError("CERTIFIED_CHARGER_HOLD_VIOLATED")
+        after_energy = min(
+            self.config.battery_capacity,
+            energy_before_charge + self.config.gain_per_step(plant.config.dt),
+        )
         plant.state = UAVPhysicalState(
-            before.position.copy(),
-            before.velocity.copy(),
+            position,
+            velocity,
             after_energy,
             before.timestamp + plant.config.dt,
         )
-        plant.step_count += 1
         plant.last_lidar = plant.lidar_model.measure(plant.state, plant.world, plant.np_random)
-        zero = np.zeros(3, dtype=np.float64)
-        trace = ActionTrace(None, None, zero, zero, zero, False, "CHARGER_HOLD", certificate_epoch)
+        trace = ActionTrace(
+            None,
+            None if hold_action is None else published,
+            published,
+            published,
+            measured,
+            False,
+            "CHARGER_HOLD",
+            certificate_epoch,
+        )
         telemetry = StepTelemetry(
             before,
             plant.state.copy(),
             trace,
-            0.0,
-            False,
+            energy_cost,
+            collision,
             plant.terminal.is_charge_admissible(plant.state),
             plant.last_lidar,
             certificate_epoch,
@@ -109,9 +146,9 @@ class ChargingDynamics:
         )
         plant.last_telemetry = telemetry
         return ChargingStepResult(
-            after_energy - before.energy,
+            after_energy - energy_before_charge,
             telemetry,
-            plant.step_count >= plant.config.episode_limit,
+            truncated,
         )
 
     def apply_during_motion_cycle(

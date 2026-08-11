@@ -597,8 +597,10 @@ class PersistentGoalCertificateProvider:
             scenario=scenario,
             config=self.runtime.config,
             calibration=self.runtime.calibration,
+            geometry=self.runtime.geometry,
             envelope_builder=self.runtime.envelope_builder,
             recovery_policy=self.runtime.recovery_policy,
+            flight_energy_multiplier=self.runtime.flight_energy_multiplier,
         )
         return MultiStepSyntheticMissionCertificateProvider(proxy, self.runtime.generator_center_mode)
 
@@ -673,6 +675,7 @@ class PersistentGoalCertificateProvider:
                     context.recovery_level,
                     context.root_index,
                     context.task_successor_cell_id,
+                    context.recovery_successor_level,
                 )
             elif self.charging_support_required:
                 restricted, restricted_certificate = verifier.restrict_to_charging_set(
@@ -732,6 +735,22 @@ class PersistentGoalCertificateProvider:
         self.providers[self.active_edge_id].commit_execution(context, task_action_executed)
         self.last_context = self.providers[self.active_edge_id].last_context
 
+    def recovery_commitment_state(self) -> dict[str, Any]:
+        return {
+            "active_recovery_edge_id": self.active_edge_id,
+            **self.providers[self.active_edge_id].recovery_commitment_state(),
+        }
+
+    def committed_recovery_successor_is_terminal(self, state, context=None) -> bool:
+        provider = self.providers[self.active_edge_id]
+        selected = provider.last_context if context is None else context
+        return provider.committed_recovery_successor_is_terminal(state, selected)
+
+    def committed_recovery_successor_is_valid(self, state, context=None) -> bool:
+        provider = self.providers[self.active_edge_id]
+        selected = provider.last_context if context is None else context
+        return provider.committed_recovery_successor_is_valid(state, selected)
+
     def verify_task_action(self, state, action: np.ndarray) -> bool:
         context = self.evaluate(state)
         result = self.recoverability_verifiers[self.active_edge_id].certify_point_action(
@@ -780,6 +799,14 @@ class PersistentGoalCertificateProvider:
 
     def certified_station_hold(self, state) -> bool:
         return self.recoverability_verifiers[self.active_edge_id].certified_station_hold(state)
+
+    def certified_station_hold_action(self, state) -> np.ndarray | None:
+        return self.recoverability_verifiers[self.active_edge_id].certified_station_hold_action(state)
+
+    def certified_station_hold_action_is_valid(self, state, action: np.ndarray) -> bool:
+        return self.recoverability_verifiers[
+            self.active_edge_id
+        ].certified_station_hold_action_is_valid(state, action)
 
     def required_departure_energy(self, task: PersistentGoalTask | None) -> float:
         if task is None:

@@ -1,0 +1,2 @@
+{"episode_step": 886, "event": "ENERGY_STRANDED", "goal_id": "episode-0-goal-0", "position": [0.5535065344810491, 2.034416862249376, 1.9465812826156614], "state_of_charge": 0.0, "training_seed": 0, "training_step": 886}
+{"episode_step": 906, "event": "ENERGY_STRANDED", "goal_id": "episode-1-goal-0", "position": [2.58561447792053, 0.05, 0.05599444046020509], "state_of_charge": 0.0, "training_seed": 0, "training_step": 5906}

@@ -1,5 +1,11 @@
 # Persistent Goal Stream with Certified Recoverability Backup
 
+The independent 2x-energy recovery-teacher protocol is documented in
+`docs/CERTIFIED_RECOVERY_TEACHER_2X.md`. It reuses the frozen foundation here and
+only revalidates energy-related numerical bounds with the simulator's exact
+`flight_energy_multiplier`; it does not alter the theory or expose certificate
+quantities to the clean SB3 actor observation.
+
 ## Status and scope
 
 The main persistent method has one trainable policy: `PersistentGeneratorSAC`. It emits only a
@@ -36,21 +42,22 @@ full-rank and must pass the recoverability verifier.
 
 ## Recoverability certificates
 
-The frozen recovery-energy field retains its undiscounted robust first-passage meaning. Define
+The exact joint first-passage value and executable upper certificate are distinct; the canonical definitions and proof are in `docs/theory/PAPER_THEOREM.md`. Define recoverability using lower battery energy:
 
 \[
 \mathcal R=\{z:\text{a valid certified kappa chain exists and }
-e-E^\kappa(z)-e_G-m_e\ge 0\}.
+e^--E^\kappa(z)-e_G-m_e\ge 0\}.
 \]
 
 Membership means kappa is available as a certified backup; it does not mean kappa currently has
-control. The admissible learned-action authority is
+control. Runtime certifies complete action supports. The recoverability predecessor collection is
 
 \[
-\mathcal A_{\rm rec}(z)=\{a:\operatorname{Post}(z,a)\subseteq\mathcal R\}.
+\mathfrak A_{\rm rec}(z)=\{S\subseteq\mathcal A_{\rm act}(z):
+\widehat{\operatorname{Post}}_{\Xi_S}(z,S)\subseteq\mathcal R\}.
 \]
 
-`Post` is the uncertainty-aware interval/zonotope successor envelope. The verifier jointly checks
+`Post_hat` is the uncertainty-aware interval/zonotope successor envelope; true `Post` is the physical relation. The verifier jointly checks
 actuator limits, velocity bounds, swept FREE geometry, tracking/dynamics bounds, and the successor
 energy inequality
 
@@ -58,10 +65,11 @@ energy inequality
 e^+_{\rm lower}\ge E^\kappa(z^+)_{\rm upper}+e_G+m_e.
 \]
 
-The state-level Generator is accepted only after complete-set verification:
+The state-level Generator is accepted only after direct complete-set verification of recoverability and the full actuator, swept-tube, collision, velocity, energy-prefix, and version schema:
 
 \[
-c(z)+G(z)[-1,1]^3\subseteq\mathcal A_{\rm rec}(z).
+C_{\rm run}(z)=c(z)+G(z)[-1,1]^3\in\mathfrak A_{\rm safe}(z)
+\subseteq\mathfrak A_{\rm rec}(z).
 \]
 
 No sampled action, center, or finite rollout substitutes for this inclusion check.
@@ -69,7 +77,7 @@ No sampled action, center, or finite rollout substitutes for this inclusion chec
 ## T_REC1 and T_REC2
 
 **T_REC1 (one-step recoverability preservation).** If `z_t` belongs to `R` and runtime publishes an
-action from a verified `C_run(z_t) subset A_rec(z_t)`, every state represented by the certified
+action from a directly verified complete support `C_run(z_t) in A_safe_set(z_t)`, every state represented by the certified
 successor envelope belongs to `R`.
 
 **T_REC2 (recursive recoverability).** If `z_0` belongs to `R` and every learned action is published
@@ -78,31 +86,55 @@ This preserves the existence of a certified recovery option; it does not claim t
 policy itself returns to the station.
 
 At the configured interior switching margin, `NO_GENERATOR_SET`, invalid evidence/version,
-watchdog failure, or another task-certificate failure, authority switches to kappa. The existing
+or a task-worker failure covered by the independent staged publisher, authority switches to kappa. Publisher/bus/watchdog failure itself is outside the positive theorem unless an independent hardware fail-safe proves publication. The existing
 strict corridor descent and E3 energy recursion then provide the conditional finite-time return
-result. If kappa's own certificate is invalid, execution fails closed.
+result. If kappa's own certificate is invalid, execution fails closed. A valid kappa preview is not
+sufficient: if the final publication-time recheck loses coverage after an RL, kappa, or nominal
+preview, the published bookkeeping command is labelled `uncertified_emergency_brake`, authority is
+`FAIL_CLOSED`, the episode terminates, no recovery child is committed, and the Bellman continuation
+is zero. Mid-cycle certificate-version mutation is handled by the same rule. A preview already
+classified `FAIL_CLOSED` uses a dedicated path that does not re-evaluate recovery and therefore
+cannot resurrect kappa or advance a proof child.
 
 ## Voluntary charging and departure
 
 Voluntary station approach is inferred from continuous behavior, not a discrete policy output. If
-the UAV reaches the charging admissible set without backup takeover, RL authority remains active and
-the visit is logged as voluntary. Remaining inside the set at admissible velocity applies synthetic
-net charging
+a covered normal flight ends in both `R` and the charging-admissible set, a fresh
+successor-bound station-hold certificate permits the zero-duration
+`RUN-ARRIVE` mode update and the visit is logged as voluntary. The flight
+interval receives no charging gain. Charging begins only on a later transition
+whose source is `CHARGING_RL`; remaining inside the set then executes the
+certified physical hold and applies synthetic charging
 
 \[
-e_{t+1}=\min(e_{\max},e_t+r_c\Delta t).
+e_{t+1}=\min(e_{\max},e_t-d_E(z_t,h_t,w_t)+r_c\Delta t).
 \]
 
 The fixture uses capacity `30.0`, rate `2.0` units/s, and `dt=0.2` s (`0.4` units per cycle).
 These are not calibrated physical values.
 
 While the departure gate is closed, the certificate path constructs
-`C_charge(z) subset A_rec(z) intersection A_stay(z)`, where every successor remains in the charging
-set. The normal accepted policy action is therefore also the physically executed action; unsafe
+`C_charge(z) in A_charge_set(z)`, whose direct complete-support certificate checks actuator bounds, the swept tube, the nonnegative energy prefix, current versions, and that every successor remains in the charging
+set, including the lower-energy condition before charge is added. The normal accepted policy action is therefore also the physically executed action; unsafe
 departure directions are absent from its support rather than post-hoc replaced. When the departure
-energy and manifest checks pass, the ordinary `C_run subset A_rec` support is restored. Certified
-zero hold remains only an explicit certificate/numerical fallback. The pending goal is unchanged,
+energy and manifest checks pass, the ordinary directly verified `C_run in A_safe_set` support is restored. A state-dependent certified hold remains only an explicit certificate/numerical fallback and is physically executed and recorded. The pending goal is unchanged,
 and future charging never reduces the energy required to reach the station from a flight state.
+
+Execution sources are mode and rank restricted. A certified `kappa` step
+requires a positive selected recovery level and a non-charging source. At level
+zero, normal authority may execute `RUN-N` or `RUN-ARRIVE`, but cannot fabricate
+a recovery step. In `CHARGING_RL`, a closed departure gate admits only verified
+constrained charging or hold, and an open gate admits only verified departure;
+missing support fails closed without recovery-child commitment.
+
+After every covered κ interval, runtime reads back the exact child named by the
+published recovery certificate. A positive-rank child remains active in
+`BACKUP_RECOVERY` even when its realized state geometrically overlaps the
+charging terminal. Only the exact committed level-zero child, together with a
+fresh station-hold check, performs the zero-duration `KAPPA-ARRIVE` update. The
+active child identifier, rank, and hash are part of the certificate snapshot;
+they cannot be cleared or replaced between readback and mode commit. Like
+`RUN-ARRIVE`, this update adds no same-step charging gain.
 
 ## Manifest and policy-authority gates
 
@@ -144,7 +176,8 @@ backup atoms do not. `c` and `G` remain detached during actor updates.
 `PersistentExecutionAuthority` is the single immutable classifier used to serialize runtime
 authority into replay. Its outcomes are `RL_GENERATOR`, `KAPPA_BACKUP`, `CHARGER_CONSTRAINED`, and
 `FAIL_CLOSED`. `PersistentGeneratorSAC` selects its next-state Bellman branch from that recorded
-authority, not merely from mathematical Generator existence. A mandatory next-step backup uses
+authority, not merely from mathematical Generator existence or a pre-publication preview. A
+mandatory next-step backup uses
 `kappa(z_next)` without Generator entropy; a closed charger uses the certified `C_charge` Generator
 when available, otherwise an explicitly recorded atomic hold; fail-closed next states do not
 bootstrap. This is runtime/training semantic closure, not a new SAC convergence claim.
@@ -171,8 +204,10 @@ The main path separates physical/certificate state `x` from externally assigned 
 The actor is goal-conditioned, `pi_theta(a | x, g)`, but the certified support is not:
 
 ```text
-A_safe(x) = A_act(x) intersect A_col(x) intersect A_rec(x)
-C_run(x) = c(x) + G(x)[-1,1]^3 subset A_safe(x)
+A_rec_set(x) = {S subset A_act(x) : Post_hat_Xi_S(x,S) subset R}
+A_safe_set(x) = {S in A_rec_set(x) : the complete swept-tube,
+                 collision, velocity, energy-prefix, and version predicates hold}
+C_run(x) = c(x) + G(x)[-1,1]^3 belongs to A_safe_set(x)
 ```
 
 `CertifiedRecoverabilityAtlas` covers a certified subset of the free workspace with recovery
@@ -192,7 +227,7 @@ certified atlas, the existing T_REC initialization premise holds.
 
 **T_RAND2 (goal-independent recursive recoverability).** For any admissible goal sequence and any
 goal-conditioned learned policy, T_REC2 remains valid when every normal action is published from
-the task-independent `C_run(x) subset A_rec(x)`. This guarantees recoverability, not sampled-goal
+the task-independent directly verified `C_run(x) in A_safe_set(x)`. This guarantees recoverability, not sampled-goal
 completion.
 
 **T_RAND3 (goal-independent support).** At identical physical/certificate state and versions,
@@ -202,29 +237,35 @@ and atlas identity unchanged. Actor output may change.
 ## Recovery versus RL-authority viability
 
 `R` contains every state with a certified finite kappa return and sufficient recovery energy.
-`R_RL` is the task-independent atlas fixed point of recoverable cells that also have full-rank
-Generator support with a complete successor in `R_RL` or `G_charge`.  Therefore
-`R_RL subset R`; cells in `R` but outside `R_RL` remain legitimate kappa-only recovery cells.
+An ideal energy-augmented `R_RL` would be the task-independent atlas fixed point of recoverable
+cells that also have full-rank Generator support with a complete successor in `R_RL` or
+`G_charge`. Therefore `R_RL subset R`; cells in `R` but outside `R_RL` remain legitimate
+kappa-only recovery cells. The current implementation computes only a topology/cell-ID candidate
+kernel and does not establish equality with this state-level fixed point.
 
-Normal support additionally satisfies `C_run subset A_cont`, where `A_cont` preserves `R_RL` or
-enters the certified charging set.  The safety-neutral center may apply atlas-state feedback needed
-for this invariant support, but it receives no goal, task route, waypoint, or reward.  Goal changes
-must leave `R`, `R_RL`, `E^kappa`, `c`, `G`, continuation target, and certificate identity unchanged.
+The canonical safety theorem requires `C_run in A_safe_set` and hence return to `R`. The optional
+stronger normal-authority theorem would additionally require direct complete-support continuation into `R_RL union G_charge`, where `A_cont`
+preserves `R_RL` or enters the certified charging set. The safety-neutral center may apply
+atlas-state feedback needed for invariant support, but it receives no goal, task route, waypoint,
+or reward. Goal changes must leave `R`, `E^kappa`, `c`, `G`, and certificate identity unchanged;
+an implemented stronger capability would also bind `R_RL` and its continuation target.
 
 The charging terminal has a formal level-zero recovery certificate.  It binds terminal geometry,
 dynamics, tracking, energy, terminal and kappa versions, and the atlas core hash; its recovery
-energy upper bound is zero. It additionally binds a local terminal hold controller whose complete
+energy upper bound is exactly zero. It additionally binds a local terminal hold controller whose complete
 successor envelope must stay in the charging set; zero-step recovery therefore does not imply a
 zero acceleration command in the presence of residual velocity. This prevents completed recovery
 from being reinterpreted as a missing nonterminal successor. A closed departure gate uses charger-constrained support or certified hold;
-an open departure is accepted only when its complete successor returns to `R_RL`.
+an open departure in the canonical theorem is accepted only when its complete successor returns to
+`R`. Returning to `R_RL` is an optional stronger gate that the current candidate kernel does not
+certify at state level.
 
 Generator-SAC diagnostics decompose normalized and physical log density. The physical density keeps
-the affine determinant term exactly. The controlled normalized-temperature candidate changes only
-the automatic alpha residual to use `log pi_eta`; actor and Bellman terms still use `log pi_a`, so
-the executed policy density and certificate semantics are unchanged. This is equivalent to a
-state-dependent physical entropy target shifted by `log|det G|` and is invariant to uniform affine
-support scaling.
+the affine determinant term exactly. The primary default uses the normalized-coordinate alpha
+residual `log pi_eta`; actor and Bellman terms still use `log pi_a`, so the executed policy density
+and certificate semantics are unchanged. This is equivalent to a state-dependent physical entropy
+target shifted by `log|det G|` and is invariant to action-unit or uniform affine-support scaling.
+A constant physical-coordinate target remains an explicit ablation rather than the primary default.
 
 The persistent reward uses `backup_intervention_cost` as an event cost only when authority first
 transfers into `KAPPA_BACKUP`. Kappa continuation does not repeat that intervention charge. Recovery

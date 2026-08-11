@@ -73,7 +73,7 @@ def train_multiscenario(config: MultiScenarioTrainingConfig) -> dict:
     scenario_sequence = []
     latest_update = {}
     for environment_step in range(1, config.total_steps + 1):
-        if context["certificate_epoch"] != active["certificate_manifest_hash"]:
+        if context.get("certificate_manifest_hash") != active["certificate_manifest_hash"]:
             raise RuntimeError("scenario/certificate manifest mismatch")
         phase = environment.task_env.phase.name
         u = rng.normal(size=3) if environment_step <= config.warmup_steps else agent.select_u(observation)

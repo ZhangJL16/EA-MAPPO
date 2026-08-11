@@ -127,15 +127,20 @@ def validate_scenario(name: str, seeds: tuple[int, ...], endurance_steps_per_see
             trace.append(str(info.get("execution_authority")))
             invalid_kappa |= info.get("backup_reason") == "KAPPA_CERTIFICATE_INVALID"
             fail_closed |= info.get("execution_authority") == ExecutionAuthority.FAIL_CLOSED.value
-            if environment.plant.terminal.is_charge_admissible(environment.plant.state):
+            if (
+                info.get("kappa_station_arrival") is True
+                and environment.task_env.mode == PersistentMissionMode.CHARGING_RL
+            ):
                 backup_reached_terminal = True
                 break
             if terminated or truncated:
                 break
-        environment.task_env.enter_charging(voluntary=False)
+        if not backup_reached_terminal:
+            failures.append(f"seed={seed}:backup-did-not-reach-committed-terminal-child")
         environment.plant.state.energy = (
             environment.plant.scenario.terminal.minimum_energy + atlas.energy_reserve + 0.05
         )
+        environment._context_cache_key = None
         context = environment._refresh_context()
         terminal_valid = bool(
             context.get("certificate_valid")
@@ -144,19 +149,43 @@ def validate_scenario(name: str, seeds: tuple[int, ...], endurance_steps_per_see
             and np.isfinite(context.get("energy_margin"))
         )
         energy_before_charge = environment.plant.state.energy
+        departure_succeeded = False
+        post_departure_rl = False
         for _ in range(4):
             _, _, terminated, truncated, info = environment.step(np.zeros(3, dtype=np.float64))
             trace.append(str(info.get("execution_authority")))
             invalid_kappa |= info.get("backup_reason") == "KAPPA_CERTIFICATE_INVALID"
             fail_closed |= info.get("execution_authority") == ExecutionAuthority.FAIL_CLOSED.value
+            # Charging may cross the departure threshold during this bounded
+            # dwell loop.  A covered DEPART is already the lifecycle event we
+            # seek; do not issue a stale extra TASK_RL step from the rank-zero
+            # terminal node and misclassify that validator artifact as a
+            # runtime departure failure.
+            if environment.task_env.mode == PersistentMissionMode.TASK_RL:
+                departure_succeeded = True
+                next_context = environment._refresh_context()
+                post_departure_rl = bool(
+                    next_context.get("rl_authority_set_member")
+                    and next_context.get("execution_authority")
+                    == ExecutionAuthority.RL_GENERATOR.value
+                )
+                break
             if terminated or truncated:
                 break
         charging_increased = environment.plant.state.energy > energy_before_charge
-        departure_succeeded = False
-        post_departure_rl = False
         departure_oracle = BestInGeneratorGoalOracle()
-        for _ in range(80):
+        for _ in range(0 if departure_succeeded else 80):
             context = environment._refresh_context()
+            if context.get("c") is None or context.get("G") is None:
+                _, _, terminated, truncated, info = environment.step(
+                    np.zeros(3, dtype=np.float64)
+                )
+                trace.append(str(info.get("execution_authority")))
+                invalid_kappa |= info.get("backup_reason") == "KAPPA_CERTIFICATE_INVALID"
+                fail_closed |= info.get("execution_authority") == ExecutionAuthority.FAIL_CLOSED.value
+                if terminated or truncated:
+                    break
+                continue
             task = environment.task_env.manager.current_task
             goal = environment.plant.state.position if task is None else task.goal_position
             eta = departure_oracle.select_eta(

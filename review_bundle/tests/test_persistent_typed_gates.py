@@ -161,6 +161,7 @@ class TypedEdgeSemanticsTests(unittest.TestCase):
             departure_allowed=True,
             charging_support_verified=False,
             station_hold_valid=False,
+            recovery_level=1,
         ))
         self.assertEqual(decision.authority, ExecutionAuthority.KAPPA_BACKUP)
         self.assertEqual(decision.reason, "NO_GENERATOR_SET")

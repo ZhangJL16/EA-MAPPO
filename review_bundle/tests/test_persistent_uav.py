@@ -87,6 +87,20 @@ class ChargingDynamicsTests(unittest.TestCase):
         self.assertEqual(plant.state.energy, 30.0)
         np.testing.assert_array_equal(plant.state.position, position)
 
+    def test_certified_hold_action_is_physically_executed_and_recorded(self):
+        _, _, network, plant = persistent_fixture()
+        plant.reset(seed=3)
+        plant.state.position = network.nodes[network.charging_station].position.copy()
+        plant.state.velocity = np.zeros(3)
+        plant.state.energy = 5.0
+        action = np.array([0.01, 0.0, 0.0])
+        result = ChargingDynamics().step(plant, "runtime-epoch", hold_action=action)
+        self.assertGreater(plant.state.position[0], network.nodes[network.charging_station].position[0])
+        np.testing.assert_allclose(result.telemetry.action_trace.published, action)
+        np.testing.assert_allclose(result.telemetry.action_trace.measured, action)
+        self.assertEqual(result.telemetry.action_trace.certificate_epoch, "runtime-epoch")
+        self.assertGreater(result.telemetry.energy_cost, 0.0)
+
     def test_station_arrival_does_not_terminate_persistent_but_can_terminate_single_mode(self):
         scenario, config, network, persistent_plant = persistent_fixture()
         persistent_plant.reset(seed=3)

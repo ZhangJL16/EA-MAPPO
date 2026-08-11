@@ -12,6 +12,7 @@ from cert_runtime.persistent_authority import (
     PersistentAuthorityInput,
     PersistentExecutionAuthority,
 )
+from cert_runtime.trainer import CertificateEpoch
 from cert_runtime.energy_management import (
     EnergyDecision,
     EnergyManagementPolicy,
@@ -544,11 +545,14 @@ class PersistentRuntimeWrapper(gym.Env[np.ndarray, np.ndarray]):
     def _activate_current_edge(self) -> None:
         edge = getattr(self.task_env.manager, "active_edge", None)
         if edge is not None and self.certificate_provider is not None:
-            self.certificate_provider.activate_edge(edge.edge_id)
+            with self.runtime.certificate_state_transaction():
+                self.certificate_provider.activate_edge(edge.edge_id)
 
     def _refresh_context(self) -> dict[str, Any]:
         task = self.task_env.manager.current_task
         goal = self.plant.state.position if task is None else task.goal_position
+        self._activate_current_edge()
+        certificate_snapshot = self.runtime._certificate_state().snapshot()
         cache_key = (
             tuple(np.asarray(self.plant.state.position, dtype=np.float64)),
             tuple(np.asarray(self.plant.state.velocity, dtype=np.float64)),
@@ -557,14 +561,17 @@ class PersistentRuntimeWrapper(gym.Env[np.ndarray, np.ndarray]):
             None if task is None else task.task_id,
             tuple(np.asarray(goal, dtype=np.float64)),
             self._time_since_last_charge,
+            certificate_snapshot,
         )
         if cache_key == self._context_cache_key and self._context_cache is not None:
             return self._context_cache
-        self._activate_current_edge()
         charging_state = self.task_env.mode == PersistentMissionMode.CHARGING_RL
         departure = self._departure_gate() if charging_state else DepartureGateResult(True, 0.0, None)
         if self.certificate_provider is not None:
-            self.certificate_provider.configure_charging_support(charging_state and not departure.allowed)
+            with self.runtime.certificate_state_transaction():
+                self.certificate_provider.configure_charging_support(
+                    charging_state and not departure.allowed
+                )
         context = self.runtime.preview_next_action_context()
         required = float(context.get("recovery_energy_required") or float("inf"))
         margin = float(context.get("energy_margin") if context.get("energy_margin") is not None else float("-inf"))
@@ -616,6 +623,7 @@ class PersistentRuntimeWrapper(gym.Env[np.ndarray, np.ndarray]):
             station_hold_valid=station_hold_valid,
             rl_authority_member=context.get("rl_authority_set_member") is True,
             continuation_action_verified=context.get("continuation_action_verified") is True,
+            recovery_level=context.get("recovery_level"),
         )
         self._last_authority_decision = PersistentExecutionAuthority.evaluate(authority_input)
         result = context | {
@@ -643,8 +651,10 @@ class PersistentRuntimeWrapper(gym.Env[np.ndarray, np.ndarray]):
         return self.certificate_provider.required_departure_energy(self.task_env.manager.current_task)
 
     def _departure_gate(self) -> DepartureGateResult:
+        certificate_state = self.runtime._certificate_state()
+        energy_lower = float(certificate_state.energy - certificate_state.energy_error_radius)
         return verify_departure_energy(
-            self.plant.state.energy,
+            energy_lower,
             self._departure_required(),
             self.charging.config.departure_energy_margin,
             self.certificate_provider is not None and self.certificate_provider.gate_pass,
@@ -680,6 +690,7 @@ class PersistentRuntimeWrapper(gym.Env[np.ndarray, np.ndarray]):
                 station_hold_valid=False,
                 rl_authority_member=context.get("rl_authority_set_member") is True,
                 continuation_action_verified=context.get("continuation_action_verified") is True,
+                recovery_level=context.get("recovery_level"),
             ))
         if self._last_authority_decision.authority in {ExecutionAuthority.KAPPA_BACKUP, ExecutionAuthority.FAIL_CLOSED}:
             if self._last_authority_decision.reason == "RECOVERY_CERTIFICATE_INVALID" and context.get("failure_reason"):
@@ -694,25 +705,102 @@ class PersistentRuntimeWrapper(gym.Env[np.ndarray, np.ndarray]):
             self.metrics.energy_margin_at_backup.append(float(self.task_env.energy_margin))
         self.task_env.begin_backup_recovery(reason)
 
-    def _station_hold_step(self, reason: str):
+    def _execute_certified_station_hold(self, context: dict[str, Any]):
+        """Verify and execute HOLD under one certificate-state transaction."""
+
+        with self.runtime.certificate_state_transaction():
+            state = self.runtime._certificate_state()
+            hold_snapshot = state.snapshot()
+            context_epoch = context.get("runtime_certificate_epoch")
+            hold_epoch = CertificateEpoch.from_snapshot(hold_snapshot).epoch_id
+            hold_action_provider = getattr(
+                self.certificate_provider,
+                "certified_station_hold_action",
+                None,
+            )
+            hold_action = None if hold_action_provider is None else hold_action_provider(state)
+            exact_hold_verifier = getattr(
+                self.certificate_provider,
+                "certified_station_hold_action_is_valid",
+                None,
+            )
+            hold_valid = bool(
+                hold_action is not None
+                and exact_hold_verifier is not None
+                and exact_hold_verifier(state, hold_action)
+                and self.charging.can_charge(self.plant)
+            )
+            live_snapshot = self.runtime._certificate_state().snapshot()
+            snapshot_unchanged = bool(
+                context_epoch == hold_epoch
+                and state.snapshot() == hold_snapshot
+                and live_snapshot == hold_snapshot
+            )
+            if not hold_valid or not snapshot_unchanged:
+                return None, (
+                    "CERTIFICATE_VERSION_CHANGED"
+                    if not snapshot_unchanged
+                    else "CERTIFIED_CHARGER_HOLD_UNAVAILABLE"
+                )
+            certificate_epoch = str(
+                context.get("certificate_epoch", self.manifest_hash)
+            )
+            return self.charging.step(
+                self.plant,
+                certificate_epoch,
+                hold_action=hold_action,
+            ), None
+
+    def _station_hold_step(self, reason: str, context: dict[str, Any]):
         if self.certificate_provider is None:
             raise RuntimeError("persistent certificate provider is unavailable")
-        state = self.runtime._certificate_state()
-        if not self.certificate_provider.certified_station_hold(state):
-            observation = self.task_env.build_observation(self.runtime._map_encoding(), self.runtime._corridor_encoding())
+        result, hold_failure = self._execute_certified_station_hold(context)
+        if result is None:
+            observation, reward, terminated, truncated, info = self.runtime.step_fail_closed(
+                hold_failure
+            )
             self.task_env.mode = PersistentMissionMode.FAILURE
             self.task_env.phase = self.task_env.mode
-            return observation, 0.0, True, False, {
-                "failure_reason": "CERTIFIED_CHARGER_HOLD_UNAVAILABLE",
+            telemetry = info["telemetry"]
+            self.metrics.total_steps += 1
+            self.metrics.energy_consumed += telemetry.energy_cost
+            self.metrics.fail_closed_steps += 1
+            self.metrics.collision_count += int(telemetry.collision)
+            task = self.task_env.manager.current_task
+            goal = None if task is None else np.asarray(task.goal_position, dtype=np.float64).copy()
+            return observation, reward, terminated, truncated, info | {
+                "failure_reason": hold_failure.lower(),
+                "execution_authority": ExecutionAuthority.FAIL_CLOSED.value,
+                "execution_authority_reason": hold_failure,
+                "generator_executable": False,
+                "charging_restriction": True,
+                "station_hold_valid": False,
+                "charging_support_verified": False,
+                "backup_triggered": False,
+                "backup_started_now": False,
+                "backup_reason": None,
                 "departure_rejected": True,
                 "departure_rejection_reason": reason,
-                "command_source": "none",
+                "persistent_mode": self.task_env.mode.name,
+                "charging": False,
+                "task_id": None if task is None else task.task_id,
+                "current_goal_id": None if task is None else task.task_id,
+                "goal_before": goal,
+                "current_goal": goal,
+                "task_completed_now": False,
+                "task_assigned_now": False,
+                "tasks_completed": self.task_env.manager.tasks_completed,
+                "required_return_energy": self.task_env.required_return_energy,
+                "energy_margin": self.task_env.energy_margin,
+                "action_context": context,
+                "persistent_manifest_hash": self.manifest_hash,
+                "persistent_metrics": self.metric_snapshot(),
             }
-        result = self.charging.step(self.plant, self.manifest_hash)
         self.task_env.episode_step += 1
         self.metrics.total_steps += 1
         self.metrics.charging_steps += 1
         self.metrics.energy_charged += result.charged_energy
+        self.metrics.energy_consumed += result.telemetry.energy_cost
         self.metrics.departure_rejection_count += 1
         self.metrics.charger_constrained_steps += 1
         self._time_since_last_charge = 0
@@ -726,22 +814,48 @@ class PersistentRuntimeWrapper(gym.Env[np.ndarray, np.ndarray]):
             "backup_intervention_event_cost": 0.0,
             "charging_dwell_cost": reward,
         }
-        observation = self.task_env.build_observation(self.runtime._map_encoding(), self.runtime._corridor_encoding())
+        self._context_cache_key = None
+        self._refresh_context()
+        observation = self.task_env.build_observation(
+            self.runtime._map_encoding(),
+            self.runtime._corridor_encoding(),
+        )
+        task = self.task_env.manager.current_task
+        goal = None if task is None else np.asarray(task.goal_position, dtype=np.float64).copy()
         return observation, reward, False, result.truncated, {
             "telemetry": result.telemetry,
             "accepted": False,
             "fallback_reason": reason,
             "backup_triggered": False,
             "backup_reason": None,
-            "critic_action": np.zeros(3, dtype=np.float64),
+            "critic_action": result.telemetry.action_trace.published.copy(),
+            "certified_station_hold_action": result.telemetry.action_trace.published.copy(),
             "command_source": "charger_hold",
+            "command_published": True,
+            "covered_at_publication": True,
             "execution_authority": ExecutionAuthority.CHARGER_CONSTRAINED.value,
             "execution_authority_reason": reason,
+            "generator_executable": False,
+            "charging_restriction": True,
+            "station_hold_valid": True,
+            "charging_support_verified": False,
             "departure_attempt": True,
             "departure_rejected": True,
             "departure_rejection_reason": reason,
             "reward_components": reward_components,
             "persistent_mode": self.task_env.mode.name,
+            "charging": True,
+            "task_id": None if task is None else task.task_id,
+            "current_goal_id": None if task is None else task.task_id,
+            "goal_before": goal,
+            "current_goal": goal,
+            "task_completed_now": False,
+            "task_assigned_now": False,
+            "tasks_completed": self.task_env.manager.tasks_completed,
+            "episode_step": self.task_env.episode_step,
+            "required_return_energy": self.task_env.required_return_energy,
+            "energy_margin": self.task_env.energy_margin,
+            "action_context": context,
             "persistent_manifest_hash": self.manifest_hash,
             "persistent_metrics": self.metric_snapshot(),
         }
@@ -784,6 +898,89 @@ class PersistentRuntimeWrapper(gym.Env[np.ndarray, np.ndarray]):
             "trainable_policy_count": self.trainable_policy_count,
         }
 
+    def _commit_kappa_successor_mode(
+        self,
+        publication_context: dict[str, Any],
+        terminal_now: bool,
+    ) -> tuple[bool, str | None]:
+        """Atomically validate the committed κ child and apply KAPPA-ARRIVE."""
+
+        with self.runtime.certificate_state_transaction():
+            successor_level = publication_context.get("recovery_successor_level")
+            successor_state = self.runtime._certificate_state()
+            successor_snapshot = successor_state.snapshot()
+            successor_check_failed = False
+            try:
+                level = None if successor_level is None else int(successor_level)
+                committed_child_valid = bool(
+                    self.certificate_provider is not None
+                    and self.certificate_provider.committed_recovery_successor_is_valid(
+                        successor_state
+                    )
+                )
+                terminal_child_valid = bool(
+                    level == 0
+                    and terminal_now
+                    and self.certificate_provider is not None
+                    and self.certificate_provider.committed_recovery_successor_is_terminal(
+                        successor_state
+                    )
+                    and self.certificate_provider.certified_station_hold(successor_state)
+                )
+            except Exception:
+                level = None
+                committed_child_valid = False
+                terminal_child_valid = False
+                successor_check_failed = True
+            live_successor_snapshot = self.runtime._certificate_state().snapshot()
+            if (
+                successor_check_failed
+                or live_successor_snapshot != successor_snapshot
+                or level is None
+                or level < 0
+                or not committed_child_valid
+                or (level == 0 and not terminal_child_valid)
+            ):
+                failure = (
+                    "KAPPA_SUCCESSOR_SNAPSHOT_CHANGED"
+                    if live_successor_snapshot != successor_snapshot
+                    else "KAPPA_SUCCESSOR_CHECK_FAILED"
+                    if successor_check_failed
+                    else "KAPPA_COMMITTED_CHILD_INVALID"
+                )
+                return False, failure
+            if level == 0:
+                self.task_env.enter_charging(voluntary=False)
+                return True, None
+            return False, None
+
+    def _commit_normal_arrival_mode(self) -> tuple[bool, str | None]:
+        """Atomically certify the realized RUN successor and enter charging."""
+
+        with self.runtime.certificate_state_transaction():
+            arrival_state = self.runtime._certificate_state()
+            arrival_snapshot = arrival_state.snapshot()
+            arrival_check_failed = False
+            try:
+                certified_arrival = bool(
+                    self.certificate_provider is not None
+                    and self.certificate_provider.certified_station_hold(arrival_state)
+                )
+            except Exception:
+                certified_arrival = False
+                arrival_check_failed = True
+            live_arrival_snapshot = self.runtime._certificate_state().snapshot()
+            if arrival_check_failed or live_arrival_snapshot != arrival_snapshot:
+                return False, (
+                    "ARRIVAL_CERTIFICATE_CHECK_FAILED"
+                    if arrival_check_failed
+                    else "ARRIVAL_CERTIFICATE_VERSION_CHANGED"
+                )
+            if certified_arrival:
+                self.task_env.enter_charging(voluntary=True)
+                return True, None
+            return False, None
+
     def step(self, actor_output: np.ndarray):
         actor_u = np.asarray(actor_output, dtype=np.float64)
         if actor_u.shape != (3,):
@@ -794,29 +991,83 @@ class PersistentRuntimeWrapper(gym.Env[np.ndarray, np.ndarray]):
         if decision is None:
             raise RuntimeError("persistent execution authority was not evaluated")
         backup_reason = self._backup_reason(context)
-        if decision.authority in {ExecutionAuthority.KAPPA_BACKUP, ExecutionAuthority.FAIL_CLOSED}:
+        recovery_level = context.get("recovery_level")
+        allow_runtime_kappa_fallback = bool(
+            mode_before == PersistentMissionMode.TASK_RL
+            and recovery_level is not None
+            and int(recovery_level) > 0
+        )
+        if decision.authority == ExecutionAuthority.KAPPA_BACKUP:
             backup_reason = decision.reason
-            self._begin_backup(backup_reason)
             observation, reward, terminated, truncated, info = self.runtime.step_recovery(backup_reason)
+        elif decision.authority == ExecutionAuthority.FAIL_CLOSED:
+            # The runtime may execute an uncertified emergency-brake transition
+            # for simulator bookkeeping, but it is not a certified kappa branch
+            # and must terminate without Bellman bootstrap.
+            backup_reason = None
+            observation, reward, _, truncated, info = self.runtime.step_fail_closed(decision.reason)
+            terminated = True
+            self.task_env.mode = PersistentMissionMode.FAILURE
+            self.task_env.phase = self.task_env.mode
+            info = info | {
+                "failure_reason": decision.reason,
+                "execution_authority": ExecutionAuthority.FAIL_CLOSED.value,
+                "execution_authority_reason": decision.reason,
+                "command_source": "uncertified_emergency_brake",
+            }
         elif decision.authority == ExecutionAuthority.CHARGER_CONSTRAINED and decision.station_hold_required:
-            return self._station_hold_step(decision.reason)
+            return self._station_hold_step(decision.reason, context)
         else:
             candidate = self._candidate_from_context(actor_u, context)
             if candidate is None:
-                self._begin_backup("ACTOR_OR_GENERATOR_INVALID")
-                observation, reward, terminated, truncated, info = self.runtime.step_recovery("ACTOR_OR_GENERATOR_INVALID")
-                backup_reason = "ACTOR_OR_GENERATOR_INVALID"
+                if allow_runtime_kappa_fallback:
+                    observation, reward, terminated, truncated, info = self.runtime.step_recovery("ACTOR_OR_GENERATOR_INVALID")
+                    backup_reason = "ACTOR_OR_GENERATOR_INVALID"
+                else:
+                    observation, reward, terminated, truncated, info = self.runtime.step_fail_closed(
+                        "KAPPA_FALLBACK_DISALLOWED"
+                    )
+                    backup_reason = None
             else:
-                observation, reward, terminated, truncated, info = self.runtime.step(actor_u)
+                observation, reward, terminated, truncated, info = self.runtime.step(
+                    actor_u,
+                    allow_kappa_fallback=allow_runtime_kappa_fallback,
+                )
 
         telemetry = info["telemetry"]
         actual_authority = decision.authority
         actual_authority_reason = decision.reason
-        if not info.get("accepted", False):
+        publication_coverage_lost = bool(
+            info.get("command_source") == "uncertified_emergency_brake"
+            or info.get("covered_at_publication") is False
+        )
+        if publication_coverage_lost:
+            # A preview may have selected KAPPA_BACKUP, but execution authority
+            # is determined by the final publication-time check.  An uncovered
+            # emergency brake is a terminating fail-closed atom, never kappa.
+            publication_failure = str(
+                info.get("fallback_reason")
+                or info.get("mission_termination_reason")
+                or "RECOVERY_CERTIFICATE_INVALID"
+            )
+            terminated = True
+            backup_reason = None
+            actual_authority = ExecutionAuthority.FAIL_CLOSED
+            actual_authority_reason = publication_failure
+            self.task_env.mode = PersistentMissionMode.FAILURE
+            self.task_env.phase = self.task_env.mode
+            info = info | {
+                "failure_reason": publication_failure.lower(),
+                "mission_termination_reason": publication_failure,
+                "execution_authority": ExecutionAuthority.FAIL_CLOSED.value,
+                "execution_authority_reason": publication_failure,
+                "command_source": "uncertified_emergency_brake",
+                "covered_at_publication": False,
+            }
+        elif not info.get("accepted", False) and decision.authority != ExecutionAuthority.FAIL_CLOSED:
             runtime_reason = info.get("fallback_reason")
             if runtime_reason is not None and backup_reason is None:
                 backup_reason = str(runtime_reason)
-                self._begin_backup(backup_reason)
             if backup_reason is not None:
                 actual_authority = ExecutionAuthority.KAPPA_BACKUP
                 actual_authority_reason = backup_reason
@@ -848,23 +1099,95 @@ class PersistentRuntimeWrapper(gym.Env[np.ndarray, np.ndarray]):
         terminal_now = self.plant.terminal.is_charge_admissible(self.plant.state)
         was_charging = mode_before == PersistentMissionMode.CHARGING_RL
         left_station = False
-        if self.task_env.mode == PersistentMissionMode.TASK_RL and terminal_now and backup_reason is None:
-            self.task_env.enter_charging(voluntary=True)
-            self.metrics.voluntary_station_arrivals += 1
-            self.metrics.voluntary_return_count += 1
-            self.metrics.charging_visits += 1
-            self.metrics.energy_margin_at_station_approach.append(float(self.task_env.energy_margin))
-            self.metrics.energy_on_station_arrival.append(float(self.plant.state.energy))
-            self._station_approach_active = False
-        elif mode_before == PersistentMissionMode.BACKUP_RECOVERY and self.task_env.mode == PersistentMissionMode.CHARGING_RL and terminal_now:
-            self.metrics.charging_visits += 1
-            self.metrics.energy_on_station_arrival.append(float(self.plant.state.energy))
-        elif self.task_env.mode == PersistentMissionMode.CHARGING_RL and was_charging and not terminal_now and info.get("accepted"):
-            self.task_env.leave_station()
+        voluntary_arrival_now = False
+        kappa_arrival_now = False
+        departure_published = bool(
+            was_charging
+            and decision.departure_allowed
+            and actual_authority == ExecutionAuthority.RL_GENERATOR
+            and info.get("accepted")
+            and info.get("command_source") == "task"
+            and info.get("covered_at_publication") is True
+        )
+        if departure_published:
+            # DEPART is an atomic mode transition.  Its certified successor may
+            # lie in the geometric overlap R ∩ G_charge; remaining physically
+            # docked for this endpoint does not turn the executed departure into
+            # an open-gate charging self-loop.
+            with self.runtime.certificate_state_transaction():
+                self.task_env.leave_station()
+            self.metrics.departure_attempts += 1
             self.metrics.energy_on_departure.append(float(self.plant.state.energy))
             self._time_since_last_charge = 0
             left_station = True
-
+        elif (
+            not terminated
+            and self.task_env.mode == PersistentMissionMode.BACKUP_RECOVERY
+            and actual_authority == ExecutionAuthority.KAPPA_BACKUP
+            and info.get("command_source") == "kappa"
+            and info.get("covered_at_publication") is True
+        ):
+            # KAPPA commits the child named by the published recovery
+            # certificate.  Geometric overlap with the terminal cannot skip a
+            # positive-rank child or clear the committed atlas state.
+            kappa_arrival_now, successor_failure = self._commit_kappa_successor_mode(
+                info.get("action_context", {}),
+                terminal_now,
+            )
+            if successor_failure is not None:
+                # The physical κ action was already covered at publication;
+                # preserve that source, but stop before publishing an
+                # incompatible hybrid successor or charging gain.
+                terminated = True
+                actual_authority_reason = successor_failure
+                self.task_env.mode = PersistentMissionMode.FAILURE
+                self.task_env.phase = self.task_env.mode
+                info = info | {
+                    "failure_reason": successor_failure.lower(),
+                    "mission_termination_reason": successor_failure,
+                    "hybrid_successor_certified": False,
+                }
+            elif kappa_arrival_now:
+                self.metrics.charging_visits += 1
+                self.metrics.energy_on_station_arrival.append(float(self.plant.state.energy))
+                self._station_approach_active = False
+        elif (
+            self.task_env.mode == PersistentMissionMode.TASK_RL
+            and terminal_now
+            and backup_reason is None
+            and actual_authority == ExecutionAuthority.RL_GENERATOR
+            and info.get("accepted")
+            and info.get("command_source") == "task"
+            and info.get("covered_at_publication") is True
+        ):
+            # A normal task command remains a RUN command.  Its realized
+            # successor may be reclassified by a zero-motion ARRIVE update only
+            # after the successor uncertainty state is itself certified in the
+            # charging set.  Charging gain starts on a later charging-source
+            # transition, never retroactively on this flight interval.
+            voluntary_arrival_now, arrival_failure = self._commit_normal_arrival_mode()
+            if arrival_failure is not None:
+                # The physical RUN was already published and executed under
+                # its own certificate, so preserve its task source.  The
+                # zero-duration hybrid successor update is a separate proof
+                # obligation: on drift, do not enter CHARGING or apply charge,
+                # and terminate the uncovered hybrid continuation.
+                terminated = True
+                actual_authority_reason = arrival_failure
+                self.task_env.mode = PersistentMissionMode.FAILURE
+                self.task_env.phase = self.task_env.mode
+                info = info | {
+                    "failure_reason": arrival_failure.lower(),
+                    "mission_termination_reason": arrival_failure,
+                    "hybrid_successor_certified": False,
+                }
+            elif voluntary_arrival_now:
+                self.metrics.voluntary_station_arrivals += 1
+                self.metrics.voluntary_return_count += 1
+                self.metrics.charging_visits += 1
+                self.metrics.energy_margin_at_station_approach.append(float(self.task_env.energy_margin))
+                self.metrics.energy_on_station_arrival.append(float(self.plant.state.energy))
+                self._station_approach_active = False
         station_distance = float(np.linalg.norm(self.plant.state.position - self.plant.scenario.station_position))
         approach_radius = 3.0 * float(np.max(self.plant.scenario.terminal.position_high - self.plant.scenario.terminal.position_low))
         if (
@@ -875,7 +1198,7 @@ class PersistentRuntimeWrapper(gym.Env[np.ndarray, np.ndarray]):
             self._station_approach_active = True
             self.task_env.voluntary_station_approach = True
 
-        if self.task_env.mode == PersistentMissionMode.CHARGING_RL and terminal_now:
+        if was_charging and self.task_env.mode == PersistentMissionMode.CHARGING_RL and terminal_now:
             info, reward = self._apply_charging(info, reward)
             components = dict(info.get("reward_components", {}))
             if float(info.get("charged_energy", 0.0)) > 0.0:
@@ -884,11 +1207,11 @@ class PersistentRuntimeWrapper(gym.Env[np.ndarray, np.ndarray]):
                     - self.task_env.reward_config.charging_dwell_cost
                 )
             info = info | {"reward_components": components}
-            observation = self.task_env.build_observation(self.runtime._map_encoding(), self.runtime._corridor_encoding())
-        elif left_station:
-            observation = self.task_env.build_observation(self.runtime._map_encoding(), self.runtime._corridor_encoding())
         backup_started_now = backup_intervention_started(mode_before, actual_authority)
         if backup_started_now:
+            self.metrics.backup_recovery_count += 1
+            self.metrics.forced_return_count += 1
+            self.metrics.energy_margin_at_backup.append(float(self.task_env.energy_margin))
             reward -= self.task_env.reward_config.backup_intervention_cost
             components = dict(info.get("reward_components", {}))
             components["backup_intervention_event_cost"] = (
@@ -902,15 +1225,28 @@ class PersistentRuntimeWrapper(gym.Env[np.ndarray, np.ndarray]):
             self._active_task_start_step = self.metrics.total_steps
         self.metrics.tasks_completed = self.task_env.manager.tasks_completed
         self.metrics.task_interruption_count = self.task_env.manager.task_interruption_count
+        # Runtime.step builds an observation before the persistent wrapper
+        # updates elapsed-charge time and may perform ARRIVE/DEPART mode
+        # changes.  Refresh the successor certificate quantities after all
+        # wrapper state changes, then build the observation paired with the
+        # successor authority used by replay and by the next actor call.
+        if not terminated:
+            self._context_cache_key = None
+            self._refresh_context()
+        observation = self.task_env.build_observation(
+            self.runtime._map_encoding(),
+            self.runtime._corridor_encoding(),
+        )
         return observation, reward, terminated, truncated, info | {
             "persistent_mode": self.task_env.mode.name,
             "backup_triggered": backup_reason is not None,
             "backup_started_now": backup_started_now,
             "backup_reason": backup_reason,
             "voluntary_station_approach": self._station_approach_active,
-            "voluntary_station_arrival": self.metrics.voluntary_station_arrivals > 0 and terminal_now and backup_reason is None,
+            "voluntary_station_arrival": voluntary_arrival_now,
+            "kappa_station_arrival": kappa_arrival_now,
             "charging": self.task_env.mode == PersistentMissionMode.CHARGING_RL,
-            "departure_attempt": was_charging and not terminal_now,
+            "departure_attempt": left_station,
             "departure_rejected": False,
             "departure_rejection_reason": None,
             "required_return_energy": self.task_env.required_return_energy,

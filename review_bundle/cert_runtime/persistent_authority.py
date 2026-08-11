@@ -30,6 +30,7 @@ class PersistentAuthorityInput:
     station_hold_valid: bool
     rl_authority_member: bool = True
     continuation_action_verified: bool = True
+    recovery_level: int | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -48,6 +49,31 @@ class PersistentExecutionAuthority:
 
     @staticmethod
     def evaluate(inputs: PersistentAuthorityInput) -> PersistentAuthorityDecision:
+        positive_recovery_rank = bool(
+            inputs.recovery_level is not None and int(inputs.recovery_level) > 0
+        )
+
+        def recovery_or_fail(reason: str) -> PersistentAuthorityDecision:
+            if positive_recovery_rank:
+                return PersistentAuthorityDecision(
+                    ExecutionAuthority.KAPPA_BACKUP,
+                    reason,
+                    False,
+                    True,
+                    False,
+                    False,
+                    False,
+                )
+            return PersistentAuthorityDecision(
+                ExecutionAuthority.FAIL_CLOSED,
+                "ZERO_RANK_RECOVERY_ACTION_UNDEFINED",
+                False,
+                False,
+                False,
+                False,
+                False,
+            )
+
         if not inputs.kappa_valid:
             return PersistentAuthorityDecision(
                 ExecutionAuthority.FAIL_CLOSED,
@@ -59,33 +85,31 @@ class PersistentExecutionAuthority:
                 False,
             )
         if inputs.persistent_mode == "BACKUP_RECOVERY":
-            return PersistentAuthorityDecision(
-                ExecutionAuthority.KAPPA_BACKUP,
-                "BACKUP_RECOVERY_CONTINUATION",
-                False,
-                True,
-                False,
-                False,
-                False,
-            )
+            return recovery_or_fail("BACKUP_RECOVERY_CONTINUATION")
         state_checks = (
             (inputs.persistent_certificate_valid, "PERSISTENT_CERTIFICATE_GATE_FAILED"),
             (inputs.certificate_valid, "RECOVERY_CERTIFICATE_INVALID"),
             (inputs.recoverable_set_member, "RECOVERABLE_SET_CERTIFICATE_INVALID"),
             (isfinite(inputs.energy_margin), "ENERGY_MARGIN_NONFINITE"),
         )
-        for valid, reason in state_checks:
-            if not valid:
+        failed_state_reason = next((reason for valid, reason in state_checks if not valid), None)
+
+        # A charging-source state is never sent to kappa.  The covered hybrid
+        # relation has exactly two positive charging exits: closed-gate
+        # CHARGE/HOLD and open-gate DEPART.  If the certificate needed by the
+        # applicable exit is absent, termination is fail-closed instead of an
+        # unmodelled CHARGING -> KAPPA (and possibly charging) transition.
+        if inputs.charging_state and not inputs.departure_allowed:
+            if failed_state_reason is not None:
                 return PersistentAuthorityDecision(
-                    ExecutionAuthority.KAPPA_BACKUP,
-                    reason,
+                    ExecutionAuthority.FAIL_CLOSED,
+                    failed_state_reason,
+                    False,
+                    False,
                     False,
                     True,
                     False,
-                    inputs.charging_state and not inputs.departure_allowed,
-                    False,
                 )
-        if inputs.charging_state and not inputs.departure_allowed:
             if (
                 inputs.generator_available
                 and inputs.recoverability_action_verified
@@ -120,16 +144,54 @@ class PersistentExecutionAuthority:
                 True,
                 False,
             )
-        if inputs.energy_margin <= inputs.backup_switch_margin:
+
+        if inputs.charging_state and inputs.departure_allowed:
+            if failed_state_reason is not None:
+                return PersistentAuthorityDecision(
+                    ExecutionAuthority.FAIL_CLOSED,
+                    failed_state_reason,
+                    False,
+                    False,
+                    False,
+                    False,
+                    False,
+                )
+            departure_checks = (
+                (inputs.generator_available, "NO_DEPARTURE_GENERATOR_SET"),
+                (inputs.rl_authority_member, "DEPARTURE_RL_AUTHORITY_SET_MEMBERSHIP_FAILED"),
+                (inputs.recoverability_action_verified, "DEPARTURE_GENERATOR_NOT_CONTAINED_IN_A_REC"),
+                (inputs.continuation_action_verified, "DEPARTURE_GENERATOR_NOT_CONTAINED_IN_A_CONT"),
+                (inputs.policy_authority_pass, "DEPARTURE_POLICY_AUTHORITY_GATE_FAILED"),
+            )
+            failed_departure_reason = next(
+                (reason for valid, reason in departure_checks if not valid),
+                None,
+            )
+            if failed_departure_reason is not None:
+                return PersistentAuthorityDecision(
+                    ExecutionAuthority.FAIL_CLOSED,
+                    failed_departure_reason,
+                    False,
+                    False,
+                    False,
+                    False,
+                    False,
+                )
             return PersistentAuthorityDecision(
-                ExecutionAuthority.KAPPA_BACKUP,
-                "ENERGY_MARGIN_BACKUP_SWITCH",
+                ExecutionAuthority.RL_GENERATOR,
+                "VERIFIED_DEPARTURE_AUTHORITY",
+                True,
                 False,
                 True,
                 False,
                 False,
-                False,
             )
+
+        for valid, reason in state_checks:
+            if not valid:
+                return recovery_or_fail(reason)
+        if inputs.energy_margin <= inputs.backup_switch_margin:
+            return recovery_or_fail("ENERGY_MARGIN_BACKUP_SWITCH")
         generator_checks = (
             (inputs.generator_available, "NO_GENERATOR_SET"),
             (inputs.rl_authority_member, "RL_AUTHORITY_SET_MEMBERSHIP_FAILED"),
@@ -139,15 +201,7 @@ class PersistentExecutionAuthority:
         )
         for valid, reason in generator_checks:
             if not valid:
-                return PersistentAuthorityDecision(
-                    ExecutionAuthority.KAPPA_BACKUP,
-                    reason,
-                    False,
-                    True,
-                    False,
-                    False,
-                    False,
-                )
+                return recovery_or_fail(reason)
         return PersistentAuthorityDecision(
             ExecutionAuthority.RL_GENERATOR,
             "VERIFIED_RL_GENERATOR_AUTHORITY",

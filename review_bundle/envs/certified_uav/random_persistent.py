@@ -312,8 +312,8 @@ class RandomPersistentTaskWrapper(gym.Wrapper):
         }
         if self.mode == PersistentMissionMode.TASK_RL:
             events = manager.advance(self.plant.state.position, self.episode_step)
-        elif self.mode == PersistentMissionMode.BACKUP_RECOVERY and telemetry.terminal_admissible:
-            self.enter_charging(voluntary=False)
+        # Certified KAPPA-ARRIVE is decided by the outer persistent runtime
+        # from the committed recovery child, not nominal terminal overlap.
         if terminated or info.get("failure_reason"):
             self.mode = PersistentMissionMode.FAILURE
             self.phase = self.mode

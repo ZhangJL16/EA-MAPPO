@@ -37,7 +37,12 @@ class AcceptanceTraceTests(unittest.TestCase):
                 )
                 self.assertFalse(trace["accepted"])
                 self.assertEqual(trace["fallback_reason"], reason)
-                np.testing.assert_array_equal(trace["a_exec"], trace["kappa"])
+                if trace["covered_at_publication"]:
+                    self.assertEqual(trace["command_source"], "kappa")
+                    np.testing.assert_array_equal(trace["a_exec"], trace["kappa"])
+                else:
+                    self.assertEqual(trace["command_source"], "uncertified_emergency_brake")
+                    self.assertTrue(trace["terminated"])
 
     def test_reward_parameters_and_goal_do_not_change_certificate_source(self):
         first = make_certified_uav_env(timing_mode="functional")
