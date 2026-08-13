@@ -1,3 +1,5 @@
+> **LEGACY / SUPERSEDED:** Historical research provenance only. This file is not an active method, theorem, implementation, test, or README authority. The active route is in docs/new_theory/.
+
 # Theorem Ledger
 
 Status labels: `DRAFT`, `PROVISIONAL`, `UNJUSTIFIED`, `REFUTED`, `VERIFIED-CONDITIONAL`. The row labels record the last accepted mathematical disposition. Bundle-level proof-audit provenance and the exact accepted input hashes are recorded separately in `PROOF_AUDIT.md`/`.json`; any later byte change invalidates that hash-specific verdict.

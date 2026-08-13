@@ -1,3 +1,5 @@
+> **LEGACY / SUPERSEDED:** Historical research provenance only. This file is not an active method, theorem, implementation, test, or README authority. The active route is in docs/new_theory/.
+
 # EA-MAPPO Theory Master
 
 Status: **CANONICAL NARROW THEOREM UNDER FINAL ARRIVE/AUTHORITY RE-AUDIT — FULL ICLR SUBMISSION NOT READY**  
@@ -87,7 +89,7 @@ C_charge(x) is a directly verified complete support with
              Post_hat_charge(x,C_charge(x)) subset G_charge.
 ```
 
-These optional definitions are mathematically conditional and are not implemented by the current topology-only kernel. The canonical theorem below requires departure only into `R`, not `R_RL`.
+These optional definitions are mathematically conditional and are not implemented by the current topology-only kernel. The canonical theorem below requires departure into a named certified cell `K_h subset R`, not `R_RL`. The executable handoff additionally requires the complete successor lower-energy margin to exceed the normal-to-recovery switching margin and reads the realized successor back against the same `h` before changing mode. This establishes the immediate next normal-authority state without claiming the state-level fixed point.
 
 ## 4. Provisional guarantee hierarchy
 
@@ -109,6 +111,14 @@ fall back to `kappa`; an open gate admits only certified `DEPART`, and every
 its hash-declared committed child, never by minimum geometric overlap: a
 positive-rank child remains `BACKUP`, while only the exact level-zero child plus
 a fresh terminal/hold check enters `CHARGING`.
+
+The charging gate is two-stage. The scalar lower-battery predicate is only a
+prerequisite. The final `DEPART` handoff opens after the prepared full support
+names a candidate normal-authority successor, proves complete successor
+containment and a strict next-cycle normal energy margin, and the realized
+successor is transactionally read back against that identity. If the scalar
+predicate opens earlier, the hybrid gate remains closed and a certified
+`CHARGE/HOLD` continues; SAC does not receive authority yet.
 
 Coverage has two stages. `CmdCovered_t` binds the command certificate before
 the physical interval. `HybridCovered_t` additionally binds any realized
@@ -145,7 +155,7 @@ The intended claim is recursive recoverability and collision/energy preservation
 ## 6. Excluded stronger claims and submission gates
 
 1. A proposal-only dual-field core is implemented and unit-tested, but it has no trained/calibrated checkpoint or benefit evaluation; dual-field benefit remains a hypothesis.
-2. Current atlas pruning is a candidate graph kernel, not the optional state-level `R_RL` fixed point; `R_RL` is excluded from the canonical safety theorem.
+2. Current atlas pruning is a candidate graph kernel, not the optional state-level `R_RL` fixed point; `R_RL` is excluded from the canonical safety theorem. The departure handoff commits one candidate-kernel successor only as a software identity/readback contract.
 3. Current artifacts do not establish learned Generator residual benefit, autonomous policy charging, or teacher benefit.
 4. The 2× synthetic descriptors are hash-bound and now pass a deterministic full-cell-domain numerical domination audit; this does not discharge aircraft energy calibration.
 5. Full ICLR readiness requires a matched non-saturated Generator study and regenerated non-mixed-provenance ablation tables.

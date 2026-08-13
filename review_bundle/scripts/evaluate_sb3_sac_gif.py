@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from envs.certified_uav import PersistentNavigationEnv
+from envs.navigation import NavigationEnv
 
 
 @dataclass
@@ -52,7 +52,7 @@ def evaluate_checkpoint(
     record_trace: bool,
 ) -> EvaluationTrace:
     model = SAC.load(checkpoint, device="cpu")
-    environment = PersistentNavigationEnv(max_episode_steps=steps)
+    environment = NavigationEnv(max_episode_steps=steps)
     observation, _ = environment.reset(seed=evaluation_seed)
     positions = [environment.state.position.copy()]
     goals = [environment.goal.copy()]

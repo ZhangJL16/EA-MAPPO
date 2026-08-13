@@ -1,3 +1,5 @@
+> **LEGACY / SUPERSEDED:** Historical research provenance only. This file is not an active method, theorem, implementation, test, or README authority. The active route is in docs/new_theory/.
+
 # Heterogeneous Collision and Recovery-Energy Proposal Fields
 
 Status: coherent training-behavior specification after reframe; proposal core implemented and unit-tested; no trained/calibrated field or benefit claim.

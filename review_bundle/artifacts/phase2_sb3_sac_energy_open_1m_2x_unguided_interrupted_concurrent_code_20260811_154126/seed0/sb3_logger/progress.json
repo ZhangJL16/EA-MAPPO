@@ -1,2 +1,0 @@
-{"time/episodes": 1, "rollout/ep_rew_mean": -161.356114, "rollout/ep_len_mean": 5000.0, "time/fps": 2032, "time/time_elapsed": 2, "time/total_timesteps": 5000}
-{"train/learning_rate": 0.0003, "train/n_updates": 4999, "train/ent_coef": 0.223512202501297, "train/actor_loss": -20.91869354248047, "train/critic_loss": 0.013877356424927711, "train/ent_coef_loss": -7.543664932250977, "time/episodes": 2, "rollout/ep_rew_mean": -138.4598555, "rollout/ep_len_mean": 5000.0, "time/fps": 133, "time/time_elapsed": 74, "time/total_timesteps": 10000}

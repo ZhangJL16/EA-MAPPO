@@ -1,3 +1,5 @@
+> **LEGACY / SUPERSEDED:** Historical research provenance only. This file is not an active method, theorem, implementation, test, or README authority. The active route is in docs/new_theory/.
+
 # Canonical Regenerative-Recoverability Proof Skeleton
 
 Audit target: `PAPER_THEOREM.md`  

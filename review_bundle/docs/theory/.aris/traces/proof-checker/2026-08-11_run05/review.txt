@@ -1,3 +1,5 @@
+LEGACY / SUPERSEDED: historical provenance only; not active theory authority.
+
 Final hash-closure audit
 
 Verdict: PASS

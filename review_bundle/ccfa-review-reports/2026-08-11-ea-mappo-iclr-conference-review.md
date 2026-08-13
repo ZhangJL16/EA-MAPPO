@@ -1,3 +1,5 @@
+> **LEGACY / SUPERSEDED:** Historical research provenance only. This file is not an active method, theorem, implementation, test, or README authority. The active route is in docs/new_theory/.
+
 # ICLR Mock Review — EA-MAPPO Theory Bundle
 
 Mode: full scientific review of the current theory/code/evidence bundle.  

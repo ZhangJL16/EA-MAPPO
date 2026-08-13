@@ -22,7 +22,7 @@ command=(
   CUDA_VISIBLE_DEVICES="$physical_gpu_index"
   OMP_NUM_THREADS=1
   MKL_NUM_THREADS=1
-  "$python_bin" -u scripts/train_sb3_persistent_sac.py
+  "$python_bin" -u scripts/train_sb3_sac_baseline.py
   --scenario random_persistent_open.json
   --seed "$seed"
   --steps 1000000

@@ -1,3 +1,5 @@
+LEGACY / SUPERSEDED: historical provenance only; not active theory authority.
+
 # Search Notes
 
 Date: 2026-08-11

@@ -1,3 +1,5 @@
+> **LEGACY / SUPERSEDED:** Historical research provenance only. This file is not an active method, theorem, implementation, test, or README authority. The active route is in docs/new_theory/.
+
 # Derivation Package
 
 > **2026-08-11 proof-audit override.** This package remains the derivation archive, but it is not the canonical accepted proof. Fresh audits refuted its former verbatim D10/L1/L7/T1/T7/T_AUTH3 chain. Because historical sections are retained for audit provenance, they are not all rewritten in place. `docs/theory/PAPER_THEOREM.md` is the only canonical theorem statement; `THEORY_MASTER.md`, `THEOREM_LEDGER.md`, `RED_TEAM_LOG.md`, and `OPEN_THEORY_ISSUES.md` control status and non-claims.
@@ -3552,19 +3554,28 @@ certification.
 
 Recoverability and normal-policy viability are distinct.  The certified recovery domain remains
 `R`; the task-independent normal-authority domain is the greatest finite atlas fixed point
-`R_RL subset R` whose cells have a nondegenerate complete Generator and a verified continuation
-successor.  Recovery cells outside that fixed point remain valid kappa-only states.  The
+finite candidate kernel `V_N subset R` whose cell IDs have a nondegenerate complete Generator and a
+verified topology continuation successor.  Recovery cells outside that candidate kernel remain
+valid kappa-only states.  The ideal energy-augmented state-level fixed point `R_RL` remains an
+optional unimplemented object.  The
 `safety_neutral` center is computed only from the active atlas reference and physical state; it is
 independent of the sampled goal, reward, task edge, and task waypoint.
 
-Define `A_cont(x) = {a: Post(x,a) subset R_RL union G_charge}`.  Normal support must satisfy both
+The implemented continuation verifier targets cells in `V_N` and directly checks the prepared
+complete successor envelope.  In the optional stronger theory one may instead define
+`A_cont(x) = {a: Post(x,a) subset R_RL union G_charge}`.  Normal support must satisfy both
 `C_run(x) subset A_safe(x)` and `C_run(x) subset A_cont(x)`.  The implementation binds the selected
 continuation cell and complete successor certificate into the action context.  `NO_GENERATOR_SET`
 in a kappa-only state is still a valid backup condition rather than a recovery-certificate failure.
 
-**T_AUTH1 (normal-authority viability).** If `x_t in R_RL` and the runtime publishes from a freshly
+**T_AUTH1 (implemented one-step normal-authority handoff).** If the active state is contained in a
+named cell of `V_N` and the runtime publishes from a freshly
 verified `C_run subset A_safe intersect A_cont`, then every robust successor is in `R_RL` or the
-certified charging set.  This is an authority-viability statement, not task convergence.
+certified charging set only under the optional stronger `R_RL` premise.  In current software the
+proved executable property is narrower: the support names a `V_N` target, its complete successor
+envelope and lower-energy margin are checked, and the realized successor is read back against that
+same target before normal authority is published.  This is a one-cycle handoff-consistency
+statement, not a state-level fixed-point or task-convergence theorem.
 
 **T_AUTH2 (zero-step terminal recovery).** If the complete certificate-state uncertainty set is
 contained in `G_charge`, the terminal recovery certificate has level zero, no successor, and
@@ -3573,9 +3584,11 @@ boolean bypass. Zero recovery energy does not mean zero physical hold action: th
 binds a local position/velocity hold law and requires its complete successor envelope to remain in
 `G_charge`. If that invariance check fails, the terminal certificate is not valid for that state.
 
-**T_AUTH3 (safe lifecycle closure).** With valid evidence, normal RL authority may switch to kappa,
+**T_AUTH3 (covered lifecycle closure at software scope).** With valid evidence, normal RL authority may switch to kappa,
 kappa reaches the terminal, the zero-step certificate closes recovery, charger-constrained support
-or certified hold maintains the station set, and a verified departure returns to `R_RL`.  No
+or certified hold maintains the station set, and a verified departure commits and read-backs a
+named `V_N` normal-authority successor.  This does not implement or prove return to state-level
+`R_RL`.  No
 task-specific route enters this lifecycle contract.
 
 ### Task-control authority is separate from safety
@@ -3834,3 +3847,149 @@ support exists, that charging is physically calibrated, or that an uncovered
 emergency command is safe. It only closes the covered hybrid relation and its
 runtime/replay semantics. `docs/theory/PAPER_THEOREM.md` remains the canonical
 statement.
+
+## 2026-08-12 departure-to-normal-authority handoff derivation
+
+### Target
+
+Derive the exact guard and state commitment required for the persistent
+`CHARGING -> DEPART -> NORMAL` control transfer.  The immediate goal is a
+local hybrid-state proposition: a covered departure may return authority to
+SAC only when the executed support and realized successor are bound to a
+named next-cycle normal-authority certificate.
+
+### Status
+
+**COHERENT AFTER REFRAMING / EXTRA ASSUMPTION.**  The former scalar departure
+energy gate is necessary but insufficient.  The corrected software result is
+a one-cycle normal-authority handoff into a finite candidate kernel.  It is not
+the unimplemented state-level energy-augmented `R_RL` greatest fixed point.
+
+### Invariant object
+
+The invariant is the task-indexed hybrid authority state
+
+```text
+Y_t = (x_t, q_t, m_t, h_t^B, h_t^N),
+```
+
+where `h^B` is the selected recovery-child identity and `h^N` is the selected
+normal-authority successor identity.  Geometric membership alone may overlap
+several cells; the committed identity selects which branch owns the successor.
+
+### Assumptions
+
+- The departure support is verified as a complete set under one current
+  certificate snapshot.
+- Its named target `h^N` belongs to the implemented finite candidate
+  normal-authority kernel `V_N`.
+- The complete successor lower-energy margin exceeds the configured
+  normal-to-recovery switching margin `m_sw`.
+- Command publication, proof-node commitment, realized-successor readback, and
+  the `CHARGING -> NORMAL` mode update use the same certificate transaction.
+- A certified station hold exists whenever the scalar battery prerequisite is
+  true but the final handoff guard is false; otherwise the covered lifecycle
+  prefix ends fail-closed.
+
+### Notation
+
+- `G_e(x)` is the scalar lower-battery departure prerequisite.
+- `C_dep(x)` is the actually prepared complete departure support.
+- `h_N(C_dep)` is its hash-bound continuation target.
+- `e_Post^-` is the lower energy over the complete successor envelope.
+- `E_kappa(h_N)` is the target cell's certified recovery-energy upper bound,
+  including the terminal reserve used by runtime.
+- `G_H(x,C_dep)` is the final handoff predicate below.
+
+### Derivation strategy and map
+
+1. The scalar gate establishes only battery availability at the source.
+2. Complete support verification establishes physical interval safety and
+   recoverability of every successor.
+3. Target binding plus a strict successor normal margin establishes that the
+   next authority decision need not immediately collapse to recovery.
+4. Realized-state readback prevents a geometric terminal overlap from erasing
+   the selected normal successor.
+5. Only the conjunction of all four obligations permits the mode commit.
+
+### Main derivation
+
+The scalar prerequisite is
+
+```text
+G_e(x) := e^-(x) >= E_dep^req(x) + m_dep.
+```
+
+It contains no statement about the action-specific successor.  Therefore
+`G_e(x)` alone cannot imply normal authority after departure.  Define instead
+
+```text
+G_H(x,C_dep) :=
+    Verify_epoch(C_dep)
+    and C_dep in A_safe_set(x)
+    and h_N(C_dep) in V_N
+    and Post_hat(x,C_dep) subset K_{h_N}
+    and inf_{x+ in Post_hat(x,C_dep)}
+          [e^-(x+) - E_kappa(h_N)] > m_sw.
+
+G_dep(x,C_dep) := G_e(x) and G_H(x,C_dep).
+```
+
+The first equality is a definition.  The implication below is a proposition
+under the listed soundness and transaction assumptions:
+
+```text
+G_dep(x,C_dep) and a_exec in C_dep
+  => x_real+ in K_{h_N},
+     successor normal margin > m_sw,
+     q+ = q,
+     h_N+ = h_N,
+     m+ = NORMAL.
+```
+
+Before publishing the returned hybrid state, runtime independently checks
+
+```text
+Readback(x_real+,h_N) :=
+    live_snapshot = prepared_snapshot
+    and x_real+ in K_{h_N}
+    and dependencies(h_N) are current
+    and e^-(x_real+) - E_kappa(h_N) > m_sw.
+```
+
+If readback is false, the already executed physical command retains its
+command-coverage record, but the incompatible hybrid successor is not
+published as normal authority.  The episode terminates outside the positive
+hybrid relation.  If `G_e` is true while `G_H` is false, the final departure
+gate remains closed and the controller executes certified `HOLD/CHARGE`; it
+does not invoke SAC and does not fabricate kappa authority from the charging
+mode.
+
+### Remarks and interpretation
+
+- The observed `post-departure-not-in-R_RL` failure was not geometric absence
+  from the candidate cell.  The state lay in the selected candidate cell, but
+  terminal-set overlap erased that identity and selected a rank-zero recovery
+  context.  The explicit `h^N` commitment removes this ambiguous ownership.
+- The scalar margin `m_dep` and successor switching margin `m_sw` have distinct
+  roles and must not be collapsed into one threshold.
+- The backward-compatible validator field `post_departure_in_R_RL` now denotes
+  the narrower software check `post_departure_normal_authority`; new artifacts
+  should use the latter name.
+
+### Boundaries and non-claims
+
+- `V_N` remains a topology/cell candidate kernel.  This derivation does not
+  claim that current code implements `nu Phi` over energy-augmented states.
+- One successful handoff proves the immediate next authority state, not
+  perpetual positive-volume support, charging liveness, task completion, or
+  learned-policy competence.
+- The tests are synthetic software evidence; calibration, hard real-time
+  publication, and physical UAV safety remain external premises.
+
+### Open risks
+
+- A complete current-hash suite and fresh hostile proof/method audit are still
+  required after the implementation is frozen.
+- The legacy fixed-graph provider uses the same successor commitment interface
+  but does not upgrade its cells into the optional state-level `R_RL` object.

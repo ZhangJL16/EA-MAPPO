@@ -1,3 +1,5 @@
+> **LEGACY / SUPERSEDED:** Historical research provenance only. This file is not an active method, theorem, implementation, test, or README authority. The active route is in docs/new_theory/.
+
 # Assumption Ledger
 
 | ID | Assumption | Class | Why needed | Falsification / what breaks | Weakening status |

@@ -1,3 +1,5 @@
+LEGACY / SUPERSEDED: historical provenance only; not active theory authority.
+
 # Literature Scope
 
 Problem-specific primary-source register for the EA-MAPPO theory audit. Search date: 2026-08-11.

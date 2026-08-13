@@ -1,229 +1,38 @@
-# Certified UAV Review Bundle
+# Data-Driven Dual-Timescale Safety for Persistent UAVs
 
-Synthetic single-UAV certificate experiments, multi-step Generator-SAC, and legacy regression
-fixtures. This repository is software and synthetic empirical evidence only; it is not real-flight
-safety evidence.
+This directory contains the reconstructed research route. The active method learns two non-scalarized objects: short-horizon collision risk and post-action energy-to-charger return distributions under a shared goal-conditioned navigation policy.
 
-## Setup
+## Active Sources
 
-```bash
-uv venv .venv
-uv pip install --python .venv/bin/python -r requirements.txt
-```
+- Theory and claim boundaries: `docs/new_theory/`
+- Navigation baseline environment: `envs/navigation/`
+- Safety models: `safety/collision/`, `safety/energy/`, `safety/calibration/`, `safety/switching/`
+- Frozen goal-conditioned policy adapter: `agents/goal_conditioned_sac/`
+- New experiments: `experiments/new_route/`
+- Tests: `tests/new_route/`
 
-## Tests
+## Retained Baseline
 
-```bash
-.venv/bin/python -m unittest discover -v -s tests -p 'test_*.py'
-```
+`artifacts/phase1_sb3_sac_1m_gpu/` is the completed three-seed Standard SAC navigation baseline. Its checkpoint contract is 77 observation dimensions and 3 continuous actions. The large resource budget and telemetry-cost feature are retained only for checkpoint compatibility; the artifact does not establish finite-energy safety.
 
-## Multi-Step Training
+Run the focused baseline and safety tests:
 
 ```bash
-.venv/bin/python scripts/train_generator_sac.py \
-  --scenario mission_open --seeds 0 1 2 --steps 10000
-
-.venv/bin/python scripts/run_comparison.py \
-  --methods sac penalty_sac shield_sac generator_sac \
-  --scenarios mission_open mission_obstacle mission_narrow mission_energy_tight \
-  --seeds 0 1 2 3 4 --steps 10000 --warmup-steps 1000 \
-  --batch-size 128 --evaluation-episodes 20
+PYTHONPATH=. /home/zjl/mappo/.venv/bin/python -m pytest tests/new_route -q
 ```
 
-Results are written to `artifacts/comparison/<scenario>/<method>/seed_<n>/` and aggregated under
-`artifacts/comparison/aggregate/`. The checked-in 10k matrix is synthetic comparative validation,
-not convergence, physical calibration, HIL, WCET, or real-flight evidence.
-
-Before comparison, run the theorem-facing synthetic mission gate:
+The first formal energy-estimation experiment was launched before the final theory audit. Inspect it only in a results-analysis session:
 
 ```bash
-.venv/bin/python scripts/validate_mission_recovery_certificate.py
+python scripts/check_new_route_runs.py
 ```
 
-The current gate passes all four mission fixtures. In the checked-in 80-run 10k matrix, the two
-certified methods have zero sampled collision, uncertified publication, and invalid-κ fallback.
-Generator-SAC completes task and return in open/obstacle; narrow and energy-tight deliberately
-trigger certified return before task completion. See `docs/SINGLE_UAV_CERTIFICATION_ENV.md` for
-scope boundaries and exact aggregate metrics.
+Do not relaunch into existing immutable run directories and do not interpret incomplete runs.
 
-Checked-in reduced matrix:
+## Historical Provenance
 
-```bash
-.venv/bin/python scripts/run_comparison.py \
-  --methods sac penalty_sac shield_sac generator_sac \
-  --scenarios mission_open mission_obstacle mission_narrow mission_energy_tight \
-  --seeds 0 1 2 --steps 2000 --warmup-steps 200 --batch-size 64
-```
+`DERIVATION_PACKAGE.md`, `docs/theory/`, and pre-migration CCFA reports are explicitly marked `LEGACY / SUPERSEDED`. They are retained for research provenance only and are not active method authority.
 
-## RL-Contribution and Generalization Evaluation
+## Current Scientific Status
 
-The task-oriented Generator is evaluated as a certified reference plus a learned residual. The
-non-learning `center_only` and `random_generator` methods share the same mission manifest,
-complete-set verifier, and independently certified κ as Generator-SAC.
-
-```bash
-.venv/bin/python scripts/run_rl_contribution_ablation.py \
-  --scenarios mission_open mission_obstacle --seeds 0 1 2 3 4 --episodes 20
-.venv/bin/python scripts/run_center_mode_ablation.py \
-  --scenarios mission_open mission_obstacle --seeds 0 1 2 3 4
-.venv/bin/python scripts/generate_scenario_families.py \
-  --training 20 --validation 10 --heldout 20 --validate-certificates
-.venv/bin/python scripts/evaluate_heldout_generalization.py \
-  --scenario-index artifacts/scenario_families/scenario_index.json
-```
-
-Held-out evaluation refuses missing checkpoints, scenario mutations, failed certificate gates, or
-manifest mismatches. Multi-scenario training is available through
-`scripts/train_multiscenario_generator.py`, with one immutable scenario/manifest per episode and
-replay grouped by manifest epoch. Its default 50k budget is not launched merely because the
-interface exists. Results under `artifacts/paper/` remain synthetic empirical evidence.
-
-The completed five-seed, 20-episode-per-seed ablation gives task/return success 1.0 and sampled
-collision 0 for Center-Only, Random-in-Generator, and Generator-SAC in both open and obstacle
-missions. Relative to Center-Only, Generator-SAC changes mission length by 0 steps in open and
--0.15 steps in obstacle; path differences are approximately -0.000001 m and -0.000397 m. These
-gains are negligible at the fixture scale. Current task success is therefore attributed primarily
-to the verified task-oriented center, not SAC residual learning.
-
-The held-out pilot rebuilds and validates 20 manifests and evaluates 20 episodes per scenario
-using the available seed-0 frozen checkpoints. `GENERALIZATION_GATE` passes: all 60 method-scenario
-rows have zero sampled certified-method collision, zero uncertified publication, and zero invalid-
-kappa fallback. Generator-SAC and Center-Only both succeed on every open/obstacle held-out mission,
-both fail the task in narrow missions while returning successfully, and both reach only 0.20 task
-success in energy-tight missions. This is single-checkpoint-seed synthetic evidence and does not
-justify a physical or multi-seed generalization claim.
-
-```bash
-.venv/bin/python scripts/aggregate_generalization.py
-.venv/bin/python scripts/profile_certificate_scalability.py
-.venv/bin/python scripts/run_certificate_sensitivity.py --scenario mission_open --episodes 5
-```
-
-The post-change regression record is 128/128 tests. A 50k multi-scenario entry point is present,
-but larger training is intentionally deferred until a certified family demonstrates room for the
-learned residual to improve over Center-Only.
-
-## Persistent Goals and Autonomous Charging
-
-The separate persistent path uses one continuous three-dimensional Generator-SAC policy for task
-flight, voluntary station approach, charger dwell, and departure. Every accepted action set must
-preserve certified kappa recoverability; kappa is backup authority only. The task center defaults to
-`safety_neutral`, pending goals survive charging, and the synthetic charger uses `30.0` capacity,
-`2.0` units/s, and `0.4` per 0.2 s. Closed departure uses a complete charger-stay Generator support,
-and replay/Bellman targets consume the same immutable execution-authority classification as runtime.
-Persistent validation uses typed task/departure/recovery gates: recovery-only cells require the
-certified kappa chain but not a Generator, while task-RL roots retain goal/station directional checks.
-Shared bound versions are graph-wide; edge-local geometry/kappa/manifest identities remain distinct
-and are hash-bound into the aggregate manifest. The corrected synthetic gate run passes
-`persistent_open` and `persistent_energy_tight`; `persistent_obstacle` remains blocked by complete
-swept-geometry failures in four recovery chains. Acceptance and training were not run.
-
-```bash
-.venv/bin/python scripts/validate_persistent_certificate.py
-.venv/bin/python scripts/run_persistent_env_acceptance.py --scenario persistent_open --probe all --strict
-.venv/bin/python scripts/train_persistent_generator_sac.py --scenario persistent_open --legacy-fixed-graph --steps 50000
-.venv/bin/python scripts/evaluate_persistent_generator_sac.py --scenario persistent_open --legacy-fixed-graph --checkpoint <path>
-.venv/bin/python scripts/run_persistent_single_policy_baselines.py --scenario persistent_open --legacy-fixed-graph
-```
-
-See `docs/PERSISTENT_TASK_CHARGING.md`. These commands remain synthetic and do not provide real
-calibration, HIL, hard WCET, or real-flight safety evidence.
-
-### Task-independent random persistent main path
-
-The current main persistent environment is built with
-`make_random_persistent_uav_env()`. It samples the initial physical state from a frozen
-`CertifiedRecoverabilityAtlas` and samples continuous horizontal goals from certified atlas
-interiors. The atlas uses geometry, terminal, dynamics, tracking, energy, and frozen-kappa
-evidence only; it does not consume a task edge, task waypoint, goal ID, route index, or task
-reward. Thus `c(x), G(x)` are invariant to a goal change at the same certificate state, while the
-goal-conditioned actor may change its latent.
-
-The old `persistent_open`, `persistent_obstacle`, and `persistent_energy_tight` graphs remain
-legacy certificate-regression fixtures. New main fixtures are `random_persistent_open`,
-`random_persistent_obstacle`, and `random_persistent_energy_tight`.
-
-```bash
-cd review_bundle
-PYTHONPATH=. /home/zjl/mappo/.venv/bin/python scripts/validate_random_persistent_architecture.py
-PYTHONPATH=. /home/zjl/mappo/.venv/bin/python scripts/validate_random_persistent_authority_lifecycle.py
-PYTHONPATH=. /home/zjl/mappo/.venv/bin/python scripts/validate_stochastic_kappa_closure.py
-PYTHONPATH=. /home/zjl/mappo/.venv/bin/python scripts/audit_persistent_generator_sac_optimization.py --checkpoint artifacts/task_authority_smoke_open_seed0/checkpoint_latest.pt
-PYTHONPATH=. /home/zjl/mappo/.venv/bin/python scripts/train_persistent_generator_sac.py --scenario random_persistent_open --temperature-coordinate physical --steps 2000
-```
-
-Training-only multi-goal exposure is enabled explicitly with
-`--goal-exposure-reset-steps 250`. It periodically ends the data-collection rollout, samples a
-new certified start and continuous goal with a deterministic distinct reset seed, and preserves the
-agent, optimizers, alpha, gradient counter, and replay. The replay transition at that collector
-boundary stores the real physical successor but carries an independent no-bootstrap mask, so it is
-never connected to the unrelated reset state. The option is disabled by default and is never used
-during persistent evaluation.
-
-Persistent backup reward is charged once per authority takeover, not once per kappa-controlled
-step. `--temperature-coordinate normalized` changes only automatic alpha adaptation; actor and
-Bellman objectives continue to use the exact physical affine-tanh density.
-
-Actor-gradient diagnostics are available through:
-
-```bash
-PYTHONPATH=. /home/zjl/mappo/.venv/bin/python scripts/audit_actor_gradient_learning.py \
-  --checkpoint artifacts/temp_compare_physical_seed0/checkpoint_latest.pt \
-               artifacts/temp_compare_physical_seed1/checkpoint_latest.pt \
-               artifacts/temp_compare_physical_seed2/checkpoint_latest.pt \
-  --sample-count 200
-```
-
-The frozen-critic Q-only branch is diagnostic only and does not use oracle demonstrations.
-
-Counterfactual critic control-preference diagnostics use existing checkpoints only:
-
-```bash
-PYTHONPATH=. /home/zjl/mappo/.venv/bin/python scripts/audit_counterfactual_goal_critic.py \
-  --checkpoint artifacts/temp_compare_physical_seed0/checkpoint_latest.pt \
-               artifacts/temp_compare_physical_seed1/checkpoint_latest.pt \
-               artifacts/temp_compare_physical_seed2/checkpoint_latest.pt \
-  --scenario random_persistent_open --sample-count 100 --goals-per-state 8
-```
-
-The script changes only named goal observation fields and fails immediately if any certificate or
-safe-support identity changes.
-
-Bellman goal-action coupling and replay identifiability diagnostics use frozen checkpoints and
-trajectory artifacts only:
-
-```bash
-PYTHONPATH=. /home/zjl/mappo/.venv/bin/python scripts/audit_bellman_goal_action_coupling.py
-PYTHONPATH=. /home/zjl/mappo/.venv/bin/python scripts/audit_replay_goal_action_identifiability.py
-```
-
-These scripts distinguish a goal-dependent value offset from a goal-conditioned certified-action
-preference. They do not train, relabel replay, alter rewards, or change the safety support.
-
-Crossed horizon/coverage/entropy diagnostics and the isolated same-architecture capacity probe use
-frozen artifacts only:
-
-```bash
-PYTHONPATH=. /home/zjl/mappo/.venv/bin/python \
-  scripts/audit_crossed_horizon_goal_coverage.py --horizons 1 3 5 10
-PYTHONPATH=. /home/zjl/mappo/.venv/bin/python \
-  scripts/audit_disposable_goal_action_critic_fit.py --horizon 10 --target-semantics physical
-```
-
-No-entropy and normalized-entropy outputs are localization diagnostics, not alternate training
-objectives. The disposable critic cannot modify production checkpoints or replay.
-
-This validator is deterministic synthetic software evidence, not training evidence or a
-real-flight safety claim.
-
-Task-completion consistency is audited separately with:
-
-```bash
-PYTHONPATH=. /home/zjl/mappo/.venv/bin/python scripts/audit_goal_exposure_consistency.py
-```
-
-The historical `minimum_distance` diagnostic measured distance to the pending goal in every runtime
-mode. A close pass during certified kappa recovery is therefore not task completion. Task-eligible
-distance is now named separately, and completion uses the closed goal-radius set with a common
-floating-point boundary tolerance. The existing 2k checkpoints each saw one goal because none
-completed; they are single-goal training evidence, not general random-goal learning evidence.
+The conditional theory is coherent, but the final blind panel found fatal novelty overlap with Budgeted MDP, distributional constrained RL, off-policy prediction, and selective-label learning. The theory route is marked `RESEARCH_DIRECTION_BLOCKED`; see `docs/new_theory/RESEARCH_DIRECTION_BLOCKED.md`. `THEORY_ICLR_READY` and `PAPER_ICLR_READY` are both false. E1 cannot resolve this blocker because it studies only the collision-free energy-estimation special case.

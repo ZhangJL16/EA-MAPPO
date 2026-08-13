@@ -1,3 +1,5 @@
+> **LEGACY / SUPERSEDED:** Historical research provenance only. This file is not an active method, theorem, implementation, test, or README authority. The active route is in docs/new_theory/.
+
 # Canonical Paper Theorem
 
 Status: **REPAIRED; CURRENT-HASH BLIND RE-AUDIT PENDING**. A prior same-family review accepted the theorem conditionally, but the dependency ledger and runtime-alignment record changed after that audit. Software tests never discharge the physical soundness premises.
@@ -150,14 +152,26 @@ Let `E_dep^req(x)` be the versioned scalar departure-energy requirement and defi
 D_e(x) = e^-(x) - E_dep^req(x) - e_G - m_e.
 ```
 
-Departure is permitted only when `D_e(x)>=0` and a complete support satisfies
+`D_e(x)>=0` is only the source battery prerequisite.  Let `h_N` be the
+hash-bound normal-successor proof node selected by the prepared support, let
+`K_{h_N} subset R` be its certified state cell, and let `m_sw` be the strict
+normal-to-recovery switching margin.  The final departure handoff gate is open
+only when `D_e(x)>=0` and a complete support satisfies
 
 ```text
 C_dep(x) belongs to A_safe_set(x),
-Post_hat_Xi_dep(x,C_dep(x)) subset R.
+h_N belongs to the implemented candidate normal-authority kernel,
+Post_hat_Xi_dep(x,C_dep(x)) subset K_{h_N} subset R,
+inf_{x+ in Post_hat_Xi_dep} [e^-(x+) - E_{h_N}] > m_sw.
 ```
 
-The scalar gate is necessary but never substitutes for complete predecessor inclusion.
+Before the returned hybrid state is published, the realized successor is read
+back against the same `h_N`, dependency snapshot, and strict energy margin in
+the certificate transaction.  Only then is the mode changed to `NORMAL`.  If
+the scalar prerequisite is true but this final handoff gate is false, the gate
+is closed for the hybrid relation and only verified `CHARGE/HOLD` is covered.
+The scalar gate is necessary but never substitutes for complete predecessor,
+normal-successor identity, or readback.
 
 ## 4. Covered hybrid transition relation
 
@@ -189,7 +203,7 @@ The covered relation is exhaustive:
 2. `RUN-ARRIVE`: execute the same covered `RUN` physical interval and the same task update rule, but require `Arrive_t(x+)`. The atomic zero-duration successor-mode update is `NORMAL -> CHARGING`, yielding `I_C(q')`. No charging gain is credited on the `RUN` interval; charging begins only on a later `CHARGE` or `HOLD` transition whose source is `I_C`.
 3. `KAPPA`: from a positive-rank state in `I_N(q)` after a normal-authority refusal, or from a positive-rank state in `I_B(q)`, execute the selected certified `kappa` command. A positive-rank child enters `I_B(q)`; a rank-zero child enters `I_C(q)`. The selected child identity, not minimum overlap rank, is committed for the next step. A rank-zero `I_N(q)` state has no fictitious recovery action: it may execute `RUN-N` or `RUN-ARRIVE`, or the covered execution prefix ends. `KAPPA` is never a covered source branch from `I_C`.
 4. `CHARGE` or `HOLD`: from `I_C(q)` with the departure gate closed, execute verified `C_charge` or `H` and remain in `I_C(q)`.
-5. `DEPART`: from `I_C(q)` with the departure gate open, execute verified `C_dep`; the atomic successor mode update is `NORMAL`, yielding `I_N(q)`.
+5. `DEPART`: from `I_C(q)` with the final handoff gate open, execute verified `C_dep`, commit its selected `h_N`, and read back the realized successor against `K_{h_N}`, current dependencies, and the strict normal margin. The atomic successor mode update is then `NORMAL`, yielding `I_N(q)`. A source state satisfying only the scalar battery prerequisite remains on the closed-gate `CHARGE/HOLD` branch.
 
 No covered transition except a completed `RUN-N` or `RUN-ARRIVE` changes `q`. In particular, normal noncompletion, `NORMAL -> BACKUP`, every `KAPPA` arrival, charging, hold, and departure preserve the same pending task identity.
 
@@ -200,11 +214,15 @@ Fix any admissible model/calibration package and certificate epoch satisfying Se
 1. The entire realized swept motion is collision-free and the lower battery trajectory is nonnegative over `[t,t+1]`.
 2. The successor belongs to `I(q_{t+1})`; hence the union of task-indexed compatible domains is invariant over covered transitions.
 3. `q_{t+1}=q_t` except on an explicit completed `RUN-N` or `RUN-ARRIVE` transition, where `q_{t+1}=Next(q_t)`.
-4. Every `RUN-N`, `RUN-ARRIVE`, or `DEPART` physical successor is in `R`; every `RUN-ARRIVE`, closed-gate `CHARGE`, or `HOLD` successor is in `G_ch`. A `RUN-ARRIVE` interval receives no charging gain.
+4. Every `RUN-N`, `RUN-ARRIVE`, or `DEPART` physical successor is in `R`; a `DEPART` successor additionally belongs to its selected `K_{h_N}` and retains the configured next-cycle normal margin. Every `RUN-ARRIVE`, closed-gate `CHARGE`, or `HOLD` successor is in `G_ch`. A `RUN-ARRIVE` interval receives no charging gain.
 5. If `KAPPA` is entered with selected rank `r_0` and coverage persists through the recovery segment, `G_ch` is reached in at most `r_0` such transitions and its robust covered energy is at most `E_nu`. If coverage ends earlier, only strict rank decrease and safety on the covered prefix are claimed.
 6. Any covered backup–arrival–charging–departure segment resumes `NORMAL` with exactly the task identity that was pending when backup began.
 
-The theorem does not guarantee task completion, perpetual proof refresh, availability of positive-volume normal support after departure, or safety of any uncovered `FAIL_CLOSED`, publisher, hardware, or calibration failure.
+The theorem does not guarantee task completion, perpetual proof refresh,
+availability of positive-volume normal support beyond the committed immediate
+handoff, or safety of any uncovered `FAIL_CLOSED`, publisher, hardware, or
+calibration failure.  The implemented candidate kernel named above is not the
+optional state-level `R_RL` fixed point of Section 8.
 
 ## 6. Proof
 
@@ -222,7 +240,14 @@ e^-(x+) >= e^-(x)-d_bar_nu
 
 Thus a positive-rank child remains in `R` and `BACKUP`; a rank-zero child lies in `G_ch` and enters `CHARGING`. Strict descent in `N_0` proves arrival after at most the initial rank, provided all recovery transitions through arrival are covered. Induction over the same recursion proves `J_cov^kappa <= E_nu` on that covered path class.
 
-For `CHARGE` and `HOLD`, the complete hybrid tube, true-FREE premise, energy-prefix, and successor predicates give within-step collision/energy feasibility and `x+ in G_ch`; the transition rule preserves both `CHARGING` and `q`. For `DEPART`, `C_dep in A_safe_set` gives within-step feasibility and its direct complete-set predecessor gives `x+ in R`; the atomic mode rule gives `NORMAL` and preserves `q`.
+For `CHARGE` and `HOLD`, the complete hybrid tube, true-FREE premise,
+energy-prefix, and successor predicates give within-step collision/energy
+feasibility and `x+ in G_ch`; the transition rule preserves both `CHARGING`
+and `q`. For `DEPART`, `C_dep in A_safe_set` gives within-step feasibility,
+complete-set containment gives `x+ in K_{h_N} subset R`, and the lower-envelope
+inequality gives the strict next-cycle normal margin.  Snapshot-bound realized
+successor readback preserves that same node identity despite geometric overlap;
+only then does the atomic mode rule give `NORMAL` while preserving `q`.
 
 These five branch labels, with the two mutually exclusive `RUN` subcases, exhaust the covered relation. Induction on transition index proves items 1–4. Applying the rank induction to each maximal recovery segment proves item 5. Applying the task-update rule across backup, `KAPPA` arrival, charge, and departure proves item 6. All conclusions stop before the first existing transition with `not Covered_omega(t)`. QED.
 

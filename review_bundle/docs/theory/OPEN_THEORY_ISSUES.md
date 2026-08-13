@@ -1,3 +1,5 @@
+> **LEGACY / SUPERSEDED:** Historical research provenance only. This file is not an active method, theorem, implementation, test, or README authority. The active route is in docs/new_theory/.
+
 # Open Theory Issues
 
 The pre-repair theorem failed a fresh blind audit with one FATAL and eight CRITICAL findings. The canonical statement was rewritten, and a fresh normalized same-family review accepted the repair with zero open issues. Internal mathematical closure is therefore conditional/provisional; physical and deployment premises remain unverified in every case.
@@ -28,9 +30,10 @@ The pre-repair theorem failed a fresh blind audit with one FATAL and eight CRITI
 - `OTI-E10`: Successful-only teacher replay is explicitly outcome-conditioned. In stochastic settings it is not claimed to be an unbiased Bellman sample without deterministic-transition or outcome-independent-selection assumptions.
 - `OTI-E11`: **Closed at the software-contract level.** Valid KAPPA, RL, and nominal previews followed by failed publication-time recovery checks now publish `uncertified_emergency_brake`, record `FAIL_CLOSED`, terminate, exclude κ metrics/child commitment, and yield zero Bellman bootstrap. A preview already classified `FAIL_CLOSED` uses a dedicated path that cannot re-evaluate and resurrect κ. All branches pass the 440-test current-snapshot suite.
 - `OTI-E12`: **Closed for the synthetic plant contract.** `RecoverabilityActionCertificate` now hash-binds explicit complete current swept-hull and within-step energy-prefix predicates; endpoint-safe/interior-gap and endpoint-energy-safe/prefix-unsafe counterexamples are regressions. Physical tube/envelope calibration remains external.
-- `OTI-E13`: **Closed at the executable scalar gate.** Departure compares the certificate-state lower battery `e^-` with route requirement plus margin rather than nominal plant energy.
+- `OTI-E13`: **Closed at the executable source prerequisite.** Departure compares the certificate-state lower battery `e^-` with route requirement plus margin rather than nominal plant energy. This scalar check is explicitly not the final handoff gate.
 - `OTI-E14`: **Closed at the software-contract level.** A certificate-version mutation during task candidate construction no longer rejects the task and then publishes a stale κ label. The watchdog emits an uncovered emergency source, runtime clears the stale recovery hash, persistent authority becomes `FAIL_CLOSED`, and no proof child is committed. Targeted and 440-test full-suite regressions pass.
 - `OTI-E15`: **Closed at the software-contract level.** Acceptance traces now distinguish a covered certified κ fallback from an uncovered emergency command. Concrete root causes remain in `fallback_reason` instead of being erased by the authority category; the complete failure matrix and full suite pass.
+- `OTI-E16`: **Closed by targeted software regressions; complete-suite rerun pending.** The final departure gate now requires the prepared complete support to name a candidate normal-authority successor and retain a strict robust successor switching margin. Runtime commits and reads back that exact normal successor before changing to `TASK_RL`; terminal geometric overlap cannot silently replace it with a rank-zero recovery node. This is not closure of optional `OTI-S01`.
 
 ## External evidence limitations
 

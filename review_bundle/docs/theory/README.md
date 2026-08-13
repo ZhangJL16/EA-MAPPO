@@ -1,0 +1,1 @@
+> **LEGACY / SUPERSEDED:** Every file in this directory is retained only as historical theory, proof, red-team, or mock-review provenance. No active code, test, README, or new theorem may use it as current-method authority. See ../new_theory/.

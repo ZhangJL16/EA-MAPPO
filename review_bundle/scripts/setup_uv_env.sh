@@ -42,9 +42,9 @@ import json
 import numpy
 import gymnasium
 import torch
-from envs.certified_uav import PersistentNavigationEnv
+from envs.navigation import NavigationEnv
 
-environment = PersistentNavigationEnv(max_episode_steps=2)
+environment = NavigationEnv(max_episode_steps=2)
 observation, _ = environment.reset(seed=0)
 observation, reward, terminated, truncated, info = environment.step(environment.action_space.sample())
 result = {

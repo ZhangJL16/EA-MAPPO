@@ -1,3 +1,5 @@
+> **LEGACY / SUPERSEDED:** Historical research provenance only. This file is not an active method, theorem, implementation, test, or README authority. The active route is in docs/new_theory/.
+
 # Formula-Derivation Checkpoints
 
 ## C1 — Recovery energy and recoverability
@@ -46,14 +48,24 @@ An outer `Post_hat_charge` must include tracking, geometry/evidence updates, cos
 e^- - d_bar_hold + r_lower Delta t >= e_G + m_e.
 ```
 
-Departure requires both the scalar reserve gate and complete successor support:
+Departure uses a scalar prerequisite and a distinct final authority-handoff gate:
 
 ```text
 e^- >= E_dep_bar + e_G + m_dep,
-Post_hat(x,C_dep(x)) subset R.
+h_N(C_dep) in V_N,
+Post_hat(x,C_dep(x)) subset K_{h_N} subset R,
+inf_{x+ in Post_hat} [e^-(x+) - E_kappa(h_N)] > m_sw.
 ```
 
-Targeting `R_RL` instead is the optional stronger condition for persistent positive-volume normal authority and is not claimed by the current implementation.
+The realized successor and current dependency snapshot are read back against
+the same `h_N` before `CHARGING -> NORMAL` is committed. If the scalar
+inequality is true but the remaining conjuncts are false, the final departure
+gate is still closed and only a verified hold/charge transition is covered.
+
+Here `V_N` is the implemented finite candidate normal-authority kernel.
+Targeting the state-level energy-augmented `R_RL` instead is the optional
+stronger condition for persistent positive-volume normal authority and is not
+claimed by the current implementation.
 
 The energy inequality is necessary, not sufficient. Same-task resume follows a separate `q+=q` mode-transition rule.
 

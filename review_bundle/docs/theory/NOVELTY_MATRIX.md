@@ -1,3 +1,5 @@
+> **LEGACY / SUPERSEDED:** Historical research provenance only. This file is not an active method, theorem, implementation, test, or README authority. The active route is in docs/new_theory/.
+
 # Novelty Matrix
 
 Search date: 2026-08-11. Sources are primary proceedings, OpenReview pages, or author preprints. This is a closest-work risk map, not an exhaustiveness or priority claim.

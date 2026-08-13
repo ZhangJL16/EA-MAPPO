@@ -9,7 +9,7 @@ import numpy as np
 import torch
 from stable_baselines3.common.callbacks import BaseCallback
 
-from envs.certified_uav import NavigationRewardConfig, PersistentNavigationEnv
+from envs.navigation import NavigationEnv, NavigationRewardConfig
 
 
 def jsonable(value: Any) -> Any:
@@ -91,7 +91,7 @@ def augment_attempt_record(
     return augmented
 
 
-def make_navigation_environment(args, *, max_episode_steps: int | None = None) -> PersistentNavigationEnv:
+def make_navigation_environment(args, *, max_episode_steps: int | None = None) -> NavigationEnv:
     reward_config = NavigationRewardConfig(
         distance_potential_scale=args.distance_potential_scale,
         gamma=args.gamma,
@@ -102,7 +102,7 @@ def make_navigation_environment(args, *, max_episode_steps: int | None = None) -
         energy_cost_weight=args.energy_cost_weight,
         backup_intervention_cost=args.backup_intervention_cost,
     )
-    return PersistentNavigationEnv(
+    return NavigationEnv(
         args.scenario,
         max_episode_steps=args.max_episode_steps if max_episode_steps is None else max_episode_steps,
         navigation_energy_capacity=args.navigation_energy_capacity,

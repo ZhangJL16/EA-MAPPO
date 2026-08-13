@@ -1,3 +1,5 @@
+LEGACY / SUPERSEDED: historical provenance only; not active theory authority.
+
 # Closest Persistent-Autonomy Papers
 
 Search purpose: standard-mode novelty red-team for persistent task execution, battery safety, charging, and learned finite-duration safety. Public title/keyword queries only; primary paper pages and publisher records were used. MDPI and snippet-only sources were excluded.

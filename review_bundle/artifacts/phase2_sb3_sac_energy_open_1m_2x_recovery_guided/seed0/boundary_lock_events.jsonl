@@ -1,3 +1,0 @@
-{"boundary_axes": [2], "consecutive_boundary_contacts": 101, "episode_step": 147, "event": "BOUNDARY_LOCK_EVENT", "position": [2.63679586681078, 3.4847786705852233, 1.95], "training_seed": 0, "training_step": 15147}
-{"boundary_axes": [2], "consecutive_boundary_contacts": 101, "episode_step": 169, "event": "BOUNDARY_LOCK_EVENT", "position": [3.345547653126717, 2.8628421244711206, 1.95], "training_seed": 0, "training_step": 20169}
-{"boundary_axes": [1, 2], "consecutive_boundary_contacts": 101, "episode_step": 165, "event": "BOUNDARY_LOCK_EVENT", "position": [2.192715990627783, 0.05, 1.95], "training_seed": 0, "training_step": 30165}

@@ -1,9 +1,0 @@
-{
-  "MISSION_CERTIFICATE_GATE": "PASS",
-  "scenarios": [
-    "mission_open",
-    "mission_obstacle",
-    "mission_narrow",
-    "mission_energy_tight"
-  ]
-}

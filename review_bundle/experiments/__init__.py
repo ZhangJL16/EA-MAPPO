@@ -1,1 +1,1 @@
-"""Unified synthetic comparison experiments."""
+"""Experiment entry points for active research routes."""

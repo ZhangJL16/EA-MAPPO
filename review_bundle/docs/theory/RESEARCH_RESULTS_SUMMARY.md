@@ -1,3 +1,5 @@
+> **LEGACY / SUPERSEDED:** Historical research provenance only. This file is not an active method, theorem, implementation, test, or README authority. The active route is in docs/new_theory/.
+
 # EA-MAPPO Research Results Summary
 
 Date: 2026-08-11  
@@ -98,7 +100,7 @@ Current validation performed during this summary:
 - `python3 -m compileall -q review_bundle`: PASS.
 - terminal `FAILURE`/`SUCCESS` phases are now explicitly ineligible for covered kappa publication; the focused regression passes.
 - the current 2x certificate was deterministically regenerated and rebound to the current recovery manifest/atlas/terminal/kappa versions.
-- the exact persistent authority lifecycle test still fails on seed 0 after a covered departure: the mode transition reaches `TASK_RL`, but the refreshed successor is not classified in `R_RL` with `RL_GENERATOR` authority (`post-departure-not-in-R_RL`). The validator's former extra rank-zero step was removed; the remaining successor-classification failure is an open software-contract issue, not a passed lifecycle result.
+- the former seed-0 `post-departure-not-in-R_RL` lifecycle failure is repaired at the software-contract scope. Root cause was a two-part handoff defect: the scalar battery gate opened before the action-specific robust successor retained the normal switching margin, and terminal-set overlap erased the support-selected normal successor identity after mode change. Runtime now keeps charging under an exact certified hold until the full handoff gate passes, commits the selected candidate normal-authority cell, and transactionally reads back the realized successor before changing to `TASK_RL`. The exact full lifecycle and direct departure-successor regressions pass. The old artifact field is retained for compatibility but means `post_departure_normal_authority`, not implementation of state-level `R_RL`.
 - a complete current-snapshot test suite and fresh exact-hash hostile review remain pending.
 
 Historical documents that mention a prior `440-test` pass describe earlier byte snapshots. They are useful provenance but do not replace the current rerun.
@@ -115,7 +117,7 @@ The recovery-teacher protocol separates replay prefill and actor warm start conc
 | --- | --- |
 | Standard SAC solves open synthetic navigation at 1M | **Supported** |
 | Synthetic 2x atlas one-step and cumulative energy bounds pass | **Supported conditionally** |
-| Current runtime embodies the intended authority branches | **Partially supported; one lifecycle regression remains failing** |
+| Current runtime embodies the intended authority branches | **Supported narrowly by targeted lifecycle regressions; complete current-hash suite pending** |
 | Learned Generator residual improves over center-only | **Not supported** |
 | Policy autonomously learns reliable charging and task resume | **Not supported** |
 | Dual learned fields improve data efficiency | **Not supported** |
@@ -126,8 +128,8 @@ The recovery-teacher protocol separates replay prefill and actor warm start conc
 
 ## 8. Next decisive experiments and gates
 
-1. Repair and regression-test the covered departure successor so the lifecycle ends in `R_RL` without fail-closed.
-2. Freeze the source, run the complete suite, and repeat the exact-hash proof and three-role method review.
+1. Freeze the source, run the complete suite, and repeat the exact-hash proof and three-role method review.
+2. Decide whether to implement the optional energy-augmented state-level `R_RL`; do not relabel the current candidate-kernel handoff as that stronger result.
 3. Build a non-saturated certified family where Center-Only is feasible but suboptimal; rerun matched Center / Random-in-Generator / Generator-SAC ablations.
 4. Complete multi-seed 2x policy-only and system-with-kappa studies with equal checkpoints and full/low-SOC evaluations.
 5. Run the teacher 2x2 factorial and a matched no-field / separate-field / coupled-field ablation before retaining either as a paper contribution.
