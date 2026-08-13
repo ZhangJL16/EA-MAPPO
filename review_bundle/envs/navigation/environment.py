@@ -70,6 +70,7 @@ class NavigationEnv(gym.Env[np.ndarray, np.ndarray]):
             raise ValueError("sampling_margin must cover the UAV body radius")
 
         self.world = self.scenario.world
+        self.station_position = self.scenario.station_position.copy()
         self.max_episode_steps = int(max_episode_steps)
         self.navigation_energy_capacity = float(navigation_energy_capacity)
         self.goal_radius = float(goal_radius)
@@ -220,7 +221,7 @@ class NavigationEnv(gym.Env[np.ndarray, np.ndarray]):
                 self.state.position / self.config.world_size,
                 self.state.velocity / self.config.v_max,
                 self.goal / self.config.world_size,
-                self.scenario.station_position / self.config.world_size,
+                self.station_position / self.config.world_size,
                 np.array([self.state.energy / self._energy_observation_capacity]),
                 self.last_lidar.distances / self.config.lidar_range,
                 self.last_lidar.valid.astype(np.float64),
@@ -237,6 +238,33 @@ class NavigationEnv(gym.Env[np.ndarray, np.ndarray]):
     def _initial_energy(self, reset_options: dict[str, Any]) -> float:
         del reset_options
         return self.navigation_energy_capacity
+
+    def observation_for_goal(self, goal: np.ndarray) -> np.ndarray:
+        requested_goal = self._validate_reset_position(goal, "goal")
+        current_goal = self.goal
+        self.goal = requested_goal
+        try:
+            return self._observation()
+        finally:
+            self.goal = current_goal
+
+    def set_external_goal(self, goal: np.ndarray) -> tuple[np.ndarray, dict[str, Any]]:
+        requested_goal = self._validate_reset_position(goal, "goal")
+        previous_distance = float(np.linalg.norm(self.goal - self.state.position))
+        interrupted_attempt = self._finalize_goal_attempt(completed=False, final_distance=previous_distance)
+        self.goal = requested_goal
+        self._start_goal_attempt()
+        return self._observation(), interrupted_attempt
+
+    def _sample_station(self, start: np.ndarray, goal: np.ndarray) -> np.ndarray:
+        for _ in range(10000):
+            candidate = self._sample_free_position()
+            if np.linalg.norm(candidate - start) < self.minimum_goal_separation:
+                continue
+            if np.linalg.norm(candidate - goal) < self.minimum_goal_separation:
+                continue
+            return candidate
+        raise RuntimeError("failed to sample a separated charger position")
 
     def _start_goal_attempt(self) -> None:
         delta = self.goal - self.state.position
@@ -324,8 +352,18 @@ class NavigationEnv(gym.Env[np.ndarray, np.ndarray]):
         else:
             velocity = np.zeros(3)
 
+        if "station_position" in reset_options and reset_options.get("randomize_station", False):
+            raise ValueError("station_position and randomize_station are mutually exclusive")
+        if "station_position" in reset_options:
+            station = self._validate_reset_position(reset_options["station_position"], "station_position")
+        elif reset_options.get("randomize_station", False):
+            station = self._sample_station(start, goal)
+        else:
+            station = self.scenario.station_position.copy()
+
         self.state = NavigationState(start, velocity, self._initial_energy(reset_options), 0.0)
         self.goal = goal
+        self.station_position = station
         self.last_lidar = self.lidar_model.measure(self.state, self.world, self.np_random)
         self.episode_step = 0
         self.tasks_completed = 0
@@ -348,6 +386,7 @@ class NavigationEnv(gym.Env[np.ndarray, np.ndarray]):
         return self._observation(), {
             "sampled_start": start.copy(),
             "sampled_goal": goal.copy(),
+            "station_position": station.copy(),
             "goal_id": self._goal_attempt["goal_id"],
             "observation_layout": dict(self.observation_layout),
             "energy_semantics": "navigation_baseline_nonterminating_large_budget",

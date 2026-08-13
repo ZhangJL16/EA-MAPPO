@@ -68,3 +68,16 @@ def test_all_retained_checkpoints_load_and_step() -> None:
         assert next_observation.shape == (77,)
         assert np.isfinite(reward)
         assert not terminated
+
+
+def test_frozen_checkpoint_is_dimensionally_compatible_with_target_open_world() -> None:
+    checkpoint = ARTIFACT / "seed0/checkpoint_step_1000000.zip"
+    model = SAC.load(checkpoint, device="cpu")
+    environment = NavigationEnv("target_open_16x16.json", max_episode_steps=2)
+    observation, _ = environment.reset(seed=501)
+    action, _ = model.predict(observation, deterministic=True)
+    next_observation, reward, terminated, _, _ = environment.step(action)
+    assert observation.shape == next_observation.shape == (77,)
+    assert action.shape == (3,)
+    assert np.isfinite(reward)
+    assert not terminated

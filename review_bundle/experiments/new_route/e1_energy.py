@@ -1,3 +1,9 @@
+"""SUPERSEDED diagnostic E1 implementation.
+
+This module is retained only to explain the invalid 2026-08-13 artifacts. New
+energy work must use ``experiments.energy_transfer.stage_a_bootstrap``.
+"""
+
 from __future__ import annotations
 
 import argparse

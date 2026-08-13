@@ -25,7 +25,14 @@ def code_hash(root: str | Path) -> str:
     digest = hashlib.sha256()
     paths = sorted(
         path
-        for prefix in ("agents", "envs/navigation", "safety", "experiments/new_route", "scripts")
+        for prefix in (
+            "agents",
+            "envs/navigation",
+            "safety",
+            "experiments/new_route",
+            "experiments/energy_transfer",
+            "scripts",
+        )
         for path in (root_path / prefix).rglob("*.py")
     )
     for path in paths:

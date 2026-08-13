@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+echo "ERROR: this E1 launcher is superseded; use scripts/run_stage_a_energy_bootstrap.py with a fresh output directory." >&2
+exit 2
+
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$root"
 python_bin="${PYTHON_BIN:-/home/zjl/mappo/.venv/bin/python}"
