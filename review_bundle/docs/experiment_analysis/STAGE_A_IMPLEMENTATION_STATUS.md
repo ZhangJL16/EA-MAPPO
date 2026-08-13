@@ -6,9 +6,15 @@ Date: 2026-08-14
 
 `STAGE_A_CODE_COMPLETE = TRUE`
 
+`STAGE_A_VALIDATION_RUN_COMPLETED = TRUE`
+
 `STAGE_A_FORMAL_EXPERIMENT_RUN = FALSE`
 
-Stage A now collects completed charger-return trajectories after varied task prefixes and trains B0–B3 from sortie-separated data. Only a 10-sortie smoke was run; its estimator scores are not paper results.
+`LEARNED_MODEL_ADDS_VALUE = FALSE`
+
+`READY_FOR_16X16 = FALSE`
+
+Stage A now collects completed charger-return trajectories after varied task prefixes and trains B0-B3 from sortie-separated data. The initial 10-sortie smoke was followed by a 150-sortie validation run. The validation protocol completed correctly, but B0 outperformed every learned model, B2 lacked held-out semantic stability, and B3 collapsed to grossly over-conservative predictions. See `STAGE_A_VALIDATION_RESULTS.md` for the complete numeric audit.
 
 ## Implemented Supervision
 
@@ -72,18 +78,42 @@ Observed smoke facts:
 
 The smoke establishes executable data and training plumbing only. Ten optimization updates and two test sorties cannot rank B0–B3.
 
+## Validation Evidence
+
+The completed validation artifact is:
+
+`artifacts/energy_transfer/stage_a_validation_seed0_20260814_v2/`
+
+Key facts:
+
+| Item | Value |
+|---|---:|
+| Completed / censored returns | 150 / 0 |
+| Return-to-go supervision transitions | 5,712 |
+| Prefix range / unique lengths | 0-160 / 150 |
+| Train / calibration / test sorties | 90 / 30 / 30 |
+| Train / calibration / test transitions | 3,412 / 1,170 / 1,130 |
+| B0 held-out MAE | 0.05509 |
+| Best learned held-out MAE (B1) | 0.06140 |
+| B2 held-out MAE | 0.12098 |
+| B3 q0.50 held-out MAE | 4.92040 |
+| Data coverage sufficient | yes |
+| Sortie leakage | none |
+| Formal-result eligible | no |
+
+The learned models do not establish extra value over B0. In particular, B3's 100% empirical coverage at every quantile is caused by extreme overprediction and is not reasonable calibration. No formal run was launched because the validation did not pass the success gate.
+
 ## Stage C Interface
 
 `decide_managed_goal` forms a charger-conditioned observation without changing TASK mode, obtains the charger action from frozen SAC, queries a return-energy predictor, and applies `EnergySwitchController` using the separate operational energy account. At the boundary it mutates the active navigation goal to charger exactly once; commitment is absorbing until a new sortie.
 
-## Before 16×16 Experiments
+## Before Any Formal or 16x16 Experiment
 
 Still required:
 
-1. choose physically interpretable 16×16 operational capacity, reserve, and telemetry scaling;
-2. measure whether the 4×4 frozen policy can reliably reach long-distance 16×16 open-world goals—dimensional compatibility alone is not navigation competence;
-3. implement the Stage B/C rollout runner and switching baselines: fixed SOC, distance, learned scalar, learned quantile;
-4. define target-domain replay and update cadence for Stage D without train/eval leakage;
-5. preregister fixed target train/calibration/test seeds and multi-seed budgets;
-6. run only smoke tests before any formal three-seed launch;
-7. defer obstacles and Collision Module until open-world energy adaptation is causally resolved.
+1. diagnose and repair B2 scalar-TD held-out/terminal semantics without changing the frozen SAC or adding a new model;
+2. diagnose and repair B3 terminal anchoring and quantile scale collapse;
+3. rerun the bounded 4x4 validation protocol and require semantically valid predictions;
+4. establish stable held-out value over B0 before approving a formal multi-seed scale;
+5. only after the complete Stage A gate passes, consider 16x16 competence, operational capacity, switching baselines, and target-domain adaptation;
+6. continue to defer obstacles and Collision Module.

@@ -56,4 +56,4 @@ This command is a smoke test, not a formal experiment.
 
 ## Current Scientific Status
 
-The prior general-theory routes remain blocked and are not being extended. Current work is empirical systems engineering driven by staged energy experiments. See `docs/experiment_analysis/ENERGY_ROUTE_REFACTOR_AUDIT.md` and `docs/experiment_analysis/STAGE_A_IMPLEMENTATION_STATUS.md`.
+The prior general-theory routes remain blocked and are not being extended. Current work is empirical systems engineering driven by staged energy experiments. A 150-sortie Stage A validation completed, but B0 distance estimation outperformed B1-B3, B2 lacked stable held-out semantics, and B3 collapsed to vacuous over-coverage. Stage A is not ready for a formal run or 16x16. See `docs/experiment_analysis/ENERGY_ROUTE_REFACTOR_AUDIT.md`, `docs/experiment_analysis/STAGE_A_IMPLEMENTATION_STATUS.md`, and `docs/experiment_analysis/STAGE_A_VALIDATION_RESULTS.md`.
