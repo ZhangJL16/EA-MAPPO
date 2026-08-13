@@ -1,0 +1,6 @@
+artifacts/energy_transfer/
+artifacts/scale_invariant_sac_1m/
+artifacts/scale_invariant_sac_smoke/
+artifacts/new_route/e1_energy/*/RUNNING.json
+artifacts/new_route/e1_energy/*/raw_sorties.jsonl
+artifacts/new_route/pids/

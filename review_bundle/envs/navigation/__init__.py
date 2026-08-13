@@ -4,6 +4,7 @@ from .config import NavigationConfig
 from .environment import NavigationEnv, NavigationRewardConfig, make_navigation_env
 from .operational_energy import OperationalEnergyConfig, OperationalEnergyWrapper
 from .scenario import NavigationScenario, ScenarioDefinition, load_scenario
+from .scale_invariant_environment import GOAL_DISTANCE_BINS, ScaleInvariantNavigationEnv
 
 __all__ = [
     "NavigationConfig",
@@ -13,6 +14,8 @@ __all__ = [
     "ScenarioDefinition",
     "OperationalEnergyConfig",
     "OperationalEnergyWrapper",
+    "GOAL_DISTANCE_BINS",
+    "ScaleInvariantNavigationEnv",
     "load_scenario",
     "make_navigation_env",
 ]
