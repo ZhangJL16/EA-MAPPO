@@ -14,7 +14,7 @@ Date: 2026-08-14
 
 `READY_FOR_16X16 = FALSE`
 
-Stage A now collects completed charger-return trajectories after varied task prefixes and trains B0-B3 from sortie-separated data. The initial 10-sortie smoke was followed by a 150-sortie validation run. The validation protocol completed correctly, but B0 outperformed every learned model, B2 lacked held-out semantic stability, and B3 collapsed to grossly over-conservative predictions. See `STAGE_A_VALIDATION_RESULTS.md` for the complete numeric audit.
+Stage A now collects completed charger-return trajectories after varied task prefixes and trains B0-B3 from sortie-separated data. The initial 10-sortie smoke was followed by a 150-sortie validation run. A same-data TD repair subsequently restored B2 and B3 value scale and terminal semantics, but B0 still outperforms every learned model and B3 upper quantiles remain severely under-covered. See `STAGE_A_VALIDATION_RESULTS.md` for the original validation and `STAGE_A_TD_REPAIR_RESULTS.md` for the repair audit.
 
 ## Implemented Supervision
 
@@ -103,6 +103,12 @@ Key facts:
 
 The learned models do not establish extra value over B0. In particular, B3's 100% empirical coverage at every quantile is caused by extreme overprediction and is not reasonable calibration. No formal run was launched because the validation did not pass the success gate.
 
+## TD Repair Follow-Up
+
+The repair reused the exact raw trajectories and split without recollection. With the same 800-update budget, B2 MAE changed from `0.12098` to `0.06365` and B3 median MAE from `4.92040` to `0.07131`. Terminal MAE changed from `0.07056` to `0.01725` for B2 and from `4.31169` to `0.02809` for B3.
+
+B3 q0.50 coverage is now `44.69%`, so the vacuous all-100% scale collapse is gone. Its q0.90/q0.95/q0.99 coverage is only `52.12%/55.40%/59.91%`; distributional safety semantics remain unresolved. B0 MAE remains best at `0.05509`. Therefore `LEARNED_MODEL_ADDS_VALUE` and `READY_FOR_16X16` remain false.
+
 ## Stage C Interface
 
 `decide_managed_goal` forms a charger-conditioned observation without changing TASK mode, obtains the charger action from frozen SAC, queries a return-energy predictor, and applies `EnergySwitchController` using the separate operational energy account. At the boundary it mutates the active navigation goal to charger exactly once; commitment is absorbing until a new sortie.
@@ -111,9 +117,8 @@ The learned models do not establish extra value over B0. In particular, B3's 100
 
 Still required:
 
-1. diagnose and repair B2 scalar-TD held-out/terminal semantics without changing the frozen SAC or adding a new model;
-2. diagnose and repair B3 terminal anchoring and quantile scale collapse;
-3. rerun the bounded 4x4 validation protocol and require semantically valid predictions;
-4. establish stable held-out value over B0 before approving a formal multi-seed scale;
-5. only after the complete Stage A gate passes, consider 16x16 competence, operational capacity, switching baselines, and target-domain adaptation;
-6. continue to defer obstacles and Collision Module.
+1. do not treat repaired B3 quantiles as upper bounds while q0.90/q0.95/q0.99 remain under-covered;
+2. decide whether the distance-dominated 4x4 setting warrants any further Energy Critic work before a formal multi-seed run;
+3. establish stable held-out value over B0 before approving a formal scale;
+4. only after the complete Stage A gate passes, consider 16x16 competence, operational capacity, switching baselines, and target-domain adaptation;
+5. continue to defer obstacles and Collision Module.

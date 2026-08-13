@@ -2,6 +2,8 @@
 
 Date: 2026-08-14
 
+Follow-up: the same-data TD repair removes the B2/B3 scale collapse but does not beat B0 and does not repair B3 upper-tail coverage. See `STAGE_A_TD_REPAIR_RESULTS.md`. The numbers below remain the immutable pre-repair validation result.
+
 ## Decision
 
 `VALIDATION_RUN_COMPLETED = TRUE`

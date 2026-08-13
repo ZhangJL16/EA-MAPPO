@@ -1,12 +1,19 @@
 from __future__ import annotations
 
 import numpy as np
+import torch
 
 from experiments.energy_transfer.stage_a_bootstrap import (
     build_dataset,
     collect_bootstrap_trajectory,
     split_sorties,
     trajectory_payload,
+)
+from experiments.energy_transfer.retraining import (
+    CriticTrainingProtocol,
+    deterministic_energy_dataset,
+    train_quantile_td_repair,
+    train_scalar_td_repair,
 )
 from experiments.energy_transfer import decide_managed_goal
 from envs.navigation import NavigationEnv, OperationalEnergyConfig, OperationalEnergyWrapper
@@ -97,6 +104,30 @@ def test_censored_return_has_no_return_to_go_supervision() -> None:
     assert payload["total_return_path_length"] is None
     assert all(row["return_energy_to_go"] is None for row in payload["transitions"])
     assert all(row["path_length_remaining"] is None for row in payload["transitions"])
+
+
+def test_repaired_td_recovers_one_two_and_multistep_deterministic_returns() -> None:
+    protocol = CriticTrainingProtocol(
+        total_updates=400,
+        mc_pretrain_updates=300,
+        normalize_returns=True,
+        anchor_near_terminal=True,
+        low_scale_initialization=True,
+        target_update="polyak0.01",
+        weight_nonuniform_quantile_atoms=True,
+    )
+    for length in (1, 2, 10):
+        dataset = deterministic_energy_dataset([0.1] * length)
+        datasets = {"train": dataset, "calibration": dataset, "test": dataset}
+        scalar, scalar_scale, _ = train_scalar_td_repair(datasets, protocol, seed=length)
+        quantile, quantile_scale, _ = train_quantile_td_repair(datasets, protocol, seed=length)
+        with torch.no_grad():
+            features = torch.from_numpy(dataset.features)
+            scalar_prediction = scalar(features).numpy() * scalar_scale
+            quantile_prediction = quantile(features).numpy() * quantile_scale
+        np.testing.assert_allclose(scalar_prediction, dataset.returns, atol=0.03)
+        np.testing.assert_allclose(quantile_prediction[:, 0], dataset.returns, atol=0.06)
+        assert np.all(quantile_prediction[:, 1:] >= quantile_prediction[:, :-1])
 
 
 def test_managed_goal_interface_switches_navigation_goal_once() -> None:

@@ -130,6 +130,45 @@ def residual_relationships(
     return report
 
 
+def horizon_error_report(
+    prediction: np.ndarray,
+    target: np.ndarray,
+    horizons: np.ndarray,
+) -> dict[str, Any]:
+    predicted = np.asarray(prediction, dtype=np.float64)
+    observed = np.asarray(target, dtype=np.float64)
+    steps = np.asarray(horizons, dtype=np.int64)
+    if predicted.shape != observed.shape or predicted.shape != steps.shape:
+        raise ValueError("prediction, target, and horizons must align")
+    bins = (
+        ("1", steps == 1),
+        ("2", steps == 2),
+        ("3", steps == 3),
+        ("4-5", (steps >= 4) & (steps <= 5)),
+        ("6-10", (steps >= 6) & (steps <= 10)),
+        ("11-20", (steps >= 11) & (steps <= 20)),
+        ("21-40", (steps >= 21) & (steps <= 40)),
+        (">40", steps > 40),
+    )
+    report: dict[str, dict[str, float | int]] = {}
+    for label, mask in bins:
+        if not np.any(mask):
+            continue
+        error = predicted[mask] - observed[mask]
+        report[label] = {
+            "sample_count": int(mask.sum()),
+            "mae": float(np.mean(np.abs(error))),
+            "mean_signed_error": float(np.mean(error)),
+            "mean_prediction": float(np.mean(predicted[mask])),
+            "mean_target": float(np.mean(observed[mask])),
+        }
+    return {
+        "bins": report,
+        "signed_error_vs_horizon_correlation": safe_correlation(predicted - observed, steps),
+        "absolute_error_vs_horizon_correlation": safe_correlation(np.abs(predicted - observed), steps),
+    }
+
+
 def paired_sortie_comparisons(
     predictions: dict[str, np.ndarray],
     target: np.ndarray,

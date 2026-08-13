@@ -5,8 +5,20 @@ from torch import nn
 from torch.nn import functional as functional
 
 
+def _inverse_softplus(value: float) -> float:
+    if value <= 0.0:
+        raise ValueError("initial positive output must be positive")
+    return float(torch.log(torch.expm1(torch.tensor(value, dtype=torch.float64))))
+
+
 class ScalarEnergyCritic(nn.Module):
-    def __init__(self, input_dim: int, hidden_dim: int = 128) -> None:
+    def __init__(
+        self,
+        input_dim: int,
+        hidden_dim: int = 128,
+        *,
+        initial_output: float | None = None,
+    ) -> None:
         super().__init__()
         self.network = nn.Sequential(
             nn.Linear(input_dim, hidden_dim),
@@ -15,6 +27,10 @@ class ScalarEnergyCritic(nn.Module):
             nn.ReLU(),
             nn.Linear(hidden_dim, 1),
         )
+        if initial_output is not None:
+            output = self.network[-1]
+            nn.init.zeros_(output.weight)
+            nn.init.constant_(output.bias, _inverse_softplus(initial_output))
 
     def forward(self, features: torch.Tensor) -> torch.Tensor:
         return functional.softplus(self.network(features)).squeeze(-1)
@@ -26,6 +42,9 @@ class MonotoneQuantileCritic(nn.Module):
         input_dim: int,
         quantile_levels: tuple[float, ...] = (0.50, 0.90, 0.95, 0.99),
         hidden_dim: int = 128,
+        *,
+        initial_base: float | None = None,
+        initial_increment: float | None = None,
     ) -> None:
         super().__init__()
         if not quantile_levels or any(not 0.0 < value < 1.0 for value in quantile_levels):
@@ -41,6 +60,12 @@ class MonotoneQuantileCritic(nn.Module):
         )
         self.base_head = nn.Linear(hidden_dim, 1)
         self.increment_head = nn.Linear(hidden_dim, len(quantile_levels) - 1)
+        if initial_base is not None:
+            nn.init.zeros_(self.base_head.weight)
+            nn.init.constant_(self.base_head.bias, _inverse_softplus(initial_base))
+        if initial_increment is not None and len(quantile_levels) > 1:
+            nn.init.zeros_(self.increment_head.weight)
+            nn.init.constant_(self.increment_head.bias, _inverse_softplus(initial_increment))
 
     def forward(self, features: torch.Tensor) -> torch.Tensor:
         hidden = self.backbone(features)
