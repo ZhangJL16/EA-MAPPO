@@ -31,6 +31,7 @@ def code_hash(root: str | Path) -> str:
             "safety",
             "experiments/new_route",
             "experiments/energy_transfer",
+            "experiments/navigation_scale",
             "scripts",
         )
         for path in (root_path / prefix).rglob("*.py")
