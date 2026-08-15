@@ -311,7 +311,11 @@ class _SACUAVAgent(UAVAgent):
         self.horizontal_a_max = float(horizontal_a_max)
         self.vertical_a_max = float(vertical_a_max)
 
-    def update_velocity(self, normalized_action: np.ndarray, time_step: float) -> np.ndarray:
+    def update_velocity(
+        self,
+        normalized_action: np.ndarray,
+        time_step: float,
+    ) -> tuple[np.ndarray, np.ndarray]:
         action = np.asarray(normalized_action, dtype=np.float32)
         if action.shape != (3,) or not np.all(np.isfinite(action)):
             raise ValueError("SAC action must be a finite (3,) vector")
@@ -320,7 +324,7 @@ class _SACUAVAgent(UAVAgent):
         horizontal_norm = float(np.linalg.norm(horizontal))
         if horizontal_norm > 1.0:
             horizontal = horizontal / horizontal_norm
-        acceleration = np.array(
+        commanded_acceleration = np.array(
             [
                 horizontal[0] * self.horizontal_a_max,
                 horizontal[1] * self.horizontal_a_max,
@@ -328,12 +332,14 @@ class _SACUAVAgent(UAVAgent):
             ],
             dtype=np.float32,
         )
-        self.vel += acceleration * float(time_step)
+        velocity_before = self.vel.copy()
+        self.vel += commanded_acceleration * float(time_step)
         horizontal_speed = float(np.linalg.norm(self.vel[:2]))
         if horizontal_speed > self.horizontal_v_max:
-            self.vel[:2] *= self.horizontal_v_max / (horizontal_speed + eps)
+            self.vel[:2] *= self.horizontal_v_max / horizontal_speed
         self.vel[2] = np.clip(self.vel[2], -self.vertical_v_max, self.vertical_v_max)
-        return acceleration
+        realized_acceleration = (self.vel - velocity_before) / float(time_step)
+        return commanded_acceleration, realized_acceleration.astype(np.float32)
 
 
 class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
@@ -734,18 +740,27 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         policy_distance = 0.0
         goal_reached = False
         energy_exhausted = False
-        last_acceleration = np.zeros(3, dtype=np.float32)
+        last_commanded_acceleration = np.zeros(3, dtype=np.float32)
+        last_realized_acceleration = np.zeros(3, dtype=np.float32)
         for _ in range(self.physics_substeps_per_policy_step):
             substep_start = self.agent.pos.copy()
-            last_acceleration = self.agent.update_velocity(executed_action, self.physics_dt)
+            (
+                last_commanded_acceleration,
+                last_realized_acceleration,
+            ) = self.agent.update_velocity(executed_action, self.physics_dt)
+            velocity_after_propulsion = self.agent.vel.copy()
             self.agent.preview_position(self.physics_dt)
+            substep_energy = self._realized_energy_cost(
+                last_realized_acceleration,
+                self.physics_dt,
+                velocity=velocity_after_propulsion,
+            )
             substep_boundary, _, _ = self._apply_boundary_constraints(self.agent)
             boundary_contact = boundary_contact or bool(substep_boundary)
             self.agent.pos = self.agent.prev_pos.copy()
             substep_distance = float(np.linalg.norm(self.agent.pos - substep_start))
             self._current_goal_path_length += substep_distance
             policy_distance += substep_distance
-            substep_energy = self._realized_energy_cost(last_acceleration, self.physics_dt)
             total_energy += substep_energy
             if self.finite_energy_enabled:
                 self.agent.energy = max(0.0, float(self.agent.energy) - substep_energy)
@@ -912,7 +927,9 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         info.update(
             {
                 "progress": float(progress),
-                "physical_acceleration": last_acceleration.copy(),
+                "commanded_acceleration": last_commanded_acceleration.copy(),
+                "realized_acceleration": last_realized_acceleration.copy(),
+                "physical_acceleration": last_realized_acceleration.copy(),
                 "executed_action": executed_action.copy(),
                 "mode_before": mode_before_decision.value,
                 "active_goal_before": segment_goal.copy(),
@@ -929,7 +946,9 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
                 "velocity": self.agent.vel.copy(),
                 "nominal_action": nominal_action.copy(),
                 "executed_action": executed_action.copy(),
-                "physical_acceleration": last_acceleration.copy(),
+                "commanded_acceleration": last_commanded_acceleration.copy(),
+                "realized_acceleration": last_realized_acceleration.copy(),
+                "physical_acceleration": last_realized_acceleration.copy(),
                 "active_goal": self.active_goal.copy(),
                 "task_point": self.current_task_point.copy(),
                 "mode": self.mode.value,
@@ -1006,10 +1025,17 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         direction = (delta / max(distance, eps)).astype(np.float32)
         return velocity_feature, direction, distance
 
-    def _realized_energy_cost(self, acceleration: np.ndarray, duration: float) -> float:
+    def _realized_energy_cost(
+        self,
+        acceleration: np.ndarray,
+        duration: float,
+        *,
+        velocity: np.ndarray | None = None,
+    ) -> float:
+        propulsion_velocity = self.agent.vel if velocity is None else np.asarray(velocity, dtype=np.float32)
         state = NavigationState(
             position=self.agent.pos,
-            velocity=self.agent.vel,
+            velocity=propulsion_velocity,
             energy=float(self.agent.energy),
             timestamp=float(self.current_step * self.policy_dt),
         )
@@ -1242,7 +1268,11 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
                     "distance_bucket": self._distance_bucket(self._current_goal_initial_distance),
                     "policy_steps": len(rows),
                     "path_length": float(self._current_goal_path_length),
-                    "path_efficiency": float(
+                    "path_ratio": float(
+                        self._current_goal_path_length
+                        / max(self._current_goal_initial_distance, eps)
+                    ),
+                    "path_efficiency_fraction": float(
                         self._current_goal_initial_distance / max(self._current_goal_path_length, eps)
                     ),
                     "true_total_energy": float(returns[0]),
@@ -1271,7 +1301,7 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
     @staticmethod
     def _distance_bucket(distance: float) -> str:
         if distance < 500.0:
-            return "0-500"
+            return "100-500"
         if distance < 1500.0:
             return "500-1500"
         if distance < 2500.0:

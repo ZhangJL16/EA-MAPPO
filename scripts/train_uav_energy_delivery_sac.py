@@ -41,6 +41,7 @@ from matplotlib import pyplot as plt
 
 ROOT = Path(__file__).resolve().parents[1]
 FORMAL_PHASE1_TRANSITION_BUDGET = 500_000
+FORMAL_PHASE1B_TRANSITION_BUDGET = 500_000
 FORMAL_PHASE2_TRANSITION_BUDGET = 500_000
 DISTANCE_BUCKETS = (
     ("100-500", 100.0, 500.0),
@@ -313,13 +314,21 @@ def evaluate_navigation_tasks(
             },
         )
         boundary_contacts = 0
+        consecutive_boundary_contacts = 0
+        max_consecutive_boundary_contacts = 0
         reward_total = 0.0
         while True:
             action, _ = policy.predict(observation, deterministic=True)
             observation, reward, terminated, truncated, info = environment.step(action)
             evaluation_transitions += 1
             reward_total += float(reward)
-            boundary_contacts += int(info["boundary_contact"])
+            contact = bool(info["boundary_contact"])
+            boundary_contacts += int(contact)
+            consecutive_boundary_contacts = consecutive_boundary_contacts + 1 if contact else 0
+            max_consecutive_boundary_contacts = max(
+                max_consecutive_boundary_contacts,
+                consecutive_boundary_contacts,
+            )
             if terminated or truncated:
                 success = bool(info["is_success"])
                 actual_path = float(environment._current_goal_path_length)
@@ -333,7 +342,9 @@ def evaluate_navigation_tasks(
                         "path_length": actual_path,
                         "path_ratio": actual_path / max(task.straight_line_distance, 1e-8),
                         "reward": reward_total,
-                        "boundary_contacts": boundary_contacts,
+                        "boundary_contact_steps": boundary_contacts,
+                        "had_boundary_contact": boundary_contacts > 0,
+                        "max_consecutive_boundary_contacts": max_consecutive_boundary_contacts,
                         "end_reason": info["end_reason"],
                     }
                 )
@@ -344,6 +355,9 @@ def evaluate_navigation_tasks(
         bucket_success[bucket_name] = (
             None if not subset else float(np.mean([row["success"] for row in subset]))
         )
+    boundary_contact_steps = sum(int(row["boundary_contact_steps"]) for row in records)
+    episodes_with_boundary_contact = sum(bool(row["had_boundary_contact"]) for row in records)
+    boundary_contact_step_rate = float(boundary_contact_steps / max(evaluation_transitions, 1))
     summary = {
         "global_env_transitions": int(global_env_transitions),
         "evaluation_env_transitions": int(evaluation_transitions),
@@ -352,8 +366,16 @@ def evaluate_navigation_tasks(
         "distance_bucket_success": bucket_success,
         "mean_steps_per_task": float(np.mean([row["policy_steps"] for row in records])),
         "mean_path_ratio": float(np.mean([row["path_ratio"] for row in records])),
-        "boundary_contact_rate": float(
-            sum(int(row["boundary_contacts"]) for row in records) / max(evaluation_transitions, 1)
+        "boundary_contact_step_rate": boundary_contact_step_rate,
+        "boundary_contact_rate": boundary_contact_step_rate,
+        "episodes_with_boundary_contact": int(episodes_with_boundary_contact),
+        "boundary_contact_episode_rate": float(episodes_with_boundary_contact / max(len(records), 1)),
+        "mean_boundary_contacts_per_episode": float(boundary_contact_steps / max(len(records), 1)),
+        "max_boundary_contacts_in_episode": int(
+            max((int(row["boundary_contact_steps"]) for row in records), default=0)
+        ),
+        "max_consecutive_boundary_contacts": int(
+            max((int(row["max_consecutive_boundary_contacts"]) for row in records), default=0)
         ),
         "mean_reward": float(np.mean([row["reward"] for row in records])),
         "records": records,
@@ -372,7 +394,7 @@ def navigation_gate_passed(summary: dict[str, object]) -> bool:
         summary["overall_success_rate"] >= 0.98
         and min(float(value) for value in bucket_success.values()) >= 0.95
         and summary["mean_path_ratio"] <= 1.10
-        and summary["boundary_contact_rate"] < 0.01
+        and summary["boundary_contact_step_rate"] < 0.01
     )
 
 
@@ -414,6 +436,7 @@ class NavigationBudgetCallback(BaseCallback):
         self.gif_evaluation_env_transitions = 0
         self.first_convergence_transition: int | None = None
         self.stable_convergence_transition: int | None = None
+        self.final_evaluation: dict[str, object] | None = None
         self._gate_streak = 0
         self._next_eval = int(args.eval_freq_transitions)
         self._next_checkpoint = int(args.checkpoint_freq_transitions)
@@ -450,7 +473,10 @@ class NavigationBudgetCallback(BaseCallback):
             checkpoint = self.output / "phase1_navigation" / f"checkpoint_transition_{self._next_checkpoint:06d}"
             self.model.save(checkpoint)
             self._next_checkpoint += self.args.checkpoint_freq_transitions
-        if self.num_timesteps >= self._next_eval:
+        if (
+            self.num_timesteps >= self._next_eval
+            and self._next_eval < self.args.phase1_transition_budget
+        ):
             evaluation = evaluate_navigation_tasks(
                 self.model,
                 self.args,
@@ -459,6 +485,7 @@ class NavigationBudgetCallback(BaseCallback):
                 output_path=self.output / "eval" / f"eval_transition_{self._next_eval:06d}.json",
             )
             self.evaluation_env_transitions += int(evaluation["evaluation_env_transitions"])
+            self.final_evaluation = evaluation
             if navigation_gate_passed(evaluation):
                 self._gate_streak += 1
                 if self.first_convergence_transition is None:
@@ -516,6 +543,13 @@ class NavigationBudgetCallback(BaseCallback):
                 "boundary_contact_rate": float(
                     np.mean([bool(info["boundary_contact"]) for info in self._interval_infos])
                 ),
+                "gradient_updates": int(self.model._n_updates),
+                "gradient_updates_per_transition": float(
+                    self.model._n_updates / max(self.num_timesteps, 1)
+                ),
+                "gradient_updates_per_1000_transitions": float(
+                    1000.0 * self.model._n_updates / max(self.num_timesteps, 1)
+                ),
                 "task_stuck_count": int(
                     sum(bool(info["task_stuck"]) for info in self._interval_infos)
                 ),
@@ -565,6 +599,7 @@ class NavigationBudgetCallback(BaseCallback):
             "gif_evaluation_env_transitions": self.gif_evaluation_env_transitions,
             "first_convergence_transition": self.first_convergence_transition,
             "stable_convergence_transition": self.stable_convergence_transition,
+            "final_evaluation": self.final_evaluation,
         }
 
 
@@ -588,6 +623,7 @@ def train_navigation_fixed_budget(
         tau=args.tau,
         gamma=args.gamma,
         train_freq=(1, "step"),
+        gradient_steps=args.gradient_steps,
         verbose=1,
         tensorboard_log=str(output / "tensorboard"),
     )
@@ -600,6 +636,29 @@ def train_navigation_fixed_budget(
     )
     if model.num_timesteps != args.phase1_transition_budget:
         raise RuntimeError("Phase 1A did not stop at the exact transition budget")
+    if eval_tasks:
+        callback.final_evaluation = evaluate_navigation_tasks(
+            model,
+            args,
+            eval_tasks,
+            global_env_transitions=args.phase1_transition_budget,
+            output_path=(
+                output
+                / "eval"
+                / f"eval_transition_{args.phase1_transition_budget:06d}.json"
+            ),
+        )
+        callback.evaluation_env_transitions += int(
+            callback.final_evaluation["evaluation_env_transitions"]
+        )
+        if navigation_gate_passed(callback.final_evaluation):
+            callback._gate_streak += 1
+            if callback.first_convergence_transition is None:
+                callback.first_convergence_transition = args.phase1_transition_budget
+            if callback._gate_streak >= 3 and callback.stable_convergence_transition is None:
+                callback.stable_convergence_transition = args.phase1_transition_budget
+        else:
+            callback._gate_streak = 0
     final_checkpoint = output / "phase1_navigation" / f"checkpoint_transition_{args.phase1_transition_budget:06d}"
     model.save(final_checkpoint)
     audit = callback.audit()
@@ -610,6 +669,12 @@ def train_navigation_fixed_budget(
             "exact_budget_match": model.num_timesteps == args.phase1_transition_budget,
             "finish_last_episode_after_budget": False,
             "final_checkpoint": str(final_checkpoint.with_suffix(".zip")),
+            "train_freq": [1, "step"],
+            "gradient_steps": int(model.gradient_steps),
+            "actual_gradient_updates": int(model._n_updates),
+            "gradient_update_to_transition_ratio": float(
+                model._n_updates / max(model.num_timesteps, 1)
+            ),
         }
     )
     write_json(output / "phase1_navigation" / "summary.json", audit)
@@ -717,12 +782,35 @@ def run_battery_calibration(
                 break
     after_hash = _policy_parameter_hash(policy)
     successful = [row for row in task_records if row["success"]]
+    failed = [row for row in task_records if not row["success"]]
     if not successful:
         raise RuntimeError("battery calibration has no successful frozen-policy trajectories")
     total_flight_time = float(sum(row["simulation_flight_time"] for row in successful))
     total_energy = float(sum(row["total_realized_energy"] for row in successful))
+    all_rollout_time = float(sum(row["simulation_flight_time"] for row in task_records))
+    all_rollout_energy = float(sum(row["total_realized_energy"] for row in task_records))
+    failed_energy = float(sum(row["total_realized_energy"] for row in failed))
     mean_power = total_energy / total_flight_time
+    mean_power_all_rollouts = all_rollout_energy / max(all_rollout_time, 1e-12)
     task_powers = np.asarray([row["mean_realized_power"] for row in successful], dtype=np.float64)
+    bucket_success: dict[str, float | None] = {}
+    bucket_success_counts: dict[str, int] = {}
+    bucket_task_counts: dict[str, int] = {}
+    bucket_sufficient_success: dict[str, bool] = {}
+    for bucket_name, _, _ in DISTANCE_BUCKETS:
+        subset = [row for row in task_records if row["distance_bucket"] == bucket_name]
+        success_count = sum(bool(row["success"]) for row in subset)
+        bucket_task_counts[bucket_name] = len(subset)
+        bucket_success_counts[bucket_name] = int(success_count)
+        bucket_success[bucket_name] = (
+            None if not subset else float(success_count / len(subset))
+        )
+        required_successes = int(np.ceil(0.95 * len(subset)))
+        bucket_sufficient_success[bucket_name] = bool(success_count >= required_successes)
+    calibration_success_rate = float(len(successful) / len(task_records))
+    calibration_navigation_valid = bool(
+        calibration_success_rate >= 0.98 and all(bucket_sufficient_success.values())
+    )
     capacities = calculate_battery_capacities(mean_power, args.target_nominal_endurance_minutes)
     summary = {
         "stage": "battery_calibration",
@@ -732,10 +820,22 @@ def run_battery_calibration(
         "num_tasks": len(task_records),
         "num_successful_tasks": len(successful),
         "num_failed_tasks": len(task_records) - len(successful),
+        "successful_task_count": len(successful),
+        "failed_task_count": len(failed),
+        "calibration_success_rate": calibration_success_rate,
+        "calibration_distance_bucket_success": bucket_success,
+        "calibration_distance_bucket_success_counts": bucket_success_counts,
+        "calibration_distance_bucket_task_counts": bucket_task_counts,
+        "calibration_distance_bucket_sufficient_success": bucket_sufficient_success,
+        "battery_calibration_navigation_valid": calibration_navigation_valid,
         "battery_calibration_env_transitions": calibration_transitions,
         "total_flight_time": total_flight_time,
         "total_realized_energy": total_energy,
+        "total_energy_successful": total_energy,
+        "total_energy_failed": failed_energy,
         "mean_power": mean_power,
+        "mean_power_successful_only": mean_power,
+        "mean_power_all_rollouts": mean_power_all_rollouts,
         "median_task_mean_power": float(np.median(task_powers)),
         "std_task_mean_power": float(np.std(task_powers)),
         "p50_task_mean_power": float(np.quantile(task_powers, 0.50)),
@@ -887,10 +987,111 @@ def run_battery_validation(
     return summary
 
 
+def _estimator_parameter_hash(estimator: GoalConditionedQuantileTDEnergyEstimator) -> str:
+    digest = hashlib.sha256()
+    for parameter in estimator.model.parameters():
+        digest.update(parameter.detach().cpu().numpy().tobytes())
+    return digest.hexdigest()
+
+
+def evaluate_energy_tasks(
+    policy: DeterministicPolicy,
+    estimator: GoalConditionedQuantileTDEnergyEstimator,
+    args: argparse.Namespace,
+    tasks: list[NavigationTask],
+    *,
+    global_td_transitions: int,
+    output_path: Path | None = None,
+) -> dict[str, object]:
+    environment = environment_from_args(args, phase=SACTrainingPhase.TD_PRETRAINING)
+    environment.bind_energy_learning(
+        energy_estimator=estimator,
+        goal_action_provider=single_action_provider(policy),
+        training_enabled=False,
+    )
+    replay_size_before = len(estimator.replay)
+    trainable_replay_size_before = len(estimator.trainable_replay)
+    update_count_before = estimator.update_count
+    parameter_hash_before = _estimator_parameter_hash(estimator)
+    evaluation_transitions = 0
+    successful_records: list[dict[str, object]] = []
+    task_records: list[dict[str, object]] = []
+    for task_index, task in enumerate(tasks):
+        observation, _ = environment.reset(
+            seed=args.energy_eval_seed + task_index,
+            options={
+                "start_position": task.start_position,
+                "start_velocity": task.initial_velocity,
+                "task_point": task.goal_position,
+            },
+        )
+        while True:
+            action, _ = policy.predict(observation, deterministic=True)
+            observation, _, terminated, truncated, info = environment.step(action)
+            evaluation_transitions += 1
+            if terminated or truncated:
+                success = bool(info["is_success"])
+                completed = info["completed_goal_evaluation"]
+                task_records.append(
+                    {
+                        "task_index": task_index,
+                        "distance_bucket": task.distance_bucket,
+                        "straight_line_distance": task.straight_line_distance,
+                        "success": success,
+                        "policy_steps": int(environment.current_step),
+                        "end_reason": info["end_reason"],
+                    }
+                )
+                if success and completed is not None:
+                    record = dict(completed)
+                    record["distance_bucket"] = task.distance_bucket
+                    successful_records.append(record)
+                break
+    parameter_hash_after = _estimator_parameter_hash(estimator)
+    if len(estimator.replay) != replay_size_before:
+        raise RuntimeError("held-out TD evaluation wrote to replay")
+    if len(estimator.trainable_replay) != trainable_replay_size_before:
+        raise RuntimeError("held-out TD evaluation wrote to trainable replay")
+    if estimator.update_count != update_count_before or parameter_hash_after != parameter_hash_before:
+        raise RuntimeError("held-out TD evaluation updated the energy critic")
+    metrics = aggregate_goal_evaluations(successful_records)
+    overall_metrics = metrics["overall"]
+    summary = {
+        "global_td_collection_transitions": int(global_td_transitions),
+        "energy_eval_env_transitions": int(evaluation_transitions),
+        "num_tasks": len(tasks),
+        "successful_tasks": len(successful_records),
+        "failed_tasks": len(tasks) - len(successful_records),
+        "success_rate": float(len(successful_records) / max(len(tasks), 1)),
+        "td_optimizer_enabled": False,
+        "td_replay_writes": 0,
+        "sac_deterministic": True,
+        "MAE": overall_metrics.get("td_mae"),
+        "RMSE": overall_metrics.get("td_rmse"),
+        "bias": overall_metrics.get("td_bias"),
+        "underestimation_rate": overall_metrics.get("td_underestimation_rate"),
+        "mean_underestimation_magnitude": overall_metrics.get(
+            "td_mean_underestimation_magnitude"
+        ),
+        "Q50_coverage": overall_metrics.get("q50_coverage"),
+        "Q90_coverage": overall_metrics.get("q90_coverage"),
+        "Q95_coverage": overall_metrics.get("q95_coverage"),
+        "Q99_coverage": overall_metrics.get("q99_coverage"),
+        "distance_bucket_metrics": metrics["by_initial_goal_distance"],
+        "metrics": metrics,
+        "tasks": task_records,
+    }
+    if output_path is not None:
+        write_json(output_path, summary)
+    environment.close()
+    return summary
+
+
 def run_td_pretraining(
     policy: DeterministicPolicy,
     estimator: GoalConditionedQuantileTDEnergyEstimator,
     args: argparse.Namespace,
+    energy_eval_tasks: list[NavigationTask],
     *,
     transition_budget: int,
     output: Path,
@@ -907,6 +1108,8 @@ def run_td_pretraining(
     cumulative_energy = 0.0
     diagnostic_rows: list[dict[str, object]] = []
     goal_evaluations: list[dict[str, object]] = []
+    heldout_evaluations: list[dict[str, object]] = []
+    next_heldout_evaluation = int(args.energy_eval_freq_transitions)
     while transitions < transition_budget:
         action, _ = policy.predict(observation, deterministic=True)
         observation, _, terminated, truncated, info = environment.step(action)
@@ -939,6 +1142,21 @@ def run_td_pretraining(
         if terminated or truncated:
             successful_segments += int(info["is_success"])
             observation, _ = environment.reset(seed=args.td_collection_seed + transitions)
+        if transitions >= next_heldout_evaluation:
+            evaluation = evaluate_energy_tasks(
+                policy,
+                estimator,
+                args,
+                energy_eval_tasks,
+                global_td_transitions=transitions,
+                output_path=(
+                    output
+                    / "phase1_td"
+                    / f"eval_transition_{next_heldout_evaluation:06d}.json"
+                ),
+            )
+            heldout_evaluations.append(evaluation)
+            next_heldout_evaluation += args.energy_eval_freq_transitions
     estimator.save(output / "phase1_td" / "td_energy_phase1.pt")
     summary = {
         "transition_budget": transition_budget,
@@ -951,8 +1169,15 @@ def run_td_pretraining(
         "sac_frozen": True,
         "collection_environment_recreated": True,
         "td_evaluation": aggregate_goal_evaluations(goal_evaluations),
+        "heldout_evaluation": None if not heldout_evaluations else heldout_evaluations[-1],
+        "heldout_evaluation_count": len(heldout_evaluations),
+        "heldout_evaluation_transitions": int(
+            sum(row["energy_eval_env_transitions"] for row in heldout_evaluations)
+        ),
     }
     write_json(output / "phase1_td" / "summary.json", summary)
+    if heldout_evaluations:
+        write_json(output / "phase1_td" / "heldout_summary.json", heldout_evaluations[-1])
     _plot_td_diagnostics(diagnostic_rows, output)
     environment.close()
     return summary
@@ -1376,7 +1601,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--device", default="cuda")
     parser.add_argument("--num-envs", type=int, default=8)
     parser.add_argument("--phase1-transition-budget", type=int, default=FORMAL_PHASE1_TRANSITION_BUDGET)
-    parser.add_argument("--phase1b-transition-budget", type=int, default=500_000)
+    parser.add_argument("--phase1b-transition-budget", type=int, default=FORMAL_PHASE1B_TRANSITION_BUDGET)
     parser.add_argument("--phase2-transition-budget", type=int, default=FORMAL_PHASE2_TRANSITION_BUDGET)
     parser.add_argument("--phase1-episode-max-steps", type=int, default=4000)
     parser.add_argument("--phase2-episode-max-steps", type=int, default=20_000)
@@ -1386,6 +1611,9 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--gif-freq-transitions", type=int, default=100_000)
     parser.add_argument("--eval-navigation-tasks", type=int, default=500)
     parser.add_argument("--eval-task-seed", type=int, default=70_001)
+    parser.add_argument("--energy-eval-tasks", type=int, default=500)
+    parser.add_argument("--energy-eval-seed", type=int, default=120_001)
+    parser.add_argument("--energy-eval-freq-transitions", type=int, default=50_000)
     parser.add_argument("--battery-calibration-tasks", type=int, default=500)
     parser.add_argument("--battery-calibration-seed", type=int, default=80_001)
     parser.add_argument("--battery-validation-runs", type=int, default=100)
@@ -1425,6 +1653,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--batch-size", type=int, default=256)
     parser.add_argument("--tau", type=float, default=0.005)
     parser.add_argument("--gamma", type=float, default=0.99)
+    parser.add_argument("--gradient-steps", type=int, default=-1)
     parser.add_argument("--allow-dirty", action="store_true")
     args = parser.parse_args(argv)
     if args.smoke and args.validation:
@@ -1437,6 +1666,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         args.log_freq_transitions = 800
         args.gif_freq_transitions = 8000
         args.eval_navigation_tasks = 10
+        args.energy_eval_tasks = 10
+        args.energy_eval_freq_transitions = 1000
         args.battery_calibration_tasks = 20
         args.battery_validation_runs = 5
         args.learning_starts = min(args.learning_starts, 256)
@@ -1451,6 +1682,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         args.checkpoint_freq_transitions = 25_000
         args.gif_freq_transitions = 50_000
         args.eval_navigation_tasks = 20
+        args.energy_eval_tasks = 20
+        args.energy_eval_freq_transitions = 2500
         args.battery_calibration_tasks = 20
         args.battery_validation_runs = 5
         args.target_nominal_endurance_minutes = min(args.target_nominal_endurance_minutes, 2.0)
@@ -1466,11 +1699,23 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     ):
         if getattr(args, frequency_name) <= 0 or getattr(args, frequency_name) % args.num_envs != 0:
             parser.error(f"{frequency_name.replace('_', '-')} must be positive and divisible by num-envs")
-    for name in ("eval_navigation_tasks", "battery_calibration_tasks"):
+    for name in ("eval_navigation_tasks", "energy_eval_tasks", "battery_calibration_tasks"):
         if getattr(args, name) % 5 != 0:
             parser.error(f"{name.replace('_', '-')} must be divisible by five")
-    if len({args.seed, args.eval_task_seed, args.battery_calibration_seed, args.battery_validation_seed}) != 4:
-        parser.error("training, evaluation, calibration, and battery-validation seeds must be distinct")
+    protocol_seeds = {
+        args.seed,
+        args.eval_task_seed,
+        args.energy_eval_seed,
+        args.battery_calibration_seed,
+        args.battery_validation_seed,
+        args.td_collection_seed,
+    }
+    if len(protocol_seeds) != 6:
+        parser.error("training, navigation-eval, energy-eval, calibration, validation, and TD seeds must be distinct")
+    if args.gradient_steps == 0 or args.gradient_steps < -1:
+        parser.error("gradient-steps must be -1 or a positive integer")
+    if args.energy_eval_freq_transitions <= 0:
+        parser.error("energy-eval-freq-transitions must be positive")
     if args.gamma_energy != ENERGY_GAMMA:
         parser.error("gamma-energy must equal 1.0")
     if not 0.0 <= args.energy_reserve_fraction < 1.0:
@@ -1505,6 +1750,19 @@ def train(args: argparse.Namespace) -> dict[str, object]:
         seed=args.battery_calibration_seed,
         role="battery_calibration",
     )
+    energy_eval_tasks = generate_stratified_navigation_tasks(
+        num_tasks=args.energy_eval_tasks,
+        seed=args.energy_eval_seed,
+    )
+    save_navigation_tasks(
+        output / "energy_eval_tasks.json",
+        energy_eval_tasks,
+        seed=args.energy_eval_seed,
+        role="heldout_energy_evaluation",
+    )
+    effective_updates_per_transition = (
+        1.0 if args.gradient_steps == -1 else float(args.gradient_steps / args.num_envs)
+    )
     config = {
         "protocol": "UAV_ENERGY_DELIVERY_V3_FIXED_TRANSITION_WITH_BATTERY_CALIBRATION",
         "status": "RUNNING",
@@ -1522,6 +1780,9 @@ def train(args: argparse.Namespace) -> dict[str, object]:
             "episode_max_policy_steps": args.phase1_episode_max_steps,
             "finish_last_episode_after_budget": False,
             "convergence_gate_role": "diagnostic_only_no_early_stop",
+            "train_freq": [1, "step"],
+            "gradient_steps": args.gradient_steps,
+            "effective_updates_per_transition": effective_updates_per_transition,
         },
         "battery_calibration": {
             "tasks": args.battery_calibration_tasks,
@@ -1538,6 +1799,9 @@ def train(args: argparse.Namespace) -> dict[str, object]:
             "transition_budget": args.phase1b_transition_budget,
             "sac_frozen": True,
             "td_replay_excludes_phase1a": True,
+            "heldout_energy_eval_tasks": args.energy_eval_tasks,
+            "heldout_energy_eval_seed": args.energy_eval_seed,
+            "heldout_eval_freq_transitions": args.energy_eval_freq_transitions,
         },
         "phase2": {
             "transition_budget": args.phase2_transition_budget,
@@ -1574,7 +1838,25 @@ def train(args: argparse.Namespace) -> dict[str, object]:
         navigation_audit["downstream_policy_frozen_before_calibration"] = all(
             not parameter.requires_grad for parameter in model.policy.parameters()
         )
+        final_navigation_evaluation = navigation_audit["final_evaluation"]
+        navigation_audit["navigation_training_completed"] = True
+        navigation_audit["downstream_navigation_ready"] = navigation_gate_passed(
+            final_navigation_evaluation
+        )
         write_json(output / "phase1_navigation" / "summary.json", navigation_audit)
+        if not navigation_audit["downstream_navigation_ready"] and not (
+            args.smoke or args.validation
+        ):
+            stopped = {
+                "status": "STOPPED_AFTER_PHASE1",
+                "stopped_at": utc_now(),
+                "navigation_training_completed": True,
+                "downstream_navigation_ready": False,
+                "navigation": navigation_audit,
+            }
+            write_json(output / "STOPPED_AFTER_PHASE1.json", stopped)
+            (output / "RUNNING.json").unlink(missing_ok=True)
+            return stopped
         calibration_policy: DeterministicPolicy = (
             HeuristicGoalPolicy()
             if (args.smoke or args.validation) and args.smoke_use_heuristic_policy
@@ -1587,6 +1869,20 @@ def train(args: argparse.Namespace) -> dict[str, object]:
             output / "battery_calibration",
         )
         capacity = float(calibration["calibrated_battery_capacity"])
+        if not calibration["battery_calibration_navigation_valid"] and not (
+            args.allow_failed_battery_calibration or args.smoke or args.validation
+        ):
+            stopped = {
+                "status": "STOPPED_AFTER_BATTERY_CALIBRATION",
+                "stopped_at": utc_now(),
+                "battery_calibration_navigation_valid": False,
+                "battery_calibration": {
+                    key: value for key, value in calibration.items() if key != "tasks"
+                },
+            }
+            write_json(output / "STOPPED_AFTER_BATTERY_CALIBRATION.json", stopped)
+            (output / "RUNNING.json").unlink(missing_ok=True)
+            return stopped
         battery_validation = run_battery_validation(
             calibration_policy,
             args,
@@ -1632,6 +1928,7 @@ def train(args: argparse.Namespace) -> dict[str, object]:
                 td_policy,
                 estimator,
                 args,
+                energy_eval_tasks,
                 transition_budget=args.phase1b_transition_budget,
                 output=output,
             )

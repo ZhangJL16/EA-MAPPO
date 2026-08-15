@@ -20,6 +20,8 @@ __pycache__/
 *.log
 
 # Training outputs and evaluation artifacts
+artifacts/uav_energy_delivery*/
+artifacts/launch_logs/
 result/
 model/
 replay/

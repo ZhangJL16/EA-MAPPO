@@ -23,11 +23,13 @@ from scripts.train_uav_energy_delivery_sac import (
     HeuristicGoalPolicy,
     NavigationTask,
     calculate_battery_capacities,
+    evaluate_energy_tasks,
     evaluate_navigation_tasks,
     freeze_navigation_and_start_td,
     generate_navigation_curves,
     generate_stratified_navigation_tasks,
     make_navigation_vec_env,
+    navigation_gate_passed,
     parse_args,
     run_battery_calibration,
     run_battery_validation,
@@ -166,6 +168,70 @@ def test_physical_norm_limits_are_enforced() -> None:
             break
     assert np.linalg.norm(environment.agent.vel[:2]) <= 20.0 + 1e-5
     assert abs(float(environment.agent.vel[2])) <= 5.0 + 1e-5
+
+
+def test_speed_saturation_uses_realized_not_commanded_acceleration_for_energy() -> None:
+    environment = UAVEnergyDeliverySACEnv()
+    start = np.array([1000.0, 1000.0, 100.0], dtype=np.float32)
+    environment.reset(
+        seed=51,
+        options={
+            "start_position": start,
+            "start_velocity": np.array([20.0, 0.0, 0.0], dtype=np.float32),
+            "task_point": np.array([2000.0, 1000.0, 100.0], dtype=np.float32),
+        },
+    )
+    _, _, _, _, info = environment.step(np.array([1.0, 0.0, 0.0], dtype=np.float32))
+    np.testing.assert_allclose(info["commanded_acceleration"], [5.0, 0.0, 0.0], atol=1e-6)
+    np.testing.assert_allclose(info["realized_acceleration"], 0.0, atol=1e-5)
+    np.testing.assert_allclose(info["physical_acceleration"], info["realized_acceleration"])
+    state = NavigationState(start, np.array([20.0, 0.0, 0.0]), 1.0, 0.0)
+    expected_substep = environment.telemetry_cost_model.realized_cost(
+        state,
+        np.zeros(3),
+        environment.physics_dt,
+    )
+    assert info["realized_energy_cost"] == pytest.approx(4.0 * expected_substep)
+
+
+def test_unsaturated_realized_acceleration_matches_velocity_delta() -> None:
+    environment = UAVEnergyDeliverySACEnv()
+    start = np.array([1000.0, 1000.0, 100.0], dtype=np.float32)
+    environment.reset(
+        seed=52,
+        options={
+            "start_position": start,
+            "task_point": np.array([2000.0, 1000.0, 100.0], dtype=np.float32),
+        },
+    )
+    velocity_before = environment.agent.vel.copy()
+    _, _, _, _, info = environment.step(np.array([1.0, 0.0, 0.0], dtype=np.float32))
+    expected_policy_delta = np.array([5.0 * environment.policy_dt, 0.0, 0.0])
+    np.testing.assert_allclose(environment.agent.vel - velocity_before, expected_policy_delta, atol=1e-5)
+    np.testing.assert_allclose(info["realized_acceleration"], [5.0, 0.0, 0.0], atol=1e-5)
+
+
+def test_boundary_projection_does_not_create_propulsion_acceleration_energy() -> None:
+    environment = UAVEnergyDeliverySACEnv()
+    start = np.array([0.5, 1000.0, 100.0], dtype=np.float32)
+    environment.reset(
+        seed=53,
+        options={
+            "start_position": start,
+            "start_velocity": np.array([-20.0, 0.0, 0.0], dtype=np.float32),
+            "task_point": np.array([1000.0, 1000.0, 100.0], dtype=np.float32),
+        },
+    )
+    _, _, terminated, truncated, info = environment.step(np.zeros(3, dtype=np.float32))
+    assert info["boundary_contact"] is True
+    assert not terminated and not truncated
+    np.testing.assert_allclose(info["commanded_acceleration"], 0.0)
+    np.testing.assert_allclose(info["realized_acceleration"], 0.0)
+    config = environment.telemetry_cost_model.config
+    first_power = config.base_power + 20.0 * config.velocity_coefficients[0] + config.compute_power + config.communication_power
+    hover_power = config.base_power + config.compute_power + config.communication_power
+    expected = environment.physics_dt * (first_power + 3.0 * hover_power)
+    assert info["realized_energy_cost"] == pytest.approx(expected)
 
 
 def test_sac_log_distance_and_td_linear_distance_are_distinct() -> None:
@@ -419,6 +485,26 @@ def test_small_navigation_run_stops_at_exact_budget_without_finishing_episodes(t
     assert audit["partial_episodes_at_budget_stop"] == 8
     assert audit["failed_training_episodes"] == 0
     assert checkpoint.exists()
+    assert model.gradient_steps == -1
+
+
+def test_gradient_steps_minus_one_updates_once_per_environment_transition(tmp_path: Path) -> None:
+    args = parse_args(["--output-dir", str(tmp_path / "unused"), "--smoke", "--device", "cpu"])
+    args.phase1_transition_budget = 32
+    args.phase1_episode_max_steps = 1000
+    args.eval_freq_transitions = 8000
+    args.checkpoint_freq_transitions = 32
+    args.log_freq_transitions = 8
+    args.learning_starts = 0
+    args.batch_size = 8
+    output = tmp_path / "run"
+    (output / "phase1_navigation").mkdir(parents=True)
+    (output / "eval").mkdir()
+    model, audit, _ = train_navigation_fixed_budget(args, output, [])
+    assert model.gradient_steps == -1
+    assert audit["actual_training_transitions"] == 32
+    assert audit["actual_gradient_updates"] == 32
+    assert audit["gradient_update_to_transition_ratio"] == pytest.approx(1.0)
 
 
 def test_fixed_evaluation_tasks_are_reproducible_and_stratified() -> None:
@@ -445,6 +531,30 @@ def test_evaluation_transitions_are_separate_from_training(tmp_path: Path) -> No
     assert summary["global_env_transitions"] == 8000
     assert summary["evaluation_env_transitions"] > 0
     assert summary["overall_success_rate"] == 1.0
+
+
+def test_navigation_boundary_episode_metrics_and_gate_name() -> None:
+    args = parse_args(["--output-dir", "/tmp/not-used", "--smoke", "--device", "cpu"])
+    args.phase1_episode_max_steps = 3
+
+    class BoundaryPolicy:
+        def predict(self, observation, deterministic=True):
+            del observation, deterministic
+            return np.array([-1.0, 0.0, 0.0], dtype=np.float32), None
+
+    start = np.array([0.5, 1000.0, 100.0], dtype=np.float32)
+    task = NavigationTask(start, np.array([1000.0, 1000.0, 100.0]), np.zeros(3), 999.5, "500-1500")
+    summary = evaluate_navigation_tasks(BoundaryPolicy(), args, [task], global_env_transitions=0)
+    record = summary["records"][0]
+    assert record["had_boundary_contact"] is True
+    assert record["boundary_contact_steps"] == 3
+    assert record["max_consecutive_boundary_contacts"] == 3
+    assert summary["boundary_contact_episode_rate"] == pytest.approx(1.0)
+    assert summary["mean_boundary_contacts_per_episode"] == pytest.approx(3.0)
+    assert summary["max_boundary_contacts_in_episode"] == 3
+    assert summary["max_consecutive_boundary_contacts"] == 3
+    assert summary["boundary_contact_step_rate"] == pytest.approx(1.0)
+    assert navigation_gate_passed(summary) is False
 
 
 def test_freeze_navigation_clears_only_td_replay() -> None:
@@ -486,9 +596,95 @@ def test_battery_calibration_uses_realized_telemetry_and_does_not_write_td(tmp_p
     assert summary["mean_power"] > 0.0
     assert summary["calibrated_battery_capacity"] > 0.0
     assert summary["td_replay_writes"] == 0
+    assert summary["calibration_success_rate"] == pytest.approx(1.0)
+    assert summary["mean_power_successful_only"] == pytest.approx(summary["mean_power"])
+    assert summary["mean_power_all_rollouts"] > 0.0
+    assert summary["battery_calibration_navigation_valid"] is True
     assert summary["battery_calibration_env_transitions"] > 0
     assert (output / "battery_calibration.json").exists()
     assert (output / "battery_calibration_power_distribution.png").exists()
+
+
+def test_calibration_audits_failed_rollouts_instead_of_dropping_them(tmp_path: Path) -> None:
+    args = parse_args(["--output-dir", str(tmp_path / "unused"), "--smoke", "--device", "cpu"])
+    args.minimum_task_distance = 5.0
+    args.phase1_episode_max_steps = 1
+    start = np.array([1000.0, 1000.0, 100.0], dtype=np.float32)
+    tasks = [
+        NavigationTask(
+            start,
+            start + np.array([5.5, 0.0, 0.0], dtype=np.float32),
+            np.array([20.0, 0.0, 0.0], dtype=np.float32),
+            5.5,
+            "100-500",
+        ),
+        NavigationTask(
+            start,
+            start + np.array([100.0, 0.0, 0.0], dtype=np.float32),
+            np.zeros(3, dtype=np.float32),
+            100.0,
+            "100-500",
+        ),
+    ]
+    output = tmp_path / "calibration"
+    output.mkdir()
+    summary = run_battery_calibration(HeuristicGoalPolicy(), args, tasks, output)
+    assert summary["successful_task_count"] == 1
+    assert summary["failed_task_count"] == 1
+    assert summary["calibration_success_rate"] == pytest.approx(0.5)
+    assert summary["total_energy_failed"] > 0.0
+    assert summary["mean_power_all_rollouts"] > 0.0
+    assert summary["battery_calibration_navigation_valid"] is False
+
+
+def test_heldout_energy_evaluation_is_read_only_and_seed_separate(tmp_path: Path) -> None:
+    args = parse_args(["--output-dir", str(tmp_path / "unused"), "--smoke", "--device", "cpu"])
+    args.minimum_task_distance = 5.0
+    assert args.energy_eval_seed not in {
+        args.seed,
+        args.eval_task_seed,
+        args.battery_calibration_seed,
+        args.battery_validation_seed,
+        args.td_collection_seed,
+    }
+    estimator = GoalConditionedQuantileTDEnergyEstimator(
+        hidden_dim=8,
+        batch_size=2,
+        replay_capacity=16,
+        learning_starts=2,
+    )
+    state = np.zeros(7, dtype=np.float32)
+    action = np.zeros(3, dtype=np.float32)
+    estimator.observe_transition(state, action, 1.0, state, state, action, True, "TASK")
+    replay_before = len(estimator.replay)
+    update_before = estimator.update_count
+    start = np.array([1000.0, 1000.0, 100.0], dtype=np.float32)
+    task = NavigationTask(
+        start,
+        start + np.array([5.5, 0.0, 0.0], dtype=np.float32),
+        np.array([20.0, 0.0, 0.0], dtype=np.float32),
+        5.5,
+        "100-500",
+    )
+    output = tmp_path / "heldout.json"
+    summary = evaluate_energy_tasks(
+        HeuristicGoalPolicy(),
+        estimator,
+        args,
+        [task],
+        global_td_transitions=50_000,
+        output_path=output,
+    )
+    assert summary["successful_tasks"] == 1
+    assert summary["td_optimizer_enabled"] is False
+    assert summary["td_replay_writes"] == 0
+    assert len(estimator.replay) == replay_before
+    assert estimator.update_count == update_before
+    assert summary["metrics"]["overall"]["num_completed_goals"] == 1
+    assert summary["MAE"] is not None
+    assert summary["Q95_coverage"] is not None
+    assert "100-500" in summary["distance_bucket_metrics"]
+    assert output.exists()
 
 
 def test_battery_validation_runs_to_depletion_and_writes_report(tmp_path: Path) -> None:
