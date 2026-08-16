@@ -1,0 +1,1025 @@
+{
+  "all_runs_depleted": true,
+  "battery_calibration_valid": true,
+  "battery_capacity": 378.72626091628933,
+  "battery_validation_env_transitions": 914676,
+  "battery_validation_runs": 100,
+  "engineering_calibration_tolerance_fraction": 0.2,
+  "mean_depletion_time": 1828.0125000002781,
+  "mean_distance_before_depletion": 35748.1923595088,
+  "mean_policy_steps_to_depletion": 9146.76,
+  "mean_tasks_before_depletion": 17.05,
+  "median_depletion_time": 1824.5750000002774,
+  "p10_depletion_time": 1788.9800000002692,
+  "p25_depletion_time": 1806.500000000273,
+  "p50_depletion_time": 1824.5750000002774,
+  "p75_depletion_time": 1852.512500000284,
+  "p90_depletion_time": 1864.6700000002868,
+  "records": [
+    {
+      "actual_depletion_time": 1809.8000000002737,
+      "actual_policy_steps_to_depletion": 9057,
+      "distance_before_depletion": 35483.17519246042,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 0,
+      "tasks_before_depletion": 17,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1809.5000000002742,
+      "actual_policy_steps_to_depletion": 9055,
+      "distance_before_depletion": 34900.86139973998,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 1,
+      "tasks_before_depletion": 21,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1887.0500000002914,
+      "actual_policy_steps_to_depletion": 9442,
+      "distance_before_depletion": 36673.59024976194,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 2,
+      "tasks_before_depletion": 18,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1847.4000000002825,
+      "actual_policy_steps_to_depletion": 9242,
+      "distance_before_depletion": 36104.866369500756,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 3,
+      "tasks_before_depletion": 18,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1861.050000000286,
+      "actual_policy_steps_to_depletion": 9310,
+      "distance_before_depletion": 36705.58470116556,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 4,
+      "tasks_before_depletion": 16,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1793.9000000002704,
+      "actual_policy_steps_to_depletion": 8976,
+      "distance_before_depletion": 35307.38123956323,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 5,
+      "tasks_before_depletion": 16,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1854.6500000002843,
+      "actual_policy_steps_to_depletion": 9281,
+      "distance_before_depletion": 36602.893243938684,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 6,
+      "tasks_before_depletion": 14,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1830.5000000002788,
+      "actual_policy_steps_to_depletion": 9161,
+      "distance_before_depletion": 34749.44853532314,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 7,
+      "tasks_before_depletion": 21,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1873.2500000002885,
+      "actual_policy_steps_to_depletion": 9372,
+      "distance_before_depletion": 36983.150477968156,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 8,
+      "tasks_before_depletion": 14,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1781.2000000002677,
+      "actual_policy_steps_to_depletion": 8911,
+      "distance_before_depletion": 35090.33075916767,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 9,
+      "tasks_before_depletion": 17,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1774.100000000266,
+      "actual_policy_steps_to_depletion": 8877,
+      "distance_before_depletion": 34818.815438345075,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 10,
+      "tasks_before_depletion": 17,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1857.3000000002849,
+      "actual_policy_steps_to_depletion": 9294,
+      "distance_before_depletion": 36458.533294945955,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 11,
+      "tasks_before_depletion": 18,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1811.0500000002744,
+      "actual_policy_steps_to_depletion": 9064,
+      "distance_before_depletion": 35590.8386066556,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 12,
+      "tasks_before_depletion": 18,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1838.5000000002806,
+      "actual_policy_steps_to_depletion": 9200,
+      "distance_before_depletion": 36104.11744683981,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 13,
+      "tasks_before_depletion": 16,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1780.8500000002675,
+      "actual_policy_steps_to_depletion": 8909,
+      "distance_before_depletion": 34880.967033445835,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 14,
+      "tasks_before_depletion": 16,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1823.9000000002777,
+      "actual_policy_steps_to_depletion": 9125,
+      "distance_before_depletion": 35837.2832454294,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 15,
+      "tasks_before_depletion": 15,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1830.000000000279,
+      "actual_policy_steps_to_depletion": 9157,
+      "distance_before_depletion": 35538.06490056217,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 16,
+      "tasks_before_depletion": 18,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1848.300000000283,
+      "actual_policy_steps_to_depletion": 9246,
+      "distance_before_depletion": 36563.70194001496,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 17,
+      "tasks_before_depletion": 15,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1785.5000000002688,
+      "actual_policy_steps_to_depletion": 8933,
+      "distance_before_depletion": 34930.266941547394,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 18,
+      "tasks_before_depletion": 16,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1864.1500000002864,
+      "actual_policy_steps_to_depletion": 9327,
+      "distance_before_depletion": 36836.515329539776,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 19,
+      "tasks_before_depletion": 15,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1862.650000000286,
+      "actual_policy_steps_to_depletion": 9320,
+      "distance_before_depletion": 36405.86045843363,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 20,
+      "tasks_before_depletion": 17,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1807.2000000002733,
+      "actual_policy_steps_to_depletion": 9043,
+      "distance_before_depletion": 34679.03898739815,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 21,
+      "tasks_before_depletion": 19,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1856.5000000002847,
+      "actual_policy_steps_to_depletion": 9289,
+      "distance_before_depletion": 36337.40340055525,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 22,
+      "tasks_before_depletion": 17,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1776.5000000002665,
+      "actual_policy_steps_to_depletion": 8890,
+      "distance_before_depletion": 34593.97707314044,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 23,
+      "tasks_before_depletion": 17,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1896.400000000294,
+      "actual_policy_steps_to_depletion": 9488,
+      "distance_before_depletion": 36667.76355436444,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 24,
+      "tasks_before_depletion": 18,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1805.750000000273,
+      "actual_policy_steps_to_depletion": 9035,
+      "distance_before_depletion": 35097.608267754316,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 25,
+      "tasks_before_depletion": 17,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1800.8500000002718,
+      "actual_policy_steps_to_depletion": 9010,
+      "distance_before_depletion": 35372.5633572042,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 26,
+      "tasks_before_depletion": 15,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1813.000000000275,
+      "actual_policy_steps_to_depletion": 9072,
+      "distance_before_depletion": 35850.36261872947,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 27,
+      "tasks_before_depletion": 15,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1821.1500000002766,
+      "actual_policy_steps_to_depletion": 9113,
+      "distance_before_depletion": 34753.5642323792,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 28,
+      "tasks_before_depletion": 20,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1804.0000000002728,
+      "actual_policy_steps_to_depletion": 9027,
+      "distance_before_depletion": 35350.623321831226,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 29,
+      "tasks_before_depletion": 17,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1812.7000000002745,
+      "actual_policy_steps_to_depletion": 9071,
+      "distance_before_depletion": 35644.721349552274,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 30,
+      "tasks_before_depletion": 16,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1822.5500000002767,
+      "actual_policy_steps_to_depletion": 9121,
+      "distance_before_depletion": 35328.32869884372,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 31,
+      "tasks_before_depletion": 19,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1806.750000000273,
+      "actual_policy_steps_to_depletion": 9043,
+      "distance_before_depletion": 35543.264118775725,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 32,
+      "tasks_before_depletion": 18,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1844.500000000282,
+      "actual_policy_steps_to_depletion": 9230,
+      "distance_before_depletion": 36424.2230565995,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 33,
+      "tasks_before_depletion": 15,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1839.9000000002807,
+      "actual_policy_steps_to_depletion": 9208,
+      "distance_before_depletion": 36176.20265907049,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 34,
+      "tasks_before_depletion": 16,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1855.5000000002842,
+      "actual_policy_steps_to_depletion": 9282,
+      "distance_before_depletion": 36587.1641857028,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 35,
+      "tasks_before_depletion": 15,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1806.9500000002736,
+      "actual_policy_steps_to_depletion": 9042,
+      "distance_before_depletion": 35059.17295053601,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 36,
+      "tasks_before_depletion": 18,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1810.0000000002744,
+      "actual_policy_steps_to_depletion": 9057,
+      "distance_before_depletion": 35406.90924242139,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 37,
+      "tasks_before_depletion": 17,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1887.6000000002916,
+      "actual_policy_steps_to_depletion": 9446,
+      "distance_before_depletion": 36471.58409635723,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 38,
+      "tasks_before_depletion": 16,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1863.8000000002862,
+      "actual_policy_steps_to_depletion": 9325,
+      "distance_before_depletion": 36143.24054469168,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 39,
+      "tasks_before_depletion": 18,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1825.0500000002776,
+      "actual_policy_steps_to_depletion": 9133,
+      "distance_before_depletion": 35346.06697790325,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 40,
+      "tasks_before_depletion": 19,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1826.9000000002782,
+      "actual_policy_steps_to_depletion": 9139,
+      "distance_before_depletion": 36001.20909060538,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 41,
+      "tasks_before_depletion": 16,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1807.3000000002735,
+      "actual_policy_steps_to_depletion": 9042,
+      "distance_before_depletion": 35270.69812606275,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 42,
+      "tasks_before_depletion": 17,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1910.300000000297,
+      "actual_policy_steps_to_depletion": 9560,
+      "distance_before_depletion": 36846.03847670555,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 43,
+      "tasks_before_depletion": 20,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1797.9500000002715,
+      "actual_policy_steps_to_depletion": 8995,
+      "distance_before_depletion": 35192.43160156906,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 44,
+      "tasks_before_depletion": 14,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1770.8500000002653,
+      "actual_policy_steps_to_depletion": 8862,
+      "distance_before_depletion": 34787.50012503564,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 45,
+      "tasks_before_depletion": 18,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1885.9500000002913,
+      "actual_policy_steps_to_depletion": 9434,
+      "distance_before_depletion": 37009.65302860737,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 46,
+      "tasks_before_depletion": 17,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1822.200000000277,
+      "actual_policy_steps_to_depletion": 9116,
+      "distance_before_depletion": 36056.729496628046,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 47,
+      "tasks_before_depletion": 12,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1862.6000000002862,
+      "actual_policy_steps_to_depletion": 9318,
+      "distance_before_depletion": 36677.38904866576,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 48,
+      "tasks_before_depletion": 16,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1799.750000000272,
+      "actual_policy_steps_to_depletion": 9005,
+      "distance_before_depletion": 35462.77922357619,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 49,
+      "tasks_before_depletion": 15,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1837.2000000002804,
+      "actual_policy_steps_to_depletion": 9192,
+      "distance_before_depletion": 35451.972227633,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 50,
+      "tasks_before_depletion": 16,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1780.5500000002676,
+      "actual_policy_steps_to_depletion": 8908,
+      "distance_before_depletion": 34828.62848532945,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 51,
+      "tasks_before_depletion": 15,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1841.7000000002815,
+      "actual_policy_steps_to_depletion": 9214,
+      "distance_before_depletion": 36265.67020982504,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 52,
+      "tasks_before_depletion": 17,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1800.2500000002717,
+      "actual_policy_steps_to_depletion": 9009,
+      "distance_before_depletion": 35349.04794500768,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 53,
+      "tasks_before_depletion": 17,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1792.8000000002703,
+      "actual_policy_steps_to_depletion": 8971,
+      "distance_before_depletion": 35435.1081828773,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 54,
+      "tasks_before_depletion": 16,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1794.6000000002707,
+      "actual_policy_steps_to_depletion": 8979,
+      "distance_before_depletion": 35319.411141097546,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 55,
+      "tasks_before_depletion": 17,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1814.4500000002747,
+      "actual_policy_steps_to_depletion": 9080,
+      "distance_before_depletion": 35093.8151255101,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 56,
+      "tasks_before_depletion": 21,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1864.8500000002862,
+      "actual_policy_steps_to_depletion": 9332,
+      "distance_before_depletion": 36421.042652100325,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 57,
+      "tasks_before_depletion": 19,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1864.6500000002868,
+      "actual_policy_steps_to_depletion": 9330,
+      "distance_before_depletion": 36831.6258533597,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 58,
+      "tasks_before_depletion": 15,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1833.3000000002796,
+      "actual_policy_steps_to_depletion": 9172,
+      "distance_before_depletion": 36110.62345071137,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 59,
+      "tasks_before_depletion": 15,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1872.5000000002883,
+      "actual_policy_steps_to_depletion": 9369,
+      "distance_before_depletion": 36408.98221980035,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 60,
+      "tasks_before_depletion": 17,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1836.65000000028,
+      "actual_policy_steps_to_depletion": 9191,
+      "distance_before_depletion": 35992.01004640758,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 61,
+      "tasks_before_depletion": 19,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1796.7500000002713,
+      "actual_policy_steps_to_depletion": 8989,
+      "distance_before_depletion": 35348.52242344618,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 62,
+      "tasks_before_depletion": 13,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1769.6500000002652,
+      "actual_policy_steps_to_depletion": 8855,
+      "distance_before_depletion": 34531.51154702902,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 63,
+      "tasks_before_depletion": 19,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1856.1000000002848,
+      "actual_policy_steps_to_depletion": 9286,
+      "distance_before_depletion": 36443.34174863994,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 64,
+      "tasks_before_depletion": 17,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1804.400000000273,
+      "actual_policy_steps_to_depletion": 9031,
+      "distance_before_depletion": 34804.994962498546,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 65,
+      "tasks_before_depletion": 21,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1875.8000000002892,
+      "actual_policy_steps_to_depletion": 9385,
+      "distance_before_depletion": 37083.2291302979,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 66,
+      "tasks_before_depletion": 15,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1875.0500000002887,
+      "actual_policy_steps_to_depletion": 9383,
+      "distance_before_depletion": 36925.53468104452,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 67,
+      "tasks_before_depletion": 18,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1840.9500000002813,
+      "actual_policy_steps_to_depletion": 9211,
+      "distance_before_depletion": 35954.232810646296,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 68,
+      "tasks_before_depletion": 16,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1806.9500000002733,
+      "actual_policy_steps_to_depletion": 9041,
+      "distance_before_depletion": 35542.4623478502,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 69,
+      "tasks_before_depletion": 16,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1827.0000000002776,
+      "actual_policy_steps_to_depletion": 9143,
+      "distance_before_depletion": 35232.624910756946,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 70,
+      "tasks_before_depletion": 19,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1858.8500000002853,
+      "actual_policy_steps_to_depletion": 9302,
+      "distance_before_depletion": 36426.14528025687,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 71,
+      "tasks_before_depletion": 19,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1822.3500000002769,
+      "actual_policy_steps_to_depletion": 9118,
+      "distance_before_depletion": 34852.11037968099,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 72,
+      "tasks_before_depletion": 20,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1829.7000000002788,
+      "actual_policy_steps_to_depletion": 9157,
+      "distance_before_depletion": 35516.940506652,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 73,
+      "tasks_before_depletion": 18,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1859.300000000285,
+      "actual_policy_steps_to_depletion": 9305,
+      "distance_before_depletion": 36140.7115522027,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 74,
+      "tasks_before_depletion": 20,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1821.1500000002768,
+      "actual_policy_steps_to_depletion": 9114,
+      "distance_before_depletion": 35203.66739393771,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 75,
+      "tasks_before_depletion": 23,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1824.6000000002775,
+      "actual_policy_steps_to_depletion": 9129,
+      "distance_before_depletion": 35311.10693053901,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 76,
+      "tasks_before_depletion": 17,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1851.800000000284,
+      "actual_policy_steps_to_depletion": 9265,
+      "distance_before_depletion": 36368.24738943577,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 77,
+      "tasks_before_depletion": 17,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1813.950000000275,
+      "actual_policy_steps_to_depletion": 9080,
+      "distance_before_depletion": 35293.86453539133,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 78,
+      "tasks_before_depletion": 20,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1789.0000000002692,
+      "actual_policy_steps_to_depletion": 8952,
+      "distance_before_depletion": 35379.96695818007,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 79,
+      "tasks_before_depletion": 15,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1813.600000000275,
+      "actual_policy_steps_to_depletion": 9075,
+      "distance_before_depletion": 35609.11364488304,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 80,
+      "tasks_before_depletion": 18,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1788.8000000002692,
+      "actual_policy_steps_to_depletion": 8951,
+      "distance_before_depletion": 34715.7326849252,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 81,
+      "tasks_before_depletion": 20,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1794.8500000002705,
+      "actual_policy_steps_to_depletion": 8981,
+      "distance_before_depletion": 34854.45875006169,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 82,
+      "tasks_before_depletion": 17,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1860.3500000002857,
+      "actual_policy_steps_to_depletion": 9307,
+      "distance_before_depletion": 36624.324202522635,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 83,
+      "tasks_before_depletion": 13,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1844.600000000282,
+      "actual_policy_steps_to_depletion": 9229,
+      "distance_before_depletion": 36029.77116306126,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 84,
+      "tasks_before_depletion": 17,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1804.2500000002728,
+      "actual_policy_steps_to_depletion": 9028,
+      "distance_before_depletion": 35559.026118695736,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 85,
+      "tasks_before_depletion": 17,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1842.950000000282,
+      "actual_policy_steps_to_depletion": 9221,
+      "distance_before_depletion": 36022.5110013783,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 86,
+      "tasks_before_depletion": 17,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1849.9500000002836,
+      "actual_policy_steps_to_depletion": 9256,
+      "distance_before_depletion": 35760.054987847805,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 87,
+      "tasks_before_depletion": 20,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1841.9000000002816,
+      "actual_policy_steps_to_depletion": 9217,
+      "distance_before_depletion": 35682.429661646485,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 88,
+      "tasks_before_depletion": 17,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1809.100000000274,
+      "actual_policy_steps_to_depletion": 9051,
+      "distance_before_depletion": 35479.18174992502,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 89,
+      "tasks_before_depletion": 15,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1791.00000000027,
+      "actual_policy_steps_to_depletion": 8960,
+      "distance_before_depletion": 35382.877617672086,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 90,
+      "tasks_before_depletion": 15,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1847.1000000002823,
+      "actual_policy_steps_to_depletion": 9242,
+      "distance_before_depletion": 36143.98889166117,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 91,
+      "tasks_before_depletion": 15,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1843.5500000002821,
+      "actual_policy_steps_to_depletion": 9225,
+      "distance_before_depletion": 35915.76175048947,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 92,
+      "tasks_before_depletion": 19,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1824.5500000002774,
+      "actual_policy_steps_to_depletion": 9130,
+      "distance_before_depletion": 35618.96405430138,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 93,
+      "tasks_before_depletion": 17,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1818.450000000276,
+      "actual_policy_steps_to_depletion": 9100,
+      "distance_before_depletion": 35903.61888638139,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 94,
+      "tasks_before_depletion": 18,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1806.9500000002733,
+      "actual_policy_steps_to_depletion": 9039,
+      "distance_before_depletion": 35725.79040169716,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 95,
+      "tasks_before_depletion": 15,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1837.9500000002804,
+      "actual_policy_steps_to_depletion": 9195,
+      "distance_before_depletion": 36332.674580037594,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 96,
+      "tasks_before_depletion": 15,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1861.4000000002854,
+      "actual_policy_steps_to_depletion": 9314,
+      "distance_before_depletion": 36624.66758686304,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 97,
+      "tasks_before_depletion": 17,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1817.5000000002756,
+      "actual_policy_steps_to_depletion": 9096,
+      "distance_before_depletion": 35381.22937145829,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 98,
+      "tasks_before_depletion": 19,
+      "truncated": false
+    },
+    {
+      "actual_depletion_time": 1780.5500000002673,
+      "actual_policy_steps_to_depletion": 8911,
+      "distance_before_depletion": 34881.448101609945,
+      "end_reason": "energy_exhausted",
+      "energy_exhausted": true,
+      "run_index": 99,
+      "tasks_before_depletion": 17,
+      "truncated": false
+    }
+  ],
+  "relative_endurance_error": 0.015562500000154513,
+  "stage": "battery_endurance_validation",
+  "std_depletion_time": 30.924785670242475,
+  "target_nominal_endurance_minutes": 30.0,
+  "target_nominal_endurance_seconds": 1800.0
+}

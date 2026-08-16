@@ -1,0 +1,21 @@
+
+=== BATTERY CALIBRATION ===
+Calibration tasks: 500
+Total flight time: 55504.200 s
+Mean realized power: 0.210403 synthetic_simulation_energy_units/s
+20-min capacity: 252.484174
+30-min capacity: 378.726261
+40-min capacity: 504.968348
+Selected nominal endurance: 30 min
+Selected battery capacity: 378.726261
+Equivalent nominal policy steps: 9000
+
+=== BATTERY VALIDATION ===
+Target nominal endurance: 1800.000 s
+Observed mean depletion time: 1828.013 s
+Observed median depletion time: 1824.575 s
+Mean policy transitions to depletion: 9146.76
+Mean tasks before depletion: 17.05
+Mean distance before depletion: 35748.19 m
+Relative endurance error: 1.556%
+Calibration sanity: PASS
