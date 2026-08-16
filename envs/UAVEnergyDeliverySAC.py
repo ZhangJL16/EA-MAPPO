@@ -813,6 +813,7 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
                 "goal_reached": bool(goal_reached),
                 "goal_type": goal_type,
                 "quantiles": None if quantiles_before is None else quantiles_before.copy(),
+                "boundary_contact": bool(boundary_contact),
             }
         )
         single_task_phase = self.phase in {
@@ -1262,6 +1263,20 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
             if all(prediction is not None for prediction in prediction_rows):
                 predictions = np.stack(prediction_rows).astype(np.float64)
                 q50_error = predictions[:, 0] - returns
+                boundary_contacts = np.asarray(
+                    [bool(row.get("boundary_contact", False)) for row in rows],
+                    dtype=bool,
+                )
+                consecutive_boundary_contacts = 0
+                max_consecutive_boundary_contacts = 0
+                for contact in boundary_contacts:
+                    consecutive_boundary_contacts = (
+                        consecutive_boundary_contacts + 1 if contact else 0
+                    )
+                    max_consecutive_boundary_contacts = max(
+                        max_consecutive_boundary_contacts,
+                        consecutive_boundary_contacts,
+                    )
                 result = {
                     "goal_type": rows[0]["goal_type"],
                     "initial_goal_distance": float(self._current_goal_initial_distance),
@@ -1276,6 +1291,16 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
                         self._current_goal_initial_distance / max(self._current_goal_path_length, eps)
                     ),
                     "true_total_energy": float(returns[0]),
+                    "had_boundary_contact": bool(np.any(boundary_contacts)),
+                    "boundary_contact_steps": int(np.sum(boundary_contacts)),
+                    "boundary_contact_fraction": float(np.mean(boundary_contacts)),
+                    "max_consecutive_boundary_contacts": int(
+                        max_consecutive_boundary_contacts
+                    ),
+                    "finite_predictions": bool(np.all(np.isfinite(predictions))),
+                    "quantile_ordering_valid": bool(
+                        np.all(np.diff(predictions, axis=1) >= -1e-7)
+                    ),
                     "td_mae": float(np.mean(np.abs(q50_error))),
                     "td_rmse": float(np.sqrt(np.mean(q50_error**2))),
                     "td_bias": float(np.mean(q50_error)),

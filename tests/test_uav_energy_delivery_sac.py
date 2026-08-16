@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from collections import deque
 from pathlib import Path
 
@@ -22,18 +23,22 @@ from review_bundle.safety.switching import SortieMode
 from scripts.train_uav_energy_delivery_sac import (
     HeuristicGoalPolicy,
     NavigationTask,
+    aggregate_goal_evaluations,
     calculate_battery_capacities,
     evaluate_energy_tasks,
     evaluate_navigation_tasks,
     freeze_navigation_and_start_td,
     generate_navigation_curves,
     generate_stratified_navigation_tasks,
+    load_resumed_phase1,
     make_navigation_vec_env,
-    navigation_gate_passed,
+    navigation_energy_gate_passed,
+    navigation_safety_gate_passed,
     parse_args,
     run_battery_calibration,
     run_battery_validation,
     run_energy_exhaustion_smoke,
+    run_phase2_fixed_budget,
     run_phase2_state_machine_smoke,
     train_navigation_fixed_budget,
 )
@@ -533,7 +538,7 @@ def test_evaluation_transitions_are_separate_from_training(tmp_path: Path) -> No
     assert summary["overall_success_rate"] == 1.0
 
 
-def test_navigation_boundary_episode_metrics_and_gate_name() -> None:
+def test_navigation_boundary_episode_metrics() -> None:
     args = parse_args(["--output-dir", "/tmp/not-used", "--smoke", "--device", "cpu"])
     args.phase1_episode_max_steps = 3
 
@@ -554,7 +559,125 @@ def test_navigation_boundary_episode_metrics_and_gate_name() -> None:
     assert summary["max_boundary_contacts_in_episode"] == 3
     assert summary["max_consecutive_boundary_contacts"] == 3
     assert summary["boundary_contact_step_rate"] == pytest.approx(1.0)
-    assert navigation_gate_passed(summary) is False
+    assert navigation_energy_gate_passed(summary) is False
+    assert navigation_safety_gate_passed(summary) is False
+
+
+def test_navigation_energy_and_safety_readiness_are_independent() -> None:
+    summary = {
+        "overall_success_rate": 1.0,
+        "distance_bucket_success": {
+            "100-500": 1.0,
+            "500-1500": 1.0,
+            "1500-2500": 1.0,
+            "2500-4000": 1.0,
+            ">4000": 1.0,
+        },
+        "mean_path_ratio": 1.0315,
+        "boundary_contact_step_rate": 0.02896,
+    }
+    assert navigation_energy_gate_passed(summary) is True
+    assert navigation_safety_gate_passed(summary) is False
+
+
+def test_td_metrics_are_split_by_boundary_contact() -> None:
+    base = {
+        "true_total_energy": 10.0,
+        "finite_predictions": True,
+        "quantile_ordering_valid": True,
+        "td_mae": 1.0,
+        "td_rmse": 1.0,
+        "td_bias": 0.0,
+        "td_underestimation_rate": 0.5,
+        "td_overestimation_rate": 0.5,
+        "td_mean_underestimation_magnitude": 0.5,
+        "td_relative_error": 0.1,
+        "q50_coverage": 0.5,
+        "q90_coverage": 0.9,
+        "q95_coverage": 0.95,
+        "q99_coverage": 0.99,
+        "distance_bucket": "100-500",
+    }
+    metrics = aggregate_goal_evaluations(
+        [
+            {**base, "had_boundary_contact": False},
+            {**base, "had_boundary_contact": True, "td_mae": 3.0},
+        ]
+    )
+    groups = metrics["by_boundary_contact"]
+    assert groups["all_trajectories"]["num_completed_goals"] == 2
+    assert groups["clean_trajectories"]["td_mae"] == pytest.approx(1.0)
+    assert groups["boundary_contact_trajectories"]["td_mae"] == pytest.approx(3.0)
+
+
+def test_resume_phase1_loads_and_freezes_existing_500k_checkpoint(tmp_path: Path) -> None:
+    source = tmp_path / "source"
+    phase1 = source / "phase1_navigation"
+    phase1.mkdir(parents=True)
+    environment = UAVEnergyDeliverySACEnv()
+    model = SAC("MlpPolicy", environment, device="cpu", buffer_size=32, learning_starts=32)
+    checkpoint = phase1 / "checkpoint_transition_500000.zip"
+    model.save(checkpoint)
+    final_evaluation = {
+        "overall_success_rate": 1.0,
+        "distance_bucket_success": {
+            "100-500": 1.0,
+            "500-1500": 1.0,
+            "1500-2500": 1.0,
+            "2500-4000": 1.0,
+            ">4000": 1.0,
+        },
+        "mean_path_ratio": 1.03,
+        "boundary_contact_step_rate": 0.03,
+        "boundary_contact_episode_rate": 0.28,
+        "max_consecutive_boundary_contacts": 667,
+    }
+    (phase1 / "summary.json").write_text(
+        json.dumps(
+            {
+                "actual_training_transitions": 500000,
+                "exact_budget_match": True,
+                "final_evaluation": final_evaluation,
+            }
+        ),
+        encoding="utf-8",
+    )
+    output = tmp_path / "output"
+    (output / "phase1_navigation").mkdir(parents=True)
+    args = parse_args(
+        [
+            "--output-dir",
+            str(output),
+            "--smoke",
+            "--device",
+            "cpu",
+            "--resume-after-phase1-checkpoint",
+            str(checkpoint),
+            "--source-phase1-artifact",
+            str(source),
+        ]
+    )
+    resumed, audit, resumed_checkpoint = load_resumed_phase1(args, output)
+    assert resumed_checkpoint == checkpoint.resolve()
+    assert audit["phase1_retrained"] is False
+    assert audit["source_transition"] == 500000
+    assert audit["navigation_energy_ready"] is True
+    assert audit["navigation_safety_ready"] is False
+    assert all(not parameter.requires_grad for parameter in resumed.policy.parameters())
+    assert (output / "phase1_navigation" / "source_final_evaluation.json").exists()
+    environment.close()
+
+
+def test_formal_phase2_rejects_mock_energy_estimator(tmp_path: Path) -> None:
+    args = parse_args(["--output-dir", str(tmp_path / "unused"), "--smoke", "--device", "cpu"])
+    with pytest.raises(TypeError, match="trained_goal_conditioned_quantile_td"):
+        run_phase2_fixed_budget(
+            HeuristicGoalPolicy(),
+            RecordingEstimator(1.0),
+            args,
+            battery_capacity=10.0,
+            output=tmp_path,
+        )
 
 
 def test_freeze_navigation_clears_only_td_replay() -> None:

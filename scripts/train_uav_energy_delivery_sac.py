@@ -128,6 +128,10 @@ def write_json(path: Path, payload: dict[str, object] | list[object]) -> None:
     path.write_text(json.dumps(json_value(payload), indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
+def read_json(path: Path) -> dict[str, object]:
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
 def append_jsonl(path: Path, payload: dict[str, object]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("a", encoding="utf-8") as handle:
@@ -386,7 +390,7 @@ def evaluate_navigation_tasks(
     return summary
 
 
-def navigation_gate_passed(summary: dict[str, object]) -> bool:
+def navigation_energy_gate_passed(summary: dict[str, object]) -> bool:
     bucket_success = summary["distance_bucket_success"]
     if any(value is None for value in bucket_success.values()):
         return False
@@ -394,8 +398,11 @@ def navigation_gate_passed(summary: dict[str, object]) -> bool:
         summary["overall_success_rate"] >= 0.98
         and min(float(value) for value in bucket_success.values()) >= 0.95
         and summary["mean_path_ratio"] <= 1.10
-        and summary["boundary_contact_step_rate"] < 0.01
     )
+
+
+def navigation_safety_gate_passed(summary: dict[str, object]) -> bool:
+    return bool(summary["boundary_contact_step_rate"] < 0.01)
 
 
 def make_navigation_vec_env(args: argparse.Namespace) -> DummyVecEnv:
@@ -486,7 +493,7 @@ class NavigationBudgetCallback(BaseCallback):
             )
             self.evaluation_env_transitions += int(evaluation["evaluation_env_transitions"])
             self.final_evaluation = evaluation
-            if navigation_gate_passed(evaluation):
+            if navigation_energy_gate_passed(evaluation):
                 self._gate_streak += 1
                 if self.first_convergence_transition is None:
                     self.first_convergence_transition = self.num_timesteps
@@ -651,7 +658,7 @@ def train_navigation_fixed_budget(
         callback.evaluation_env_transitions += int(
             callback.final_evaluation["evaluation_env_transitions"]
         )
-        if navigation_gate_passed(callback.final_evaluation):
+        if navigation_energy_gate_passed(callback.final_evaluation):
             callback._gate_streak += 1
             if callback.first_convergence_transition is None:
                 callback.first_convergence_transition = args.phase1_transition_budget
@@ -700,6 +707,84 @@ def freeze_navigation_policy(model: SAC) -> None:
     for parameter in model.policy.parameters():
         parameter.requires_grad_(False)
     model.policy.set_training_mode(False)
+
+
+def load_resumed_phase1(
+    args: argparse.Namespace,
+    output: Path,
+) -> tuple[SAC, dict[str, object], Path]:
+    checkpoint = Path(args.resume_after_phase1_checkpoint).expanduser().resolve()
+    source_artifact = (
+        Path(args.source_phase1_artifact).expanduser().resolve()
+        if args.source_phase1_artifact is not None
+        else checkpoint.parent.parent
+    )
+    if not checkpoint.is_file():
+        raise FileNotFoundError(f"Phase 1 checkpoint does not exist: {checkpoint}")
+    if not source_artifact.is_dir():
+        raise FileNotFoundError(f"Phase 1 artifact does not exist: {source_artifact}")
+    source_summary_path = source_artifact / "phase1_navigation" / "summary.json"
+    if not source_summary_path.is_file():
+        raise FileNotFoundError(f"Phase 1 summary does not exist: {source_summary_path}")
+    source_summary = read_json(source_summary_path)
+    source_transitions = int(source_summary.get("actual_training_transitions", -1))
+    if source_transitions != FORMAL_PHASE1_TRANSITION_BUDGET:
+        raise ValueError(
+            "resume checkpoint must have exactly 500000 recorded Phase 1 transitions"
+        )
+    if not bool(source_summary.get("exact_budget_match", False)):
+        raise ValueError("source Phase 1 summary does not prove an exact transition budget")
+    final_evaluation = source_summary.get("final_evaluation")
+    if not isinstance(final_evaluation, dict):
+        final_eval_candidates = (
+            source_artifact
+            / "phase1_navigation"
+            / f"eval_transition_{source_transitions:06d}.json",
+            source_artifact / "eval" / f"eval_transition_{source_transitions:06d}.json",
+        )
+        final_eval_path = next(
+            (candidate for candidate in final_eval_candidates if candidate.is_file()),
+            None,
+        )
+        if final_eval_path is None:
+            raise FileNotFoundError("source Phase 1 final evaluation metadata is missing")
+        final_evaluation = read_json(final_eval_path)
+    model = SAC.load(checkpoint, device=args.device)
+    if model.observation_space.shape != (7,):
+        raise ValueError(
+            f"resume checkpoint observation shape is {model.observation_space.shape}, expected (7,)"
+        )
+    if model.action_space.shape != (3,):
+        raise ValueError(
+            f"resume checkpoint action shape is {model.action_space.shape}, expected (3,)"
+        )
+    freeze_navigation_policy(model)
+    checkpoint_hash = file_sha256(checkpoint)
+    navigation_audit = {
+        **source_summary,
+        "resume_mode": True,
+        "phase1_retrained": False,
+        "source_phase1_artifact": str(source_artifact),
+        "source_checkpoint": str(checkpoint),
+        "source_checkpoint_sha256": checkpoint_hash,
+        "source_transition": source_transitions,
+        "final_evaluation": final_evaluation,
+        "downstream_checkpoint_reloaded": True,
+        "downstream_checkpoint_sha256": checkpoint_hash,
+        "downstream_policy_frozen_before_calibration": all(
+            not parameter.requires_grad for parameter in model.policy.parameters()
+        ),
+        "navigation_training_completed": True,
+        "navigation_energy_ready": navigation_energy_gate_passed(final_evaluation),
+        "navigation_safety_ready": navigation_safety_gate_passed(final_evaluation),
+    }
+    write_json(output / "phase1_navigation" / "source_summary.json", source_summary)
+    write_json(
+        output / "phase1_navigation" / "source_final_evaluation.json",
+        final_evaluation,
+    )
+    write_json(output / "phase1_navigation" / "resume_audit.json", navigation_audit)
+    return model, navigation_audit, checkpoint
 
 
 def calculate_battery_capacities(mean_power: float, target_minutes: float) -> dict[str, float]:
@@ -1078,6 +1163,7 @@ def evaluate_energy_tasks(
         "Q95_coverage": overall_metrics.get("q95_coverage"),
         "Q99_coverage": overall_metrics.get("q99_coverage"),
         "distance_bucket_metrics": metrics["by_initial_goal_distance"],
+        "boundary_contact_metrics": metrics["by_boundary_contact"],
         "metrics": metrics,
         "tasks": task_records,
     }
@@ -1175,6 +1261,9 @@ def run_td_pretraining(
             sum(row["energy_eval_env_transitions"] for row in heldout_evaluations)
         ),
     }
+    summary["td_readiness"] = (
+        None if not heldout_evaluations else td_readiness_audit(heldout_evaluations[-1])
+    )
     write_json(output / "phase1_td" / "summary.json", summary)
     if heldout_evaluations:
         write_json(output / "phase1_td" / "heldout_summary.json", heldout_evaluations[-1])
@@ -1203,6 +1292,18 @@ def aggregate_goal_evaluations(records: list[dict[str, object]]) -> dict[str, ob
             return {"num_completed_goals": 0}
         return {
             "num_completed_goals": len(rows),
+            "mean_true_total_energy": float(
+                np.mean([float(row["true_total_energy"]) for row in rows])
+            ),
+            "finite_predictions": bool(
+                all(bool(row.get("finite_predictions", True)) for row in rows)
+            ),
+            "quantile_ordering_valid": bool(
+                all(bool(row.get("quantile_ordering_valid", True)) for row in rows)
+            ),
+            "boundary_contact_trajectory_rate": float(
+                np.mean([bool(row.get("had_boundary_contact", False)) for row in rows])
+            ),
             **{
                 metric: float(np.mean([float(row[metric]) for row in rows]))
                 for metric in metric_names
@@ -1211,12 +1312,76 @@ def aggregate_goal_evaluations(records: list[dict[str, object]]) -> dict[str, ob
 
     return {
         "overall": aggregate(records),
+        "by_boundary_contact": {
+            "all_trajectories": aggregate(records),
+            "clean_trajectories": aggregate(
+                [row for row in records if not bool(row.get("had_boundary_contact", False))]
+            ),
+            "boundary_contact_trajectories": aggregate(
+                [row for row in records if bool(row.get("had_boundary_contact", False))]
+            ),
+        },
         "by_initial_goal_distance": {
             bucket_name: aggregate(
                 [row for row in records if row["distance_bucket"] == bucket_name]
             )
             for bucket_name, _, _ in DISTANCE_BUCKETS
         },
+    }
+
+
+def td_readiness_audit(summary: dict[str, object]) -> dict[str, object]:
+    metrics = summary["metrics"]
+    overall = metrics["overall"]
+    far_distance = metrics["by_initial_goal_distance"][">4000"]
+    required_values = (
+        overall.get("td_mae"),
+        overall.get("td_rmse"),
+        overall.get("td_bias"),
+        overall.get("q95_coverage"),
+    )
+    finite_predictions = bool(
+        overall.get("finite_predictions", False)
+        and all(value is not None and np.isfinite(float(value)) for value in required_values)
+    )
+    quantile_ordering_valid = bool(overall.get("quantile_ordering_valid", False))
+    far_distance_error_reported = bool(
+        far_distance.get("num_completed_goals", 0) > 0
+        and far_distance.get("td_mae") is not None
+        and np.isfinite(float(far_distance["td_mae"]))
+    )
+    far_mean_energy = float(far_distance.get("mean_true_total_energy", 0.0) or 0.0)
+    far_mae = float(far_distance.get("td_mae", np.inf) or np.inf)
+    far_mae_to_mean_energy_ratio = (
+        float(far_mae / far_mean_energy) if far_mean_energy > 0.0 else float("inf")
+    )
+    catastrophic_far_distance_error = bool(
+        not np.isfinite(far_mae_to_mean_energy_ratio)
+        or far_mae_to_mean_energy_ratio > 10.0
+    )
+    ready = bool(
+        finite_predictions
+        and quantile_ordering_valid
+        and far_distance_error_reported
+        and not catastrophic_far_distance_error
+    )
+    return {
+        "td_energy_ready": ready,
+        "finite_predictions": finite_predictions,
+        "quantile_ordering_valid": quantile_ordering_valid,
+        "q95_empirical_coverage_reported": overall.get("q95_coverage") is not None,
+        "far_distance_error_reported": far_distance_error_reported,
+        "far_distance_mae": None if not far_distance_error_reported else far_mae,
+        "far_distance_mean_true_total_energy": (
+            None if far_mean_energy <= 0.0 else far_mean_energy
+        ),
+        "far_distance_mae_to_mean_energy_ratio": (
+            None
+            if not np.isfinite(far_mae_to_mean_energy_ratio)
+            else far_mae_to_mean_energy_ratio
+        ),
+        "catastrophic_far_distance_error": catastrophic_far_distance_error,
+        "catastrophic_ratio_guard": 10.0,
     }
 
 
@@ -1431,6 +1596,10 @@ def run_phase2_fixed_budget(
     battery_capacity: float,
     output: Path,
 ) -> dict[str, object]:
+    if not isinstance(estimator, GoalConditionedQuantileTDEnergyEstimator):
+        raise TypeError(
+            "formal Phase 2 requires trained_goal_conditioned_quantile_td"
+        )
     environment = environment_from_args(
         args,
         phase=SACTrainingPhase.NAVIGATION,
@@ -1448,15 +1617,24 @@ def run_phase2_fixed_budget(
     exhaustions = 0
     emergency_truncations = 0
     completed_cycles = 0
+    total_tasks_completed = 0
+    switch_count = 0
+    cycle_records: list[dict[str, object]] = []
+    completed_goal_records: list[dict[str, object]] = []
     rows: list[dict[str, object]] = []
     while transitions < args.phase2_transition_budget:
         action, _ = policy.predict(observation, deterministic=True)
         observation, reward, terminated, truncated, info = environment.step(action)
         transitions += 1
+        total_tasks_completed += int(info["task_completed_now"])
+        switch_count += int(info["switched_now"])
+        if info["completed_goal_evaluation"] is not None:
+            completed_goal_records.append(dict(info["completed_goal_evaluation"]))
         if info["switched_now"] and environment.switching_events:
             append_jsonl(output / "switching_events.jsonl", environment.switching_events[-1])
         if info["battery_cycle_record"] is not None:
             completed_cycles += 1
+            cycle_records.append(dict(info["battery_cycle_record"]))
             append_jsonl(output / "battery_cycles.jsonl", info["battery_cycle_record"])
         if transitions % args.log_freq_transitions == 0 or terminated or truncated:
             row = {
@@ -1500,6 +1678,18 @@ def run_phase2_fixed_budget(
             observation, _ = environment.reset(seed=args.seed + 200_000 + transitions)
     estimator.save(output / "phase2" / "td_energy_final.pt")
     _plot_phase2_training_rows(rows, output / "phase2")
+    successful_returns = sum(bool(row["return_success"]) for row in cycle_records)
+    failed_returns = len(cycle_records) - successful_returns
+    successful_cycle_records = [row for row in cycle_records if row["return_success"]]
+    remaining_energy_at_charger = [
+        float(row["remaining_energy_at_cycle_end"])
+        for row in successful_cycle_records
+    ]
+    remaining_fraction_at_charger = [
+        float(row["remaining_energy_fraction_at_charger"])
+        for row in successful_cycle_records
+    ]
+    phase2_td_metrics = aggregate_goal_evaluations(completed_goal_records)
     summary = {
         "requested_transition_budget": args.phase2_transition_budget,
         "actual_training_transitions": transitions,
@@ -1507,8 +1697,43 @@ def run_phase2_fixed_budget(
         "training_stop_reason": "transition_budget_reached",
         "episodes": episodes,
         "completed_battery_cycles": completed_cycles,
+        "total_tasks_completed": total_tasks_completed,
+        "tasks_per_1000_transitions": float(
+            1000.0 * total_tasks_completed / max(transitions, 1)
+        ),
+        "tasks_per_battery_cycle": (
+            None
+            if not cycle_records
+            else float(
+                np.mean([float(row["tasks_completed_in_cycle"]) for row in cycle_records])
+            )
+        ),
+        "successful_charger_returns": successful_returns,
+        "failed_charger_returns": failed_returns,
+        "return_success_rate": float(successful_returns / max(len(cycle_records), 1)),
         "energy_exhaustions": exhaustions,
+        "energy_exhaustion_rate": float(exhaustions / max(len(cycle_records), 1)),
         "emergency_truncations": emergency_truncations,
+        "mean_remaining_energy_at_charger": (
+            None
+            if not remaining_energy_at_charger
+            else float(np.mean(remaining_energy_at_charger))
+        ),
+        "mean_remaining_energy_fraction_at_charger": (
+            None
+            if not remaining_fraction_at_charger
+            else float(np.mean(remaining_fraction_at_charger))
+        ),
+        "mean_energy_utilization": (
+            None
+            if not remaining_fraction_at_charger
+            else float(1.0 - np.mean(remaining_fraction_at_charger))
+        ),
+        "switch_count": switch_count,
+        "switching_estimator": "trained_goal_conditioned_quantile_td",
+        "switch_quantile": 0.95,
+        "td_goal_evaluation": phase2_td_metrics,
+        "Q95_coverage": phase2_td_metrics["overall"].get("q95_coverage"),
         "battery_capacity": battery_capacity,
         "battery_capacity_source": "phase1_frozen_policy_calibration",
         "energy_reserve_fraction": args.energy_reserve_fraction,
@@ -1516,6 +1741,13 @@ def run_phase2_fixed_budget(
         "sac_frozen": True,
         "td_update_count": estimator.update_count,
         "td_replay_size": len(estimator.replay),
+        "safety_module_enabled": False,
+        "obstacles_enabled": False,
+        "lidar_enabled": False,
+        "cbf_enabled": False,
+        "energy_experiment_stage": "obstacle_free_pre_safety",
+        "energy_td_policy_context": "frozen_navigation_policy_without_cbf",
+        "requires_retraining_after_safety_layer": True,
     }
     write_json(output / "phase2" / "summary.json", summary)
     environment.close()
@@ -1597,6 +1829,8 @@ def generate_eval_gif(
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="UAV Energy Delivery V3 fixed-transition protocol")
     parser.add_argument("--output-dir", required=True)
+    parser.add_argument("--resume-after-phase1-checkpoint")
+    parser.add_argument("--source-phase1-artifact")
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--device", default="cuda")
     parser.add_argument("--num-envs", type=int, default=8)
@@ -1658,9 +1892,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     args = parser.parse_args(argv)
     if args.smoke and args.validation:
         parser.error("--smoke and --validation are mutually exclusive")
+    if args.source_phase1_artifact and not args.resume_after_phase1_checkpoint:
+        parser.error("--source-phase1-artifact requires --resume-after-phase1-checkpoint")
     if args.smoke:
         args.phase1_transition_budget = 8000
         args.phase1b_transition_budget = 2000
+        args.phase2_transition_budget = 5000
         args.eval_freq_transitions = 4000
         args.checkpoint_freq_transitions = 4000
         args.log_freq_transitions = 800
@@ -1783,6 +2020,8 @@ def train(args: argparse.Namespace) -> dict[str, object]:
             "train_freq": [1, "step"],
             "gradient_steps": args.gradient_steps,
             "effective_updates_per_transition": effective_updates_per_transition,
+            "resume_after_phase1_checkpoint": args.resume_after_phase1_checkpoint,
+            "source_phase1_artifact": args.source_phase1_artifact,
         },
         "battery_calibration": {
             "tasks": args.battery_calibration_tasks,
@@ -1808,6 +2047,17 @@ def train(args: argparse.Namespace) -> dict[str, object]:
             "episode_emergency_guard": args.phase2_episode_max_steps,
             "continuous_delivery": True,
             "run_requested": args.run_phase2,
+            "switching_estimator": "trained_goal_conditioned_quantile_td",
+            "switch_quantile": 0.95,
+        },
+        "research_context": {
+            "safety_module_enabled": False,
+            "obstacles_enabled": False,
+            "lidar_enabled": False,
+            "cbf_enabled": False,
+            "energy_experiment_stage": "obstacle_free_pre_safety",
+            "energy_td_policy_context": "frozen_navigation_policy_without_cbf",
+            "requires_retraining_after_safety_layer": True,
         },
         "environment": {
             "map_m": [4000.0, 4000.0, 400.0],
@@ -1828,30 +2078,62 @@ def train(args: argparse.Namespace) -> dict[str, object]:
     write_json(output / "config.json", config)
     write_json(output / "RUNNING.json", {"status": "RUNNING", "pid": os.getpid(), "started_at": config["started_at"]})
     try:
-        trained_model, navigation_audit, checkpoint = train_navigation_fixed_budget(args, output, eval_tasks)
-        generate_navigation_curves(output)
-        del trained_model
-        model = SAC.load(checkpoint, device=args.device)
-        freeze_navigation_policy(model)
-        navigation_audit["downstream_checkpoint_reloaded"] = True
-        navigation_audit["downstream_checkpoint_sha256"] = file_sha256(checkpoint)
-        navigation_audit["downstream_policy_frozen_before_calibration"] = all(
-            not parameter.requires_grad for parameter in model.policy.parameters()
-        )
+        if args.resume_after_phase1_checkpoint:
+            model, navigation_audit, checkpoint = load_resumed_phase1(args, output)
+        else:
+            trained_model, navigation_audit, checkpoint = train_navigation_fixed_budget(
+                args, output, eval_tasks
+            )
+            generate_navigation_curves(output)
+            del trained_model
+            model = SAC.load(checkpoint, device=args.device)
+            freeze_navigation_policy(model)
+            navigation_audit["downstream_checkpoint_reloaded"] = True
+            navigation_audit["downstream_checkpoint_sha256"] = file_sha256(checkpoint)
+            navigation_audit["downstream_policy_frozen_before_calibration"] = all(
+                not parameter.requires_grad for parameter in model.policy.parameters()
+            )
         final_navigation_evaluation = navigation_audit["final_evaluation"]
         navigation_audit["navigation_training_completed"] = True
-        navigation_audit["downstream_navigation_ready"] = navigation_gate_passed(
+        navigation_audit["navigation_energy_ready"] = navigation_energy_gate_passed(
             final_navigation_evaluation
         )
+        navigation_audit["navigation_safety_ready"] = navigation_safety_gate_passed(
+            final_navigation_evaluation
+        )
+        navigation_audit["safety_module_enabled"] = False
+        navigation_audit["energy_experiment_stage"] = "obstacle_free_pre_safety"
         write_json(output / "phase1_navigation" / "summary.json", navigation_audit)
-        if not navigation_audit["downstream_navigation_ready"] and not (
+        run_config = read_json(output / "config.json")
+        run_config["navigation_readiness"] = {
+            "navigation_energy_ready": navigation_audit["navigation_energy_ready"],
+            "navigation_safety_ready": navigation_audit["navigation_safety_ready"],
+            "energy_gate_blocks_downstream": True,
+            "safety_gate_blocks_current_energy_experiment": False,
+        }
+        run_config["known_navigation_safety_limitation"] = {
+            "boundary_contact_step_rate": final_navigation_evaluation[
+                "boundary_contact_step_rate"
+            ],
+            "boundary_contact_episode_rate": final_navigation_evaluation[
+                "boundary_contact_episode_rate"
+            ],
+            "max_consecutive_boundary_contacts": final_navigation_evaluation[
+                "max_consecutive_boundary_contacts"
+            ],
+        }
+        write_json(output / "config.json", run_config)
+        if not navigation_audit["navigation_energy_ready"] and not (
             args.smoke or args.validation
         ):
             stopped = {
                 "status": "STOPPED_AFTER_PHASE1",
                 "stopped_at": utc_now(),
                 "navigation_training_completed": True,
-                "downstream_navigation_ready": False,
+                "navigation_energy_ready": False,
+                "navigation_safety_ready": navigation_audit[
+                    "navigation_safety_ready"
+                ],
                 "navigation": navigation_audit,
             }
             write_json(output / "STOPPED_AFTER_PHASE1.json", stopped)
@@ -1912,8 +2194,12 @@ def train(args: argparse.Namespace) -> dict[str, object]:
                 **phase_boundary,
                 "source_checkpoint": str(checkpoint),
                 "source_checkpoint_sha256": file_sha256(checkpoint),
-                "source_transition": args.phase1_transition_budget,
+                "source_transition": int(
+                    navigation_audit["actual_training_transitions"]
+                ),
                 "calibrated_battery_capacity": capacity,
+                "energy_td_policy_context": "frozen_navigation_policy_without_cbf",
+                "requires_retraining_after_safety_layer": True,
             },
         )
         td_summary = None
@@ -1932,12 +2218,32 @@ def train(args: argparse.Namespace) -> dict[str, object]:
                 transition_budget=args.phase1b_transition_budget,
                 output=output,
             )
-        state_machine = run_phase2_state_machine_smoke(
-            args,
-            battery_capacity=capacity,
-            output=output,
-        )
-        exhaustion = run_energy_exhaustion_smoke(args, output)
+        if args.run_phase2 and td_summary is None:
+            raise RuntimeError("formal Phase 2 requires trained Goal-conditioned Quantile TD")
+        if (
+            td_summary is not None
+            and not td_summary["td_readiness"]["td_energy_ready"]
+            and not (args.smoke or args.validation)
+        ):
+            stopped = {
+                "status": "STOPPED_AFTER_PHASE1B",
+                "stopped_at": utc_now(),
+                "td_readiness": td_summary["td_readiness"],
+                "phase1b": td_summary,
+            }
+            write_json(output / "STOPPED_AFTER_PHASE1B.json", stopped)
+            (output / "RUNNING.json").unlink(missing_ok=True)
+            return stopped
+        if args.smoke or args.validation:
+            state_machine = run_phase2_state_machine_smoke(
+                args,
+                battery_capacity=capacity,
+                output=output,
+            )
+            exhaustion = run_energy_exhaustion_smoke(args, output)
+        else:
+            state_machine = None
+            exhaustion = None
         phase2_summary = None
         if args.run_phase2:
             phase2_summary = run_phase2_fixed_budget(
@@ -1950,7 +2256,10 @@ def train(args: argparse.Namespace) -> dict[str, object]:
         completed = {
             "status": "COMPLETED",
             "completed_at": utc_now(),
-            "requested_transition_budget": args.phase1_transition_budget,
+            "requested_transition_budget": navigation_audit.get(
+                "requested_transition_budget",
+                navigation_audit["actual_training_transitions"],
+            ),
             "actual_training_transitions": navigation_audit["actual_training_transitions"],
             "exact_budget_match": navigation_audit["exact_budget_match"],
             "training_stop_reason": "transition_budget_reached",

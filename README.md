@@ -26,6 +26,18 @@ accepted action, and kappa is backup only. Code and deterministic unit tests are
 persistent certificate validation, baseline comparisons, and learning are left for manual execution. See
 `review_bundle/docs/PERSISTENT_TASK_CHARGING.md`.
 
+## UAV Energy Delivery V3
+
+The current V3 energy experiment is explicitly `obstacle_free_pre_safety`.
+Navigation energy readiness is separated from boundary-safety readiness, so a
+frozen policy that passes goal success and path-quality gates may proceed to
+battery calibration and Energy TD while boundary-contact limitations remain
+recorded. The active Energy TD context is
+`frozen_navigation_policy_without_cbf`, and its artifacts declare
+`requires_retraining_after_safety_layer = true`: a future LiDAR/CBF layer will
+change executed trajectories and therefore requires Energy TD retraining or
+fine-tuning. See `docs/UAV_ENERGY_DELIVERY_V3.md`.
+
 The persistent Bellman/runtime closure records one shared execution authority for each next state.
 Closed charging departure is handled by a certified stay-inside Generator support; kappa and charger
 hold remain explicit fallback atoms rather than silently aliased accepted policy actions.
