@@ -155,6 +155,7 @@ def fit_goal_calibration(
     dataset: PackedEnergyDataset,
     *,
     coverage: float,
+    minimum_group_trajectories: int = 100,
 ) -> tuple[MondrianTrajectoryCalibration, np.ndarray, np.ndarray]:
     point = chunked_point_predictions(point_model, dataset.states)
     builder = GoalRiskFeatureBuilder("compact_decision_context")
@@ -168,7 +169,7 @@ def fit_goal_calibration(
         dataset.distance_buckets,
         coverage=coverage,
         mode="additive",
-        minimum_group_trajectories=100,
+        minimum_group_trajectories=minimum_group_trajectories,
     )
     missing = sorted(set(EXPECTED_GOAL_INTERACTIONS) - calibration.group_values.keys())
     if missing:
@@ -182,6 +183,7 @@ def fit_mission_calibration(
     dataset: PackedMissionDataset,
     *,
     coverage: float,
+    minimum_group_missions: int = 100,
 ) -> tuple[MondrianMissionCalibration, np.ndarray, np.ndarray]:
     _, _, point = mission_component_predictions(point_callable(point_model), dataset)
     features = np.concatenate([dataset.task_states, dataset.return_after_states], axis=1)
@@ -192,7 +194,7 @@ def fit_mission_calibration(
         dataset.mission_ids,
         dataset.initial_distance_buckets,
         coverage=coverage,
-        minimum_group_missions=100,
+        minimum_group_missions=minimum_group_missions,
     )
     missing = sorted(set(DISTANCE_BUCKETS) - calibration.distance_corrections.keys())
     if missing:
@@ -499,12 +501,14 @@ def run(args: argparse.Namespace) -> dict[str, object]:
             risk_model,
             goal_calibration_set,
             coverage=args.goal_conformal_coverage,
+            minimum_group_trajectories=args.minimum_calibration_group_trajectories,
         )
         mission_calibration, _, _ = fit_mission_calibration(
             point_model,
             mission_model,
             mission_calibration_set,
             coverage=args.mission_conformal_coverage,
+            minimum_group_missions=args.minimum_calibration_group_trajectories,
         )
         write_json(
             output / "FINAL_CALIBRATION_AUDIT.json",
@@ -522,6 +526,9 @@ def run(args: argparse.Namespace) -> dict[str, object]:
                 "mission_disjoint_from_all_development": True,
                 "used_for_model_or_alpha_selection": False,
                 "used_only_for_fixed_conformal_quantiles": True,
+                "minimum_group_trajectories": (
+                    args.minimum_calibration_group_trajectories
+                ),
             },
         )
         report_stage(output, "independent_final_calibration_completed")
@@ -611,6 +618,9 @@ def run(args: argparse.Namespace) -> dict[str, object]:
                 "mission_trajectories": args.final_mission_calibration_trajectories,
                 "collected_after_method_selection_freeze": True,
                 "used_for_selection": False,
+                "minimum_group_trajectories": (
+                    args.minimum_calibration_group_trajectories
+                ),
             },
             "phase2": {
                 "run_only_if_fresh_v5_gate_passes": True,
@@ -845,6 +855,11 @@ def parser() -> argparse.ArgumentParser:
     value.add_argument("--goal-method", choices=sorted(GOAL_MODEL_PATHS), default="k2_suffix")
     value.add_argument("--goal-conformal-coverage", type=float, default=0.975)
     value.add_argument("--mission-conformal-coverage", type=float, default=0.99)
+    value.add_argument(
+        "--minimum-calibration-group-trajectories",
+        type=int,
+        default=100,
+    )
     value.add_argument("--run-phase2", action="store_true")
     value.add_argument("--phase2-transitions", type=int, default=100_000)
     value.add_argument(

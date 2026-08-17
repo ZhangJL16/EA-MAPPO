@@ -251,6 +251,7 @@ def test_v5_uses_independent_final_calibration_before_fresh_test(tmp_path) -> No
     assert args.final_mission_calibration_trajectories == 1_000
     assert args.fresh_goal_trajectories == 5_000
     assert args.fresh_mission_trajectories == 3_000
+    assert args.minimum_calibration_group_trajectories == 100
     assert len(
         {
             args.model_seed,
