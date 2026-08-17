@@ -7,6 +7,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 import torch
+from PIL import Image
 from stable_baselines3 import SAC
 
 from envs.UAVEnergyDelivery import UAVEnv
@@ -42,6 +43,12 @@ from scripts.train_uav_energy_delivery_sac import (
     run_phase2_state_machine_smoke,
     train_navigation_fixed_budget,
 )
+from scripts.evaluate_td_flight_gif import collect_td_flight, render_td_flight_gif
+from scripts.evaluate_energy_managed_scene_gif import (
+    audit_managed_lifecycle,
+    collect_energy_managed_scene,
+    render_energy_managed_gif,
+)
 
 
 class RecordingEstimator:
@@ -61,6 +68,21 @@ class RecordingEstimator:
     def observe_transition(self, *args, **kwargs):
         self.replay.append((args, kwargs))
         return None
+
+
+class ZeroPredictPolicy:
+    def predict(self, observation: np.ndarray, deterministic: bool = True):
+        del observation, deterministic
+        return np.zeros(3, dtype=np.float32), None
+
+
+class ConstantActionPolicy:
+    def __init__(self, action: np.ndarray) -> None:
+        self.action = np.asarray(action, dtype=np.float32)
+
+    def predict(self, observation: np.ndarray, deterministic: bool = True):
+        del observation, deterministic
+        return self.action.copy(), None
 
 
 def zero_policy(observation: np.ndarray) -> np.ndarray:
@@ -678,6 +700,187 @@ def test_formal_phase2_rejects_mock_energy_estimator(tmp_path: Path) -> None:
             battery_capacity=10.0,
             output=tmp_path,
         )
+
+
+def test_td_checkpoint_round_trip_for_flight_evaluation(tmp_path: Path) -> None:
+    estimator = GoalConditionedQuantileTDEnergyEstimator(
+        hidden_dim=8,
+        batch_size=2,
+        replay_capacity=8,
+        learning_starts=2,
+        device="cpu",
+    )
+    state = np.linspace(0.0, 1.0, 7, dtype=np.float32)
+    action = np.array([0.1, -0.2, 0.3], dtype=np.float32)
+    expected = estimator.predict_quantiles(state, action)
+    checkpoint = tmp_path / "td.pt"
+    estimator.save(checkpoint)
+    restored = GoalConditionedQuantileTDEnergyEstimator.load(checkpoint, device="cpu")
+    np.testing.assert_allclose(restored.predict_quantiles(state, action), expected)
+    assert restored.update_count == estimator.update_count
+
+
+def test_full_td_flight_gif_generation(tmp_path: Path) -> None:
+    environment = UAVEnergyDeliverySACEnv()
+    environment.reset(seed=4)
+    rows = []
+    for step in range(1, 4):
+        rows.append(
+            {
+                "step": step,
+                "position": np.array([100.0 + 20.0 * step, 200.0, 50.0]),
+                "velocity": np.array([5.0, 0.0, 0.0]),
+                "speed": 5.0,
+                "distance_to_goal": 80.0 - 20.0 * step,
+                "realized_energy": 0.2,
+                "true_energy_to_go": 0.2 * (4 - step),
+                "Q50": 0.3 * (4 - step),
+                "Q90": 0.4 * (4 - step),
+                "Q95": 0.5 * (4 - step),
+                "Q99": 0.6 * (4 - step),
+                "boundary_contact": False,
+            }
+        )
+    summary = {
+        "start_position": [100.0, 200.0, 50.0],
+        "goal_position": [180.0, 200.0, 50.0],
+    }
+    output = tmp_path / "full.gif"
+    frames = render_td_flight_gif(rows, summary, environment, output, fps=5)
+    assert frames == 3
+    assert output.exists() and output.stat().st_size > 0
+    with Image.open(output) as image:
+        assert image.n_frames == 3
+    environment.close()
+
+
+def test_collect_td_flight_records_every_transition_until_natural_goal_reach() -> None:
+    task = {
+        "start_position": [1000.0, 1000.0, 100.0],
+        "goal_position": [1100.0, 1000.0, 100.0],
+        "initial_velocity": [20.0, 0.0, 0.0],
+    }
+    rows, summary, environment = collect_td_flight(
+        ConstantActionPolicy(np.array([1.0, 0.0, 0.0], dtype=np.float32)),
+        RecordingEstimator(1.0),
+        task,
+        seed=17,
+        max_steps=30,
+    )
+    assert 1 < len(rows) < 30
+    assert summary["success"] is True
+    assert summary["end_reason"] == "goal_reached"
+    assert summary["policy_steps"] == len(rows)
+    assert summary["boundary_contact_steps"] == 0
+    assert summary["quantile_ordering_valid"] is True
+    assert [row["step"] for row in rows] == list(range(1, len(rows) + 1))
+    assert all(float(row["realized_energy"]) > 0.0 for row in rows)
+    assert all(float(row["transition_dt"]) > 0.0 for row in rows)
+    assert rows[-1]["true_energy_to_go"] == pytest.approx(rows[-1]["realized_energy"])
+    assert rows[0]["true_energy_to_go"] == pytest.approx(summary["true_total_energy"])
+    environment.close()
+
+
+def test_energy_managed_scene_records_exhaustion_and_full_gif(tmp_path: Path) -> None:
+    trace, summary, environment = collect_energy_managed_scene(
+        ZeroPredictPolicy(),
+        RecordingEstimator(1_000.0),
+        capacity=1.0,
+        seed=5,
+        max_recording_steps=10,
+        start_position=np.array([500.0, 500.0, 200.0], dtype=np.float32),
+        task_point=np.array([3500.0, 3500.0, 200.0], dtype=np.float32),
+        initial_energy_fraction=0.001,
+    )
+    assert len(trace) == 1
+    assert summary["energy_exhausted"] is True
+    assert summary["environment_terminated"] is True
+    assert summary["recording_stop_reason"] == "energy_exhausted"
+    output = tmp_path / "managed_exhaustion.gif"
+    frames = render_energy_managed_gif(trace, summary, environment, output, fps=5)
+    assert frames == 1
+    assert output.exists() and output.stat().st_size > 0
+    environment.close()
+
+
+def test_energy_managed_scene_detects_zero_task_charger_loop() -> None:
+    environment = UAVEnergyDeliverySACEnv(
+        phase=SACTrainingPhase.ENERGY_MANAGED,
+        operational_energy_capacity=10.0,
+        minimum_task_distance=5.1,
+    )
+    trace, summary, environment = collect_energy_managed_scene(
+        ZeroPredictPolicy(),
+        RecordingEstimator(1_000.0),
+        capacity=10.0,
+        seed=6,
+        max_recording_steps=10,
+        start_position=environment.charger_position,
+        task_point=environment.charger_position + np.array([6.0, 0.0, 0.0], dtype=np.float32),
+        post_first_recharge_steps=2,
+        environment=environment,
+    )
+    assert len(trace) == 3
+    assert summary["battery_cycles_completed"] == 3
+    assert summary["tasks_completed"] == 0
+    assert summary["charger_loop_detected"] is True
+    assert summary["successful_recharge_count"] == 3
+    assert summary["resumed_task_after_recharge"] is False
+    assert summary["requested_task_return_recharge_resume_exhaustion_lifecycle_observed"] is False
+    assert summary["environment_terminated"] is False
+    assert summary["recording_stop_reason"] == "post_first_recharge_recording_complete"
+    environment.close()
+
+
+def test_energy_managed_lifecycle_audit_requires_all_physical_events() -> None:
+    trace = [
+        {
+            "step": 1,
+            "tasks_completed": 1,
+            "battery_cycle_end": False,
+            "battery_cycle_record": None,
+            "mode": "TASK",
+            "switched_now": False,
+            "terminated": False,
+            "end_reason": "in_progress",
+        },
+        {
+            "step": 2,
+            "tasks_completed": 1,
+            "battery_cycle_end": True,
+            "battery_cycle_record": {"return_success": True},
+            "mode": "TASK",
+            "switched_now": False,
+            "terminated": False,
+            "end_reason": "charger_reached",
+        },
+        {
+            "step": 3,
+            "tasks_completed": 1,
+            "battery_cycle_end": False,
+            "battery_cycle_record": None,
+            "mode": "TASK",
+            "switched_now": False,
+            "terminated": False,
+            "end_reason": "in_progress",
+        },
+        {
+            "step": 4,
+            "tasks_completed": 1,
+            "battery_cycle_end": True,
+            "battery_cycle_record": {"return_success": False},
+            "mode": "CHARGER_COMMITTED",
+            "switched_now": False,
+            "terminated": True,
+            "end_reason": "energy_exhausted",
+        },
+    ]
+    audit = audit_managed_lifecycle(trace)
+    assert audit["tasks_before_first_recharge"] == 1
+    assert audit["successful_recharge_count"] == 1
+    assert audit["resumed_task_after_recharge"] is True
+    assert audit["energy_exhausted_after_recharge"] is True
+    assert audit["requested_task_return_recharge_resume_exhaustion_lifecycle_observed"] is True
 
 
 def test_freeze_navigation_clears_only_td_replay() -> None:

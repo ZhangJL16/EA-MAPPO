@@ -15,6 +15,7 @@ from envs.UAVEnergyDelivery import UAVAgent, UAVEnv as LegacyUAVEnv, eps
 from review_bundle.envs.navigation.state import NavigationState
 from review_bundle.envs.navigation.telemetry_cost import TelemetryCostConfig, TelemetryCostModel
 from review_bundle.safety.energy.critics import MonotoneQuantileCritic
+from review_bundle.safety.energy.mc_regression import GoalEnergyPrediction
 from review_bundle.safety.energy.td import quantile_atom_weights, quantile_huber_loss, quantile_ssp_target
 from review_bundle.safety.switching import SortieMode
 
@@ -54,10 +55,32 @@ class EnergyTDTransition:
 
 @dataclass(frozen=True)
 class MissionEnergyEstimate:
-    task_q95: float
-    return_after_task_q95: float
-    mission_q95_composition: float
-    return_now_q95: float
+    task_prediction: float
+    task_upper95: float
+    return_after_task_prediction: float
+    return_after_task_upper95: float
+    return_now_prediction: float
+    return_now_upper95: float
+
+    @property
+    def mission_upper95(self) -> float:
+        return self.task_upper95 + self.return_after_task_upper95
+
+    @property
+    def task_q95(self) -> float:
+        return self.task_upper95
+
+    @property
+    def return_after_task_q95(self) -> float:
+        return self.return_after_task_upper95
+
+    @property
+    def mission_q95_composition(self) -> float:
+        return self.mission_upper95
+
+    @property
+    def return_now_q95(self) -> float:
+        return self.return_now_upper95
 
 
 class GoalConditionedQuantileTDEnergyEstimator:
@@ -264,6 +287,35 @@ class GoalConditionedQuantileTDEnergyEstimator:
         destination = Path(path)
         destination.parent.mkdir(parents=True, exist_ok=True)
         torch.save(self.checkpoint_payload(), destination)
+
+    @classmethod
+    def load(
+        cls,
+        path: str | Path,
+        *,
+        device: str = "cpu",
+    ) -> "GoalConditionedQuantileTDEnergyEstimator":
+        payload = torch.load(Path(path), map_location=device, weights_only=False)
+        estimator = cls(
+            state_dim=int(payload["state_dim"]),
+            action_dim=int(payload["action_dim"]),
+            quantile_levels=tuple(float(value) for value in payload["quantile_levels"]),
+            hidden_dim=int(payload["hidden_dim"]),
+            learning_rate=float(payload["learning_rate"]),
+            batch_size=int(payload["batch_size"]),
+            replay_capacity=max(int(payload.get("replay_size", 0)), int(payload["batch_size"])),
+            learning_starts=int(payload["learning_starts"]),
+            target_tau=float(payload["target_tau"]),
+            gamma_energy=float(payload["gamma_energy"]),
+            device=device,
+        )
+        estimator.model.load_state_dict(payload["model_state_dict"])
+        estimator.target_model.load_state_dict(payload["target_state_dict"])
+        estimator.optimizer.load_state_dict(payload["optimizer_state_dict"])
+        estimator.update_count = int(payload.get("update_count", 0))
+        estimator.model.eval()
+        estimator.target_model.eval()
+        return estimator
 
     def _features(self, energy_state: np.ndarray, action: np.ndarray) -> torch.Tensor:
         state = self._vector(energy_state, self.state_dim, "energy_state")
@@ -494,7 +546,7 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         self.d_max = float(np.linalg.norm([self.length, self.width, self.height]))
         self.current_task_point = np.zeros(3, dtype=np.float32)
         self.mode = SortieMode.TASK
-        self.energy_estimator: GoalConditionedQuantileTDEnergyEstimator | None = None
+        self.energy_estimator: object | None = None
         self.goal_action_provider: GoalActionProvider | None = None
         self.energy_learning_enabled = False
         self.action_space = spaces.Box(-1.0, 1.0, shape=(3,), dtype=np.float32)
@@ -561,7 +613,7 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
     def bind_energy_learning(
         self,
         *,
-        energy_estimator: GoalConditionedQuantileTDEnergyEstimator,
+        energy_estimator: object,
         goal_action_provider: GoalActionProvider,
         training_enabled: bool,
     ) -> None:
@@ -1055,47 +1107,67 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
     def _predict_quantiles(self, goal: np.ndarray, action: np.ndarray) -> np.ndarray | None:
         if self.energy_estimator is None:
             return None
+        if not hasattr(self.energy_estimator, "predict_quantiles"):
+            return None
         prediction = self.energy_estimator.predict_quantiles(self.energy_state_for_goal(goal), action)
         self.last_quantile_prediction = prediction.copy()
         return prediction
 
+    def _goal_energy_prediction(
+        self,
+        goal: np.ndarray,
+        *,
+        position: np.ndarray | None = None,
+        velocity: np.ndarray | None = None,
+    ) -> GoalEnergyPrediction:
+        if self.energy_estimator is None:
+            raise RuntimeError("energy estimator is not configured")
+        if hasattr(self.energy_estimator, "estimate_context"):
+            prediction = self.energy_estimator.estimate_context(
+                self,
+                goal,
+                position=position,
+                velocity=velocity,
+            )
+            if not isinstance(prediction, GoalEnergyPrediction):
+                raise TypeError("estimate_context must return GoalEnergyPrediction")
+            return prediction
+        sac_observation = self.sac_observation_for_goal(
+            goal,
+            position=position,
+            velocity=velocity,
+        )
+        action = self._goal_action(sac_observation)
+        energy_state = self.energy_state_for_goal(
+            goal,
+            position=position,
+            velocity=velocity,
+        )
+        quantiles = self.energy_estimator.predict_quantiles(energy_state, action)
+        values = np.asarray(quantiles, dtype=np.float64)
+        if values.shape != (4,) or not np.all(np.isfinite(values)):
+            raise ValueError("legacy energy estimator returned invalid quantiles")
+        return GoalEnergyPrediction(float(values[0]), float(values[2]))
+
     def mission_energy_estimate(self) -> MissionEnergyEstimate:
         if self.energy_estimator is None or self.goal_action_provider is None:
             raise RuntimeError("mission estimation requires energy estimator and frozen navigation policy")
-        task_sac = self.sac_observation_for_goal(self.current_task_point)
-        task_action = self._goal_action(task_sac)
-        task_q95 = self.energy_estimator.predict(
-            self.energy_state_for_goal(self.current_task_point), task_action, quantile=SWITCH_QUANTILE
-        )
+        task = self._goal_energy_prediction(self.current_task_point)
         return_position = self.current_task_point.copy()
         return_velocity = np.zeros(3, dtype=np.float32)
-        return_after_sac = self.sac_observation_for_goal(
+        return_after = self._goal_energy_prediction(
             self.charger_position,
             position=return_position,
             velocity=return_velocity,
         )
-        return_after_action = self._goal_action(return_after_sac)
-        return_after_q95 = self.energy_estimator.predict(
-            self.energy_state_for_goal(
-                self.charger_position,
-                position=return_position,
-                velocity=return_velocity,
-            ),
-            return_after_action,
-            quantile=SWITCH_QUANTILE,
-        )
-        return_now_sac = self.sac_observation_for_goal(self.charger_position)
-        return_now_action = self._goal_action(return_now_sac)
-        return_now_q95 = self.energy_estimator.predict(
-            self.energy_state_for_goal(self.charger_position),
-            return_now_action,
-            quantile=SWITCH_QUANTILE,
-        )
+        return_now = self._goal_energy_prediction(self.charger_position)
         return MissionEnergyEstimate(
-            float(task_q95),
-            float(return_after_q95),
-            float(task_q95 + return_after_q95),
-            float(return_now_q95),
+            task.prediction,
+            task.upper95,
+            return_after.prediction,
+            return_after.upper95,
+            return_now.prediction,
+            return_now.upper95,
         )
 
     def _refresh_mission_decision(self) -> bool:
@@ -1105,8 +1177,8 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         estimate = self.mission_energy_estimate()
         self.last_mission_estimate = estimate
         remaining = float(self.agent.energy)
-        immediate_margin = remaining - estimate.return_now_q95 - self.energy_reserve
-        mission_margin = remaining - estimate.mission_q95_composition - self.energy_reserve
+        immediate_margin = remaining - estimate.return_now_upper95 - self.energy_reserve
+        mission_margin = remaining - estimate.mission_upper95 - self.energy_reserve
         reason = None
         if immediate_margin <= 0.0:
             reason = "immediate_return_energy_boundary"
@@ -1128,6 +1200,18 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
             "E_return_after_task_95": estimate.return_after_task_q95,
             "E_mission_95": estimate.mission_q95_composition,
             "E_return_now_95": estimate.return_now_q95,
+            "energy_estimator_type": getattr(
+                self.energy_estimator,
+                "estimator_type",
+                "legacy_goal_conditioned_quantile_td",
+            ),
+            "task_energy_prediction": estimate.task_prediction,
+            "task_energy_upper95": estimate.task_upper95,
+            "return_after_task_energy_prediction": estimate.return_after_task_prediction,
+            "return_after_task_energy_upper95": estimate.return_after_task_upper95,
+            "return_now_energy_prediction": estimate.return_now_prediction,
+            "return_now_energy_upper95": estimate.return_now_upper95,
+            "mission_energy_upper95": estimate.mission_upper95,
             "reserve": self.energy_reserve,
             "continuation_margin": min(immediate_margin, mission_margin),
             "mode_before": SortieMode.TASK.value,
@@ -1159,6 +1243,13 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
             "return_commit_step": commit.get("global_step"),
             "distance_to_charger_at_commit": commit.get("distance_to_charger"),
             "predicted_energy_at_commit": commit.get("E_return_now_95"),
+            "return_now_energy_prediction_at_commit": commit.get(
+                "return_now_energy_prediction"
+            ),
+            "return_now_energy_upper95_at_commit": commit.get(
+                "return_now_energy_upper95"
+            ),
+            "mission_energy_upper95_at_switch": commit.get("mission_energy_upper95"),
             "remaining_energy_at_commit": commit.get("remaining_energy"),
             "energy_at_switch": commit.get("remaining_energy"),
             "E_mission_95_at_switch": commit.get("E_mission_95"),
@@ -1212,6 +1303,13 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
             "return_commit_step": commit.get("global_step"),
             "distance_to_charger_at_commit": commit.get("distance_to_charger"),
             "predicted_energy_at_commit": commit.get("E_return_now_95"),
+            "return_now_energy_prediction_at_commit": commit.get(
+                "return_now_energy_prediction"
+            ),
+            "return_now_energy_upper95_at_commit": commit.get(
+                "return_now_energy_upper95"
+            ),
+            "mission_energy_upper95_at_switch": commit.get("mission_energy_upper95"),
             "remaining_energy_at_commit": commit.get("remaining_energy"),
             "energy_at_switch": commit.get("remaining_energy"),
             "E_mission_95_at_switch": commit.get("E_mission_95"),
@@ -1240,7 +1338,11 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         if not self._pending_goal_transitions:
             return None
         rows = self._pending_goal_transitions
-        if self.energy_learning_enabled and self.energy_estimator is not None:
+        if (
+            self.energy_learning_enabled
+            and self.energy_estimator is not None
+            and hasattr(self.energy_estimator, "observe_transition")
+        ):
             for row in rows:
                 loss = self.energy_estimator.observe_transition(
                     row["state"],
@@ -1467,8 +1569,12 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
             "physics_substeps": int(physics_substeps),
             "instantaneous_service_reset": bool(instantaneous_service_reset),
             "td_loss": self.last_td_loss,
-            "td_update_count": 0 if self.energy_estimator is None else int(self.energy_estimator.update_count),
-            "td_replay_size": 0 if self.energy_estimator is None else len(self.energy_estimator.replay),
+            "td_update_count": 0
+            if self.energy_estimator is None
+            else int(getattr(self.energy_estimator, "update_count", 0)),
+            "td_replay_size": 0
+            if self.energy_estimator is None
+            else len(getattr(self.energy_estimator, "replay", ())),
             "Q50": None if quantiles is None else float(quantiles[0]),
             "Q90": None if quantiles is None else float(quantiles[1]),
             "Q95": None if quantiles is None else float(quantiles[2]),
@@ -1477,6 +1583,28 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
             "E_return_after_task_95": None if estimate is None else estimate.return_after_task_q95,
             "E_mission_95": None if estimate is None else estimate.mission_q95_composition,
             "E_return_now_95": None if estimate is None else estimate.return_now_q95,
+            "energy_estimator_type": None
+            if self.energy_estimator is None
+            else getattr(
+                self.energy_estimator,
+                "estimator_type",
+                "legacy_goal_conditioned_quantile_td",
+            ),
+            "task_energy_prediction": None if estimate is None else estimate.task_prediction,
+            "task_energy_upper95": None if estimate is None else estimate.task_upper95,
+            "return_after_task_energy_prediction": None
+            if estimate is None
+            else estimate.return_after_task_prediction,
+            "return_after_task_energy_upper95": None
+            if estimate is None
+            else estimate.return_after_task_upper95,
+            "return_now_energy_prediction": None
+            if estimate is None
+            else estimate.return_now_prediction,
+            "return_now_energy_upper95": None
+            if estimate is None
+            else estimate.return_now_upper95,
+            "mission_energy_upper95": None if estimate is None else estimate.mission_upper95,
             "boundary_contact": bool(boundary_contact),
             "boundary_collision_count": int(self.boundary_collision_count),
             "consecutive_boundary_contacts": int(self.consecutive_boundary_contacts),
