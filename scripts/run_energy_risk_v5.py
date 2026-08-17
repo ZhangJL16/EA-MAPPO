@@ -73,6 +73,7 @@ from scripts.train_uav_energy_mc import (
 ROOT = Path(__file__).resolve().parents[1]
 DEVELOPMENT = ROOT / "artifacts/energy_risk_v5_development"
 METHOD_LADDER = DEVELOPMENT / "method_ladder"
+V4 = ROOT / "artifacts/uav_energy_uncertainty_v4_20260818_001949_v2"
 GOAL_MODEL_PATHS = {
     "k1_state": METHOD_LADDER / "models/k1_state_residual.pt",
     "k2_suffix": METHOD_LADDER / "models/k2_suffix_max_residual.pt",
@@ -401,7 +402,7 @@ def run(args: argparse.Namespace) -> dict[str, object]:
     assert_tracked_worktree_clean()
     output = Path(args.output_dir)
     output.mkdir(parents=True, exist_ok=False)
-    for directory in ("models", "fresh_v5", "phase2_100k"):
+    for directory in ("models", "final_calibration", "fresh_v5", "phase2_100k"):
         (output / directory).mkdir()
     write_json(
         output / "RUNNING.json",
@@ -421,7 +422,78 @@ def run(args: argparse.Namespace) -> dict[str, object]:
             device=args.device,
         )
         policy = load_frozen_sac(SAC_CHECKPOINT, args.navigation_device)
-        goal_calibration_set, mission_calibration_set, _ = load_development_sets()
+        (
+            development_goal_calibration,
+            development_mission_calibration,
+            development_mission_test,
+        ) = load_development_sets()
+        development_goal_ids = {
+            "point_train": PackedEnergyDataset.load(
+                SOURCE / "energy_dataset/train"
+            ).successful_trajectory_ids,
+            "point_validation": PackedEnergyDataset.load(
+                SOURCE / "energy_dataset/validation"
+            ).successful_trajectory_ids,
+            "development_calibration": (
+                development_goal_calibration.successful_trajectory_ids
+            ),
+            "v2_diagnostic": PackedEnergyDataset.load(
+                V2 / "final_conformal_test_v2/trajectories"
+            ).successful_trajectory_ids,
+            "v4_diagnostic": PackedEnergyDataset.load(
+                V4 / "fresh_v4/goal_trajectories"
+            ).successful_trajectory_ids,
+        }
+        development_mission_ids = (
+            development_mission_calibration.successful_mission_ids
+            | development_mission_test.successful_mission_ids
+            | PackedMissionDataset.load(
+                V4 / "fresh_v4/mission_trajectories"
+            ).successful_mission_ids
+        )
+        write_json(
+            output / "MODEL_SELECTION_FROZEN.json",
+            {
+                "frozen_at": utc_now(),
+                "goal_method": args.goal_method,
+                "goal_model_sha256": file_sha256(GOAL_MODEL_PATHS[args.goal_method]),
+                "goal_conformal_coverage": args.goal_conformal_coverage,
+                "mission_method": "frozen_heteroscedastic_laplace_plus_distance_mondrian",
+                "mission_model_sha256": file_sha256(MISSION_MODEL_CHECKPOINT),
+                "mission_conformal_coverage": args.mission_conformal_coverage,
+                "final_calibration_not_yet_collected": True,
+                "selection_must_not_change_after_final_calibration": True,
+            },
+        )
+        calibration_args = environment_args(
+            seed=args.model_seed,
+            phase2_budget=args.phase2_transitions,
+        )
+        report_stage(output, "independent_final_calibration_collection_started")
+        goal_calibration_set = collect_intersection_split(
+            policy,
+            calibration_args,
+            count=args.final_goal_calibration_trajectories,
+            seed=args.final_goal_calibration_seed,
+            trajectory_id_offset=10_000_000,
+            output=output / "final_calibration/goal_trajectories",
+            label="final_goal_calibration",
+        )
+        mission_calibration_set = collect_mission_split(
+            policy,
+            calibration_args,
+            count=args.final_mission_calibration_trajectories,
+            seed=args.final_mission_calibration_seed,
+            trajectory_id_offset=11_000_000,
+            output=output / "final_calibration/mission_trajectories",
+            label="final_mission_calibration",
+        )
+        assert_fresh_test_isolation(
+            goal_calibration_set.successful_trajectory_ids,
+            development_goal_ids,
+        )
+        if mission_calibration_set.successful_mission_ids & development_mission_ids:
+            raise RuntimeError("final Mission calibration overlaps development data")
         goal_calibration, _, _ = fit_goal_calibration(
             point_model,
             risk_model,
@@ -434,6 +506,25 @@ def run(args: argparse.Namespace) -> dict[str, object]:
             mission_calibration_set,
             coverage=args.mission_conformal_coverage,
         )
+        write_json(
+            output / "FINAL_CALIBRATION_AUDIT.json",
+            {
+                "method_selection_frozen_before_collection": True,
+                "goal_seed": args.final_goal_calibration_seed,
+                "goal_trajectories": len(
+                    goal_calibration_set.successful_trajectory_ids
+                ),
+                "mission_seed": args.final_mission_calibration_seed,
+                "mission_trajectories": len(
+                    mission_calibration_set.successful_mission_ids
+                ),
+                "goal_disjoint_from_all_development": True,
+                "mission_disjoint_from_all_development": True,
+                "used_for_model_or_alpha_selection": False,
+                "used_only_for_fixed_conformal_quantiles": True,
+            },
+        )
+        report_stage(output, "independent_final_calibration_completed")
         estimator = MondrianGoalMissionRiskEstimator(
             point_model,
             GoalRiskFeatureBuilder("compact_decision_context"),
@@ -513,6 +604,14 @@ def run(args: argparse.Namespace) -> dict[str, object]:
                 "used_for_training_validation_calibration_or_selection": False,
                 "one_shot": True,
             },
+            "independent_final_calibration": {
+                "goal_seed": args.final_goal_calibration_seed,
+                "goal_trajectories": args.final_goal_calibration_trajectories,
+                "mission_seed": args.final_mission_calibration_seed,
+                "mission_trajectories": args.final_mission_calibration_trajectories,
+                "collected_after_method_selection_freeze": True,
+                "used_for_selection": False,
+            },
             "phase2": {
                 "run_only_if_fresh_v5_gate_passes": True,
                 "seeds": list(args.phase2_seeds),
@@ -525,17 +624,11 @@ def run(args: argparse.Namespace) -> dict[str, object]:
         write_json(output / "PREREGISTERED_ENERGY_RISK_V5.json", preregistration)
         report_stage(output, "configuration_preregistered")
 
-        development_goal_ids = {
-            "point_train": PackedEnergyDataset.load(
-                SOURCE / "energy_dataset/train"
-            ).successful_trajectory_ids,
-            "point_validation": PackedEnergyDataset.load(
-                SOURCE / "energy_dataset/validation"
-            ).successful_trajectory_ids,
-            "risk_calibration": goal_calibration_set.successful_trajectory_ids,
-            "v4_diagnostic": PackedEnergyDataset.load(
-                V2 / "final_conformal_test_v2/trajectories"
-            ).successful_trajectory_ids,
+        all_prefresh_goal_ids = {
+            **development_goal_ids,
+            "independent_final_calibration": (
+                goal_calibration_set.successful_trajectory_ids
+            ),
         }
         report_stage(output, "fresh_v5_collection_started")
         fresh_args = environment_args(
@@ -562,13 +655,11 @@ def run(args: argparse.Namespace) -> dict[str, object]:
         )
         assert_fresh_test_isolation(
             fresh_goal.successful_trajectory_ids,
-            development_goal_ids,
+            all_prefresh_goal_ids,
         )
         prior_mission_ids = (
-            mission_calibration_set.successful_mission_ids
-            | PackedMissionDataset.load(
-                V2 / "mission_test_v2/trajectories"
-            ).successful_mission_ids
+            development_mission_ids
+            | mission_calibration_set.successful_mission_ids
         )
         if fresh_mission.successful_mission_ids & prior_mission_ids:
             raise RuntimeError("fresh v5 Mission IDs overlap development data")
@@ -735,6 +826,18 @@ def parser() -> argparse.ArgumentParser:
     value.add_argument("--device", default="cuda")
     value.add_argument("--navigation-device", default="cuda")
     value.add_argument("--model-seed", type=int, default=940_001)
+    value.add_argument("--final-goal-calibration-seed", type=int, default=940_101)
+    value.add_argument("--final-mission-calibration-seed", type=int, default=940_201)
+    value.add_argument(
+        "--final-goal-calibration-trajectories",
+        type=int,
+        default=2_500,
+    )
+    value.add_argument(
+        "--final-mission-calibration-trajectories",
+        type=int,
+        default=1_000,
+    )
     value.add_argument("--fresh-goal-seed", type=int, default=950_001)
     value.add_argument("--fresh-mission-seed", type=int, default=960_001)
     value.add_argument("--fresh-goal-trajectories", type=int, default=5_000)

@@ -25,6 +25,7 @@ from experiments.energy_mc.trajectory_context import (
     ShortFrozenSACRolloutContext,
     ShortRolloutConfig,
 )
+from scripts.run_energy_risk_v5 import parser as v5_parser
 
 
 class _ConstantPolicy:
@@ -242,3 +243,20 @@ def test_short_rollout_context_does_not_mutate_live_environment() -> None:
     np.testing.assert_allclose(environment.agent.vel, velocity_before)
     np.testing.assert_allclose(environment.current_task_point, goal_before)
     environment.close()
+
+
+def test_v5_uses_independent_final_calibration_before_fresh_test(tmp_path) -> None:
+    args = v5_parser().parse_args(["--output-dir", str(tmp_path / "run")])
+    assert args.final_goal_calibration_trajectories == 2_500
+    assert args.final_mission_calibration_trajectories == 1_000
+    assert args.fresh_goal_trajectories == 5_000
+    assert args.fresh_mission_trajectories == 3_000
+    assert len(
+        {
+            args.model_seed,
+            args.final_goal_calibration_seed,
+            args.final_mission_calibration_seed,
+            args.fresh_goal_seed,
+            args.fresh_mission_seed,
+        }
+    ) == 5
