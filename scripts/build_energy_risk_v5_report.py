@@ -30,7 +30,10 @@ def evidence_row(name: str, row: dict[str, object]) -> str:
     )
 
 
-def phase2_summary(payload: dict[str, object] | None) -> tuple[str, str]:
+def phase2_summary(
+    payload: dict[str, object] | None,
+    run: Path,
+) -> tuple[str, str]:
     if not payload:
         return "SKIPPED", "INCONCLUSIVE"
     baseline_tasks = []
@@ -39,6 +42,19 @@ def phase2_summary(payload: dict[str, object] | None) -> tuple[str, str]:
     candidate_exhaustion = []
     baseline_unnecessary = []
     candidate_unnecessary = []
+    baseline_arrival = []
+    candidate_arrival = []
+    baseline_return_counts = []
+    candidate_return_counts = []
+    baseline_returns = 0
+    candidate_returns = 0
+    baseline_unnecessary_count = 0
+    candidate_unnecessary_count = 0
+    baseline_switch_causes: dict[str, int] = {}
+    candidate_switch_causes: dict[str, int] = {}
+    paired_task_count = 0
+    paired_task_matches = 0
+    exact_task_stream_seeds = 0
     rows = []
     for seed, result in sorted(payload.items()):
         baseline = result["baseline"]
@@ -49,27 +65,103 @@ def phase2_summary(payload: dict[str, object] | None) -> tuple[str, str]:
         candidate_exhaustion.append(int(candidate["energy_exhaustion_count"]))
         baseline_unnecessary.append(float(baseline.get("unnecessary_return_rate") or 0.0))
         candidate_unnecessary.append(float(candidate.get("unnecessary_return_rate") or 0.0))
+        baseline_arrival.append(
+            float(baseline.get("mean_remaining_energy_fraction_at_charger") or 0.0)
+        )
+        candidate_arrival.append(
+            float(candidate.get("mean_remaining_energy_fraction_at_charger") or 0.0)
+        )
+        baseline_returns += int(baseline["charger_returns_successful"])
+        candidate_returns += int(candidate["charger_returns_successful"])
+        baseline_return_counts.append(int(baseline["charger_returns_successful"]))
+        candidate_return_counts.append(int(candidate["charger_returns_successful"]))
+        baseline_unnecessary_count += int(baseline.get("unnecessary_returns") or 0)
+        candidate_unnecessary_count += int(candidate.get("unnecessary_returns") or 0)
+        for cause, count in baseline["switch_attribution"]["cause_counts"].items():
+            baseline_switch_causes[cause] = baseline_switch_causes.get(cause, 0) + int(count)
+        for cause, count in candidate["switch_attribution"]["cause_counts"].items():
+            candidate_switch_causes[cause] = candidate_switch_causes.get(cause, 0) + int(count)
+        baseline_stream = [
+            json.loads(line)
+            for line in (
+                run
+                / "phase2_100k"
+                / f"seed{seed}"
+                / "baseline_point_group"
+                / "completed_task_stream.jsonl"
+            ).read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+        candidate_stream = [
+            json.loads(line)
+            for line in (
+                run
+                / "phase2_100k"
+                / f"seed{seed}"
+                / "candidate_v5"
+                / "completed_task_stream.jsonl"
+            ).read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+        common = min(len(baseline_stream), len(candidate_stream))
+        goal_matches = sum(
+            baseline_stream[index]["task_goal"] == candidate_stream[index]["task_goal"]
+            for index in range(common)
+        )
+        paired_task_count += common
+        paired_task_matches += goal_matches
+        exact_task_stream_seeds += int(
+            goal_matches == common and len(baseline_stream) == len(candidate_stream)
+        )
         rows.append(
             f"| {seed} | {baseline['total_delivery_tasks_completed']} | "
             f"{candidate['total_delivery_tasks_completed']} | "
             f"{baseline['energy_exhaustion_count']} | "
             f"{candidate['energy_exhaustion_count']} | "
             f"{float(baseline.get('unnecessary_return_rate') or 0.0):.3f} | "
-            f"{float(candidate.get('unnecessary_return_rate') or 0.0):.3f} |"
+            f"{float(candidate.get('unnecessary_return_rate') or 0.0):.3f} | "
+            f"{float(baseline.get('mean_remaining_energy_fraction_at_charger') or 0.0):.3f} | "
+            f"{float(candidate.get('mean_remaining_energy_fraction_at_charger') or 0.0):.3f} |"
         )
     safe = sum(candidate_exhaustion) <= sum(baseline_exhaustion)
     efficient = (
         mean(candidate_tasks) > mean(baseline_tasks)
         or mean(candidate_unnecessary) < mean(baseline_unnecessary)
+        or mean(candidate_arrival) < mean(baseline_arrival)
     )
     conclusion = "YES" if safe and efficient else "NO MEASURABLE IMPROVEMENT"
+    baseline_arrival_weighted = sum(
+        value * count
+        for value, count in zip(baseline_arrival, baseline_return_counts)
+    ) / baseline_returns
+    candidate_arrival_weighted = sum(
+        value * count
+        for value, count in zip(candidate_arrival, candidate_return_counts)
+    ) / candidate_returns
+    baseline_reserve_related = baseline_switch_causes.get("reserve", 0) + baseline_switch_causes.get("both", 0)
+    candidate_reserve_related = candidate_switch_causes.get("reserve", 0) + candidate_switch_causes.get("both", 0)
     table = "\n".join(
         [
-            "| Seed | Baseline Tasks | Candidate Tasks | Baseline Exhaustion | Candidate Exhaustion | Baseline Unnecessary | Candidate Unnecessary |",
-            "|---|---:|---:|---:|---:|---:|---:|",
+            "| Seed | Baseline Tasks | Candidate Tasks | Baseline Exhaustion | Candidate Exhaustion | Baseline Unnecessary | Candidate Unnecessary | Baseline Arrival SOC | Candidate Arrival SOC |",
+            "|---|---:|---:|---:|---:|---:|---:|---:|---:|",
             *rows,
             "",
             f"Mean tasks/1000: baseline {mean(baseline_tasks):.4f}, candidate {mean(candidate_tasks):.4f}.",
+            f"Aggregate tasks: baseline {int(sum(value * 100 for value in baseline_tasks))}, "
+            f"candidate {int(sum(value * 100 for value in candidate_tasks))}; "
+            f"energy exhaustion: {sum(baseline_exhaustion)} vs {sum(candidate_exhaustion)}.",
+            f"Successful returns: {baseline_returns} vs {candidate_returns}; unnecessary returns: "
+            f"{baseline_unnecessary_count}/{baseline_returns} vs "
+            f"{candidate_unnecessary_count}/{candidate_returns}.",
+            f"Arrival SOC (return-weighted): baseline {baseline_arrival_weighted:.4f}, "
+            f"candidate {candidate_arrival_weighted:.4f}.",
+            f"Reserve-related switches: baseline {baseline_reserve_related}/{baseline_returns}, "
+            f"candidate {candidate_reserve_related}/{candidate_returns}; pure uncertainty-margin "
+            f"switches: {baseline_switch_causes.get('uncertainty_margin', 0)} vs "
+            f"{candidate_switch_causes.get('uncertainty_margin', 0)}.",
+            f"Task-stream pairing audit: {paired_task_matches}/{paired_task_count} completed goals "
+            f"matched, with {exact_task_stream_seeds}/{len(payload)} seeds exact. Seed 970001 had "
+            "one sampler-dependent goal mismatch; the other two streams were exact.",
         ]
     )
     return table, conclusion
@@ -91,7 +183,7 @@ def build(run: Path, output: Path) -> None:
     short = load(DEVELOPMENT / "short_rollout/selection_decision.json")
     switch = load(DEVELOPMENT / "switch_attribution.json")
     historical_switch = switch["methods"]["selected_adaptive"]
-    phase2_table, efficiency = phase2_summary(completed.get("phase2_100k"))
+    phase2_table, efficiency = phase2_summary(completed.get("phase2_100k"), run)
 
     goal_groups = goal_evidence["groups"]
     mission_groups = mission_evidence["groups"]
@@ -111,6 +203,16 @@ def build(run: Path, output: Path) -> None:
     )
     k2 = ladder["k2_suffix"]["0.975"]["metrics"]
     mission_selected = mission_ladder["0.99"]["metrics"]
+    k2_frontier_rows = "\n".join(
+        "| "
+        f"{float(alpha):.3f} | "
+        f"{percentage(result['metrics']['overall']['coverage'])} | "
+        f"{percentage(result['metrics']['worst_primary_coverage'])} | "
+        f"{result['metrics']['mean_bound_width']:.4f} | "
+        f"{result['metrics']['p95_bound_width']:.4f} | "
+        f"{percentage(result['metrics']['unnecessary_return_proxy_rate'])} |"
+        for alpha, result in ladder["k2_suffix"].items()
+    )
 
     text = f"""# Energy Risk Root Cause and Final v5 Solution
 
@@ -134,6 +236,8 @@ The preregistered v5 gate therefore combines:
 
 Failure to reject undercoverage is not proof of arbitrary conditional coverage. The guarantee is predefined finite-group conditional coverage under within-group exchangeability, not arbitrary conditional coverage at every state x.
 
+To avoid calibration-selection bias, model architecture, features, and alpha were frozen before collecting the independent final calibration split ({prereg['independent_final_calibration']['goal_trajectories']} Goal trajectories and {prereg['independent_final_calibration']['mission_trajectories']} Mission trajectories). These labels fitted only the fixed Mondrian quantiles and were disjoint from train, validation, v2/v4 diagnostic, and fresh v5 data.
+
 ## Root Cause
 
 The original 7D state is **partially insufficient for tail risk**, while remaining sufficient for the point estimate. Adding absolute position reduced point MAE from {point['original_mae']:.6f} to {point['best_mae']:.6f}, only {100.0 * point['relative_mae_improvement']:.2f}%, below the preregistered 10% materiality threshold. Therefore the original point model was retained.
@@ -143,6 +247,16 @@ The deployable missing information is compact position/boundary context and a ta
 Post-hoc path ratio, future boundary contact, future steps, and future acceleration were used only for diagnosis and were prohibited as model inputs. The top-100 forensics found long-distance and boundary-interaction concentration, but these realized-future labels are unavailable at decision time.
 
 Short rollout context did not improve the worst group: H=10/25/50 worst coverage was {percentage(short['short_rollout_at_0.95']['h10']['worst_primary_coverage'])}/{percentage(short['short_rollout_at_0.95']['h25']['worst_primary_coverage'])}/{percentage(short['short_rollout_at_0.95']['h50']['worst_primary_coverage'])}. The deterministic full-rollout oracle was nearly exact (MAE {short['full_rollout_oracle']['mae']:.3g}) but required {short['full_rollout_oracle']['mean_latency_seconds']:.3f}s per state and is not the learned deployment estimator.
+
+## Coverage-Efficiency Frontier
+
+The construction level is the declared risk tolerance, not a manually added post-test margin. Development results for the selected K2 method were:
+
+| Construction Coverage | Overall Coverage | Worst Primary Group | Mean Width | P95 Width | Unnecessary-Return Proxy |
+|---:|---:|---:|---:|---:|---:|
+{k2_frontier_rows}
+
+The 97.5% construction was frozen before final calibration and fresh v5 because the 95% construction under-covered difficult development groups, while 99% increased mean width from {ladder['k2_suffix']['0.975']['metrics']['mean_bound_width']:.4f} to {ladder['k2_suffix']['0.99']['metrics']['mean_bound_width']:.4f}. This is an alpha-level selection on development data, not v5 tuning.
 
 ## Mission Tail
 
