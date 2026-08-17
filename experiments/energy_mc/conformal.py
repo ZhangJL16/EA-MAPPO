@@ -48,6 +48,37 @@ class MissionTrajectory:
     true_mission_energy: np.ndarray
 
     def metadata(self) -> dict[str, object]:
+        segments = [self.task]
+        if self.return_after_task is not None:
+            segments.append(self.return_after_task)
+        acceleration_values: list[np.ndarray] = []
+        for segment in segments:
+            velocity = segment.states[:, :3].astype(np.float64) * np.asarray(
+                [20.0, 20.0, 5.0], dtype=np.float64
+            )
+            if velocity.shape[0] > 1:
+                acceleration_values.append(
+                    np.linalg.norm(
+                        np.diff(velocity, axis=0)
+                        / np.maximum(segment.transition_dt[:-1, None], 1e-8),
+                        axis=1,
+                    )
+                )
+        acceleration = (
+            np.concatenate(acceleration_values)
+            if acceleration_values
+            else np.zeros(1, dtype=np.float64)
+        )
+        return_path_length = (
+            0.0 if self.return_after_task is None else self.return_after_task.path_length
+        )
+        return_initial_distance = (
+            0.0
+            if self.return_after_task is None
+            else self.return_after_task.spec.initial_goal_distance
+        )
+        total_path_length = self.task.path_length + return_path_length
+        straight_route_length = self.task.spec.initial_goal_distance + return_initial_distance
         return {
             "mission_id": self.mission_id,
             "initial_task_distance": self.task.spec.initial_goal_distance,
@@ -71,6 +102,27 @@ class MissionTrajectory:
                     self.return_after_task is not None
                     and self.return_after_task.had_boundary_contact
                 )
+            ),
+            "start_position": self.task.spec.start_position.tolist(),
+            "task_goal_position": self.task.spec.goal_position.tolist(),
+            "task_path_length": self.task.path_length,
+            "return_path_length": return_path_length,
+            "actual_path_length": total_path_length,
+            "straight_route_length": straight_route_length,
+            "path_ratio": total_path_length / max(straight_route_length, 1e-8),
+            "total_steps": int(sum(segment.steps for segment in segments)),
+            "total_flight_time": float(sum(segment.flight_time for segment in segments)),
+            "mean_acceleration": float(np.mean(acceleration)),
+            "max_acceleration": float(np.max(acceleration)),
+            "vertical_displacement": float(
+                abs(self.task.spec.goal_position[2] - self.task.spec.start_position[2])
+                + return_initial_distance * abs(float(self.return_after_state[5]))
+            ),
+            "boundary_contact_steps": int(
+                sum(segment.boundary_contact_steps for segment in segments)
+            ),
+            "maximum_consecutive_boundary_contacts": int(
+                max(segment.maximum_consecutive_boundary_contacts for segment in segments)
             ),
             "task_success": self.task.success,
             "return_success": True
@@ -169,6 +221,18 @@ class PackedMissionDataset:
             + "\n",
             encoding="utf-8",
         )
+
+    @classmethod
+    def load(cls, directory: str | Path) -> "PackedMissionDataset":
+        source = Path(directory)
+        with np.load(source / "mission_transitions.npz", allow_pickle=False) as payload:
+            arrays = {key: payload[key] for key in payload.files}
+        metadata = [
+            json.loads(line)
+            for line in (source / "missions.jsonl").read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+        return cls(metadata=metadata, **arrays)
 
 
 def collect_mission_trajectory(

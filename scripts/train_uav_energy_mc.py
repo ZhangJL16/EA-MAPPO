@@ -422,11 +422,23 @@ def run_phase2(
     has_recharged = False
     consecutive_zero = 0
     max_consecutive_zero = 0
+    completed_task_stream: list[list[float]] = []
     for transition in range(1, args.phase2_transition_budget + 1):
+        task_goal_before_step = environment.current_task_point.copy()
         action, _ = policy.predict(observation, deterministic=True)
         observation, _, terminated, truncated, info = environment.step(action)
         switch_events += int(info["switched_now"])
         total_tasks += int(info["task_completed_now"])
+        if info["task_completed_now"]:
+            completed_task_stream.append(task_goal_before_step.astype(float).tolist())
+            append_jsonl(
+                output / "completed_task_stream.jsonl",
+                {
+                    "task_index": len(completed_task_stream) - 1,
+                    "completion_transition": transition,
+                    "task_goal": task_goal_before_step,
+                },
+            )
         if info["task_completed_now"] and has_recharged:
             tasks_after_recharge += 1
         if info["switched_now"] and environment.switching_events:
@@ -534,6 +546,7 @@ def run_phase2(
         "actual_training_transitions": args.phase2_transition_budget,
         "exact_budget_match": True,
         "total_delivery_tasks_completed": total_tasks,
+        "completed_task_stream_length": len(completed_task_stream),
         "tasks_per_1000_transitions": 1000.0
         * float(total_tasks)
         / args.phase2_transition_budget,

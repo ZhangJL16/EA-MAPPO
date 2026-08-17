@@ -1047,6 +1047,31 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         state = np.concatenate((velocity_feature, direction, [np.clip(distance / self.d_max, 0.0, 1.0)]))
         return np.clip(state, self.observation_space.low, self.observation_space.high).astype(np.float32)
 
+    def energy_context_for_goal(
+        self,
+        goal: np.ndarray,
+        *,
+        position: np.ndarray | None = None,
+    ) -> dict[str, np.ndarray]:
+        self._validate_position(goal, "energy_goal")
+        current_position = (
+            self.agent.pos
+            if position is None
+            else self._validate_position(position, "position")
+        )
+        extent = np.asarray([self.length, self.width, self.height], dtype=np.float32)
+        normalized_position = np.clip(current_position / extent, 0.0, 1.0)
+        return {
+            "absolute_position_normalized": normalized_position.astype(np.float32),
+            "directional_boundary_distances_normalized": np.concatenate(
+                [normalized_position, 1.0 - normalized_position]
+            ).astype(np.float32),
+            "nearest_boundary_by_axis_normalized": np.minimum(
+                normalized_position,
+                1.0 - normalized_position,
+            ).astype(np.float32),
+        }
+
     def observation_for_goal(self, goal: np.ndarray) -> np.ndarray:
         return self.sac_observation_for_goal(goal)
 
@@ -1110,6 +1135,14 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
     def _predict_quantiles(self, goal: np.ndarray, action: np.ndarray) -> np.ndarray | None:
         if self.energy_estimator is None:
             return None
+        if hasattr(self.energy_estimator, "predict_quantiles_context"):
+            prediction = self.energy_estimator.predict_quantiles_context(
+                self,
+                goal,
+                action,
+            )
+            self.last_quantile_prediction = np.asarray(prediction, dtype=np.float64).copy()
+            return self.last_quantile_prediction
         if not hasattr(self.energy_estimator, "predict_quantiles"):
             return None
         prediction = self.energy_estimator.predict_quantiles(self.energy_state_for_goal(goal), action)
@@ -1172,7 +1205,13 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         )
         mission_prediction = task.prediction + return_after.prediction
         component_upper95_sum = task.upper95 + return_after.upper95
-        if hasattr(self.energy_estimator, "estimate_mission"):
+        if hasattr(self.energy_estimator, "estimate_mission_context"):
+            mission = self.energy_estimator.estimate_mission_context(
+                self,
+                self.current_task_point,
+            )
+            mission_upper95 = mission.upper95
+        elif hasattr(self.energy_estimator, "estimate_mission"):
             mission = self.energy_estimator.estimate_mission(
                 task.prediction,
                 return_after.prediction,
@@ -1217,6 +1256,7 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
             "battery_cycle_id": int(self.battery_cycle_id),
             "position": self.agent.pos.copy(),
             "velocity": self.agent.vel.copy(),
+            "task_goal": self.current_task_point.copy(),
             "distance_to_charger": float(np.linalg.norm(self.charger_position - self.agent.pos)),
             "remaining_energy": remaining,
             "E_task_95": estimate.task_q95,

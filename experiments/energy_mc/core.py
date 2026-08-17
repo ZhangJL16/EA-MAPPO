@@ -70,6 +70,7 @@ class EnergyTrajectory:
     boundary_contact_steps: int
     final_position: np.ndarray | None = None
     final_velocity: np.ndarray | None = None
+    maximum_consecutive_boundary_contacts: int = 0
 
     def metadata(self) -> dict[str, object]:
         return {
@@ -82,6 +83,7 @@ class EnergyTrajectory:
             "end_reason": self.end_reason,
             "had_boundary_contact": self.had_boundary_contact,
             "boundary_contact_steps": self.boundary_contact_steps,
+            "maximum_consecutive_boundary_contacts": self.maximum_consecutive_boundary_contacts,
             "final_position": None
             if self.final_position is None
             else self.final_position.tolist(),
@@ -500,6 +502,8 @@ def collect_energy_trajectory(
     transition_dts: list[float] = []
     path_length = 0.0
     boundary_contacts = 0
+    consecutive_boundary_contacts = 0
+    maximum_consecutive_boundary_contacts = 0
     success = False
     end_reason = "unknown"
     while True:
@@ -511,6 +515,13 @@ def collect_energy_trajectory(
         transition_dts.append(float(info["transition_dt"]))
         path_length += float(np.linalg.norm(environment.agent.pos - previous_position))
         boundary_contacts += int(info["boundary_contact"])
+        consecutive_boundary_contacts = (
+            consecutive_boundary_contacts + 1 if info["boundary_contact"] else 0
+        )
+        maximum_consecutive_boundary_contacts = max(
+            maximum_consecutive_boundary_contacts,
+            consecutive_boundary_contacts,
+        )
         if terminated or truncated:
             success = bool(info["is_success"])
             end_reason = str(info["end_reason"])
@@ -536,6 +547,7 @@ def collect_energy_trajectory(
         boundary_contacts,
         final_position,
         final_velocity,
+        maximum_consecutive_boundary_contacts,
     )
 
 
