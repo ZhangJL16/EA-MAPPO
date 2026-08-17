@@ -374,7 +374,12 @@ def phase2_counterfactual_audit(
         position = np.asarray(event["position"], dtype=np.float32)
         velocity = np.asarray(event["velocity"], dtype=np.float32)
         task_goal = np.asarray(event["task_goal"], dtype=np.float32)
-        environment = environment_from_args(args, phase=SACTrainingPhase.TD_PRETRAINING)
+        audit_args = SimpleNamespace(**vars(args))
+        audit_args.minimum_task_distance = 5.0
+        environment = environment_from_args(
+            audit_args,
+            phase=SACTrainingPhase.TD_PRETRAINING,
+        )
         environment.reset(
             seed=args.seed + 900_000 + index,
             options={
