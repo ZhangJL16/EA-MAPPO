@@ -13,6 +13,226 @@ from torch.nn import functional
 
 
 ENERGY_ESTIMATOR_TYPE = "mc_supervised_energy_to_go"
+GROUP_CONFORMAL_ESTIMATOR_TYPE = "mc_supervised_energy_to_go_group_conformal"
+ENERGY_DISTANCE_BUCKETS = (
+    ("100-500", 100.0, 500.0),
+    ("500-1500", 500.0, 1500.0),
+    ("1500-2500", 1500.0, 2500.0),
+    ("2500-4000", 2500.0, 4000.0),
+    (">4000", 4000.0, float("inf")),
+)
+
+
+def energy_distance_bucket(distance: float) -> str:
+    value = float(distance)
+    if not np.isfinite(value) or value < 0.0:
+        raise ValueError("distance must be finite and nonnegative")
+    if value < 100.0:
+        return "100-500"
+    for name, lower, upper in ENERGY_DISTANCE_BUCKETS:
+        if lower <= value < upper:
+            return name
+    raise ValueError(f"distance {value} is outside configured buckets")
+
+
+def finite_sample_conformal_margin(
+    scores: np.ndarray,
+    *,
+    coverage: float,
+) -> tuple[float, float, int]:
+    values = np.asarray(scores, dtype=np.float64)
+    if values.ndim != 1 or values.size == 0:
+        raise ValueError("conformal scores must be a nonempty vector")
+    if not np.all(np.isfinite(values)):
+        raise ValueError("conformal scores must be finite")
+    if not 0.0 < coverage < 1.0:
+        raise ValueError("coverage must lie in (0, 1)")
+    rank = min(values.size, int(math.ceil((values.size + 1) * coverage)))
+    raw_margin = float(np.partition(values, rank - 1)[rank - 1])
+    return max(0.0, raw_margin), raw_margin, rank
+
+
+@dataclass(frozen=True)
+class HierarchicalConformalCalibration:
+    coverage_target: float
+    global_margin: float
+    global_raw_margin: float
+    global_rank: int
+    num_trajectories: int
+    goal_type_margins: dict[str, float]
+    goal_type_raw_margins: dict[str, float]
+    goal_type_ranks: dict[str, int]
+    goal_type_counts: dict[str, int]
+    distance_margins: dict[str, float]
+    distance_raw_margins: dict[str, float]
+    distance_ranks: dict[str, int]
+    distance_counts: dict[str, int]
+    intersection_counts: dict[str, int]
+
+    @classmethod
+    def fit(
+        cls,
+        predictions: np.ndarray,
+        targets: np.ndarray,
+        trajectory_ids: np.ndarray,
+        goal_types: np.ndarray,
+        distance_buckets: np.ndarray,
+        *,
+        coverage: float = 0.95,
+    ) -> "HierarchicalConformalCalibration":
+        predicted = np.asarray(predictions, dtype=np.float64)
+        truth = np.asarray(targets, dtype=np.float64)
+        ids = np.asarray(trajectory_ids, dtype=np.int64)
+        types = np.asarray(goal_types).astype("U32")
+        buckets = np.asarray(distance_buckets).astype("U16")
+        if not (
+            predicted.shape == truth.shape == ids.shape == types.shape == buckets.shape
+            and predicted.ndim == 1
+        ):
+            raise ValueError("trajectory conformal arrays must be aligned vectors")
+        rows: list[tuple[float, str, str]] = []
+        for trajectory_id in np.unique(ids):
+            mask = ids == trajectory_id
+            unique_types = np.unique(types[mask])
+            unique_buckets = np.unique(buckets[mask])
+            if unique_types.size != 1 or unique_buckets.size != 1:
+                raise ValueError("goal type and initial distance bucket must be trajectory-constant")
+            rows.append(
+                (
+                    float(np.max(truth[mask] - predicted[mask])),
+                    str(unique_types[0]),
+                    str(unique_buckets[0]),
+                )
+            )
+        scores = np.asarray([row[0] for row in rows], dtype=np.float64)
+        global_margin, global_raw, global_rank = finite_sample_conformal_margin(
+            scores,
+            coverage=coverage,
+        )
+
+        def grouped(index: int):
+            deployed: dict[str, float] = {}
+            raw: dict[str, float] = {}
+            ranks: dict[str, int] = {}
+            counts: dict[str, int] = {}
+            for name in sorted({row[index] for row in rows}):
+                group_scores = np.asarray(
+                    [row[0] for row in rows if row[index] == name],
+                    dtype=np.float64,
+                )
+                margin, raw_margin, rank = finite_sample_conformal_margin(
+                    group_scores,
+                    coverage=coverage,
+                )
+                deployed[name] = margin
+                raw[name] = raw_margin
+                ranks[name] = rank
+                counts[name] = int(group_scores.size)
+            return deployed, raw, ranks, counts
+
+        goal_margins, goal_raw, goal_ranks, goal_counts = grouped(1)
+        distance_margins, distance_raw, distance_ranks, distance_counts = grouped(2)
+        intersection_counts: dict[str, int] = {}
+        for _, goal_type, bucket in rows:
+            key = f"{goal_type}|{bucket}"
+            intersection_counts[key] = intersection_counts.get(key, 0) + 1
+        return cls(
+            float(coverage),
+            global_margin,
+            global_raw,
+            global_rank,
+            len(rows),
+            goal_margins,
+            goal_raw,
+            goal_ranks,
+            goal_counts,
+            distance_margins,
+            distance_raw,
+            distance_ranks,
+            distance_counts,
+            dict(sorted(intersection_counts.items())),
+        )
+
+    def margin_for(self, goal_type: str, distance: float) -> float:
+        bucket = energy_distance_bucket(distance)
+        return max(
+            self.global_margin,
+            self.goal_type_margins.get(str(goal_type), self.global_margin),
+            self.distance_margins.get(bucket, self.global_margin),
+        )
+
+    def as_dict(self) -> dict[str, object]:
+        return asdict(self)
+
+    @classmethod
+    def from_dict(cls, payload: dict[str, object]) -> "HierarchicalConformalCalibration":
+        return cls(**payload)
+
+
+@dataclass(frozen=True)
+class MissionConformalCalibration:
+    coverage_target: float
+    global_margin: float
+    global_raw_margin: float
+    global_rank: int
+    num_missions: int
+    distance_margins: dict[str, float]
+    distance_raw_margins: dict[str, float]
+    distance_ranks: dict[str, int]
+    distance_counts: dict[str, int]
+
+    @classmethod
+    def fit(
+        cls,
+        mission_scores: np.ndarray,
+        distance_buckets: np.ndarray,
+        *,
+        coverage: float = 0.95,
+    ) -> "MissionConformalCalibration":
+        scores = np.asarray(mission_scores, dtype=np.float64)
+        buckets = np.asarray(distance_buckets).astype("U16")
+        if scores.ndim != 1 or scores.shape != buckets.shape or scores.size == 0:
+            raise ValueError("mission scores and buckets must be aligned nonempty vectors")
+        global_margin, global_raw, global_rank = finite_sample_conformal_margin(
+            scores,
+            coverage=coverage,
+        )
+        margins: dict[str, float] = {}
+        raw_margins: dict[str, float] = {}
+        ranks: dict[str, int] = {}
+        counts: dict[str, int] = {}
+        for bucket in sorted(np.unique(buckets)):
+            group_scores = scores[buckets == bucket]
+            margin, raw_margin, rank = finite_sample_conformal_margin(
+                group_scores,
+                coverage=coverage,
+            )
+            margins[str(bucket)] = margin
+            raw_margins[str(bucket)] = raw_margin
+            ranks[str(bucket)] = rank
+            counts[str(bucket)] = int(group_scores.size)
+        return cls(
+            float(coverage),
+            global_margin,
+            global_raw,
+            global_rank,
+            int(scores.size),
+            margins,
+            raw_margins,
+            ranks,
+            counts,
+        )
+
+    def margin_for(self, task_distance: float) -> float:
+        bucket = energy_distance_bucket(task_distance)
+        return max(self.global_margin, self.distance_margins.get(bucket, self.global_margin))
+
+    def as_dict(self) -> dict[str, object]:
+        return asdict(self)
+
+    @classmethod
+    def from_dict(cls, payload: dict[str, object]) -> "MissionConformalCalibration":
+        return cls(**payload)
 
 
 class DeterministicGoalPolicy(Protocol):
@@ -138,7 +358,9 @@ class EnergyToGoRegressor:
         *,
         position: np.ndarray | None = None,
         velocity: np.ndarray | None = None,
+        goal_type: str | None = None,
     ) -> GoalEnergyPrediction:
+        del goal_type
         state = environment.energy_state_for_goal(goal, position=position, velocity=velocity)
         prediction = self.predict(state)
         return GoalEnergyPrediction(prediction, prediction + self.upper_delta)
@@ -290,8 +512,12 @@ class EnergyToGoRegressor:
         torch.save(self.checkpoint_payload(), destination)
 
     @classmethod
-    def load(cls, path: str | Path, *, device: str = "cpu") -> "EnergyToGoRegressor":
-        payload = torch.load(Path(path), map_location=device, weights_only=False)
+    def from_checkpoint_payload(
+        cls,
+        payload: dict[str, object],
+        *,
+        device: str = "cpu",
+    ) -> "EnergyToGoRegressor":
         if payload.get("energy_estimator_type") != ENERGY_ESTIMATOR_TYPE:
             raise ValueError("checkpoint is not an MC-supervised Energy-to-Go estimator")
         estimator = cls(
@@ -311,6 +537,113 @@ class EnergyToGoRegressor:
         estimator.update_count = int(payload.get("update_count", 0))
         estimator.model.eval()
         return estimator
+
+    @classmethod
+    def load(cls, path: str | Path, *, device: str = "cpu") -> "EnergyToGoRegressor":
+        payload = torch.load(Path(path), map_location=device, weights_only=False)
+        return cls.from_checkpoint_payload(payload, device=device)
+
+
+class HierarchicalConformalEnergyEstimator:
+    estimator_type = GROUP_CONFORMAL_ESTIMATOR_TYPE
+    bootstrapping = False
+    gamma = None
+
+    def __init__(
+        self,
+        point_estimator: EnergyToGoRegressor,
+        trajectory_calibration: HierarchicalConformalCalibration,
+        mission_calibration: MissionConformalCalibration,
+    ) -> None:
+        self.point_estimator = point_estimator
+        self.trajectory_calibration = trajectory_calibration
+        self.mission_calibration = mission_calibration
+        self.update_count = point_estimator.update_count
+        self.replay: tuple[()] = ()
+        self.trainable_replay: tuple[()] = ()
+
+    @property
+    def battery_capacity(self) -> float:
+        return self.point_estimator.battery_capacity
+
+    def predict(self, energy_state: np.ndarray, action: np.ndarray | None = None, **kwargs: object) -> float:
+        return self.point_estimator.predict(energy_state, action, **kwargs)
+
+    def predict_batch(self, states: np.ndarray) -> np.ndarray:
+        return self.point_estimator.predict_batch(states)
+
+    def predict_quantiles(
+        self,
+        energy_state: np.ndarray,
+        action: np.ndarray | None = None,
+    ) -> np.ndarray:
+        prediction = self.predict(energy_state, action)
+        upper = prediction + self.trajectory_calibration.global_margin
+        return np.asarray([prediction, upper, upper, upper], dtype=np.float64)
+
+    def estimate_context(
+        self,
+        environment,
+        goal: np.ndarray,
+        *,
+        position: np.ndarray | None = None,
+        velocity: np.ndarray | None = None,
+        goal_type: str | None = None,
+    ) -> GoalEnergyPrediction:
+        selected_position = environment.agent.pos if position is None else np.asarray(position)
+        selected_type = "TASK" if goal_type is None else str(goal_type)
+        state = environment.energy_state_for_goal(goal, position=position, velocity=velocity)
+        prediction = self.point_estimator.predict(state)
+        distance = float(np.linalg.norm(np.asarray(goal) - selected_position))
+        margin = self.trajectory_calibration.margin_for(selected_type, distance)
+        return GoalEnergyPrediction(prediction, prediction + margin)
+
+    def estimate_mission(
+        self,
+        task_prediction: float,
+        return_after_task_prediction: float,
+        *,
+        task_distance: float,
+    ) -> GoalEnergyPrediction:
+        point = float(task_prediction + return_after_task_prediction)
+        margin = self.mission_calibration.margin_for(task_distance)
+        return GoalEnergyPrediction(point, point + margin)
+
+    def checkpoint_payload(self) -> dict[str, object]:
+        return {
+            "energy_estimator_type": self.estimator_type,
+            "bootstrapping": False,
+            "gamma": None,
+            "navigation_policy": "frozen_sac_500k",
+            "point_estimator_payload": self.point_estimator.checkpoint_payload(),
+            "trajectory_calibration": self.trajectory_calibration.as_dict(),
+            "mission_calibration": self.mission_calibration.as_dict(),
+        }
+
+    def save(self, path: str | Path) -> None:
+        destination = Path(path)
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        torch.save(self.checkpoint_payload(), destination)
+
+    @classmethod
+    def load(
+        cls,
+        path: str | Path,
+        *,
+        device: str = "cpu",
+    ) -> "HierarchicalConformalEnergyEstimator":
+        payload = torch.load(Path(path), map_location=device, weights_only=False)
+        if payload.get("energy_estimator_type") != GROUP_CONFORMAL_ESTIMATOR_TYPE:
+            raise ValueError("checkpoint is not a hierarchical conformal energy estimator")
+        point = EnergyToGoRegressor.from_checkpoint_payload(
+            payload["point_estimator_payload"],
+            device=device,
+        )
+        return cls(
+            point,
+            HierarchicalConformalCalibration.from_dict(payload["trajectory_calibration"]),
+            MissionConformalCalibration.from_dict(payload["mission_calibration"]),
+        )
 
 
 class DistanceEnergyEstimator:
@@ -362,7 +695,9 @@ class ModelBasedEnergyRolloutEstimator:
         *,
         position: np.ndarray | None = None,
         velocity: np.ndarray | None = None,
+        goal_type: str | None = None,
     ) -> GoalEnergyPrediction:
+        del goal_type
         start_position = environment.agent.pos.copy() if position is None else np.asarray(position, dtype=np.float32)
         start_velocity = environment.agent.vel.copy() if velocity is None else np.asarray(velocity, dtype=np.float32)
         horizontal_speed = float(np.linalg.norm(start_velocity[:2]))
@@ -465,12 +800,19 @@ def energy_regression_metrics(
 
 
 __all__ = [
+    "ENERGY_DISTANCE_BUCKETS",
     "ENERGY_ESTIMATOR_TYPE",
+    "GROUP_CONFORMAL_ESTIMATOR_TYPE",
     "EnergyToGoNetwork",
     "EnergyToGoRegressor",
     "DistanceEnergyEstimator",
     "EnergyTrainingHistory",
     "GoalEnergyPrediction",
+    "HierarchicalConformalCalibration",
+    "HierarchicalConformalEnergyEstimator",
+    "MissionConformalCalibration",
     "ModelBasedEnergyRolloutEstimator",
+    "energy_distance_bucket",
     "energy_regression_metrics",
+    "finite_sample_conformal_margin",
 ]

@@ -376,6 +376,8 @@ def test_phase2_charger_recharge_is_nonterminal_and_increments_cycle() -> None:
     np.testing.assert_allclose(environment.agent.vel, 0.0)
     assert environment.mode is SortieMode.TASK
     assert environment.battery_cycle_id == 1
+    assert environment.battery_cycles_completed == 1
+    assert info["battery_cycle_record"]["segment_type"] == "completed_recharge_cycle"
 
 
 def test_energy_exhaustion_is_failure_terminal() -> None:

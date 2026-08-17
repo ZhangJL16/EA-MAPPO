@@ -68,6 +68,8 @@ class EnergyTrajectory:
     end_reason: str
     had_boundary_contact: bool
     boundary_contact_steps: int
+    final_position: np.ndarray | None = None
+    final_velocity: np.ndarray | None = None
 
     def metadata(self) -> dict[str, object]:
         return {
@@ -80,6 +82,12 @@ class EnergyTrajectory:
             "end_reason": self.end_reason,
             "had_boundary_contact": self.had_boundary_contact,
             "boundary_contact_steps": self.boundary_contact_steps,
+            "final_position": None
+            if self.final_position is None
+            else self.final_position.tolist(),
+            "final_velocity": None
+            if self.final_velocity is None
+            else self.final_velocity.tolist(),
         }
 
 
@@ -180,6 +188,29 @@ class PackedEnergyDataset:
             if line.strip()
         ]
         return cls(metadata=metadata, **arrays)
+
+    @classmethod
+    def concatenate(cls, datasets: list["PackedEnergyDataset"]) -> "PackedEnergyDataset":
+        if not datasets:
+            raise ValueError("at least one dataset is required")
+        combined = cls(
+            states=np.concatenate([row.states for row in datasets]),
+            targets=np.concatenate([row.targets for row in datasets]),
+            step_energy=np.concatenate([row.step_energy for row in datasets]),
+            transition_dt=np.concatenate([row.transition_dt for row in datasets]),
+            trajectory_ids=np.concatenate([row.trajectory_ids for row in datasets]),
+            goal_types=np.concatenate([row.goal_types for row in datasets]),
+            distance_buckets=np.concatenate([row.distance_buckets for row in datasets]),
+            boundary_contact_trajectories=np.concatenate(
+                [row.boundary_contact_trajectories for row in datasets]
+            ),
+            metadata=[item for row in datasets for item in row.metadata],
+        )
+        if len(combined.successful_trajectory_ids) != sum(
+            len(row.successful_trajectory_ids) for row in datasets
+        ):
+            raise ValueError("cannot concatenate datasets with overlapping trajectory ids")
+        return combined
 
 
 def _sample_position(
@@ -331,6 +362,123 @@ def generate_energy_goal_specs(
     return specs
 
 
+def generate_intersection_stratified_energy_goal_specs(
+    *,
+    num_trajectories: int,
+    seed: int,
+    charger_position: np.ndarray,
+    trajectory_id_offset: int = 0,
+    length: float = 4000.0,
+    width: float = 4000.0,
+    z_min: float = 20.0,
+    z_max: float = 380.0,
+    margin: float = 100.0,
+) -> list[EnergyGoalSpec]:
+    if num_trajectories < 13:
+        raise ValueError("intersection-stratified data requires at least 13 trajectories")
+    feasible_cells = [
+        (goal_type, bucket)
+        for bucket in DISTANCE_BUCKETS
+        for goal_type in ENERGY_GOAL_TYPES
+        if not (bucket[0] == ">4000" and goal_type != "TASK")
+    ]
+    rng = np.random.default_rng(seed)
+    base, remainder = divmod(num_trajectories, len(feasible_cells))
+    specs: list[EnergyGoalSpec] = []
+    charger = np.asarray(charger_position, dtype=np.float32)
+    for cell_index, (goal_type, bucket) in enumerate(feasible_cells):
+        count = base + int(cell_index < remainder)
+        for _ in range(count):
+            if goal_type == "TASK":
+                start, goal, distance = _sample_pair_for_bucket(
+                    rng,
+                    bucket,
+                    length=length,
+                    width=width,
+                    z_min=z_min,
+                    z_max=z_max,
+                    margin=margin,
+                )
+                velocity = np.zeros(3, dtype=np.float32)
+            else:
+                start, distance = _sample_charger_context(
+                    rng,
+                    bucket,
+                    charger,
+                    length=length,
+                    width=width,
+                    z_min=z_min,
+                    z_max=z_max,
+                    margin=margin,
+                )
+                goal = charger.copy()
+                velocity = (
+                    np.asarray(
+                        [
+                            rng.uniform(-2.0, 2.0),
+                            rng.uniform(-2.0, 2.0),
+                            rng.uniform(-0.5, 0.5),
+                        ],
+                        dtype=np.float32,
+                    )
+                    if goal_type == "CHARGER"
+                    else np.zeros(3, dtype=np.float32)
+                )
+            specs.append(
+                EnergyGoalSpec(
+                    trajectory_id_offset + len(specs),
+                    goal_type,
+                    start,
+                    goal,
+                    velocity,
+                    distance,
+                    bucket[0],
+                )
+            )
+    return specs
+
+
+def generate_stratified_task_specs(
+    *,
+    num_trajectories: int,
+    seed: int,
+    trajectory_id_offset: int = 0,
+    length: float = 4000.0,
+    width: float = 4000.0,
+    z_min: float = 20.0,
+    z_max: float = 380.0,
+    margin: float = 100.0,
+) -> list[EnergyGoalSpec]:
+    if num_trajectories <= 0 or num_trajectories % len(DISTANCE_BUCKETS) != 0:
+        raise ValueError("task trajectory count must be a positive multiple of five")
+    rng = np.random.default_rng(seed)
+    specs: list[EnergyGoalSpec] = []
+    per_bucket = num_trajectories // len(DISTANCE_BUCKETS)
+    for bucket in DISTANCE_BUCKETS:
+        for _ in range(per_bucket):
+            start, goal, distance = _sample_pair_for_bucket(
+                rng,
+                bucket,
+                length=length,
+                width=width,
+                z_min=z_min,
+                z_max=z_max,
+                margin=margin,
+            )
+            specs.append(
+                EnergyGoalSpec(
+                    trajectory_id_offset + len(specs),
+                    "TASK",
+                    start,
+                    goal,
+                    np.zeros(3, dtype=np.float32),
+                    distance,
+                    bucket[0],
+                )
+            )
+    return specs
+
+
 def collect_energy_trajectory(
     policy: DeterministicPolicy,
     environment_factory: Callable[[], object],
@@ -367,6 +515,8 @@ def collect_energy_trajectory(
             success = bool(info["is_success"])
             end_reason = str(info["end_reason"])
             break
+    final_position = environment.agent.pos.copy()
+    final_velocity = environment.agent.vel.copy()
     environment.close()
     energy = np.asarray(costs, dtype=np.float32)
     returns = monte_carlo_energy_to_go(energy).astype(np.float32)
@@ -384,6 +534,8 @@ def collect_energy_trajectory(
         end_reason,
         boundary_contacts > 0,
         boundary_contacts,
+        final_position,
+        final_velocity,
     )
 
 
@@ -410,5 +562,7 @@ __all__ = [
     "assert_disjoint_trajectory_splits",
     "collect_energy_trajectory",
     "generate_energy_goal_specs",
+    "generate_intersection_stratified_energy_goal_specs",
+    "generate_stratified_task_specs",
     "monte_carlo_energy_to_go",
 ]

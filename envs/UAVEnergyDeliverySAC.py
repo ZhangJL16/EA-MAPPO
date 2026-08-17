@@ -61,10 +61,13 @@ class MissionEnergyEstimate:
     return_after_task_upper95: float
     return_now_prediction: float
     return_now_upper95: float
+    mission_prediction: float
+    calibrated_mission_upper95: float
+    component_upper95_sum: float
 
     @property
     def mission_upper95(self) -> float:
-        return self.task_upper95 + self.return_after_task_upper95
+        return self.calibrated_mission_upper95
 
     @property
     def task_q95(self) -> float:
@@ -1117,6 +1120,7 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         self,
         goal: np.ndarray,
         *,
+        goal_type: str,
         position: np.ndarray | None = None,
         velocity: np.ndarray | None = None,
     ) -> GoalEnergyPrediction:
@@ -1128,6 +1132,7 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
                 goal,
                 position=position,
                 velocity=velocity,
+                goal_type=goal_type,
             )
             if not isinstance(prediction, GoalEnergyPrediction):
                 raise TypeError("estimate_context must return GoalEnergyPrediction")
@@ -1152,15 +1157,30 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
     def mission_energy_estimate(self) -> MissionEnergyEstimate:
         if self.energy_estimator is None or self.goal_action_provider is None:
             raise RuntimeError("mission estimation requires energy estimator and frozen navigation policy")
-        task = self._goal_energy_prediction(self.current_task_point)
+        task = self._goal_energy_prediction(self.current_task_point, goal_type="TASK")
         return_position = self.current_task_point.copy()
         return_velocity = np.zeros(3, dtype=np.float32)
         return_after = self._goal_energy_prediction(
             self.charger_position,
+            goal_type="TASK_ENDPOINT_TO_CHARGER",
             position=return_position,
             velocity=return_velocity,
         )
-        return_now = self._goal_energy_prediction(self.charger_position)
+        return_now = self._goal_energy_prediction(
+            self.charger_position,
+            goal_type="CHARGER",
+        )
+        mission_prediction = task.prediction + return_after.prediction
+        component_upper95_sum = task.upper95 + return_after.upper95
+        if hasattr(self.energy_estimator, "estimate_mission"):
+            mission = self.energy_estimator.estimate_mission(
+                task.prediction,
+                return_after.prediction,
+                task_distance=float(np.linalg.norm(self.current_task_point - self.agent.pos)),
+            )
+            mission_upper95 = mission.upper95
+        else:
+            mission_upper95 = component_upper95_sum
         return MissionEnergyEstimate(
             task.prediction,
             task.upper95,
@@ -1168,6 +1188,9 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
             return_after.upper95,
             return_now.prediction,
             return_now.upper95,
+            mission_prediction,
+            mission_upper95,
+            component_upper95_sum,
         )
 
     def _refresh_mission_decision(self) -> bool:
@@ -1212,6 +1235,8 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
             "return_now_energy_prediction": estimate.return_now_prediction,
             "return_now_energy_upper95": estimate.return_now_upper95,
             "mission_energy_upper95": estimate.mission_upper95,
+            "mission_energy_prediction": estimate.mission_prediction,
+            "mission_component_upper95_sum": estimate.component_upper95_sum,
             "reserve": self.energy_reserve,
             "continuation_margin": min(immediate_margin, mission_margin),
             "mode_before": SortieMode.TASK.value,
@@ -1225,6 +1250,7 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
     def _complete_battery_cycle(self) -> dict[str, object]:
         commit = {} if self.return_commit_record is None else self.return_commit_record
         record = {
+            "segment_type": "completed_recharge_cycle",
             "battery_cycle_id": int(self.battery_cycle_id),
             "cycle_start_global_step": int(self.cycle_start_global_step),
             "cycle_end_global_step": int(self.current_step),
@@ -1250,6 +1276,10 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
                 "return_now_energy_upper95"
             ),
             "mission_energy_upper95_at_switch": commit.get("mission_energy_upper95"),
+            "mission_energy_prediction_at_switch": commit.get("mission_energy_prediction"),
+            "mission_component_upper95_sum_at_switch": commit.get(
+                "mission_component_upper95_sum"
+            ),
             "remaining_energy_at_commit": commit.get("remaining_energy"),
             "energy_at_switch": commit.get("remaining_energy"),
             "E_mission_95_at_switch": commit.get("E_mission_95"),
@@ -1287,6 +1317,11 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
             raise RuntimeError("failed battery-cycle records require finite calibrated energy")
         commit = {} if self.return_commit_record is None else self.return_commit_record
         record = {
+            "segment_type": (
+                "guard_truncated_partial_segment"
+                if reason == "episode_emergency_step_guard"
+                else "failed_battery_segment"
+            ),
             "battery_cycle_id": int(self.battery_cycle_id),
             "cycle_start_global_step": int(self.cycle_start_global_step),
             "cycle_end_global_step": int(self.current_step),
@@ -1310,6 +1345,10 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
                 "return_now_energy_upper95"
             ),
             "mission_energy_upper95_at_switch": commit.get("mission_energy_upper95"),
+            "mission_energy_prediction_at_switch": commit.get("mission_energy_prediction"),
+            "mission_component_upper95_sum_at_switch": commit.get(
+                "mission_component_upper95_sum"
+            ),
             "remaining_energy_at_commit": commit.get("remaining_energy"),
             "energy_at_switch": commit.get("remaining_energy"),
             "E_mission_95_at_switch": commit.get("E_mission_95"),
@@ -1605,6 +1644,12 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
             if estimate is None
             else estimate.return_now_upper95,
             "mission_energy_upper95": None if estimate is None else estimate.mission_upper95,
+            "mission_energy_prediction": None
+            if estimate is None
+            else estimate.mission_prediction,
+            "mission_component_upper95_sum": None
+            if estimate is None
+            else estimate.component_upper95_sum,
             "boundary_contact": bool(boundary_contact),
             "boundary_collision_count": int(self.boundary_collision_count),
             "consecutive_boundary_contacts": int(self.consecutive_boundary_contacts),

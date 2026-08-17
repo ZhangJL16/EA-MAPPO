@@ -391,7 +391,7 @@ def run_exhaustion_smoke(
 
 def run_phase2(
     policy: SAC,
-    estimator: EnergyToGoRegressor,
+    estimator,
     args: argparse.Namespace,
     *,
     capacity: float,
@@ -411,12 +411,15 @@ def run_phase2(
     )
     environment.enable_phase_two()
     observation, _ = environment.reset(seed=args.seed + 200_000)
-    cycles: list[dict[str, object]] = []
+    completed_cycles: list[dict[str, object]] = []
+    partial_segments: list[dict[str, object]] = []
     switch_events = 0
     exhaustions = 0
     truncations = 0
     total_tasks = 0
     tasks_after_recharge = 0
+    gym_episodes = 1
+    has_recharged = False
     consecutive_zero = 0
     max_consecutive_zero = 0
     for transition in range(1, args.phase2_transition_budget + 1):
@@ -424,17 +427,23 @@ def run_phase2(
         observation, _, terminated, truncated, info = environment.step(action)
         switch_events += int(info["switched_now"])
         total_tasks += int(info["task_completed_now"])
-        if info["task_completed_now"] and int(info["battery_cycle_id"]) > 0:
+        if info["task_completed_now"] and has_recharged:
             tasks_after_recharge += 1
         if info["switched_now"] and environment.switching_events:
             append_jsonl(output / "switching_events.jsonl", environment.switching_events[-1])
         if info["battery_cycle_record"] is not None:
             record = dict(info["battery_cycle_record"])
-            cycles.append(record)
             append_jsonl(output / "battery_cycles.jsonl", record)
-            zero = int(record["tasks_completed_in_cycle"]) == 0
-            consecutive_zero = consecutive_zero + 1 if zero else 0
-            max_consecutive_zero = max(max_consecutive_zero, consecutive_zero)
+            if bool(record["return_success"]):
+                completed_cycles.append(record)
+                append_jsonl(output / "completed_recharge_cycles.jsonl", record)
+                has_recharged = True
+                zero = int(record["tasks_completed_in_cycle"]) == 0
+                consecutive_zero = consecutive_zero + 1 if zero else 0
+                max_consecutive_zero = max(max_consecutive_zero, consecutive_zero)
+            else:
+                partial_segments.append(record)
+                append_jsonl(output / "partial_battery_segments.jsonl", record)
         if transition % args.phase2_log_frequency == 0 or terminated or truncated:
             append_jsonl(
                 output / "training_curve.jsonl",
@@ -459,6 +468,10 @@ def run_phase2(
                         "return_after_task_energy_upper95"
                     ],
                     "mission_energy_upper95": info["mission_energy_upper95"],
+                    "mission_energy_prediction": info["mission_energy_prediction"],
+                    "mission_component_upper95_sum": info[
+                        "mission_component_upper95_sum"
+                    ],
                     "energy_reserve": info["energy_reserve"],
                     "battery_cycle_id": info["battery_cycle_id"],
                 },
@@ -467,16 +480,56 @@ def run_phase2(
             exhaustions += int(terminated and info["end_reason"] == "energy_exhausted")
             truncations += int(truncated)
             observation, _ = environment.reset(seed=args.seed + 200_000 + transition)
-    successful = [row for row in cycles if bool(row["return_success"])]
-    post_recharge_cycles = [row for row in successful if int(row["battery_cycle_id"]) > 0]
+            gym_episodes += 1
+            has_recharged = False
+    if environment.cycle_policy_steps > 0:
+        budget_partial = {
+            "segment_type": "training_budget_partial_segment",
+            "battery_cycle_id": int(environment.battery_cycle_id),
+            "cycle_start_transition": int(environment.cycle_start_global_step),
+            "cycle_end_transition": int(args.phase2_transition_budget),
+            "cycle_policy_steps": int(environment.cycle_policy_steps),
+            "cycle_simulation_time": float(
+                environment.simulation_time - environment.cycle_start_simulation_time
+            ),
+            "tasks_completed_in_cycle": int(environment.tasks_in_current_battery_cycle),
+            "energy_used": float(environment.cycle_start_energy - environment.agent.energy),
+            "remaining_energy_at_segment_end": float(environment.agent.energy),
+            "remaining_energy_fraction_at_segment_end": float(
+                environment.agent.energy / capacity
+            ),
+            "mode_at_segment_end": environment.mode.value,
+            "return_commit_step": None
+            if environment.return_commit_record is None
+            else environment.return_commit_record.get("global_step"),
+            "return_success": False,
+            "charger_reached": False,
+            "energy_exhausted": False,
+            "emergency_time_limit": False,
+        }
+        partial_segments.append(budget_partial)
+        append_jsonl(output / "partial_battery_segments.jsonl", budget_partial)
+    post_recharge_cycles = completed_cycles[1:]
     remaining_at_charger = [
-        float(row["remaining_energy_at_cycle_end"]) for row in successful
+        float(row["remaining_energy_at_cycle_end"]) for row in completed_cycles
     ]
     remaining_fraction_at_charger = [
-        float(row["remaining_energy_fraction_at_charger"]) for row in successful
+        float(row["remaining_energy_fraction_at_charger"]) for row in completed_cycles
     ]
+    guard_segments = [
+        row for row in partial_segments if bool(row.get("emergency_time_limit", False))
+    ]
+    failed_returns = [
+        row
+        for row in partial_segments
+        if row.get("return_commit_step") is not None and not bool(row.get("return_success"))
+    ]
+    completed_tasks = sum(
+        int(row["tasks_completed_in_cycle"]) for row in completed_cycles
+    )
     summary = {
-        "energy_estimator_type": ENERGY_ESTIMATOR_TYPE,
+        "energy_estimator_type": getattr(estimator, "estimator_type", ENERGY_ESTIMATOR_TYPE),
+        "environment_transitions": args.phase2_transition_budget,
         "requested_transition_budget": args.phase2_transition_budget,
         "actual_training_transitions": args.phase2_transition_budget,
         "exact_budget_match": True,
@@ -484,23 +537,41 @@ def run_phase2(
         "tasks_per_1000_transitions": 1000.0
         * float(total_tasks)
         / args.phase2_transition_budget,
-        "battery_cycles_completed": len(cycles),
-        "tasks_per_battery_cycle": None
-        if not cycles
-        else float(np.mean([row["tasks_completed_in_cycle"] for row in cycles])),
+        "completed_recharge_cycles": len(completed_cycles),
+        "battery_cycles_completed": len(completed_cycles),
+        "partial_battery_segments": len(partial_segments),
+        "guard_truncated_segments": len(guard_segments),
+        "gym_episodes": gym_episodes,
+        "charger_arrivals": len(completed_cycles),
+        "successful_recharges": len(completed_cycles),
+        "tasks_per_completed_recharge_cycle": None
+        if not completed_cycles
+        else float(completed_tasks / len(completed_cycles)),
         "charger_returns_attempted": switch_events,
-        "charger_returns_successful": len(successful),
+        "successful_autonomous_returns": len(completed_cycles),
+        "charger_returns_successful": len(completed_cycles),
+        "failed_autonomous_returns": len(failed_returns),
+        "mean_remaining_energy_at_real_charger_arrival": None
+        if not remaining_at_charger
+        else float(np.mean(remaining_at_charger)),
         "mean_remaining_energy_at_charger": None
         if not remaining_at_charger
         else float(np.mean(remaining_at_charger)),
+        "mean_remaining_fraction_at_real_charger_arrival": None
+        if not remaining_fraction_at_charger
+        else float(np.mean(remaining_fraction_at_charger)),
         "mean_remaining_energy_fraction_at_charger": None
         if not remaining_fraction_at_charger
         else float(np.mean(remaining_fraction_at_charger)),
+        "mean_energy_utilization_per_completed_recharge_cycle": None
+        if not remaining_fraction_at_charger
+        else float(1.0 - np.mean(remaining_fraction_at_charger)),
         "mean_energy_utilization": None
         if not remaining_fraction_at_charger
         else float(1.0 - np.mean(remaining_fraction_at_charger)),
+        "energy_exhaustions": exhaustions,
         "energy_exhaustion_count": exhaustions,
-        "energy_exhaustion_rate": float(exhaustions / max(len(cycles), 1)),
+        "energy_exhaustion_rate": float(exhaustions / max(switch_events, 1)),
         "tasks_completed_after_recharge": tasks_after_recharge,
         "fraction_of_cycles_with_post_recharge_task": None
         if not post_recharge_cycles
@@ -508,11 +579,23 @@ def run_phase2(
             np.mean([int(row["tasks_completed_in_cycle"]) > 0 for row in post_recharge_cycles])
         ),
         "consecutive_charger_returns_without_task": max_consecutive_zero,
+        "charger_loop_count": sum(
+            int(row["tasks_completed_in_cycle"]) == 0 for row in completed_cycles
+        ),
         "CHARGER_LOOP_WARNING": max_consecutive_zero > 2,
         "emergency_truncations": truncations,
         "energy_reserve_fraction": args.energy_reserve_fraction,
         "energy_reserve_absolute": capacity * args.energy_reserve_fraction,
-        "calibration_upper_delta": estimator.upper_delta,
+        "trajectory_global_margin": getattr(
+            getattr(estimator, "trajectory_calibration", None),
+            "global_margin",
+            getattr(estimator, "upper_delta", None),
+        ),
+        "mission_global_margin": getattr(
+            getattr(estimator, "mission_calibration", None),
+            "global_margin",
+            None,
+        ),
         "sac_frozen": True,
     }
     write_json(output / "summary.json", summary)

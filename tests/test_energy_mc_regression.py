@@ -216,8 +216,16 @@ class UpperOnlyEstimator:
     update_count = 0
     replay = ()
 
-    def estimate_context(self, environment, goal, *, position=None, velocity=None):
-        del environment, goal, position, velocity
+    def estimate_context(
+        self,
+        environment,
+        goal,
+        *,
+        position=None,
+        velocity=None,
+        goal_type=None,
+    ):
+        del environment, goal, position, velocity, goal_type
         return GoalEnergyPrediction(1.0, 1_000.0)
 
     def predict_quantiles(self, state, action=None):
