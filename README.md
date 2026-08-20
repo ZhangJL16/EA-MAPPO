@@ -1,5 +1,19 @@
 # Swap Certified UAV Research Bundle
 
+## Current Research Index
+
+The consolidated status of the energy-estimation, sampled-data safety-filter,
+history-conditioned trajectory, recurrent-memory, and control-grounded memory
+studies is maintained in [`docs/RESEARCH_OVERVIEW.md`](docs/RESEARCH_OVERVIEW.md).
+That document also links the complete primary-paper matrices, proof audits,
+controlled experiment reports, hostile reviews, and final keep/reject decisions.
+
+The current high-level conclusion is deliberately mixed: calibrated Monte Carlo
+energy estimation remains a useful component under its stated exchangeability
+and predefined-group assumptions, while the attempted generic theory claims for
+energy-aware filtering, history-conditioned safe sampling, and structured memory
+were not supported. Those rejected routes are preserved as research provenance.
+
 The active research package is in `review_bundle/`.
 
 ```bash

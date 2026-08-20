@@ -1,0 +1,28 @@
+{
+  "acceptance_status": "provisional",
+  "agent_id": "01a01e33-3f73-76d1-a667-3df4f8b6c1f0",
+  "audit_skill": "experiment-audit",
+  "checks": {
+    "ground_truth_provenance": "pass",
+    "heldout_test_leakage": "pass",
+    "invalid_artifact_exclusion": "pass",
+    "result_existence": "pass",
+    "scope": "warn",
+    "score_normalization": "pass",
+    "source_input_provenance": "pass"
+  },
+  "evaluation_type": "simulation_only",
+  "final_artifact": "artifacts/memory_closed_loop_controlled_final_audited_20260820",
+  "generated_at": "2026-08-20T00:00:00+08:00",
+  "integrity_status": "warn",
+  "overall_verdict": "warn",
+  "review_independence": "same-family",
+  "reviewer_model": "gpt-5.5",
+  "severity": {
+    "critical": 0,
+    "fatal": 0,
+    "major": 0,
+    "minor": 0
+  },
+  "summary": "All artifact-integrity defects are resolved; warning remains only for the narrow simulation claim ceiling."
+}

@@ -52,7 +52,12 @@ saved_methods/
 *.mat
 *.csv
 !train_logs/uav_delivery_experiments.csv
+!docs/uav_safety_energy_literature_matrix.csv
+!docs/grounded_memory_literature_matrix.csv
 *.SC2Replay
+
+# Local ARIS orchestration state is not a research artifact.
+.aris/
 
 # Environment datasets generated or downloaded locally
 envs/stego/dataset/

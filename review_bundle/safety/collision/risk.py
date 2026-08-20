@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from safety.calibration import SplitConformalUpperBound
+from ..calibration import SplitConformalUpperBound
 
 
 def short_horizon_labels(
