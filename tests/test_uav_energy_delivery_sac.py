@@ -10,12 +10,17 @@ import torch
 from PIL import Image
 from stable_baselines3 import SAC
 
-from envs.UAVEnergyDelivery import UAVEnv
+from envs.UAVEnergyDelivery import (
+    UAVEnv,
+    update_lasers_to_boundary,
+    update_lasers_to_obstacle,
+)
 from envs.UAVEnergyDeliverySAC import (
     ENERGY_QUANTILES,
     ENERGY_UNIT,
     GoalConditionedQuantileTDEnergyEstimator,
     SACTrainingPhase,
+    StaticCylinderObstacle,
     UAVEnergyDeliverySACEnv,
 )
 from review_bundle.envs.navigation.state import NavigationState
@@ -28,12 +33,14 @@ from scripts.train_uav_energy_delivery_sac import (
     calculate_battery_capacities,
     evaluate_energy_tasks,
     evaluate_navigation_tasks,
+    environment_from_args,
     freeze_navigation_and_start_td,
     generate_navigation_curves,
     generate_stratified_navigation_tasks,
     load_resumed_phase1,
     make_navigation_vec_env,
     navigation_energy_gate_passed,
+    navigation_observation_dim,
     navigation_safety_gate_passed,
     parse_args,
     run_battery_calibration,
@@ -106,6 +113,233 @@ def test_default_contract_and_legacy_environment_are_independent() -> None:
     assert (new.lidar_max_range, new.lidar_frequency) == (100.0, 10.0)
     assert (new.lidar_horizontal_sectors, new.lidar_vertical_sectors) == (128, 8)
     assert new.cbf_frequency == 20.0
+
+
+def test_legacy_32_ray_contract_remains_available_without_action_filter() -> None:
+    environment = UAVEnergyDeliverySACEnv(
+        lidar_enabled=True,
+        lidar_max_range=250.0,
+        lidar_horizontal_sectors=32,
+        lidar_vertical_sectors=1,
+        num_obstacles=6,
+    )
+    observation, info = environment.reset(seed=700)
+    energy_state = environment.energy_state_for_goal(environment.current_task_point)
+    assert observation.shape == (71,)
+    assert energy_state.shape == (71,)
+    assert environment.cbf_enabled is False
+    assert len(environment.obstacles) == 6
+    np.testing.assert_allclose(observation[7:], energy_state[7:])
+    assert np.all((0.0 <= observation[7:39]) & (observation[7:39] <= 1.0))
+    assert set(np.unique(observation[39:])).issubset({0.0, 1.0})
+    assert info["lidar_enabled"] is True
+    assert info["num_obstacles"] == 6
+    environment.close()
+
+
+def test_obstacle_collision_is_penalized_but_nonterminal() -> None:
+    environment = UAVEnergyDeliverySACEnv(
+        lidar_enabled=True,
+        lidar_horizontal_sectors=32,
+        lidar_vertical_sectors=1,
+        minimum_task_distance=5.0,
+    )
+    start = np.array([1000.0, 1000.0, 100.0], dtype=np.float32)
+    environment.reset(
+        seed=701,
+        options={
+            "start_position": start,
+            "start_velocity": np.array([20.0, 0.0, 0.0], dtype=np.float32),
+            "task_point": np.array([1500.0, 1000.0, 100.0], dtype=np.float32),
+        },
+    )
+    environment.obstacles = [
+        StaticCylinderObstacle(np.array([1001.0, 1000.0], dtype=np.float32), 1.0)
+    ]
+    environment._update_lidar()
+    _, reward, terminated, truncated, info = environment.step(
+        np.zeros(3, dtype=np.float32)
+    )
+    assert info["obstacle_collision"] is True
+    assert info["reward_components"]["obstacle_penalty_component"] == pytest.approx(-1.2)
+    assert reward > -10.0
+    assert not terminated and not truncated
+    environment.close()
+
+
+def test_obstacle_training_cli_builds_71d_direct_sac_environment() -> None:
+    args = parse_args(
+        [
+            "--output-dir",
+            "/tmp/not-used",
+            "--smoke",
+            "--lidar-enabled",
+            "--lidar-sectors",
+            "32",
+            "--lidar-range",
+            "250",
+            "--num-obstacles",
+            "24",
+        ]
+    )
+    assert args.legacy_lidar_alias_used is True
+    assert args.hocbf_enabled is False
+    assert args.buffer_size == 1_000_000
+    assert navigation_observation_dim(args) == 71
+    environment = environment_from_args(args, phase=SACTrainingPhase.NAVIGATION)
+    observation, _ = environment.reset(seed=702)
+    assert observation.shape == (71,)
+    assert len(environment.obstacles) == 24
+    assert environment.lidar_max_range == pytest.approx(250.0)
+    assert environment.cbf_enabled is False
+    environment.close()
+
+
+def test_formal_obstacle_contract_uses_1024_ray_3d_lidar_and_hocbf() -> None:
+    args = parse_args(
+        [
+            "--output-dir",
+            "/tmp/not-used",
+            "--smoke",
+            "--lidar-enabled",
+            "--num-obstacles",
+            "4",
+        ]
+    )
+    assert args.lidar_horizontal_sectors == 128
+    assert args.lidar_vertical_sectors == 8
+    assert args.lidar_sectors == 1024
+    assert args.hocbf_enabled is True
+    assert args.buffer_size == 200_000
+    assert navigation_observation_dim(args) == 2055
+    environment = environment_from_args(args, phase=SACTrainingPhase.NAVIGATION)
+    observation, info = environment.reset(seed=704)
+    assert observation.shape == (2055,)
+    assert environment._lidar_packet is not None
+    assert environment._lidar_packet.directions.shape == (1024, 3)
+    assert info["lidar_num_sectors"] == 1024
+    assert info["cbf_enabled"] is True
+    environment.close()
+
+
+def test_hocbf_leaves_safe_nominal_action_unchanged() -> None:
+    environment = UAVEnergyDeliverySACEnv(
+        lidar_enabled=True,
+        cbf_enabled=True,
+        minimum_task_distance=5.0,
+    )
+    environment.reset(
+        seed=705,
+        options={
+            "start_position": np.array([2000.0, 2000.0, 200.0], dtype=np.float32),
+            "task_point": np.array([2100.0, 2000.0, 200.0], dtype=np.float32),
+        },
+    )
+    _, _, _, _, info = environment.step(np.zeros(3, dtype=np.float32))
+    assert info["hocbf_intervened"] is False
+    np.testing.assert_allclose(info["executed_action"], 0.0, atol=1e-7)
+    environment.close()
+
+
+def test_hocbf_does_not_duplicate_physical_speed_saturation() -> None:
+    environment = UAVEnergyDeliverySACEnv(
+        lidar_enabled=True,
+        cbf_enabled=True,
+        minimum_task_distance=5.0,
+    )
+    environment.reset(
+        seed=7051,
+        options={
+            "start_position": np.array([2000.0, 2000.0, 200.0], dtype=np.float32),
+            "start_velocity": np.array([20.0, 0.0, 0.0], dtype=np.float32),
+            "task_point": np.array([2500.0, 2000.0, 200.0], dtype=np.float32),
+        },
+    )
+    _, _, _, _, info = environment.step(
+        np.array([1.0, 0.0, 0.0], dtype=np.float32)
+    )
+    assert info["hocbf_intervened"] is False
+    assert info["executed_action"][0] == pytest.approx(1.0)
+    assert environment.agent.vel[0] == pytest.approx(20.0)
+    environment.close()
+
+
+def test_hocbf_uses_reverse_braking_when_current_barrier_state_is_unsafe() -> None:
+    environment = UAVEnergyDeliverySACEnv(
+        lidar_enabled=True,
+        cbf_enabled=True,
+        minimum_task_distance=5.0,
+    )
+    environment.reset(
+        seed=706,
+        options={
+            "start_position": np.array([1000.0, 1000.0, 100.0], dtype=np.float32),
+            "start_velocity": np.array([20.0, 0.0, 0.0], dtype=np.float32),
+            "task_point": np.array([1500.0, 1000.0, 100.0], dtype=np.float32),
+        },
+    )
+    environment.obstacles = [
+        StaticCylinderObstacle(np.array([1045.0, 1000.0], dtype=np.float32), 10.0)
+    ]
+    environment._update_lidar()
+    _, _, terminated, truncated, info = environment.step(
+        np.array([1.0, 0.0, 0.0], dtype=np.float32)
+    )
+    assert info["hocbf_intervened"] is True
+    assert info["hocbf_emergency_brake"] is True
+    assert info["executed_action"][0] < 0.0
+    assert environment.agent.vel[0] < 20.0
+    assert info["obstacle_collision"] is False
+    assert not terminated and not truncated
+    environment.close()
+
+
+def test_vectorized_lidar_matches_legacy_sensor_geometry() -> None:
+    environment = UAVEnergyDeliverySACEnv(
+        lidar_enabled=True,
+        lidar_horizontal_sectors=32,
+        lidar_vertical_sectors=1,
+        lidar_max_range=250.0,
+    )
+    environment.reset(seed=703)
+    environment.agent.pos = np.array([1000.0, 1200.0, 100.0], dtype=np.float32)
+    environment.obstacles = [
+        StaticCylinderObstacle(np.array([1100.0, 1200.0], dtype=np.float32), 30.0),
+        StaticCylinderObstacle(np.array([900.0, 1300.0], dtype=np.float32), 45.0),
+    ]
+    expected = update_lasers_to_boundary(
+        environment.agent.pos[:2],
+        environment.lidar_max_range,
+        environment.lidar_horizontal_sectors,
+        environment.length,
+        environment.width,
+    )
+    for obstacle in environment.obstacles:
+        expected = np.minimum(
+            expected,
+            update_lasers_to_obstacle(
+                environment.agent.pos[:2],
+                obstacle.pos,
+                obstacle.radius,
+                environment.lidar_max_range,
+                environment.lidar_horizontal_sectors,
+            ),
+        )
+    environment._update_lidar()
+    np.testing.assert_allclose(environment.agent.lasers, expected, rtol=1e-5, atol=1e-4)
+    environment.close()
+
+
+def test_obstacles_without_lidar_are_rejected_by_training_cli() -> None:
+    with pytest.raises(SystemExit):
+        parse_args(
+            [
+                "--output-dir",
+                "/tmp/not-used",
+                "--num-obstacles",
+                "1",
+            ]
+        )
 
 
 def test_phase1_reset_is_random_single_task_with_zero_velocity() -> None:
@@ -447,6 +681,26 @@ def test_td_recomputes_next_action_from_current_policy_provider() -> None:
     estimator.observe_transition(state, action, 1.0, state, state, action, False, "TASK")
     estimator.observe_transition(state, action, 1.0, state, state, action, False, "TASK")
     assert calls and calls[-1].shape == (2, 7)
+
+
+def test_lidar_conditioned_energy_td_uses_matching_71d_state() -> None:
+    estimator = GoalConditionedQuantileTDEnergyEstimator(
+        state_dim=71,
+        hidden_dim=8,
+        batch_size=2,
+        replay_capacity=16,
+        learning_starts=2,
+        seed=130,
+    )
+    state = np.zeros(71, dtype=np.float32)
+    action = np.zeros(3, dtype=np.float32)
+    estimator.observe_transition(state, action, 1.0, state, state, action, True, "TASK")
+    estimator.observe_transition(state, action, 1.0, state, state, action, True, "TASK")
+    assert estimator.update_count == 1
+    payload = estimator.checkpoint_payload()
+    assert payload["state_dim"] == 71
+    assert "lidar_normalized32" in payload["energy_observation"]
+    assert "lidar_valid_mask32" in payload["energy_observation"]
 
 
 def test_mission_composition_and_commitment_are_correct_and_irreversible() -> None:

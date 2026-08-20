@@ -182,6 +182,26 @@ def environment_from_args(
         energy_reserve_fraction=args.energy_reserve_fraction,
         telemetry_cost_config=telemetry_config_from_args(args),
         render_vertical_exaggeration=args.render_vertical_exaggeration,
+        lidar_enabled=bool(getattr(args, "lidar_enabled", False)),
+        lidar_max_range=float(getattr(args, "lidar_range", 100.0)),
+        lidar_horizontal_sectors=int(getattr(args, "lidar_horizontal_sectors", 128)),
+        lidar_vertical_sectors=int(getattr(args, "lidar_vertical_sectors", 8)),
+        num_obstacles=int(getattr(args, "num_obstacles", 0)),
+        obstacle_radius_min=float(getattr(args, "obstacle_radius_min", 25.0)),
+        obstacle_radius_max=float(getattr(args, "obstacle_radius_max", 60.0)),
+        obstacle_sampling_margin=float(getattr(args, "obstacle_sampling_margin", 20.0)),
+        obstacle_collision_penalty=float(getattr(args, "obstacle_collision_penalty", 1.2)),
+        repeat_collision_scale=float(getattr(args, "repeat_collision_scale", 0.35)),
+        safety_intervention_penalty=float(
+            getattr(args, "safety_intervention_penalty", 0.05)
+        ),
+        cbf_enabled=bool(getattr(args, "hocbf_enabled", False)),
+        hocbf_k1=float(getattr(args, "hocbf_k1", 1.0)),
+        hocbf_k2=float(getattr(args, "hocbf_k2", 1.0)),
+        hocbf_uncertainty_margin=float(
+            getattr(args, "hocbf_uncertainty_margin", 1.0)
+        ),
+        hocbf_top_k=getattr(args, "hocbf_top_k", None),
     )
     if battery_capacity is not None:
         environment.configure_calibrated_battery(
@@ -190,6 +210,16 @@ def environment_from_args(
             source="phase1_frozen_policy_calibration",
         )
     return environment
+
+
+def navigation_observation_dim(args: argparse.Namespace) -> int:
+    return 7 + (
+        2
+        * int(getattr(args, "lidar_horizontal_sectors", 128))
+        * int(getattr(args, "lidar_vertical_sectors", 8))
+        if bool(getattr(args, "lidar_enabled", False))
+        else 0
+    )
 
 
 def single_action_provider(policy: DeterministicPolicy):
@@ -306,6 +336,9 @@ def evaluate_navigation_tasks(
     output_path: Path | None = None,
 ) -> dict[str, object]:
     environment = environment_from_args(args, phase=SACTrainingPhase.NAVIGATION)
+    navigation_eval_max_steps = getattr(args, "navigation_eval_max_steps", None)
+    if navigation_eval_max_steps is not None:
+        environment.phase1_episode_max_policy_steps = int(navigation_eval_max_steps)
     records: list[dict[str, object]] = []
     evaluation_transitions = 0
     for task_index, task in enumerate(tasks):
@@ -318,6 +351,9 @@ def evaluate_navigation_tasks(
             },
         )
         boundary_contacts = 0
+        obstacle_collision_steps = 0
+        hocbf_intervention_steps = 0
+        hocbf_emergency_brake_steps = 0
         consecutive_boundary_contacts = 0
         max_consecutive_boundary_contacts = 0
         reward_total = 0.0
@@ -327,6 +363,11 @@ def evaluate_navigation_tasks(
             evaluation_transitions += 1
             reward_total += float(reward)
             contact = bool(info["boundary_contact"])
+            obstacle_collision_steps += int(bool(info["obstacle_collision"]))
+            hocbf_intervention_steps += int(bool(info.get("hocbf_intervened", False)))
+            hocbf_emergency_brake_steps += int(
+                bool(info.get("hocbf_emergency_brake", False))
+            )
             boundary_contacts += int(contact)
             consecutive_boundary_contacts = consecutive_boundary_contacts + 1 if contact else 0
             max_consecutive_boundary_contacts = max(
@@ -349,6 +390,13 @@ def evaluate_navigation_tasks(
                         "boundary_contact_steps": boundary_contacts,
                         "had_boundary_contact": boundary_contacts > 0,
                         "max_consecutive_boundary_contacts": max_consecutive_boundary_contacts,
+                        "obstacle_collision_steps": obstacle_collision_steps,
+                        "had_obstacle_collision": obstacle_collision_steps > 0,
+                        "hocbf_intervention_steps": hocbf_intervention_steps,
+                        "hocbf_intervention_rate": float(
+                            hocbf_intervention_steps / max(environment.current_step, 1)
+                        ),
+                        "hocbf_emergency_brake_steps": hocbf_emergency_brake_steps,
                         "end_reason": info["end_reason"],
                     }
                 )
@@ -361,6 +409,16 @@ def evaluate_navigation_tasks(
         )
     boundary_contact_steps = sum(int(row["boundary_contact_steps"]) for row in records)
     episodes_with_boundary_contact = sum(bool(row["had_boundary_contact"]) for row in records)
+    obstacle_collision_steps = sum(int(row["obstacle_collision_steps"]) for row in records)
+    episodes_with_obstacle_collision = sum(
+        bool(row["had_obstacle_collision"]) for row in records
+    )
+    hocbf_intervention_steps = sum(
+        int(row["hocbf_intervention_steps"]) for row in records
+    )
+    hocbf_emergency_brake_steps = sum(
+        int(row["hocbf_emergency_brake_steps"]) for row in records
+    )
     boundary_contact_step_rate = float(boundary_contact_steps / max(evaluation_transitions, 1))
     summary = {
         "global_env_transitions": int(global_env_transitions),
@@ -380,6 +438,22 @@ def evaluate_navigation_tasks(
         ),
         "max_consecutive_boundary_contacts": int(
             max((int(row["max_consecutive_boundary_contacts"]) for row in records), default=0)
+        ),
+        "obstacle_collision_steps": int(obstacle_collision_steps),
+        "obstacle_collision_step_rate": float(
+            obstacle_collision_steps / max(evaluation_transitions, 1)
+        ),
+        "episodes_with_obstacle_collision": int(episodes_with_obstacle_collision),
+        "obstacle_collision_episode_rate": float(
+            episodes_with_obstacle_collision / max(len(records), 1)
+        ),
+        "hocbf_intervention_steps": int(hocbf_intervention_steps),
+        "hocbf_intervention_step_rate": float(
+            hocbf_intervention_steps / max(evaluation_transitions, 1)
+        ),
+        "hocbf_emergency_brake_steps": int(hocbf_emergency_brake_steps),
+        "hocbf_emergency_brake_step_rate": float(
+            hocbf_emergency_brake_steps / max(evaluation_transitions, 1)
         ),
         "mean_reward": float(np.mean([row["reward"] for row in records])),
         "records": records,
@@ -402,7 +476,10 @@ def navigation_energy_gate_passed(summary: dict[str, object]) -> bool:
 
 
 def navigation_safety_gate_passed(summary: dict[str, object]) -> bool:
-    return bool(summary["boundary_contact_step_rate"] < 0.01)
+    return bool(
+        summary["boundary_contact_step_rate"] < 0.01
+        and summary.get("obstacle_collision_steps", 0) == 0
+    )
 
 
 def make_navigation_vec_env(args: argparse.Namespace) -> DummyVecEnv:
@@ -519,6 +596,8 @@ class NavigationBudgetCallback(BaseCallback):
                 "task_completion_reward_component",
                 "time_penalty_component",
                 "boundary_penalty_component",
+                "obstacle_penalty_component",
+                "safety_intervention_penalty_component",
             )
             row = {
                 "global_env_transitions": int(self.num_timesteps),
@@ -549,6 +628,26 @@ class NavigationBudgetCallback(BaseCallback):
                 ),
                 "boundary_contact_rate": float(
                     np.mean([bool(info["boundary_contact"]) for info in self._interval_infos])
+                ),
+                "obstacle_collision_count": int(
+                    sum(bool(info["obstacle_collision"]) for info in self._interval_infos)
+                ),
+                "obstacle_collision_rate": float(
+                    np.mean([bool(info["obstacle_collision"]) for info in self._interval_infos])
+                ),
+                "hocbf_intervention_count": int(
+                    sum(bool(info.get("hocbf_intervened", False)) for info in self._interval_infos)
+                ),
+                "hocbf_intervention_rate": float(
+                    np.mean(
+                        [bool(info.get("hocbf_intervened", False)) for info in self._interval_infos]
+                    )
+                ),
+                "hocbf_emergency_brake_count": int(
+                    sum(
+                        bool(info.get("hocbf_emergency_brake", False))
+                        for info in self._interval_infos
+                    )
                 ),
                 "gradient_updates": int(self.model._n_updates),
                 "gradient_updates_per_transition": float(
@@ -750,9 +849,11 @@ def load_resumed_phase1(
             raise FileNotFoundError("source Phase 1 final evaluation metadata is missing")
         final_evaluation = read_json(final_eval_path)
     model = SAC.load(checkpoint, device=args.device)
-    if model.observation_space.shape != (7,):
+    expected_observation_shape = (navigation_observation_dim(args),)
+    if model.observation_space.shape != expected_observation_shape:
         raise ValueError(
-            f"resume checkpoint observation shape is {model.observation_space.shape}, expected (7,)"
+            "resume checkpoint observation shape is "
+            f"{model.observation_space.shape}, expected {expected_observation_shape}"
         )
     if model.action_space.shape != (3,):
         raise ValueError(
@@ -817,6 +918,8 @@ def run_battery_calibration(
     if isinstance(policy, SAC) and any(parameter.requires_grad for parameter in policy.policy.parameters()):
         raise RuntimeError("battery calibration requires a frozen SAC policy")
     environment = environment_from_args(args, phase=SACTrainingPhase.NAVIGATION)
+    if bool(getattr(args, "smoke", False)):
+        environment.phase1_episode_max_policy_steps = 300
     before_hash = _policy_parameter_hash(policy)
     task_records: list[dict[str, object]] = []
     full_policy_step_energies: list[float] = []
@@ -1089,6 +1192,8 @@ def evaluate_energy_tasks(
     output_path: Path | None = None,
 ) -> dict[str, object]:
     environment = environment_from_args(args, phase=SACTrainingPhase.TD_PRETRAINING)
+    if bool(getattr(args, "smoke", False)):
+        environment.phase1_episode_max_policy_steps = 300
     environment.bind_energy_learning(
         energy_estimator=estimator,
         goal_action_provider=single_action_provider(policy),
@@ -1741,13 +1846,18 @@ def run_phase2_fixed_budget(
         "sac_frozen": True,
         "td_update_count": estimator.update_count,
         "td_replay_size": len(estimator.replay),
-        "safety_module_enabled": False,
-        "obstacles_enabled": False,
-        "lidar_enabled": False,
-        "cbf_enabled": False,
-        "energy_experiment_stage": "obstacle_free_pre_safety",
-        "energy_td_policy_context": "frozen_navigation_policy_without_cbf",
-        "requires_retraining_after_safety_layer": True,
+        "safety_module_enabled": bool(args.hocbf_enabled),
+        "obstacles_enabled": args.num_obstacles > 0,
+        "lidar_enabled": args.lidar_enabled,
+        "cbf_enabled": bool(args.hocbf_enabled),
+        "action_authority": (
+            "lidar_conditioned_sac_with_hocbf_minimal_projection_and_emergency_braking"
+            if args.hocbf_enabled
+            else "lidar_conditioned_sac_direct_action"
+        ),
+        "energy_experiment_stage": "obstacle_aware_navigation_then_energy",
+        "energy_td_policy_context": "frozen_obstacle_aware_navigation_policy",
+        "requires_retraining_after_safety_layer": False,
     }
     write_json(output / "phase2" / "summary.json", summary)
     environment.close()
@@ -1844,6 +1954,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--log-freq-transitions", type=int, default=1000)
     parser.add_argument("--gif-freq-transitions", type=int, default=100_000)
     parser.add_argument("--eval-navigation-tasks", type=int, default=500)
+    parser.add_argument("--navigation-eval-max-steps", type=int)
     parser.add_argument("--eval-task-seed", type=int, default=70_001)
     parser.add_argument("--energy-eval-tasks", type=int, default=500)
     parser.add_argument("--energy-eval-seed", type=int, default=120_001)
@@ -1865,6 +1976,38 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--xy-sampling-margin", type=float, default=100.0)
     parser.add_argument("--task-z-min", type=float, default=20.0)
     parser.add_argument("--task-z-max", type=float, default=380.0)
+    parser.add_argument(
+        "--lidar-enabled",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+        help="append normalized local LiDAR ranges and validity mask to SAC and energy states",
+    )
+    parser.add_argument("--lidar-range", type=float, default=100.0)
+    parser.add_argument(
+        "--lidar-sectors",
+        type=int,
+        default=None,
+        help="legacy 2D alias: use this many horizontal rays and one vertical sector",
+    )
+    parser.add_argument("--lidar-horizontal-sectors", type=int, default=128)
+    parser.add_argument("--lidar-vertical-sectors", type=int, default=8)
+    parser.add_argument("--num-obstacles", type=int, default=0)
+    parser.add_argument("--obstacle-radius-min", type=float, default=25.0)
+    parser.add_argument("--obstacle-radius-max", type=float, default=60.0)
+    parser.add_argument("--obstacle-sampling-margin", type=float, default=20.0)
+    parser.add_argument("--obstacle-collision-penalty", type=float, default=1.2)
+    parser.add_argument("--repeat-collision-scale", type=float, default=0.35)
+    parser.add_argument("--safety-intervention-penalty", type=float, default=0.05)
+    parser.add_argument(
+        "--hocbf-enabled",
+        action=argparse.BooleanOptionalAction,
+        default=None,
+        help="project unsafe SAC accelerations with the LiDAR HOCBF safety filter",
+    )
+    parser.add_argument("--hocbf-k1", type=float, default=1.0)
+    parser.add_argument("--hocbf-k2", type=float, default=1.0)
+    parser.add_argument("--hocbf-uncertainty-margin", type=float, default=1.0)
+    parser.add_argument("--hocbf-top-k", type=int, default=None)
     parser.add_argument("--render-vertical-exaggeration", type=float, default=4.0)
     parser.add_argument("--gif-seed", type=int, default=110_001)
     parser.add_argument("--gif-frame-skip", type=int, default=20)
@@ -1882,7 +2025,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--energy-target-tau", type=float, default=0.01)
     parser.add_argument("--gamma-energy", type=float, default=1.0)
     parser.add_argument("--learning-rate", type=float, default=3e-4)
-    parser.add_argument("--buffer-size", type=int, default=1_000_000)
+    parser.add_argument(
+        "--buffer-size",
+        type=int,
+        default=None,
+        help="SAC replay capacity; defaults to 200k for 1024-ray input and 1M otherwise",
+    )
     parser.add_argument("--learning-starts", type=int, default=5000)
     parser.add_argument("--batch-size", type=int, default=256)
     parser.add_argument("--tau", type=float, default=0.005)
@@ -1890,6 +2038,21 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--gradient-steps", type=int, default=-1)
     parser.add_argument("--allow-dirty", action="store_true")
     args = parser.parse_args(argv)
+    args.legacy_lidar_alias_used = args.lidar_sectors is not None
+    if args.legacy_lidar_alias_used:
+        args.lidar_horizontal_sectors = args.lidar_sectors
+        args.lidar_vertical_sectors = 1
+    args.lidar_sectors = (
+        args.lidar_horizontal_sectors * args.lidar_vertical_sectors
+    )
+    if args.hocbf_enabled is None:
+        args.hocbf_enabled = bool(
+            args.lidar_enabled
+            and args.num_obstacles > 0
+            and not args.legacy_lidar_alias_used
+        )
+    if args.buffer_size is None:
+        args.buffer_size = 200_000 if args.lidar_sectors >= 1024 else 1_000_000
     if args.smoke and args.validation:
         parser.error("--smoke and --validation are mutually exclusive")
     if args.source_phase1_artifact and not args.resume_after_phase1_checkpoint:
@@ -1898,6 +2061,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         args.phase1_transition_budget = 8000
         args.phase1b_transition_budget = 2000
         args.phase2_transition_budget = 5000
+        args.phase2_episode_max_steps = min(args.phase2_episode_max_steps, 1000)
+        args.navigation_eval_max_steps = 300
         args.eval_freq_transitions = 4000
         args.checkpoint_freq_transitions = 4000
         args.log_freq_transitions = 800
@@ -1926,6 +2091,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         args.target_nominal_endurance_minutes = min(args.target_nominal_endurance_minutes, 2.0)
     if args.num_envs <= 0:
         parser.error("num-envs must be positive")
+    if args.navigation_eval_max_steps is not None and args.navigation_eval_max_steps <= 0:
+        parser.error("navigation-eval-max-steps must be positive when configured")
     if args.phase1_transition_budget % args.num_envs != 0:
         parser.error("phase1-transition-budget must be exactly divisible by num-envs")
     for frequency_name in (
@@ -1951,6 +2118,34 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         parser.error("training, navigation-eval, energy-eval, calibration, validation, and TD seeds must be distinct")
     if args.gradient_steps == 0 or args.gradient_steps < -1:
         parser.error("gradient-steps must be -1 or a positive integer")
+    if args.buffer_size <= 0:
+        parser.error("buffer-size must be positive")
+    if args.num_obstacles < 0:
+        parser.error("num-obstacles must be nonnegative")
+    if args.num_obstacles > 0 and not args.lidar_enabled:
+        parser.error("obstacle training requires --lidar-enabled")
+    if (
+        args.lidar_horizontal_sectors <= 0
+        or args.lidar_vertical_sectors <= 0
+        or args.lidar_range <= 0.0
+    ):
+        parser.error("LiDAR sectors and range must be positive")
+    if args.hocbf_enabled and not args.lidar_enabled:
+        parser.error("HOCBF requires --lidar-enabled")
+    if args.obstacle_radius_min <= 0.0 or args.obstacle_radius_max < args.obstacle_radius_min:
+        parser.error("obstacle radius range is invalid")
+    if args.obstacle_sampling_margin < 0.0 or args.obstacle_collision_penalty < 0.0:
+        parser.error("obstacle margin and collision penalty must be nonnegative")
+    if not 0.0 < args.repeat_collision_scale <= 1.0:
+        parser.error("repeat-collision-scale must lie in (0, 1]")
+    if args.safety_intervention_penalty < 0.0:
+        parser.error("safety-intervention-penalty must be nonnegative")
+    if args.hocbf_k1 <= 0.0 or args.hocbf_k2 <= 0.0:
+        parser.error("HOCBF gains must be positive")
+    if args.hocbf_uncertainty_margin < 0.0:
+        parser.error("hocbf-uncertainty-margin must be nonnegative")
+    if args.hocbf_top_k is not None and args.hocbf_top_k <= 0:
+        parser.error("hocbf-top-k must be positive when configured")
     if args.energy_eval_freq_transitions <= 0:
         parser.error("energy-eval-freq-transitions must be positive")
     if args.gamma_energy != ENERGY_GAMMA:
@@ -2008,6 +2203,21 @@ def train(args: argparse.Namespace) -> dict[str, object]:
         "git_sha": git_sha(),
         "git_clean_at_start": git_clean(),
         "exact_argv": os.sys.argv,
+        "two_stage_budget": {
+            "obstacle_navigation_transitions": args.phase1_transition_budget,
+            "obstacle_energy_transitions": (
+                args.phase1b_transition_budget + args.phase2_transition_budget
+            ),
+            "total_training_transitions": (
+                args.phase1_transition_budget
+                + args.phase1b_transition_budget
+                + args.phase2_transition_budget
+            ),
+            "energy_stage_split": {
+                "frozen_policy_td_warmup": args.phase1b_transition_budget,
+                "continuous_energy_managed_delivery": args.phase2_transition_budget,
+            },
+        },
         "phase1": {
             "training_unit": "environment_transition",
             "transition_budget": args.phase1_transition_budget,
@@ -2020,6 +2230,7 @@ def train(args: argparse.Namespace) -> dict[str, object]:
             "train_freq": [1, "step"],
             "gradient_steps": args.gradient_steps,
             "effective_updates_per_transition": effective_updates_per_transition,
+            "replay_buffer_capacity": args.buffer_size,
             "resume_after_phase1_checkpoint": args.resume_after_phase1_checkpoint,
             "source_phase1_artifact": args.source_phase1_artifact,
         },
@@ -2051,13 +2262,18 @@ def train(args: argparse.Namespace) -> dict[str, object]:
             "switch_quantile": 0.95,
         },
         "research_context": {
-            "safety_module_enabled": False,
-            "obstacles_enabled": False,
-            "lidar_enabled": False,
-            "cbf_enabled": False,
-            "energy_experiment_stage": "obstacle_free_pre_safety",
-            "energy_td_policy_context": "frozen_navigation_policy_without_cbf",
-            "requires_retraining_after_safety_layer": True,
+            "safety_module_enabled": bool(args.hocbf_enabled),
+            "obstacles_enabled": args.num_obstacles > 0,
+            "lidar_enabled": args.lidar_enabled,
+            "cbf_enabled": bool(args.hocbf_enabled),
+            "action_authority": (
+                "lidar_conditioned_sac_with_hocbf_minimal_projection_and_emergency_braking"
+                if args.hocbf_enabled
+                else "lidar_conditioned_sac_direct_action"
+            ),
+            "energy_experiment_stage": "obstacle_aware_navigation_then_energy",
+            "energy_td_policy_context": "frozen_obstacle_aware_navigation_policy",
+            "requires_retraining_after_safety_layer": False,
         },
         "environment": {
             "map_m": [4000.0, 4000.0, 400.0],
@@ -2065,6 +2281,38 @@ def train(args: argparse.Namespace) -> dict[str, object]:
             "physics_dt_s": 0.05,
             "velocity_limits_mps": [20.0, 20.0, 5.0],
             "acceleration_limits_mps2": [5.0, 5.0, 3.0],
+            "observation_dim": navigation_observation_dim(args),
+            "observation_definition": (
+                "velocity3_goal_direction3_log_distance1_"
+                f"lidar_ranges{args.lidar_sectors}_lidar_valid{args.lidar_sectors}"
+                if args.lidar_enabled
+                else "velocity3_goal_direction3_log_distance1"
+            ),
+            "lidar": {
+                "enabled": args.lidar_enabled,
+                "range_m": args.lidar_range,
+                "horizontal_sectors": args.lidar_horizontal_sectors,
+                "vertical_sectors": args.lidar_vertical_sectors,
+                "num_sectors": args.lidar_sectors,
+                "legacy_2d_alias_used": args.legacy_lidar_alias_used,
+            },
+            "static_obstacles": {
+                "count": args.num_obstacles,
+                "radius_range_m": [args.obstacle_radius_min, args.obstacle_radius_max],
+                "sampling_margin_m": args.obstacle_sampling_margin,
+                "collision_penalty": args.obstacle_collision_penalty,
+                "repeat_collision_scale": args.repeat_collision_scale,
+                "collision_terminal": False,
+            },
+            "hocbf": {
+                "enabled": bool(args.hocbf_enabled),
+                "k1": args.hocbf_k1,
+                "k2": args.hocbf_k2,
+                "uncertainty_margin_m": args.hocbf_uncertainty_margin,
+                "top_k": args.hocbf_top_k,
+                "fallback": "reverse_emergency_braking",
+                "intervention_penalty": args.safety_intervention_penalty,
+            },
             "telemetry_cost_config": telemetry_config_from_args(args).__dict__,
         },
         "packages": {
@@ -2101,15 +2349,21 @@ def train(args: argparse.Namespace) -> dict[str, object]:
         navigation_audit["navigation_safety_ready"] = navigation_safety_gate_passed(
             final_navigation_evaluation
         )
-        navigation_audit["safety_module_enabled"] = False
-        navigation_audit["energy_experiment_stage"] = "obstacle_free_pre_safety"
+        navigation_audit["safety_module_enabled"] = bool(args.hocbf_enabled)
+        navigation_audit["energy_experiment_stage"] = (
+            "obstacle_aware_navigation_then_energy"
+            if args.num_obstacles > 0
+            else "obstacle_free_pre_safety"
+        )
         write_json(output / "phase1_navigation" / "summary.json", navigation_audit)
         run_config = read_json(output / "config.json")
         run_config["navigation_readiness"] = {
             "navigation_energy_ready": navigation_audit["navigation_energy_ready"],
             "navigation_safety_ready": navigation_audit["navigation_safety_ready"],
             "energy_gate_blocks_downstream": True,
-            "safety_gate_blocks_current_energy_experiment": False,
+            "safety_gate_blocks_current_energy_experiment": bool(
+                args.num_obstacles > 0
+            ),
         }
         run_config["known_navigation_safety_limitation"] = {
             "boundary_contact_step_rate": final_navigation_evaluation[
@@ -2121,16 +2375,30 @@ def train(args: argparse.Namespace) -> dict[str, object]:
             "max_consecutive_boundary_contacts": final_navigation_evaluation[
                 "max_consecutive_boundary_contacts"
             ],
+            "obstacle_collision_step_rate": final_navigation_evaluation[
+                "obstacle_collision_step_rate"
+            ],
+            "obstacle_collision_episode_rate": final_navigation_evaluation[
+                "obstacle_collision_episode_rate"
+            ],
+            "collision_action_filter_enabled": bool(args.hocbf_enabled),
         }
         write_json(output / "config.json", run_config)
-        if not navigation_audit["navigation_energy_ready"] and not (
-            args.smoke or args.validation
-        ):
+        downstream_ready = bool(
+            navigation_audit["navigation_energy_ready"]
+            and (
+                args.num_obstacles == 0
+                or navigation_audit["navigation_safety_ready"]
+            )
+        )
+        if not downstream_ready and not (args.smoke or args.validation):
             stopped = {
                 "status": "STOPPED_AFTER_PHASE1",
                 "stopped_at": utc_now(),
                 "navigation_training_completed": True,
-                "navigation_energy_ready": False,
+                "navigation_energy_ready": navigation_audit[
+                    "navigation_energy_ready"
+                ],
                 "navigation_safety_ready": navigation_audit[
                     "navigation_safety_ready"
                 ],
@@ -2178,6 +2446,7 @@ def train(args: argparse.Namespace) -> dict[str, object]:
                 "battery calibration sanity gate failed; pass --allow-failed-battery-calibration to override"
             )
         estimator = GoalConditionedQuantileTDEnergyEstimator(
+            state_dim=navigation_observation_dim(args),
             learning_rate=args.energy_learning_rate,
             batch_size=args.energy_batch_size,
             replay_capacity=args.energy_replay_capacity,
@@ -2198,8 +2467,12 @@ def train(args: argparse.Namespace) -> dict[str, object]:
                     navigation_audit["actual_training_transitions"]
                 ),
                 "calibrated_battery_capacity": capacity,
-                "energy_td_policy_context": "frozen_navigation_policy_without_cbf",
-                "requires_retraining_after_safety_layer": True,
+                "energy_td_policy_context": (
+                    "frozen_obstacle_aware_navigation_policy"
+                    if args.num_obstacles > 0
+                    else "frozen_navigation_policy_without_cbf"
+                ),
+                "requires_retraining_after_safety_layer": False,
             },
         )
         td_summary = None

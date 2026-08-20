@@ -775,6 +775,12 @@ class LidarGeometryTests(unittest.TestCase):
         self.assertEqual(lidar.directions.shape, (1024, 3))
         np.testing.assert_allclose(np.linalg.norm(lidar.directions, axis=1), 1.0)
 
+    def test_single_vertical_sector_is_horizontal_for_legacy_2d_compatibility(self) -> None:
+        lidar = Lidar3DModel(
+            Lidar3DConfig(horizontal_sectors=32, vertical_sectors=1)
+        )
+        np.testing.assert_allclose(lidar.directions[:, 2], 0.0, atol=1e-12)
+
     def test_lidar_detects_sphere_cylinder_and_box(self) -> None:
         lidar = Lidar3DModel(
             Lidar3DConfig(

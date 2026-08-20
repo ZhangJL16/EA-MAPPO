@@ -213,10 +213,14 @@ class Lidar3DModel:
                 0.5 * horizontal,
                 self.config.horizontal_sectors,
             )
-        elevation = np.linspace(
-            -0.5 * vertical,
-            0.5 * vertical,
-            self.config.vertical_sectors,
+        elevation = (
+            np.zeros(1, dtype=np.float64)
+            if self.config.vertical_sectors == 1
+            else np.linspace(
+                -0.5 * vertical,
+                0.5 * vertical,
+                self.config.vertical_sectors,
+            )
         )
         directions = []
         for angle_z in elevation:

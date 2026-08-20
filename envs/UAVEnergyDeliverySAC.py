@@ -14,6 +14,21 @@ from gymnasium import spaces
 from envs.UAVEnergyDelivery import UAVAgent, UAVEnv as LegacyUAVEnv, eps
 from review_bundle.envs.navigation.state import NavigationState
 from review_bundle.envs.navigation.telemetry_cost import TelemetryCostConfig, TelemetryCostModel
+from review_bundle.safety.collision.filter import (
+    SafetyFilterConfig,
+    SafetyFilterMethod,
+    UAVSafetyActionFilter,
+)
+from review_bundle.safety.collision.geometry3d import (
+    Lidar3DConfig,
+    Lidar3DModel,
+    Lidar3DPacket,
+    raw_lidar_point_obstacles,
+)
+from review_bundle.safety.collision.hocbf import (
+    HOCBFConfig,
+    emergency_braking_acceleration,
+)
 from review_bundle.safety.energy.critics import MonotoneQuantileCritic
 from review_bundle.safety.energy.mc_regression import GoalEnergyPrediction
 from review_bundle.safety.energy.td import quantile_atom_weights, quantile_huber_loss, quantile_ssp_target
@@ -24,6 +39,21 @@ ENERGY_UNIT = "synthetic_simulation_energy_units"
 ENERGY_GAMMA = 1.0
 ENERGY_QUANTILES = (0.50, 0.90, 0.95, 0.99)
 SWITCH_QUANTILE = 0.95
+
+
+@dataclass
+class StaticCylinderObstacle:
+    pos: np.ndarray
+    radius: float
+
+    def __post_init__(self) -> None:
+        self.pos = np.asarray(self.pos, dtype=np.float32)
+        if self.pos.shape != (2,) or not np.all(np.isfinite(self.pos)):
+            raise ValueError("obstacle position must be a finite (2,) vector")
+        self.radius = float(self.radius)
+        if not np.isfinite(self.radius) or self.radius <= 0.0:
+            raise ValueError("obstacle radius must be finite and positive")
+        self.vel = np.zeros(2, dtype=np.float32)
 
 
 class SACTrainingPhase(IntEnum):
@@ -265,6 +295,13 @@ class GoalConditionedQuantileTDEnergyEstimator:
         return float(loss.detach().cpu().item())
 
     def checkpoint_payload(self) -> dict[str, object]:
+        lidar_feature_count = max(0, self.state_dim - 7)
+        energy_observation = "velocity3_goal_direction3_linear_distance_over_dmax1"
+        if lidar_feature_count:
+            energy_observation += (
+                f"_lidar_normalized{lidar_feature_count // 2}"
+                f"_lidar_valid_mask{lidar_feature_count // 2}"
+            )
         return {
             "input_dim": self.input_dim,
             "state_dim": self.state_dim,
@@ -277,7 +314,7 @@ class GoalConditionedQuantileTDEnergyEstimator:
             "target_tau": self.target_tau,
             "gamma_energy": self.gamma_energy,
             "energy_unit": ENERGY_UNIT,
-            "energy_observation": "velocity3_goal_direction3_linear_distance_over_dmax1",
+            "energy_observation": energy_observation,
             "model_state_dict": self.model.state_dict(),
             "target_state_dict": self.target_model.state_dict(),
             "optimizer_state_dict": self.optimizer.state_dict(),
@@ -427,6 +464,8 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         time_penalty: float = 0.01,
         boundary_penalty: float = 1.2,
         obstacle_collision_penalty: float = 1.2,
+        repeat_collision_scale: float = 0.35,
+        safety_intervention_penalty: float = 0.05,
         safe_radius: float = 0.5,
         operational_energy_capacity: float | None = None,
         energy_reserve_fraction: float = 0.10,
@@ -442,8 +481,16 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         lidar_frequency: float = 10.0,
         lidar_horizontal_sectors: int = 128,
         lidar_vertical_sectors: int = 8,
+        num_obstacles: int = 0,
+        obstacle_radius_min: float = 25.0,
+        obstacle_radius_max: float = 60.0,
+        obstacle_sampling_margin: float = 20.0,
         cbf_enabled: bool = False,
         cbf_frequency: float = 20.0,
+        hocbf_k1: float = 1.0,
+        hocbf_k2: float = 1.0,
+        hocbf_uncertainty_margin: float = 1.0,
+        hocbf_top_k: int | None = None,
         render_mode: str | None = None,
         render_vertical_exaggeration: float = 4.0,
     ) -> None:
@@ -468,10 +515,24 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
             raise ValueError("operational_energy_capacity must be positive when configured")
         if not 0.0 <= energy_reserve_fraction < 1.0:
             raise ValueError("energy_reserve_fraction must lie in [0, 1)")
-        if lidar_enabled:
-            raise ValueError("current obstacle-free baseline fixes lidar_enabled=False")
-        if cbf_enabled:
-            raise ValueError("current obstacle-free baseline fixes cbf_enabled=False")
+        if cbf_enabled and not lidar_enabled:
+            raise ValueError("HOCBF action filtering requires LiDAR perception")
+        if int(num_obstacles) < 0:
+            raise ValueError("num_obstacles must be nonnegative")
+        if lidar_enabled and lidar_horizontal_sectors <= 0:
+            raise ValueError("lidar_horizontal_sectors must be positive")
+        if lidar_max_range <= lidar_min_range or lidar_min_range < 0.0:
+            raise ValueError("LiDAR range bounds are invalid")
+        if obstacle_radius_min <= 0.0 or obstacle_radius_max < obstacle_radius_min:
+            raise ValueError("obstacle radius range is invalid")
+        if obstacle_sampling_margin < 0.0:
+            raise ValueError("obstacle_sampling_margin must be nonnegative")
+        if not 0.0 < repeat_collision_scale <= 1.0:
+            raise ValueError("repeat_collision_scale must lie in (0, 1]")
+        if safety_intervention_penalty < 0.0:
+            raise ValueError("safety_intervention_penalty must be nonnegative")
+        if cbf_frequency <= 0.0 or not np.isclose(cbf_frequency, 1.0 / physics_dt):
+            raise ValueError("cbf_frequency must match the physics-substep frequency")
         selected_charger_radius = goal_radius if charger_radius is None else float(charger_radius)
         gym.Env.__init__(self)
         LegacyUAVEnv.__init__(
@@ -517,6 +578,8 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         self.time_penalty = float(time_penalty)
         self.boundary_penalty = float(boundary_penalty)
         self.obstacle_collision_penalty = float(obstacle_collision_penalty)
+        self.repeat_collision_scale = float(repeat_collision_scale)
+        self.safety_intervention_penalty = float(safety_intervention_penalty)
         self.safe_radius = float(safe_radius)
         self.operational_energy_capacity = (
             None if operational_energy_capacity is None else float(operational_energy_capacity)
@@ -536,7 +599,7 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         self.phase = SACTrainingPhase(int(phase))
         self.mission_switching_enabled = self.phase is SACTrainingPhase.ENERGY_MANAGED
         self.reset_at_charger = self.phase is SACTrainingPhase.ENERGY_MANAGED
-        self.lidar_enabled = False
+        self.lidar_enabled = bool(lidar_enabled)
         self.lidar_max_range = float(lidar_max_range)
         self.lidar_min_range = float(lidar_min_range)
         self.lidar_horizontal_fov = float(lidar_horizontal_fov)
@@ -544,8 +607,46 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         self.lidar_frequency = float(lidar_frequency)
         self.lidar_horizontal_sectors = int(lidar_horizontal_sectors)
         self.lidar_vertical_sectors = int(lidar_vertical_sectors)
-        self.cbf_enabled = False
+        self.num_obstacles = int(num_obstacles)
+        self.obstacle_radius_min = float(obstacle_radius_min)
+        self.obstacle_radius_max = float(obstacle_radius_max)
+        self.obstacle_sampling_margin = float(obstacle_sampling_margin)
+        self.cbf_enabled = bool(cbf_enabled)
         self.cbf_frequency = float(cbf_frequency)
+        self.hocbf_k1 = float(hocbf_k1)
+        self.hocbf_k2 = float(hocbf_k2)
+        self.hocbf_uncertainty_margin = float(hocbf_uncertainty_margin)
+        self.hocbf_top_k = None if hocbf_top_k is None else int(hocbf_top_k)
+        self._lidar_model = Lidar3DModel(
+            Lidar3DConfig(
+                horizontal_sectors=self.lidar_horizontal_sectors,
+                vertical_sectors=self.lidar_vertical_sectors,
+                max_range=self.lidar_max_range,
+                horizontal_fov_degrees=self.lidar_horizontal_fov,
+                vertical_fov_degrees=self.lidar_vertical_fov,
+            )
+        )
+        self._lidar_packet: Lidar3DPacket | None = None
+        self.safety_filter = (
+            UAVSafetyActionFilter(
+                SafetyFilterConfig(
+                    method=SafetyFilterMethod.HOCBF,
+                    horizontal_acceleration_limit=self.horizontal_a_max,
+                    vertical_acceleration_limit=self.vertical_a_max,
+                    top_k=self.hocbf_top_k,
+                    safety_dt=self.physics_dt,
+                    deadline_seconds=self.physics_dt,
+                ),
+                HOCBFConfig(
+                    k1=self.hocbf_k1,
+                    k2=self.hocbf_k2,
+                    uav_radius=self.safe_radius,
+                    uncertainty_margin=self.hocbf_uncertainty_margin,
+                ),
+            )
+            if self.cbf_enabled
+            else None
+        )
         self.d_max = float(np.linalg.norm([self.length, self.width, self.height]))
         self.current_task_point = np.zeros(3, dtype=np.float32)
         self.mode = SortieMode.TASK
@@ -553,9 +654,15 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         self.goal_action_provider: GoalActionProvider | None = None
         self.energy_learning_enabled = False
         self.action_space = spaces.Box(-1.0, 1.0, shape=(3,), dtype=np.float32)
+        observation_low = [-1.0] * 6 + [0.0]
+        observation_high = [1.0] * 7
+        if self.lidar_enabled:
+            lidar_sector_count = self.lidar_horizontal_sectors * self.lidar_vertical_sectors
+            observation_low.extend([0.0] * (2 * lidar_sector_count))
+            observation_high.extend([1.0] * (2 * lidar_sector_count))
         self.observation_space = spaces.Box(
-            np.array([-1.0] * 6 + [0.0], dtype=np.float32),
-            np.ones(7, dtype=np.float32),
+            np.asarray(observation_low, dtype=np.float32),
+            np.asarray(observation_high, dtype=np.float32),
             dtype=np.float32,
         )
         self.orders = []
@@ -572,6 +679,10 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         self.last_td_loss: float | None = None
         self.last_realized_energy = 0.0
         self.last_battery_cycle_record: dict[str, object] | None = None
+        self.safety_filter_calls = 0
+        self.safety_interventions = 0
+        self.safety_fallbacks = 0
+        self.safety_emergency_brakes = 0
 
     @property
     def agent(self) -> _SACUAVAgent:
@@ -688,12 +799,39 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         requested_task = reset_options.pop("task_point", None)
         if reset_options:
             raise ValueError(f"unsupported reset options: {sorted(reset_options)}")
+        requested_start_position = (
+            None
+            if requested_start is None
+            else self._validate_position(
+                requested_start,
+                "start_position",
+                check_obstacles=False,
+            )
+        )
+        requested_task_position = (
+            None
+            if requested_task is None
+            else self._validate_position(
+                requested_task,
+                "task_point",
+                check_obstacles=False,
+            )
+        )
+        obstacle_exclusions = [self.charger_position]
+        if requested_start_position is not None:
+            obstacle_exclusions.append(requested_start_position)
+        if requested_task_position is not None:
+            obstacle_exclusions.append(requested_task_position)
+        self._initialize_static_obstacles(obstacle_exclusions)
         default_start = (
             self.charger_position
             if self.finite_energy_enabled and self.reset_at_charger
             else self._sample_legal_position()
         )
-        start = self._validate_position(default_start if requested_start is None else requested_start, "start_position")
+        start = self._validate_position(
+            default_start if requested_start_position is None else requested_start_position,
+            "start_position",
+        )
         velocity = np.zeros(3, dtype=np.float32)
         if requested_velocity is not None:
             velocity = self._validate_velocity(requested_velocity)
@@ -718,8 +856,8 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         self.agent.spawn_pos = start.copy()
         self.current_task_point = (
             self._sample_task_point(start)
-            if requested_task is None
-            else self._validate_task_point(requested_task, start)
+            if requested_task_position is None
+            else self._validate_task_point(requested_task_position, start)
         )
         self.tasks_completed = 0
         self.tasks_in_current_battery_cycle = 0
@@ -755,8 +893,15 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         self.last_td_loss = None
         self.last_realized_energy = 0.0
         self.last_battery_cycle_record = None
+        self.safety_filter_calls = 0
+        self.safety_interventions = 0
+        self.safety_fallbacks = 0
+        self.safety_emergency_brakes = 0
+        self.agent.prev_collided = False
+        self.agent.collided = False
         self._current_goal_initial_distance = float(np.linalg.norm(self.active_goal - self.agent.pos))
         self._current_goal_path_length = 0.0
+        self._update_lidar()
         observation = self._active_goal_sac_observation()
         return observation, self._info()
 
@@ -780,14 +925,17 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
                 self._start_goal_trajectory(self.charger_position)
         goal_type = "CHARGER" if self.mode is SortieMode.CHARGER_COMMITTED else "TASK"
         segment_goal = self.active_goal.copy()
-        executed_action = (
+        policy_action = (
             self._goal_action(self.sac_observation_for_goal(segment_goal))
             if switched_at_step_start
             else nominal_action
         )
+        first_executed_action, first_safety_diagnostics = self._safety_filtered_action(
+            policy_action
+        )
         distance_before = float(np.linalg.norm(segment_goal - self.agent.pos))
         energy_state_before = self.energy_state_for_goal(segment_goal)
-        quantiles_before = self._predict_quantiles(segment_goal, executed_action)
+        quantiles_before = self._predict_quantiles(segment_goal, first_executed_action)
         total_energy = 0.0
         boundary_contact = False
         obstacle_collision = False
@@ -797,12 +945,23 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         energy_exhausted = False
         last_commanded_acceleration = np.zeros(3, dtype=np.float32)
         last_realized_acceleration = np.zeros(3, dtype=np.float32)
-        for _ in range(self.physics_substeps_per_policy_step):
+        executed_actions: list[np.ndarray] = []
+        safety_diagnostics: list[dict[str, object]] = []
+        for substep_index in range(self.physics_substeps_per_policy_step):
+            if substep_index == 0:
+                executed_substep_action = first_executed_action
+                substep_safety = first_safety_diagnostics
+            else:
+                executed_substep_action, substep_safety = self._safety_filtered_action(
+                    policy_action
+                )
+            executed_actions.append(executed_substep_action.copy())
+            safety_diagnostics.append(substep_safety)
             substep_start = self.agent.pos.copy()
             (
                 last_commanded_acceleration,
                 last_realized_acceleration,
-            ) = self.agent.update_velocity(executed_action, self.physics_dt)
+            ) = self.agent.update_velocity(executed_substep_action, self.physics_dt)
             velocity_after_propulsion = self.agent.vel.copy()
             self.agent.preview_position(self.physics_dt)
             substep_energy = self._realized_energy_cost(
@@ -811,8 +970,11 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
                 velocity=velocity_after_propulsion,
             )
             substep_boundary, _, _ = self._apply_boundary_constraints(self.agent)
+            substep_obstacle, _, _ = self._resolve_obstacle_collisions(self.agent)
             boundary_contact = boundary_contact or bool(substep_boundary)
+            obstacle_collision = obstacle_collision or bool(substep_obstacle)
             self.agent.pos = self.agent.prev_pos.copy()
+            self._update_lidar()
             substep_distance = float(np.linalg.norm(self.agent.pos - substep_start))
             self._current_goal_path_length += substep_distance
             policy_distance += substep_distance
@@ -824,6 +986,13 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
             goal_reached = bool(np.linalg.norm(segment_goal - self.agent.pos) <= self.goal_tolerance)
             if goal_reached or energy_exhausted:
                 break
+        executed_action = np.mean(np.stack(executed_actions), axis=0).astype(np.float32)
+        safety_intervened = any(bool(row["intervened"]) for row in safety_diagnostics)
+        safety_fallback_used = any(bool(row["fallback_used"]) for row in safety_diagnostics)
+        safety_emergency_brake = any(bool(row["emergency_brake"]) for row in safety_diagnostics)
+        mean_safety_intervention_norm = float(
+            np.mean([float(row["intervention_norm"]) for row in safety_diagnostics])
+        )
         transition_dt = physics_substeps * self.physics_dt
         self.simulation_time += transition_dt
         if self.finite_energy_enabled:
@@ -941,6 +1110,7 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
                     self._start_goal_trajectory(self.charger_position)
         self.agent.goal = self.active_goal.copy()
         self.agent_paths[0].append(self.agent.pos.copy())
+        self.agent.prev_collided = bool(getattr(self.agent, "collided", False))
         self.agent.collided = bool(boundary_contact or obstacle_collision)
         reward_components = self._reward_components(
             progress=progress,
@@ -949,6 +1119,7 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
             task_completed=task_completed_now,
             boundary_contact=boundary_contact,
             obstacle_collision=obstacle_collision,
+            safety_intervention_norm=mean_safety_intervention_norm,
         )
         reward = float(sum(reward_components.values()))
         terminated = bool(energy_exhausted or (task_completed_now and single_task_phase))
@@ -986,7 +1157,13 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
                 "commanded_acceleration": last_commanded_acceleration.copy(),
                 "realized_acceleration": last_realized_acceleration.copy(),
                 "physical_acceleration": last_realized_acceleration.copy(),
+                "nominal_action": policy_action.copy(),
                 "executed_action": executed_action.copy(),
+                "hocbf_intervened": safety_intervened,
+                "hocbf_fallback_used": safety_fallback_used,
+                "hocbf_emergency_brake": safety_emergency_brake,
+                "hocbf_intervention_norm": mean_safety_intervention_norm,
+                "hocbf_substep_diagnostics": safety_diagnostics,
                 "mode_before": mode_before_decision.value,
                 "active_goal_before": segment_goal.copy(),
                 "energy_exhausted": energy_exhausted,
@@ -1001,7 +1178,12 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
                 "position": self.agent.pos.copy(),
                 "velocity": self.agent.vel.copy(),
                 "nominal_action": nominal_action.copy(),
+                "policy_action": policy_action.copy(),
                 "executed_action": executed_action.copy(),
+                "hocbf_intervened": safety_intervened,
+                "hocbf_fallback_used": safety_fallback_used,
+                "hocbf_emergency_brake": safety_emergency_brake,
+                "hocbf_intervention_norm": mean_safety_intervention_norm,
                 "commanded_acceleration": last_commanded_acceleration.copy(),
                 "realized_acceleration": last_realized_acceleration.copy(),
                 "physical_acceleration": last_realized_acceleration.copy(),
@@ -1032,7 +1214,11 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         target = self._validate_position(goal, "goal")
         velocity_feature, direction, distance = self._goal_features(target, position=position, velocity=velocity)
         distance_feature = np.log1p(distance) / np.log1p(self.d_max)
-        observation = np.concatenate((velocity_feature, direction, [np.clip(distance_feature, 0.0, 1.0)]))
+        values = [velocity_feature, direction, np.asarray([np.clip(distance_feature, 0.0, 1.0)])]
+        if self.lidar_enabled:
+            lidar_ranges, lidar_valid = self._lidar_features()
+            values.extend((lidar_ranges, lidar_valid))
+        observation = np.concatenate(values)
         return np.clip(observation, self.observation_space.low, self.observation_space.high).astype(np.float32)
 
     def energy_state_for_goal(
@@ -1044,7 +1230,11 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
     ) -> np.ndarray:
         target = self._validate_position(goal, "energy_goal")
         velocity_feature, direction, distance = self._goal_features(target, position=position, velocity=velocity)
-        state = np.concatenate((velocity_feature, direction, [np.clip(distance / self.d_max, 0.0, 1.0)]))
+        values = [velocity_feature, direction, np.asarray([np.clip(distance / self.d_max, 0.0, 1.0)])]
+        if self.lidar_enabled:
+            lidar_ranges, lidar_valid = self._lidar_features()
+            values.extend((lidar_ranges, lidar_valid))
+        state = np.concatenate(values)
         return np.clip(state, self.observation_space.low, self.observation_space.high).astype(np.float32)
 
     def energy_context_for_goal(
@@ -1525,18 +1715,33 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         task_completed: bool,
         boundary_contact: bool,
         obstacle_collision: bool,
+        safety_intervention_norm: float,
     ) -> dict[str, float]:
         delta = goal - self.agent.pos
         distance = float(np.linalg.norm(delta))
         direction = delta / max(distance, eps)
         velocity_toward_goal = float(np.dot(velocity, direction)) / self.horizontal_v_max
+        collision_scale = (
+            self.repeat_collision_scale
+            if bool(getattr(self.agent, "prev_collided", False))
+            else 1.0
+        )
         return {
             "progress_reward_component": self.progress_reward_weight * float(progress),
             "velocity_reward_component": self.velocity_reward_weight * max(0.0, velocity_toward_goal),
             "task_completion_reward_component": self.task_completion_reward * float(task_completed),
             "time_penalty_component": -self.time_penalty,
-            "boundary_penalty_component": -self.boundary_penalty * float(boundary_contact),
-            "obstacle_penalty_component": -self.obstacle_collision_penalty * float(obstacle_collision),
+            "boundary_penalty_component": (
+                -collision_scale * self.boundary_penalty * float(boundary_contact)
+            ),
+            "obstacle_penalty_component": (
+                -collision_scale
+                * self.obstacle_collision_penalty
+                * float(obstacle_collision)
+            ),
+            "safety_intervention_penalty_component": (
+                -self.safety_intervention_penalty * float(safety_intervention_norm)
+            ),
         }
 
     @staticmethod
@@ -1548,17 +1753,296 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
             "time_penalty_component": 0.0,
             "boundary_penalty_component": 0.0,
             "obstacle_penalty_component": 0.0,
+            "safety_intervention_penalty_component": 0.0,
         }
 
     def _sample_legal_position(self) -> np.ndarray:
+        for _ in range(max(1000, self.sample_retry_limit)):
+            candidate = np.array(
+                [
+                    self.np_random.uniform(
+                        self.xy_sampling_margin,
+                        self.length - self.xy_sampling_margin,
+                    ),
+                    self.np_random.uniform(
+                        self.xy_sampling_margin,
+                        self.width - self.xy_sampling_margin,
+                    ),
+                    self.np_random.uniform(self.task_z_min, self.task_z_max),
+                ],
+                dtype=np.float32,
+            )
+            if self._position_clear_of_obstacles(candidate, self.goal_tolerance):
+                return candidate
+        raise RuntimeError("failed to sample a legal obstacle-free position")
+
+    def _initialize_static_obstacles(self, excluded_positions: list[np.ndarray]) -> None:
+        if self.num_obstacles == 0:
+            self.obstacles = []
+            return
+        exclusions = [
+            self._validate_position(value, "obstacle_exclusion", check_obstacles=False)
+            for value in excluded_positions
+        ]
+        obstacles: list[StaticCylinderObstacle] = []
+        for obstacle_index in range(self.num_obstacles):
+            for _ in range(max(1000, self.sample_retry_limit)):
+                radius = float(
+                    self.np_random.uniform(
+                        self.obstacle_radius_min,
+                        self.obstacle_radius_max,
+                    )
+                )
+                margin = radius + self.safe_radius + self.obstacle_sampling_margin
+                position = np.array(
+                    [
+                        self.np_random.uniform(margin, self.length - margin),
+                        self.np_random.uniform(margin, self.width - margin),
+                    ],
+                    dtype=np.float32,
+                )
+                if any(
+                    np.linalg.norm(position - point[:2])
+                    <= radius + self.goal_tolerance + self.obstacle_sampling_margin
+                    for point in exclusions
+                ):
+                    continue
+                if any(
+                    np.linalg.norm(position - other.pos)
+                    <= radius
+                    + other.radius
+                    + self.obstacle_sampling_margin
+                    for other in obstacles
+                ):
+                    continue
+                obstacles.append(StaticCylinderObstacle(position, radius))
+                break
+            else:
+                raise RuntimeError(
+                    f"failed to place obstacle {obstacle_index} without overlap"
+                )
+        self.obstacles = obstacles
+
+    def _position_clear_of_obstacles(
+        self,
+        position: np.ndarray,
+        extra_clearance: float = 0.0,
+    ) -> bool:
+        point = np.asarray(position, dtype=np.float32)
+        return all(
+            np.linalg.norm(point[:2] - obstacle.pos)
+            > obstacle.radius + self.safe_radius + float(extra_clearance)
+            for obstacle in self.obstacles
+        )
+
+    def _update_lidar(self) -> None:
+        if not self.lidar_enabled or not self.agents:
+            self._lidar_packet = None
+            return
+        directions = self._lidar_model.directions
+        sector_count = directions.shape[0]
+        self.agent.num_lasers = sector_count
+        self.agent.l_sensor = self.lidar_max_range
+        origin = np.asarray(self.agent.pos, dtype=np.float64)
+        distances = np.full(sector_count, self.lidar_max_range, dtype=np.float64)
+        indices = np.full(sector_count, -1, dtype=np.int64)
+
+        bounds = (
+            (0, 0.0),
+            (0, self.length),
+            (1, 0.0),
+            (1, self.width),
+            (2, 0.0),
+            (2, self.height),
+        )
+        for boundary_index, (axis, coordinate) in enumerate(bounds):
+            component = directions[:, axis]
+            candidate = np.divide(
+                coordinate - origin[axis],
+                component,
+                out=np.full(sector_count, np.inf, dtype=np.float64),
+                where=np.abs(component) > eps,
+            )
+            update = (candidate >= 0.0) & (candidate < distances)
+            distances[update] = candidate[update]
+            indices[update] = self.num_obstacles + boundary_index
+
+        if self.obstacles:
+            centers = np.stack([obstacle.pos for obstacle in self.obstacles]).astype(np.float64)
+            radii = np.asarray(
+                [obstacle.radius for obstacle in self.obstacles],
+                dtype=np.float64,
+            )
+            origin_to_center = origin[None, :2] - centers
+            direction_xy = directions[:, :2]
+            quadratic = np.sum(direction_xy * direction_xy, axis=1, keepdims=True)
+            linear = 2.0 * direction_xy @ origin_to_center.T
+            constant = np.sum(origin_to_center * origin_to_center, axis=1) - radii * radii
+            discriminant = linear * linear - 4.0 * quadratic * constant[None, :]
+            valid_discriminant = discriminant >= 0.0
+            square_root = np.sqrt(np.maximum(discriminant, 0.0))
+            denominator = 2.0 * quadratic
+            root_near = np.divide(
+                -linear - square_root,
+                denominator,
+                out=np.full_like(linear, np.inf),
+                where=denominator > eps,
+            )
+            root_far = np.divide(
+                -linear + square_root,
+                denominator,
+                out=np.full_like(linear, np.inf),
+                where=denominator > eps,
+            )
+            roots = np.where(
+                valid_discriminant & (root_near >= 0.0),
+                root_near,
+                np.where(valid_discriminant & (root_far >= 0.0), root_far, np.inf),
+            )
+            obstacle_index = np.argmin(roots, axis=1)
+            obstacle_distance = roots[np.arange(sector_count), obstacle_index]
+            update = obstacle_distance < distances
+            distances[update] = obstacle_distance[update]
+            indices[update] = obstacle_index[update]
+        hit = (indices >= 0) & (distances <= self.lidar_max_range)
+        indices[~hit] = -1
+        distances = np.clip(distances, 0.0, self.lidar_max_range)
+        self.agent.lasers = distances.astype(np.float32)
+        self._lidar_packet = Lidar3DPacket(
+            distances=distances,
+            hit=hit,
+            directions=directions,
+            obstacle_indices=indices,
+            timestamp=float(self.simulation_time),
+            origin=origin,
+        )
+
+    def _lidar_features(self) -> tuple[np.ndarray, np.ndarray]:
+        if not self.lidar_enabled:
+            return np.empty(0, dtype=np.float32), np.empty(0, dtype=np.float32)
+        sector_count = self.lidar_horizontal_sectors * self.lidar_vertical_sectors
+        if not self.agents or self.agent.lasers.shape != (sector_count,):
+            ranges = np.full(
+                sector_count,
+                self.lidar_max_range,
+                dtype=np.float32,
+            )
+        else:
+            ranges = np.asarray(self.agent.lasers, dtype=np.float32)
+        valid = (ranges < self.lidar_max_range - eps).astype(np.float32)
+        normalized = np.clip(ranges / self.lidar_max_range, 0.0, 1.0).astype(np.float32)
+        return normalized, valid
+
+    def _normalized_action_to_acceleration(self, action: np.ndarray) -> np.ndarray:
+        normalized = np.clip(np.asarray(action, dtype=np.float64), -1.0, 1.0)
+        horizontal = normalized[:2]
+        horizontal_norm = float(np.linalg.norm(horizontal))
+        if horizontal_norm > 1.0:
+            horizontal = horizontal / horizontal_norm
         return np.array(
             [
-                self.np_random.uniform(self.xy_sampling_margin, self.length - self.xy_sampling_margin),
-                self.np_random.uniform(self.xy_sampling_margin, self.width - self.xy_sampling_margin),
-                self.np_random.uniform(self.task_z_min, self.task_z_max),
+                horizontal[0] * self.horizontal_a_max,
+                horizontal[1] * self.horizontal_a_max,
+                normalized[2] * self.vertical_a_max,
             ],
-            dtype=np.float32,
+            dtype=np.float64,
         )
+
+    def _acceleration_to_normalized_action(self, acceleration: np.ndarray) -> np.ndarray:
+        physical = np.asarray(acceleration, dtype=np.float64)
+        action = np.array(
+            [
+                physical[0] / self.horizontal_a_max,
+                physical[1] / self.horizontal_a_max,
+                physical[2] / self.vertical_a_max,
+            ],
+            dtype=np.float64,
+        )
+        horizontal_norm = float(np.linalg.norm(action[:2]))
+        if horizontal_norm > 1.0:
+            action[:2] /= horizontal_norm
+        return np.clip(action, -1.0, 1.0).astype(np.float32)
+
+    def _safety_filtered_action(
+        self,
+        nominal_action: np.ndarray,
+    ) -> tuple[np.ndarray, dict[str, object]]:
+        nominal = np.asarray(nominal_action, dtype=np.float32)
+        if not self.cbf_enabled:
+            return nominal.copy(), {
+                "enabled": False,
+                "intervened": False,
+                "fallback_used": False,
+                "emergency_brake": False,
+                "intervention_norm": 0.0,
+            }
+        if self.safety_filter is None or self._lidar_packet is None:
+            raise RuntimeError("HOCBF requires an initialized safety filter and LiDAR packet")
+        nominal_acceleration = self._normalized_action_to_acceleration(nominal)
+        perceived_obstacles = raw_lidar_point_obstacles(self._lidar_packet)
+        self.safety_filter_calls += 1
+        if not perceived_obstacles:
+            return nominal.copy(), {
+                "enabled": True,
+                "intervened": False,
+                "fallback_used": False,
+                "fallback_satisfies_constraints": True,
+                "emergency_brake": False,
+                "intervention_norm": 0.0,
+                "minimum_h": None,
+                "minimum_psi1": None,
+                "minimum_nominal_slack": None,
+                "minimum_executed_slack": None,
+                "candidate_constraints": 0,
+                "active_constraints": 0,
+                "feasible": True,
+                "solver_reason": "no_lidar_hits_nominal_passthrough",
+                "deadline_missed": False,
+            }
+        output = self.safety_filter.filter(
+            self.agent.pos,
+            self.agent.vel,
+            nominal_acceleration,
+            perceived_obstacles,
+        )
+        diagnostics = output.diagnostics
+        emergency_brake = bool(
+            diagnostics.fallback_used
+            or (diagnostics.minimum_h is not None and diagnostics.minimum_h < 0.0)
+            or (diagnostics.minimum_psi1 is not None and diagnostics.minimum_psi1 < 0.0)
+        )
+        safe_acceleration = output.acceleration
+        if emergency_brake:
+            safe_acceleration = emergency_braking_acceleration(
+                self.agent.vel,
+                self.horizontal_a_max,
+                self.vertical_a_max,
+            )
+        safe_action = self._acceleration_to_normalized_action(safe_acceleration)
+        intervention_norm = float(np.linalg.norm(safe_action - nominal))
+        intervened = bool(intervention_norm > 1e-6)
+        self.safety_interventions += int(intervened)
+        self.safety_fallbacks += int(diagnostics.fallback_used)
+        self.safety_emergency_brakes += int(emergency_brake)
+        return safe_action, {
+            "enabled": True,
+            "intervened": intervened,
+            "fallback_used": bool(diagnostics.fallback_used),
+            "fallback_satisfies_constraints": bool(
+                diagnostics.fallback_satisfies_constraints
+            ),
+            "emergency_brake": emergency_brake,
+            "intervention_norm": intervention_norm,
+            "minimum_h": diagnostics.minimum_h,
+            "minimum_psi1": diagnostics.minimum_psi1,
+            "minimum_nominal_slack": diagnostics.minimum_nominal_slack,
+            "minimum_executed_slack": diagnostics.minimum_executed_slack,
+            "candidate_constraints": diagnostics.candidate_constraints,
+            "active_constraints": diagnostics.active_constraints,
+            "feasible": diagnostics.feasible,
+            "solver_reason": diagnostics.solver_reason,
+            "deadline_missed": diagnostics.deadline_missed,
+        }
 
     def _sample_task_point(self, reference_position: np.ndarray) -> np.ndarray:
         reference = self._validate_position(reference_position, "reference_position")
@@ -1574,13 +2058,24 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
             raise ValueError("task_point violates minimum_task_distance")
         return point
 
-    def _validate_position(self, value: np.ndarray, name: str) -> np.ndarray:
+    def _validate_position(
+        self,
+        value: np.ndarray,
+        name: str,
+        *,
+        check_obstacles: bool = True,
+    ) -> np.ndarray:
         position = np.asarray(value, dtype=np.float32)
         upper = np.array([self.length, self.width, self.height], dtype=np.float32) - self.safe_radius
         if position.shape != (3,) or not np.all(np.isfinite(position)):
             raise ValueError(f"{name} must be a finite (3,) vector")
         if np.any(position < self.safe_radius) or np.any(position > upper):
             raise ValueError(f"{name} lies outside the legal map interior")
+        if check_obstacles and not self._position_clear_of_obstacles(
+            position,
+            self.goal_tolerance,
+        ):
+            raise ValueError(f"{name} lies inside an obstacle clearance region")
         return position.copy()
 
     def _validate_velocity(self, value: np.ndarray) -> np.ndarray:
@@ -1647,6 +2142,20 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
             ),
             "physics_substeps": int(physics_substeps),
             "instantaneous_service_reset": bool(instantaneous_service_reset),
+            "lidar_enabled": self.lidar_enabled,
+            "lidar_num_sectors": (
+                self.lidar_horizontal_sectors * self.lidar_vertical_sectors
+                if self.lidar_enabled
+                else 0
+            ),
+            "cbf_enabled": self.cbf_enabled,
+            "hocbf_filter_calls": int(self.safety_filter_calls),
+            "hocbf_interventions": int(self.safety_interventions),
+            "hocbf_intervention_rate": float(
+                self.safety_interventions / max(self.safety_filter_calls, 1)
+            ),
+            "hocbf_fallbacks": int(self.safety_fallbacks),
+            "hocbf_emergency_brakes": int(self.safety_emergency_brakes),
             "td_loss": self.last_td_loss,
             "td_update_count": 0
             if self.energy_estimator is None
@@ -1698,6 +2207,18 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
             ),
             "obstacle_collision": bool(obstacle_collision),
             "obstacle_collision_count": int(self.obstacle_collision_count),
+            "num_obstacles": int(len(self.obstacles)),
+            "lidar_enabled": bool(self.lidar_enabled),
+            "lidar_min_normalized_range": (
+                None
+                if not self.lidar_enabled
+                else float(np.min(self._lidar_features()[0]))
+            ),
+            "lidar_valid_fraction": (
+                None
+                if not self.lidar_enabled
+                else float(np.mean(self._lidar_features()[1]))
+            ),
             "task_stuck": bool(task_stuck),
             "task_stuck_count": int(self.task_stuck_count),
             "end_reason": end_reason,
@@ -1730,6 +2251,8 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
             "task_stuck_count": int(self.task_stuck_count),
             "boundary_collision_count": int(self.boundary_collision_count),
             "obstacle_collision_count": int(self.obstacle_collision_count),
+            "num_obstacles": int(len(self.obstacles)),
+            "lidar_enabled": bool(self.lidar_enabled),
         }
 
     def get_trajectory_log(self) -> list[dict[str, object]]:
