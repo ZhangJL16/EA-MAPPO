@@ -113,6 +113,7 @@ def test_default_contract_and_legacy_environment_are_independent() -> None:
     assert (new.lidar_max_range, new.lidar_frequency) == (100.0, 10.0)
     assert (new.lidar_horizontal_sectors, new.lidar_vertical_sectors) == (128, 8)
     assert new.cbf_frequency == 20.0
+    assert (new.obstacle_radius_min, new.obstacle_radius_max) == (50.0, 120.0)
 
 
 def test_legacy_32_ray_contract_remains_available_without_action_filter() -> None:
@@ -134,6 +135,26 @@ def test_legacy_32_ray_contract_remains_available_without_action_filter() -> Non
     assert set(np.unique(observation[39:])).issubset({0.0, 1.0})
     assert info["lidar_enabled"] is True
     assert info["num_obstacles"] == 6
+    environment.close()
+
+
+def test_static_obstacles_are_drawn_in_2d_and_3d() -> None:
+    import matplotlib.pyplot as plt
+
+    environment = UAVEnergyDeliverySACEnv(num_obstacles=3, render_mode="rgb_array")
+    environment.reset(seed=123)
+
+    figure_2d, axis_2d = plt.subplots()
+    environment._render_2d(axis_2d)
+    assert len(axis_2d.patches) == 3
+    plt.close(figure_2d)
+
+    figure_3d = plt.figure()
+    axis_3d = figure_3d.add_subplot(111, projection="3d")
+    collections_before = len(axis_3d.collections)
+    environment._render_3d(axis_3d)
+    assert len(axis_3d.collections) - collections_before >= 3
+    plt.close(figure_3d)
     environment.close()
 
 

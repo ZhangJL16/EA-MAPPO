@@ -10,6 +10,7 @@ import gymnasium as gym
 import numpy as np
 import torch
 from gymnasium import spaces
+from matplotlib.patches import Circle
 
 from envs.UAVEnergyDelivery import UAVAgent, UAVEnv as LegacyUAVEnv, eps
 from review_bundle.envs.navigation.state import NavigationState
@@ -482,8 +483,8 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         lidar_horizontal_sectors: int = 128,
         lidar_vertical_sectors: int = 8,
         num_obstacles: int = 0,
-        obstacle_radius_min: float = 25.0,
-        obstacle_radius_max: float = 60.0,
+        obstacle_radius_min: float = 50.0,
+        obstacle_radius_max: float = 120.0,
         obstacle_sampling_margin: float = 20.0,
         cbf_enabled: bool = False,
         cbf_frequency: float = 20.0,
@@ -2296,9 +2297,44 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         if is_3d:
             axis.set_zticks(np.linspace(0.0, self.height, 5))
 
+    def _render_obstacles_2d(self, axis) -> None:
+        for obstacle_index, obstacle in enumerate(self.obstacles):
+            axis.add_patch(
+                Circle(
+                    obstacle.pos,
+                    obstacle.radius,
+                    facecolor="#d95f02",
+                    edgecolor="#7f2704",
+                    linewidth=1.0,
+                    alpha=0.55,
+                    label="static obstacle" if obstacle_index == 0 else None,
+                )
+            )
+
+    def _render_obstacles_3d(self, axis) -> None:
+        angles = np.linspace(0.0, 2.0 * np.pi, 20)
+        heights = np.asarray([0.0, self.height], dtype=np.float64)
+        angle_grid, height_grid = np.meshgrid(angles, heights)
+        for obstacle in self.obstacles:
+            x_grid = obstacle.pos[0] + obstacle.radius * np.cos(angle_grid)
+            y_grid = obstacle.pos[1] + obstacle.radius * np.sin(angle_grid)
+            axis.plot_surface(
+                x_grid,
+                y_grid,
+                height_grid,
+                color="#d95f02",
+                edgecolor="#7f2704",
+                linewidth=0.35,
+                alpha=0.30,
+                shade=False,
+            )
+        if self.obstacles:
+            axis.plot([], [], [], color="#d95f02", linewidth=4.0, alpha=0.55, label="static obstacle")
+
     def _render_2d(self, axis) -> None:
         color = self._agent_color(0)
         trajectory = self._agent_trajectory(0, self.agent)
+        self._render_obstacles_2d(axis)
         if len(trajectory) > 1:
             axis.plot(trajectory[:, 0], trajectory[:, 1], color=color, alpha=0.9, linewidth=1.8)
         axis.scatter(*self.current_task_point[:2], c=["#2ca02c"], marker="X", s=125, edgecolors="black", label="current task")
@@ -2316,6 +2352,7 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
     def _render_3d(self, axis) -> None:
         color = self._agent_color(0)
         trajectory = self._agent_trajectory(0, self.agent)
+        self._render_obstacles_3d(axis)
         if len(trajectory) > 1:
             axis.plot(trajectory[:, 0], trajectory[:, 1], trajectory[:, 2], color=color, alpha=0.9, linewidth=1.8)
         axis.scatter(*self.current_task_point, c=["#2ca02c"], marker="X", s=125, edgecolors="black", label="current task")
