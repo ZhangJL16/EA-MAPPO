@@ -202,6 +202,9 @@ def environment_from_args(
             getattr(args, "hocbf_uncertainty_margin", 1.0)
         ),
         hocbf_top_k=getattr(args, "hocbf_top_k", None),
+        projection_geometry_enabled=bool(
+            getattr(args, "projection_geometry_enabled", False)
+        ),
     )
     if battery_capacity is not None:
         environment.configure_calibrated_battery(
@@ -354,6 +357,13 @@ def evaluate_navigation_tasks(
         obstacle_collision_steps = 0
         hocbf_intervention_steps = 0
         hocbf_emergency_brake_steps = 0
+        projection_valid_steps = 0
+        nominal_safe_steps = 0
+        projection_active_set_switches = 0
+        projection_authorities: list[float] = []
+        projection_normal_fractions: list[float] = []
+        intervention_norms: list[float] = []
+        projection_ranks: list[int] = []
         consecutive_boundary_contacts = 0
         max_consecutive_boundary_contacts = 0
         reward_total = 0.0
@@ -367,6 +377,28 @@ def evaluate_navigation_tasks(
             hocbf_intervention_steps += int(bool(info.get("hocbf_intervened", False)))
             hocbf_emergency_brake_steps += int(
                 bool(info.get("hocbf_emergency_brake", False))
+            )
+            geometry = info.get("projection_geometry")
+            if isinstance(geometry, dict):
+                valid_geometry = bool(
+                    geometry.get("valid", False)
+                    and geometry.get("active_set_stable", False)
+                    and geometry.get("coordinate_map_stable", False)
+                )
+                projection_valid_steps += int(valid_geometry)
+                nominal_safe_steps += int(bool(geometry.get("nominal_safe", False)))
+                projection_active_set_switches += int(
+                    bool(info.get("active_set_changed", False))
+                )
+                projection_authorities.append(
+                    float(geometry.get("action_authority", 0.0))
+                )
+                projection_normal_fractions.append(
+                    float(geometry.get("normal_action_fraction", 0.0))
+                )
+                projection_ranks.append(int(geometry.get("rank", 0)))
+            intervention_norms.append(
+                float(info.get("hocbf_intervention_norm", 0.0))
             )
             boundary_contacts += int(contact)
             consecutive_boundary_contacts = consecutive_boundary_contacts + 1 if contact else 0
@@ -397,6 +429,25 @@ def evaluate_navigation_tasks(
                             hocbf_intervention_steps / max(environment.current_step, 1)
                         ),
                         "hocbf_emergency_brake_steps": hocbf_emergency_brake_steps,
+                        "projection_valid_steps": projection_valid_steps,
+                        "nominal_safe_steps": nominal_safe_steps,
+                        "projection_active_set_switches": projection_active_set_switches,
+                        "mean_projection_authority": float(
+                            np.mean(projection_authorities)
+                        ),
+                        "mean_normal_action_fraction": float(
+                            np.mean(projection_normal_fractions)
+                        ),
+                        "mean_intervention_norm": float(np.mean(intervention_norms)),
+                        "p90_intervention_norm": float(
+                            np.quantile(intervention_norms, 0.9)
+                        ),
+                        "projection_rank_histogram": {
+                            str(rank): int(
+                                np.sum(np.asarray(projection_ranks) == rank)
+                            )
+                            for rank in range(4)
+                        },
                         "end_reason": info["end_reason"],
                     }
                 )
@@ -419,6 +470,17 @@ def evaluate_navigation_tasks(
     hocbf_emergency_brake_steps = sum(
         int(row["hocbf_emergency_brake_steps"]) for row in records
     )
+    projection_valid_steps = sum(int(row["projection_valid_steps"]) for row in records)
+    nominal_safe_steps = sum(int(row["nominal_safe_steps"]) for row in records)
+    projection_active_set_switches = sum(
+        int(row["projection_active_set_switches"]) for row in records
+    )
+    total_rank_counts = {
+        str(rank): sum(
+            int(row["projection_rank_histogram"][str(rank)]) for row in records
+        )
+        for rank in range(4)
+    }
     boundary_contact_step_rate = float(boundary_contact_steps / max(evaluation_transitions, 1))
     summary = {
         "global_env_transitions": int(global_env_transitions),
@@ -455,6 +517,37 @@ def evaluate_navigation_tasks(
         "hocbf_emergency_brake_step_rate": float(
             hocbf_emergency_brake_steps / max(evaluation_transitions, 1)
         ),
+        "projection_valid_step_rate": float(
+            projection_valid_steps / max(evaluation_transitions, 1)
+        ),
+        "nominal_safe_action_rate": float(
+            nominal_safe_steps / max(evaluation_transitions, 1)
+        ),
+        "projection_active_set_switch_frequency": float(
+            projection_active_set_switches / max(evaluation_transitions, 1)
+        ),
+        "mean_projection_authority": float(
+            np.average(
+                [row["mean_projection_authority"] for row in records],
+                weights=[row["policy_steps"] for row in records],
+            )
+        ),
+        "mean_normal_action_fraction": float(
+            np.average(
+                [row["mean_normal_action_fraction"] for row in records],
+                weights=[row["policy_steps"] for row in records],
+            )
+        ),
+        "mean_intervention_norm": float(
+            np.average(
+                [row["mean_intervention_norm"] for row in records],
+                weights=[row["policy_steps"] for row in records],
+            )
+        ),
+        "p90_intervention_norm_episode_mean": float(
+            np.mean([row["p90_intervention_norm"] for row in records])
+        ),
+        "projection_rank_histogram": total_rank_counts,
         "mean_reward": float(np.mean([row["reward"] for row in records])),
         "records": records,
     }
@@ -920,6 +1013,8 @@ def run_battery_calibration(
     environment = environment_from_args(args, phase=SACTrainingPhase.NAVIGATION)
     if bool(getattr(args, "smoke", False)):
         environment.phase1_episode_max_policy_steps = 300
+    elif bool(getattr(args, "pilot", False)):
+        environment.phase1_episode_max_policy_steps = int(args.navigation_eval_max_steps)
     before_hash = _policy_parameter_hash(policy)
     task_records: list[dict[str, object]] = []
     full_policy_step_energies: list[float] = []

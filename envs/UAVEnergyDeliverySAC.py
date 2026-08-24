@@ -30,6 +30,11 @@ from review_bundle.safety.collision.hocbf import (
     HOCBFConfig,
     emergency_braking_acceleration,
 )
+from review_bundle.safety.collision.projection_geometry import (
+    ProjectionGeometry,
+    analyze_projection_geometry,
+    identity_projection_geometry,
+)
 from review_bundle.safety.energy.critics import MonotoneQuantileCritic
 from review_bundle.safety.energy.mc_regression import GoalEnergyPrediction
 from review_bundle.safety.energy.td import quantile_atom_weights, quantile_huber_loss, quantile_ssp_target
@@ -492,6 +497,7 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         hocbf_k2: float = 1.0,
         hocbf_uncertainty_margin: float = 1.0,
         hocbf_top_k: int | None = None,
+        projection_geometry_enabled: bool = False,
         render_mode: str | None = None,
         render_vertical_exaggeration: float = 4.0,
     ) -> None:
@@ -618,6 +624,7 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         self.hocbf_k2 = float(hocbf_k2)
         self.hocbf_uncertainty_margin = float(hocbf_uncertainty_margin)
         self.hocbf_top_k = None if hocbf_top_k is None else int(hocbf_top_k)
+        self.projection_geometry_enabled = bool(projection_geometry_enabled)
         self._lidar_model = Lidar3DModel(
             Lidar3DConfig(
                 horizontal_sectors=self.lidar_horizontal_sectors,
@@ -684,6 +691,10 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         self.safety_interventions = 0
         self.safety_fallbacks = 0
         self.safety_emergency_brakes = 0
+        self.projection_geometry_calls = 0
+        self.projection_geometry_valid = 0
+        self.projection_active_set_switches = 0
+        self._last_projection_active_signature: tuple[int, ...] | None = None
 
     @property
     def agent(self) -> _SACUAVAgent:
@@ -798,6 +809,7 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         requested_start = reset_options.pop("start_position", None)
         requested_velocity = reset_options.pop("start_velocity", None)
         requested_task = reset_options.pop("task_point", None)
+        requested_obstacles = reset_options.pop("static_obstacles", None)
         if reset_options:
             raise ValueError(f"unsupported reset options: {sorted(reset_options)}")
         requested_start_position = (
@@ -823,7 +835,13 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
             obstacle_exclusions.append(requested_start_position)
         if requested_task_position is not None:
             obstacle_exclusions.append(requested_task_position)
-        self._initialize_static_obstacles(obstacle_exclusions)
+        if requested_obstacles is None:
+            self._initialize_static_obstacles(obstacle_exclusions)
+        else:
+            self.obstacles = self._validate_static_obstacle_layout(
+                requested_obstacles,
+                obstacle_exclusions,
+            )
         default_start = (
             self.charger_position
             if self.finite_energy_enabled and self.reset_at_charger
@@ -898,6 +916,10 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         self.safety_interventions = 0
         self.safety_fallbacks = 0
         self.safety_emergency_brakes = 0
+        self.projection_geometry_calls = 0
+        self.projection_geometry_valid = 0
+        self.projection_active_set_switches = 0
+        self._last_projection_active_signature = None
         self.agent.prev_collided = False
         self.agent.collided = False
         self._current_goal_initial_distance = float(np.linalg.norm(self.active_goal - self.agent.pos))
@@ -926,16 +948,26 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
                 self._start_goal_trajectory(self.charger_position)
         goal_type = "CHARGER" if self.mode is SortieMode.CHARGER_COMMITTED else "TASK"
         segment_goal = self.active_goal.copy()
+        anchor_sac_observation = self.sac_observation_for_goal(segment_goal)
         policy_action = (
-            self._goal_action(self.sac_observation_for_goal(segment_goal))
+            self._goal_action(anchor_sac_observation)
             if switched_at_step_start
             else nominal_action
         )
         first_executed_action, first_safety_diagnostics = self._safety_filtered_action(
             policy_action
         )
+        anchor_projection_geometry = dict(
+            first_safety_diagnostics["projection_geometry"]
+        )
+        anchor_active_set_changed = bool(
+            first_safety_diagnostics.get("active_set_changed", False)
+        )
         distance_before = float(np.linalg.norm(segment_goal - self.agent.pos))
         energy_state_before = self.energy_state_for_goal(segment_goal)
+        compact_energy_state_before = self.compact_energy_state_for_goal(segment_goal)
+        anchor_position = self.agent.pos.copy()
+        anchor_velocity = self.agent.vel.copy()
         quantiles_before = self._predict_quantiles(segment_goal, first_executed_action)
         total_energy = 0.0
         boundary_contact = False
@@ -1158,13 +1190,41 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
                 "commanded_acceleration": last_commanded_acceleration.copy(),
                 "realized_acceleration": last_realized_acceleration.copy(),
                 "physical_acceleration": last_realized_acceleration.copy(),
+                "anchor_sac_observation": anchor_sac_observation.copy(),
+                "anchor_compact_energy_state": compact_energy_state_before.copy(),
+                "anchor_position": anchor_position.copy(),
+                "anchor_velocity": anchor_velocity.copy(),
+                "anchor_goal": segment_goal.copy(),
+                "goal_type": goal_type,
+                "distance_to_goal_before": distance_before,
                 "nominal_action": policy_action.copy(),
                 "executed_action": executed_action.copy(),
+                "anchor_executed_action": first_executed_action.copy(),
+                "projection_geometry": anchor_projection_geometry,
+                "active_set_changed": anchor_active_set_changed,
                 "hocbf_intervened": safety_intervened,
                 "hocbf_fallback_used": safety_fallback_used,
                 "hocbf_emergency_brake": safety_emergency_brake,
                 "hocbf_intervention_norm": mean_safety_intervention_norm,
                 "hocbf_substep_diagnostics": safety_diagnostics,
+                "hocbf_constraint_build_seconds": float(
+                    sum(
+                        float(row.get("constraint_build_seconds", 0.0))
+                        for row in safety_diagnostics
+                    )
+                ),
+                "hocbf_solver_seconds": float(
+                    sum(
+                        float(row.get("solver_seconds", 0.0))
+                        for row in safety_diagnostics
+                    )
+                ),
+                "hocbf_filter_total_seconds": float(
+                    sum(
+                        float(row.get("filter_total_seconds", 0.0))
+                        for row in safety_diagnostics
+                    )
+                ),
                 "mode_before": mode_before_decision.value,
                 "active_goal_before": segment_goal.copy(),
                 "energy_exhausted": energy_exhausted,
@@ -1178,9 +1238,19 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
                 "step": self.current_step,
                 "position": self.agent.pos.copy(),
                 "velocity": self.agent.vel.copy(),
+                "anchor_sac_observation": anchor_sac_observation.copy(),
+                "anchor_compact_energy_state": compact_energy_state_before.copy(),
+                "anchor_position": anchor_position.copy(),
+                "anchor_velocity": anchor_velocity.copy(),
+                "anchor_goal": segment_goal.copy(),
+                "goal_type": goal_type,
+                "distance_to_goal_before": distance_before,
                 "nominal_action": nominal_action.copy(),
                 "policy_action": policy_action.copy(),
                 "executed_action": executed_action.copy(),
+                "anchor_executed_action": first_executed_action.copy(),
+                "projection_geometry": anchor_projection_geometry,
+                "active_set_changed": anchor_active_set_changed,
                 "hocbf_intervened": safety_intervened,
                 "hocbf_fallback_used": safety_fallback_used,
                 "hocbf_emergency_brake": safety_emergency_brake,
@@ -1237,6 +1307,27 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
             values.extend((lidar_ranges, lidar_valid))
         state = np.concatenate(values)
         return np.clip(state, self.observation_space.low, self.observation_space.high).astype(np.float32)
+
+    def compact_energy_state_for_goal(
+        self,
+        goal: np.ndarray,
+        *,
+        position: np.ndarray | None = None,
+        velocity: np.ndarray | None = None,
+    ) -> np.ndarray:
+        target = self._validate_position(goal, "compact_energy_goal")
+        velocity_feature, direction, distance = self._goal_features(
+            target,
+            position=position,
+            velocity=velocity,
+        )
+        return np.concatenate(
+            [
+                velocity_feature,
+                direction,
+                np.asarray([np.clip(distance / self.d_max, 0.0, 1.0)]),
+            ]
+        ).astype(np.float32)
 
     def energy_context_for_goal(
         self,
@@ -1824,6 +1915,47 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
                 )
         self.obstacles = obstacles
 
+    def static_obstacle_layout(self) -> list[dict[str, object]]:
+        return [
+            {"position": obstacle.pos.tolist(), "radius": float(obstacle.radius)}
+            for obstacle in self.obstacles
+        ]
+
+    def _validate_static_obstacle_layout(
+        self,
+        values: object,
+        excluded_positions: list[np.ndarray],
+    ) -> list[StaticCylinderObstacle]:
+        if not isinstance(values, (list, tuple)):
+            raise TypeError("static_obstacles must be a list of obstacle specifications")
+        obstacles: list[StaticCylinderObstacle] = []
+        for value in values:
+            if isinstance(value, StaticCylinderObstacle):
+                obstacle = StaticCylinderObstacle(value.pos.copy(), value.radius)
+            elif isinstance(value, dict):
+                obstacle = StaticCylinderObstacle(
+                    np.asarray(value["position"], dtype=np.float32),
+                    float(value["radius"]),
+                )
+            else:
+                raise TypeError("unsupported static obstacle specification")
+            margin = obstacle.radius + self.safe_radius
+            if not (
+                margin <= obstacle.pos[0] <= self.length - margin
+                and margin <= obstacle.pos[1] <= self.width - margin
+            ):
+                raise ValueError("static obstacle lies outside the legal map region")
+            if any(
+                np.linalg.norm(obstacle.pos - np.asarray(point)[:2])
+                < obstacle.radius + self.safe_radius + self.obstacle_sampling_margin
+                for point in excluded_positions
+            ):
+                raise ValueError("static obstacle overlaps a protected reset position")
+            obstacles.append(obstacle)
+        if len(obstacles) != self.num_obstacles:
+            raise ValueError("static obstacle layout count does not match num_obstacles")
+        return obstacles
+
     def _position_clear_of_obstacles(
         self,
         position: np.ndarray,
@@ -1970,12 +2102,22 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
     ) -> tuple[np.ndarray, dict[str, object]]:
         nominal = np.asarray(nominal_action, dtype=np.float32)
         if not self.cbf_enabled:
+            geometry = (
+                identity_projection_geometry(
+                    nominal,
+                    reason="hocbf_disabled_nominal_passthrough",
+                )
+                if self.projection_geometry_enabled
+                else ProjectionGeometry.invalid("projection_geometry_disabled")
+            )
             return nominal.copy(), {
                 "enabled": False,
                 "intervened": False,
                 "fallback_used": False,
                 "emergency_brake": False,
                 "intervention_norm": 0.0,
+                "projection_geometry": geometry.as_dict(),
+                "active_set_changed": False,
             }
         if self.safety_filter is None or self._lidar_packet is None:
             raise RuntimeError("HOCBF requires an initialized safety filter and LiDAR packet")
@@ -1983,6 +2125,18 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         perceived_obstacles = raw_lidar_point_obstacles(self._lidar_packet)
         self.safety_filter_calls += 1
         if not perceived_obstacles:
+            geometry = (
+                identity_projection_geometry(
+                    nominal,
+                    reason="no_lidar_hits_nominal_passthrough",
+                )
+                if self.projection_geometry_enabled
+                else ProjectionGeometry.invalid(
+                    "projection_geometry_disabled",
+                    nominal_safe=True,
+                )
+            )
+            active_set_changed = self._record_projection_geometry(geometry)
             return nominal.copy(), {
                 "enabled": True,
                 "intervened": False,
@@ -1999,6 +2153,11 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
                 "feasible": True,
                 "solver_reason": "no_lidar_hits_nominal_passthrough",
                 "deadline_missed": False,
+                "constraint_build_seconds": 0.0,
+                "solver_seconds": 0.0,
+                "filter_total_seconds": 0.0,
+                "projection_geometry": geometry.as_dict(),
+                "active_set_changed": active_set_changed,
             }
         output = self.safety_filter.filter(
             self.agent.pos,
@@ -2020,6 +2179,33 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
                 self.vertical_a_max,
             )
         safe_action = self._acceleration_to_normalized_action(safe_acceleration)
+        if not self.projection_geometry_enabled:
+            geometry = ProjectionGeometry.invalid(
+                "projection_geometry_disabled",
+                nominal_safe=bool(np.linalg.norm(safe_action - nominal) <= 1e-6),
+                minimum_nominal_slack=diagnostics.minimum_nominal_slack,
+                minimum_executed_slack=diagnostics.minimum_executed_slack,
+            )
+        elif output.projection_problem is None:
+            geometry = ProjectionGeometry.invalid(
+                "missing_projection_problem",
+                nominal_safe=False,
+                minimum_nominal_slack=diagnostics.minimum_nominal_slack,
+                minimum_executed_slack=diagnostics.minimum_executed_slack,
+            )
+        else:
+            geometry = analyze_projection_geometry(
+                output.projection_problem,
+                nominal_normalized_action=nominal,
+                executed_normalized_action=safe_action,
+                horizontal_acceleration_limit=self.horizontal_a_max,
+                vertical_acceleration_limit=self.vertical_a_max,
+                fallback_used=bool(diagnostics.fallback_used),
+                emergency_brake=emergency_brake,
+                minimum_nominal_slack=diagnostics.minimum_nominal_slack,
+                minimum_executed_slack=diagnostics.minimum_executed_slack,
+            )
+        active_set_changed = self._record_projection_geometry(geometry)
         intervention_norm = float(np.linalg.norm(safe_action - nominal))
         intervened = bool(intervention_norm > 1e-6)
         self.safety_interventions += int(intervened)
@@ -2043,7 +2229,26 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
             "feasible": diagnostics.feasible,
             "solver_reason": diagnostics.solver_reason,
             "deadline_missed": diagnostics.deadline_missed,
+            "constraint_build_seconds": diagnostics.constraint_build_seconds,
+            "solver_seconds": diagnostics.solver_seconds,
+            "filter_total_seconds": diagnostics.total_seconds,
+            "projection_geometry": geometry.as_dict(),
+            "active_set_changed": active_set_changed,
         }
+
+    def _record_projection_geometry(self, geometry: ProjectionGeometry) -> bool:
+        self.projection_geometry_calls += 1
+        self.projection_geometry_valid += int(geometry.valid)
+        signature = geometry.active_constraint_indices if geometry.valid else None
+        changed = bool(
+            signature is not None
+            and self._last_projection_active_signature is not None
+            and signature != self._last_projection_active_signature
+        )
+        self.projection_active_set_switches += int(changed)
+        if signature is not None:
+            self._last_projection_active_signature = signature
+        return changed
 
     def _sample_task_point(self, reference_position: np.ndarray) -> np.ndarray:
         reference = self._validate_position(reference_position, "reference_position")
@@ -2157,6 +2362,14 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
             ),
             "hocbf_fallbacks": int(self.safety_fallbacks),
             "hocbf_emergency_brakes": int(self.safety_emergency_brakes),
+            "projection_geometry_calls": int(self.projection_geometry_calls),
+            "projection_geometry_valid": int(self.projection_geometry_valid),
+            "projection_geometry_valid_rate": float(
+                self.projection_geometry_valid / max(self.projection_geometry_calls, 1)
+            ),
+            "projection_active_set_switches": int(
+                self.projection_active_set_switches
+            ),
             "td_loss": self.last_td_loss,
             "td_update_count": 0
             if self.energy_estimator is None

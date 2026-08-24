@@ -8,6 +8,7 @@ import numpy as np
 from scipy.optimize import linprog, minimize
 
 from .feasibility import joint_feasibility_margin
+from .projection_geometry import ProjectionProblem
 
 from .hocbf import (
     BarrierConstraint,
@@ -145,6 +146,7 @@ class SafetyFilterDiagnostics:
 class SafetyFilterOutput:
     acceleration: np.ndarray
     diagnostics: SafetyFilterDiagnostics
+    projection_problem: ProjectionProblem | None = None
 
 
 class UAVSafetyActionFilter:
@@ -433,7 +435,22 @@ class UAVSafetyActionFilter:
             required_progress=required_progress,
             achieved_progress=achieved_progress,
         )
-        return SafetyFilterOutput(executed.copy(), diagnostics)
+        projection_problem = ProjectionProblem(
+            center=center,
+            hessian=hessian,
+            rows=rows,
+            lower_bounds=bounds,
+            projected_acceleration=projection.acceleration,
+            barrier_constraint_count=barrier_rows.shape[0],
+            feasible=projection.feasible,
+            converged=projection.converged,
+            solver_reason=projection.reason,
+        )
+        return SafetyFilterOutput(
+            executed.copy(),
+            diagnostics,
+            projection_problem,
+        )
 
     def _build_constraints(
         self,
