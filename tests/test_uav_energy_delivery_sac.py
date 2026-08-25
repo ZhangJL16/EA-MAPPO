@@ -967,6 +967,56 @@ def test_resume_phase1_loads_and_freezes_existing_500k_checkpoint(tmp_path: Path
     environment.close()
 
 
+def test_intermediate_100k_resume_uses_checkpoint_transition_not_500k_summary(
+    tmp_path: Path,
+) -> None:
+    source = tmp_path / "source"
+    phase1 = source / "phase1_navigation"
+    phase1.mkdir(parents=True)
+    environment = UAVEnergyDeliverySACEnv()
+    model = SAC("MlpPolicy", environment, device="cpu", buffer_size=32, learning_starts=32)
+    model.num_timesteps = 100_000
+    checkpoint = phase1 / "checkpoint_transition_100000.zip"
+    model.save(checkpoint)
+    (phase1 / "summary.json").write_text(
+        json.dumps(
+            {
+                "actual_training_transitions": 500_000,
+                "exact_budget_match": True,
+                "gif_evaluation_env_transitions": 0,
+            }
+        ),
+        encoding="utf-8",
+    )
+    output = tmp_path / "output"
+    (output / "phase1_navigation").mkdir(parents=True)
+    args = parse_args(
+        [
+            "--output-dir",
+            str(output),
+            "--smoke",
+            "--device",
+            "cpu",
+            "--resume-after-phase1-checkpoint",
+            str(checkpoint),
+            "--source-phase1-artifact",
+            str(source),
+            "--source-phase1-transition",
+            "100000",
+            "--intermediate-checkpoint-energy-ablation",
+        ]
+    )
+    resumed, audit, _ = load_resumed_phase1(args, output)
+    assert audit["actual_training_transitions"] == 100_000
+    assert audit["final_evaluation"] is None
+    assert audit["navigation_energy_ready"] is None
+    assert audit["intermediate_checkpoint_energy_ablation"] is True
+    assert "EXPLORATORY" in audit["claim_status"]
+    assert not (output / "phase1_navigation" / "source_final_evaluation.json").exists()
+    assert all(not parameter.requires_grad for parameter in resumed.policy.parameters())
+    environment.close()
+
+
 def test_formal_phase2_rejects_mock_energy_estimator(tmp_path: Path) -> None:
     args = parse_args(["--output-dir", str(tmp_path / "unused"), "--smoke", "--device", "cpu"])
     with pytest.raises(TypeError, match="trained_goal_conditioned_quantile_td"):

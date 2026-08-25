@@ -926,15 +926,25 @@ def load_resumed_phase1(
     if not source_summary_path.is_file():
         raise FileNotFoundError(f"Phase 1 summary does not exist: {source_summary_path}")
     source_summary = read_json(source_summary_path)
-    source_transitions = int(source_summary.get("actual_training_transitions", -1))
-    if source_transitions != FORMAL_PHASE1_TRANSITION_BUDGET:
+    recorded_source_transitions = int(source_summary.get("actual_training_transitions", -1))
+    source_transitions = (
+        int(args.source_phase1_transition)
+        if args.intermediate_checkpoint_energy_ablation
+        else recorded_source_transitions
+    )
+    expected_checkpoint_name = f"checkpoint_transition_{source_transitions:06d}.zip"
+    if checkpoint.name != expected_checkpoint_name:
+        raise ValueError(
+            f"resume checkpoint must be named {expected_checkpoint_name}, got {checkpoint.name}"
+        )
+    if not args.intermediate_checkpoint_energy_ablation and source_transitions != FORMAL_PHASE1_TRANSITION_BUDGET:
         raise ValueError(
             "resume checkpoint must have exactly 500000 recorded Phase 1 transitions"
         )
-    if not bool(source_summary.get("exact_budget_match", False)):
+    if not args.intermediate_checkpoint_energy_ablation and not bool(source_summary.get("exact_budget_match", False)):
         raise ValueError("source Phase 1 summary does not prove an exact transition budget")
-    final_evaluation = source_summary.get("final_evaluation")
-    if not isinstance(final_evaluation, dict):
+    final_evaluation = None if args.intermediate_checkpoint_energy_ablation else source_summary.get("final_evaluation")
+    if not args.intermediate_checkpoint_energy_ablation and not isinstance(final_evaluation, dict):
         final_eval_candidates = (
             source_artifact
             / "phase1_navigation"
@@ -949,6 +959,14 @@ def load_resumed_phase1(
             raise FileNotFoundError("source Phase 1 final evaluation metadata is missing")
         final_evaluation = read_json(final_eval_path)
     model = SAC.load(checkpoint, device=args.device)
+    if (
+        args.intermediate_checkpoint_energy_ablation
+        and int(model.num_timesteps) != source_transitions
+    ):
+        raise ValueError(
+            f"resume checkpoint records {model.num_timesteps} transitions, "
+            f"expected {source_transitions}"
+        )
     expected_observation_shape = (navigation_observation_dim(args),)
     if model.observation_space.shape != expected_observation_shape:
         raise ValueError(
@@ -963,6 +981,9 @@ def load_resumed_phase1(
     checkpoint_hash = file_sha256(checkpoint)
     navigation_audit = {
         **source_summary,
+        "requested_transition_budget": source_transitions,
+        "actual_training_transitions": source_transitions,
+        "exact_budget_match": True,
         "resume_mode": True,
         "phase1_retrained": False,
         "source_phase1_artifact": str(source_artifact),
@@ -976,14 +997,31 @@ def load_resumed_phase1(
             not parameter.requires_grad for parameter in model.policy.parameters()
         ),
         "navigation_training_completed": True,
-        "navigation_energy_ready": navigation_energy_gate_passed(final_evaluation),
-        "navigation_safety_ready": navigation_safety_gate_passed(final_evaluation),
+        "navigation_energy_ready": (
+            None
+            if args.intermediate_checkpoint_energy_ablation
+            else navigation_energy_gate_passed(final_evaluation)
+        ),
+        "navigation_safety_ready": (
+            None
+            if args.intermediate_checkpoint_energy_ablation
+            else navigation_safety_gate_passed(final_evaluation)
+        ),
+        "intermediate_checkpoint_energy_ablation": bool(
+            args.intermediate_checkpoint_energy_ablation
+        ),
+        "claim_status": (
+            "EXPLORATORY_INTERMEDIATE_CHECKPOINT_ENERGY_ABLATION_NOT_FORMAL"
+            if args.intermediate_checkpoint_energy_ablation
+            else "FORMAL_FINAL_CHECKPOINT_DOWNSTREAM"
+        ),
     }
     write_json(output / "phase1_navigation" / "source_summary.json", source_summary)
-    write_json(
-        output / "phase1_navigation" / "source_final_evaluation.json",
-        final_evaluation,
-    )
+    if final_evaluation is not None:
+        write_json(
+            output / "phase1_navigation" / "source_final_evaluation.json",
+            final_evaluation,
+        )
     write_json(output / "phase1_navigation" / "resume_audit.json", navigation_audit)
     return model, navigation_audit, checkpoint
 
@@ -2043,6 +2081,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--output-dir", required=True)
     parser.add_argument("--resume-after-phase1-checkpoint")
     parser.add_argument("--source-phase1-artifact")
+    parser.add_argument("--source-phase1-transition", type=int)
+    parser.add_argument(
+        "--intermediate-checkpoint-energy-ablation",
+        action="store_true",
+        help="run exploratory downstream energy stages from an explicitly named intermediate checkpoint",
+    )
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--device", default="cuda")
     parser.add_argument("--num-envs", type=int, default=8)
@@ -2159,6 +2203,13 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         parser.error("--smoke and --validation are mutually exclusive")
     if args.source_phase1_artifact and not args.resume_after_phase1_checkpoint:
         parser.error("--source-phase1-artifact requires --resume-after-phase1-checkpoint")
+    if args.intermediate_checkpoint_energy_ablation:
+        if not args.resume_after_phase1_checkpoint:
+            parser.error("intermediate checkpoint ablation requires --resume-after-phase1-checkpoint")
+        if args.source_phase1_transition is None or args.source_phase1_transition <= 0:
+            parser.error("intermediate checkpoint ablation requires a positive --source-phase1-transition")
+    elif args.source_phase1_transition is not None:
+        parser.error("--source-phase1-transition is only valid with --intermediate-checkpoint-energy-ablation")
     if args.smoke:
         args.phase1_transition_budget = 8000
         args.phase1b_transition_budget = 2000
@@ -2306,14 +2357,28 @@ def train(args: argparse.Namespace) -> dict[str, object]:
         "git_clean_at_start": git_clean(),
         "exact_argv": os.sys.argv,
         "two_stage_budget": {
-            "obstacle_navigation_transitions": args.phase1_transition_budget,
+            "obstacle_navigation_transitions": (
+                args.source_phase1_transition
+                if args.intermediate_checkpoint_energy_ablation
+                else args.phase1_transition_budget
+            ),
             "obstacle_energy_transitions": (
                 args.phase1b_transition_budget + args.phase2_transition_budget
             ),
             "total_training_transitions": (
-                args.phase1_transition_budget
+                (
+                    args.source_phase1_transition
+                    if args.intermediate_checkpoint_energy_ablation
+                    else args.phase1_transition_budget
+                )
                 + args.phase1b_transition_budget
                 + args.phase2_transition_budget
+            ),
+            "current_run_energy_transitions": (
+                args.phase1b_transition_budget + args.phase2_transition_budget
+            ),
+            "source_navigation_reused": bool(
+                args.intermediate_checkpoint_energy_ablation
             ),
             "energy_stage_split": {
                 "frozen_policy_td_warmup": args.phase1b_transition_budget,
@@ -2335,6 +2400,10 @@ def train(args: argparse.Namespace) -> dict[str, object]:
             "replay_buffer_capacity": args.buffer_size,
             "resume_after_phase1_checkpoint": args.resume_after_phase1_checkpoint,
             "source_phase1_artifact": args.source_phase1_artifact,
+            "source_phase1_transition": args.source_phase1_transition,
+            "intermediate_checkpoint_energy_ablation": bool(
+                args.intermediate_checkpoint_energy_ablation
+            ),
         },
         "battery_calibration": {
             "tasks": args.battery_calibration_tasks,
@@ -2445,12 +2514,19 @@ def train(args: argparse.Namespace) -> dict[str, object]:
             )
         final_navigation_evaluation = navigation_audit["final_evaluation"]
         navigation_audit["navigation_training_completed"] = True
-        navigation_audit["navigation_energy_ready"] = navigation_energy_gate_passed(
-            final_navigation_evaluation
-        )
-        navigation_audit["navigation_safety_ready"] = navigation_safety_gate_passed(
-            final_navigation_evaluation
-        )
+        if args.intermediate_checkpoint_energy_ablation:
+            navigation_audit["navigation_energy_ready"] = None
+            navigation_audit["navigation_safety_ready"] = None
+            navigation_audit["readiness_gate_status"] = (
+                "BYPASSED_BY_EXPLICIT_USER_REQUEST_FOR_100K_EXPLORATORY_ENERGY_ABLATION"
+            )
+        else:
+            navigation_audit["navigation_energy_ready"] = navigation_energy_gate_passed(
+                final_navigation_evaluation
+            )
+            navigation_audit["navigation_safety_ready"] = navigation_safety_gate_passed(
+                final_navigation_evaluation
+            )
         navigation_audit["safety_module_enabled"] = bool(args.hocbf_enabled)
         navigation_audit["energy_experiment_stage"] = (
             "obstacle_aware_navigation_then_energy"
@@ -2462,35 +2538,45 @@ def train(args: argparse.Namespace) -> dict[str, object]:
         run_config["navigation_readiness"] = {
             "navigation_energy_ready": navigation_audit["navigation_energy_ready"],
             "navigation_safety_ready": navigation_audit["navigation_safety_ready"],
-            "energy_gate_blocks_downstream": True,
+            "energy_gate_blocks_downstream": not args.intermediate_checkpoint_energy_ablation,
             "safety_gate_blocks_current_energy_experiment": bool(
                 args.num_obstacles > 0
             ),
         }
-        run_config["known_navigation_safety_limitation"] = {
-            "boundary_contact_step_rate": final_navigation_evaluation[
-                "boundary_contact_step_rate"
-            ],
-            "boundary_contact_episode_rate": final_navigation_evaluation[
-                "boundary_contact_episode_rate"
-            ],
-            "max_consecutive_boundary_contacts": final_navigation_evaluation[
-                "max_consecutive_boundary_contacts"
-            ],
-            "obstacle_collision_step_rate": final_navigation_evaluation[
-                "obstacle_collision_step_rate"
-            ],
-            "obstacle_collision_episode_rate": final_navigation_evaluation[
-                "obstacle_collision_episode_rate"
-            ],
-            "collision_action_filter_enabled": bool(args.hocbf_enabled),
-        }
+        run_config["known_navigation_safety_limitation"] = (
+            {
+                "status": "NOT_REEVALUATED_AT_INTERMEDIATE_CHECKPOINT",
+                "collision_action_filter_enabled": bool(args.hocbf_enabled),
+            }
+            if args.intermediate_checkpoint_energy_ablation
+            else {
+                "boundary_contact_step_rate": final_navigation_evaluation[
+                    "boundary_contact_step_rate"
+                ],
+                "boundary_contact_episode_rate": final_navigation_evaluation[
+                    "boundary_contact_episode_rate"
+                ],
+                "max_consecutive_boundary_contacts": final_navigation_evaluation[
+                    "max_consecutive_boundary_contacts"
+                ],
+                "obstacle_collision_step_rate": final_navigation_evaluation[
+                    "obstacle_collision_step_rate"
+                ],
+                "obstacle_collision_episode_rate": final_navigation_evaluation[
+                    "obstacle_collision_episode_rate"
+                ],
+                "collision_action_filter_enabled": bool(args.hocbf_enabled),
+            }
+        )
         write_json(output / "config.json", run_config)
         downstream_ready = bool(
-            navigation_audit["navigation_energy_ready"]
-            and (
-                args.num_obstacles == 0
-                or navigation_audit["navigation_safety_ready"]
+            args.intermediate_checkpoint_energy_ablation
+            or (
+                navigation_audit["navigation_energy_ready"]
+                and (
+                    args.num_obstacles == 0
+                    or navigation_audit["navigation_safety_ready"]
+                )
             )
         )
         if not downstream_ready and not (args.smoke or args.validation):
@@ -2598,7 +2684,11 @@ def train(args: argparse.Namespace) -> dict[str, object]:
         if (
             td_summary is not None
             and not td_summary["td_readiness"]["td_energy_ready"]
-            and not (args.smoke or args.validation)
+            and not (
+                args.smoke
+                or args.validation
+                or args.intermediate_checkpoint_energy_ablation
+            )
         ):
             stopped = {
                 "status": "STOPPED_AFTER_PHASE1B",

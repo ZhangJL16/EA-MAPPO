@@ -29,6 +29,8 @@ from experiments.jacobian_energy_bridge.sac import JacobianBridgeSAC
 from scripts.run_jacobian_safety_energy_1m import (
     FORMAL_TOTAL_TRANSITIONS,
     collect_mission_budget,
+    disjoint_bridge_and_energy_data,
+    load_intermediate_phase1,
     make_bridge_replay,
     parse_args,
     prepare_output_directory,
@@ -445,3 +447,106 @@ def test_checkpoint_sweep_discovers_transition_order(tmp_path: Path) -> None:
     discovered = discover_checkpoints(tmp_path / "artifact")
     assert [transition for transition, _ in discovered] == [50_000, 100_000, 150_000]
     assert checkpoint_transition(discovered[-1][1]) == 150_000
+
+
+def test_intermediate_jseb_parser_requires_exact_500k_downstream_budget() -> None:
+    args = parse_args(
+        [
+            "--output-dir",
+            "/tmp/jseb-intermediate",
+            "--intermediate-checkpoint-energy-ablation",
+            "--resume-phase1-checkpoint",
+            "/tmp/checkpoint_transition_100000.zip",
+            "--source-phase1-transition",
+            "100000",
+            "--phase1-transitions",
+            "100000",
+            "--phase2a-transitions",
+            "100000",
+            "--phase2b-transitions",
+            "300000",
+            "--phase2c-transitions",
+            "100000",
+        ]
+    )
+    assert args.source_phase1_transition == 100_000
+    assert args.phase2a_transitions + args.phase2b_transitions + args.phase2c_transitions == 500_000
+
+
+def test_intermediate_jseb_loads_100k_checkpoint_without_phase1_dataset(
+    tmp_path: Path,
+) -> None:
+    environment = UAVEnergyDeliverySACEnv(
+        lidar_enabled=True,
+        lidar_horizontal_sectors=8,
+        lidar_vertical_sectors=2,
+        num_obstacles=24,
+        cbf_enabled=True,
+        hocbf_top_k=16,
+    )
+    model = JacobianBridgeSAC(
+        "MlpPolicy",
+        environment,
+        device="cpu",
+        buffer_size=32,
+        learning_starts=32,
+    )
+    model.num_timesteps = 100_000
+    checkpoint = tmp_path / "checkpoint_transition_100000.zip"
+    model.save(checkpoint)
+    output = tmp_path / "output"
+    (output / "phase1_navigation").mkdir(parents=True)
+    args = parse_args(
+        [
+            "--output-dir",
+            str(output),
+            "--smoke",
+            "--device",
+            "cpu",
+            "--lidar-horizontal-sectors",
+            "8",
+            "--lidar-vertical-sectors",
+            "2",
+            "--intermediate-checkpoint-energy-ablation",
+            "--resume-phase1-checkpoint",
+            str(checkpoint),
+            "--source-phase1-transition",
+            "100000",
+        ]
+    )
+    resumed, audit = load_intermediate_phase1(args, output)
+    assert resumed.num_timesteps == 100_000
+    assert audit["phase1_trajectory_dataset_reused"] is False
+    assert audit["navigation_energy_ready"] is None
+    assert "EXPLORATORY" in audit["claim_status"]
+    environment.close()
+
+
+def test_intermediate_jseb_fresh_bridge_split_has_no_trajectory_overlap(
+    tmp_path: Path,
+) -> None:
+    writer = SafetyBridgeTrajectoryWriter(tmp_path / "dataset", num_envs=1)
+    mission_units = []
+    for mission_id in range(5):
+        ids = []
+        for _ in range(2):
+            trajectory_id = writer.completed_trajectories
+            writer.observe(0, _info(terminal=True), True)
+            ids.append(trajectory_id)
+        mission_units.append(
+            {
+                "mission_id": mission_id,
+                "task_trajectory_id": ids[0],
+                "return_trajectory_id": ids[1],
+                "direct_charger_trajectory_id": None,
+            }
+        )
+    dataset = load_bridge_dataset(tmp_path / "dataset")
+    bridge, energy, energy_units, audit = disjoint_bridge_and_energy_data(
+        dataset,
+        mission_units,
+        seed=7,
+    )
+    assert bridge.unique_trajectory_ids.isdisjoint(energy.unique_trajectory_ids)
+    assert len(energy_units) >= 3
+    assert audit["existing_phase1_500k_data_reused"] is False

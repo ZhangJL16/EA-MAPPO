@@ -154,6 +154,14 @@ def policy_hash(model: JacobianBridgeSAC) -> str:
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Jacobian Safety-Energy Bridge static-obstacle protocol")
     parser.add_argument("--output-dir", required=True)
+    parser.add_argument("--resume-phase1-checkpoint")
+    parser.add_argument("--source-phase1-artifact")
+    parser.add_argument("--source-phase1-transition", type=int)
+    parser.add_argument(
+        "--intermediate-checkpoint-energy-ablation",
+        action="store_true",
+        help="reuse an explicitly named intermediate navigation checkpoint and run only Phase 2A/B/C",
+    )
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--device", default="cuda")
     parser.add_argument("--num-envs", type=int, default=8)
@@ -253,6 +261,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--smoke", action="store_true")
     parser.add_argument("--pilot", action="store_true")
     parser.add_argument("--allow-dirty", action="store_true")
+    parser.add_argument("--allow-failed-battery-calibration", action="store_true")
     args = parser.parse_args(argv)
     args.lidar_sectors = args.lidar_horizontal_sectors * args.lidar_vertical_sectors
     args.legacy_lidar_alias_used = False
@@ -262,6 +271,13 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     args.max_steps_per_task = args.phase1_episode_max_steps
     if args.smoke and args.pilot:
         parser.error("--smoke and --pilot are mutually exclusive")
+    if args.intermediate_checkpoint_energy_ablation:
+        if not args.resume_phase1_checkpoint:
+            parser.error("intermediate checkpoint ablation requires --resume-phase1-checkpoint")
+        if args.source_phase1_transition is None or args.source_phase1_transition <= 0:
+            parser.error("intermediate checkpoint ablation requires a positive --source-phase1-transition")
+    elif args.resume_phase1_checkpoint or args.source_phase1_transition is not None:
+        parser.error("resume options require --intermediate-checkpoint-energy-ablation")
     if args.smoke:
         args.phase1_transitions = 2_000
         args.phase2a_transitions = 500
@@ -323,7 +339,9 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     args.td_collection_seed = 100_001
     args.run_phase2 = True
     args.run_td_pretraining = False
-    args.allow_failed_battery_calibration = bool(args.smoke or args.pilot)
+    args.allow_failed_battery_calibration = bool(
+        args.allow_failed_battery_calibration or args.smoke or args.pilot
+    )
     if args.ablation == "A":
         args.projection_geometry_enabled = False
         args.shield_loss_weight = 0.0
@@ -356,7 +374,15 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
                 args.phase2c_transitions,
             ]
         )
-        if total != FORMAL_TOTAL_TRANSITIONS:
+        expected_total = (
+            args.phase2a_transitions + args.phase2b_transitions + args.phase2c_transitions
+            if args.intermediate_checkpoint_energy_ablation
+            else FORMAL_TOTAL_TRANSITIONS
+        )
+        if args.intermediate_checkpoint_energy_ablation:
+            if expected_total != 500_000:
+                parser.error("intermediate JSEB energy ablation requires exactly 500000 Phase 2 transitions")
+        elif total != FORMAL_TOTAL_TRANSITIONS:
             parser.error("formal JSEB training budget must equal exactly 1,000,000 transitions")
         if (args.lidar_horizontal_sectors, args.lidar_vertical_sectors) != (128, 8):
             parser.error("formal JSEB requires 128 x 8 LiDAR")
@@ -573,6 +599,109 @@ def train_phase1(
     generate_navigation_curves(output)
     dataset = load_bridge_dataset(output / "phase1_safety_bridge" / "trajectories")
     return model, audit, dataset
+
+
+def load_intermediate_phase1(
+    args: argparse.Namespace,
+    output: Path,
+) -> tuple[JacobianBridgeSAC, dict[str, object]]:
+    checkpoint = Path(args.resume_phase1_checkpoint).expanduser().resolve()
+    source_artifact = (
+        Path(args.source_phase1_artifact).expanduser().resolve()
+        if args.source_phase1_artifact
+        else checkpoint.parent.parent
+    )
+    expected_name = f"checkpoint_transition_{args.source_phase1_transition:06d}.zip"
+    if not checkpoint.is_file():
+        raise FileNotFoundError(f"JSEB checkpoint does not exist: {checkpoint}")
+    if checkpoint.name != expected_name:
+        raise ValueError(
+            f"JSEB checkpoint must be named {expected_name}, got {checkpoint.name}"
+        )
+    model = JacobianBridgeSAC.load(checkpoint, device=args.device)
+    expected_observation_shape = (navigation_observation_dim(args),)
+    if model.observation_space.shape != expected_observation_shape:
+        raise ValueError(
+            f"JSEB checkpoint observation shape is {model.observation_space.shape}, "
+            f"expected {expected_observation_shape}"
+        )
+    if model.action_space.shape != (3,):
+        raise ValueError(
+            f"JSEB checkpoint action shape is {model.action_space.shape}, expected (3,)"
+        )
+    if int(model.num_timesteps) != int(args.source_phase1_transition):
+        raise ValueError(
+            f"JSEB checkpoint records {model.num_timesteps} transitions, "
+            f"expected {args.source_phase1_transition}"
+        )
+    freeze_navigation_policy(model)
+    audit = {
+        "requested_transition_budget": int(args.source_phase1_transition),
+        "actual_training_transitions": int(args.source_phase1_transition),
+        "exact_budget_match": True,
+        "source_phase1_artifact": str(source_artifact),
+        "source_checkpoint": str(checkpoint),
+        "source_checkpoint_sha256": file_sha256(checkpoint),
+        "source_checkpoint_model_num_timesteps": int(model.num_timesteps),
+        "phase1_retrained": False,
+        "navigation_readiness_gate": (
+            "BYPASSED_BY_EXPLICIT_USER_REQUEST_FOR_100K_EXPLORATORY_ENERGY_ABLATION"
+        ),
+        "navigation_energy_ready": None,
+        "navigation_safety_ready": None,
+        "claim_status": "EXPLORATORY_INTERMEDIATE_CHECKPOINT_ENERGY_ABLATION_NOT_FORMAL",
+        "phase1_trajectory_dataset_reused": False,
+        "data_leakage_control": (
+            "existing_500k_phase1_bridge_trajectories_are_not_loaded; "
+            "all downstream bridge and energy data are freshly collected"
+        ),
+    }
+    write_json(output / "phase1_navigation" / "resume_audit.json", audit)
+    return model, audit
+
+
+def disjoint_bridge_and_energy_data(
+    dataset: PackedBridgeDataset,
+    mission_units: list[dict[str, object]],
+    *,
+    seed: int,
+) -> tuple[PackedBridgeDataset, PackedBridgeDataset, list[dict[str, object]], dict[str, object]]:
+    if len(mission_units) < 5:
+        raise RuntimeError(
+            "100k JSEB downstream run needs at least five complete missions to make "
+            "disjoint bridge-source and energy-model datasets"
+        )
+    rng = np.random.default_rng(seed)
+    order = rng.permutation(len(mission_units))
+    bridge_count = max(2, int(np.floor(0.20 * len(order))))
+    bridge_count = min(bridge_count, len(order) - 3)
+    bridge_units = [mission_units[int(index)] for index in order[:bridge_count]]
+    energy_units = [mission_units[int(index)] for index in order[bridge_count:]]
+
+    def trajectory_ids(units: list[dict[str, object]]) -> set[int]:
+        ids: set[int] = set()
+        for unit in units:
+            ids.add(int(unit["task_trajectory_id"]))
+            ids.add(int(unit["return_trajectory_id"]))
+            direct_id = unit.get("direct_charger_trajectory_id")
+            if direct_id is not None:
+                ids.add(int(direct_id))
+        return ids
+
+    bridge_ids = trajectory_ids(bridge_units)
+    energy_ids = trajectory_ids(energy_units)
+    if bridge_ids & energy_ids:
+        raise RuntimeError("bridge-source and energy-model trajectory sets overlap")
+    audit = {
+        "protocol": "fresh_phase2a_disjoint_mission_split",
+        "bridge_source_missions": len(bridge_units),
+        "energy_model_missions": len(energy_units),
+        "bridge_source_trajectory_ids": sorted(bridge_ids),
+        "energy_model_trajectory_ids": sorted(energy_ids),
+        "trajectory_overlap": False,
+        "existing_phase1_500k_data_reused": False,
+    }
+    return dataset.subset(bridge_ids), dataset.subset(energy_ids), energy_units, audit
 
 
 def _run_goal_segment(
@@ -1399,7 +1528,11 @@ def run_persistent_evaluation(
 
 def formal_config(args: argparse.Namespace) -> dict[str, object]:
     return {
-        "protocol": "JACOBIAN_SAFETY_ENERGY_BRIDGE_STATIC_1M",
+        "protocol": (
+            "JSEB_100K_CHECKPOINT_ENERGY_ABLATION"
+            if args.intermediate_checkpoint_energy_ablation
+            else "JACOBIAN_SAFETY_ENERGY_BRIDGE_STATIC_1M"
+        ),
         "ablation": {
             "id": args.ablation,
             "name": {
@@ -1418,19 +1551,43 @@ def formal_config(args: argparse.Namespace) -> dict[str, object]:
         "git_status": subprocess.check_output(["git", "status", "--porcelain"], text=True).splitlines(),
         "exact_command": sys.argv,
         "training_budget": {
-            "phase1": args.phase1_transitions,
+            "phase1": (
+                args.source_phase1_transition
+                if args.intermediate_checkpoint_energy_ablation
+                else args.phase1_transitions
+            ),
             "phase2a": args.phase2a_transitions,
             "phase2b": args.phase2b_transitions,
             "phase2c": args.phase2c_transitions,
             "total": sum(
                 [
-                    args.phase1_transitions,
+                    (
+                        args.source_phase1_transition
+                        if args.intermediate_checkpoint_energy_ablation
+                        else args.phase1_transitions
+                    ),
                     args.phase2a_transitions,
                     args.phase2b_transitions,
                     args.phase2c_transitions,
                 ]
             ),
             "evaluation_transitions_excluded": True,
+            "current_run_phase2_total": (
+                args.phase2a_transitions
+                + args.phase2b_transitions
+                + args.phase2c_transitions
+            ),
+            "source_navigation_reused": bool(
+                args.intermediate_checkpoint_energy_ablation
+            ),
+        },
+        "source_checkpoint": {
+            "path": args.resume_phase1_checkpoint,
+            "source_artifact": args.source_phase1_artifact,
+            "transition": args.source_phase1_transition,
+            "intermediate_energy_ablation": bool(
+                args.intermediate_checkpoint_energy_ablation
+            ),
         },
         "evaluation_protocol": {
             "phase_end_eval_only": bool(args.phase_end_eval_only),
@@ -1478,14 +1635,19 @@ def formal_config(args: argparse.Namespace) -> dict[str, object]:
             "active_set_switches_masked": True,
             "hocbf_remains_final_safety_layer": True,
             "real_uav_safety_claim": False,
+            "formal_paper_comparison": not args.intermediate_checkpoint_energy_ablation,
+            "intermediate_checkpoint_exploratory_only": bool(
+                args.intermediate_checkpoint_energy_ablation
+            ),
         },
     }
 
 
 def run(args: argparse.Namespace) -> dict[str, object]:
-    formal = not (args.smoke or args.pilot)
-    if formal and (args.allow_dirty or not git_clean()):
-        raise RuntimeError("formal JSEB requires a clean worktree and forbids --allow-dirty")
+    long_run = not (args.smoke or args.pilot)
+    formal = long_run and not args.intermediate_checkpoint_energy_ablation
+    if long_run and (args.allow_dirty or not git_clean()):
+        raise RuntimeError("long JSEB runs require a clean worktree and forbid --allow-dirty")
     output = prepare_output_directory(args.output_dir)
     for directory in (
         "phase1_navigation",
@@ -1513,10 +1675,15 @@ def run(args: argparse.Namespace) -> dict[str, object]:
             seed=args.eval_task_seed,
             role="fixed_navigation_evaluation",
         )
-        model, phase1, phase1_dataset = train_phase1(args, output, eval_tasks)
-        downstream_ready = bool(
-            phase1["navigation_energy_ready"] and phase1["navigation_safety_ready"]
-        )
+        if args.intermediate_checkpoint_energy_ablation:
+            model, phase1 = load_intermediate_phase1(args, output)
+            phase1_dataset = None
+            downstream_ready = True
+        else:
+            model, phase1, phase1_dataset = train_phase1(args, output, eval_tasks)
+            downstream_ready = bool(
+                phase1["navigation_energy_ready"] and phase1["navigation_safety_ready"]
+            )
         if formal and not downstream_ready:
             stopped = {
                 "status": "STOPPED_AFTER_PHASE1",
@@ -1529,7 +1696,7 @@ def run(args: argparse.Namespace) -> dict[str, object]:
             return stopped
 
         freeze_navigation_policy(model)
-        calibration_policy = model if formal else HeuristicGoalPolicy()
+        calibration_policy = model if long_run else HeuristicGoalPolicy()
         calibration_tasks = generate_stratified_navigation_tasks(
             num_tasks=args.battery_calibration_tasks,
             seed=args.battery_calibration_seed,
@@ -1547,7 +1714,7 @@ def run(args: argparse.Namespace) -> dict[str, object]:
             battery_capacity=capacity,
             output=output / "battery_calibration",
         )
-        if formal and (
+        if long_run and not args.allow_failed_battery_calibration and (
             not calibration["battery_calibration_navigation_valid"]
             or not validation["battery_calibration_valid"]
         ):
@@ -1570,10 +1737,28 @@ def run(args: argparse.Namespace) -> dict[str, object]:
             seed=args.seed + 200_000,
             replay=phase2_replay,
         )
+        if phase2a_dataset is None:
+            raise RuntimeError("Phase 2A produced no complete trajectory dataset")
+        if args.intermediate_checkpoint_energy_ablation:
+            bridge_source_dataset, phase2a_energy_dataset, phase2a_energy_units, split_audit = (
+                disjoint_bridge_and_energy_data(
+                    phase2a_dataset,
+                    phase2a_units,
+                    seed=args.seed + 250_000,
+                )
+            )
+            write_json(
+                output / "phase2a_energy_collection" / "fresh_data_split_audit.json",
+                split_audit,
+            )
+        else:
+            bridge_source_dataset = phase1_dataset
+            phase2a_energy_dataset = phase2a_dataset
+            phase2a_energy_units = phase2a_units
         models, encoder, critic, _, _, phase2a_models = fit_energy_models(
-            phase1_dataset,
-            phase2a_dataset,
-            phase2a_units,
+            bridge_source_dataset,
+            phase2a_energy_dataset,
+            phase2a_energy_units,
             args,
             output / "phase2a_energy_collection" / "models",
             seed=args.seed + 300_000,
@@ -1599,7 +1784,7 @@ def run(args: argparse.Namespace) -> dict[str, object]:
             replay=phase2c_replay,
         )
         final_models, final_encoder, final_critic, final_splits, final_unit_splits, final_models_summary = fit_energy_models(
-            phase1_dataset,
+            bridge_source_dataset,
             phase2c_dataset,
             phase2c_units,
             args,
@@ -1620,13 +1805,26 @@ def run(args: argparse.Namespace) -> dict[str, object]:
             model,
             args,
             eval_tasks,
-            global_env_transitions=FORMAL_TOTAL_TRANSITIONS if formal else sum(
-                [args.phase1_transitions, args.phase2a_transitions, args.phase2b_transitions, args.phase2c_transitions]
+            global_env_transitions=(
+                FORMAL_TOTAL_TRANSITIONS
+                if formal
+                else sum(
+                    [
+                        (
+                            args.source_phase1_transition
+                            if args.intermediate_checkpoint_energy_ablation
+                            else args.phase1_transitions
+                        ),
+                        args.phase2a_transitions,
+                        args.phase2b_transitions,
+                        args.phase2c_transitions,
+                    ]
+                )
             ),
             output_path=output / "eval" / "final_policy_navigation.json",
         )
         if estimator is None:
-            if formal:
+            if long_run:
                 raise RuntimeError(
                     "formal JSEB requires complete mission calibration before switching"
                 )
@@ -1645,9 +1843,15 @@ def run(args: argparse.Namespace) -> dict[str, object]:
                 battery_capacity=capacity,
                 output=output / "persistent_evaluation",
             )
-        total_training = sum(
-            [args.phase1_transitions, args.phase2a_transitions, args.phase2b_transitions, args.phase2c_transitions]
+        source_navigation_transitions = (
+            args.source_phase1_transition
+            if args.intermediate_checkpoint_energy_ablation
+            else args.phase1_transitions
         )
+        phase2_training = sum(
+            [args.phase2a_transitions, args.phase2b_transitions, args.phase2c_transitions]
+        )
+        total_training = source_navigation_transitions + phase2_training
         summary = {
             "status": "COMPLETED",
             "completed_at": utc_now(),
@@ -1657,7 +1861,9 @@ def run(args: argparse.Namespace) -> dict[str, object]:
                 "phase2b": phase2b["actual_training_transitions"],
                 "phase2c": phase2c_collection["actual_training_transitions"],
                 "total": total_training,
-                "exact_formal_1m": (not formal) or total_training == FORMAL_TOTAL_TRANSITIONS,
+                "current_run_phase2_total": phase2_training,
+                "exact_phase2_500k": phase2_training == 500_000,
+                "exact_formal_1m": formal and total_training == FORMAL_TOTAL_TRANSITIONS,
                 "evaluation_transitions_excluded": True,
             },
             "phase1": compact_summary(phase1),
@@ -1672,6 +1878,11 @@ def run(args: argparse.Namespace) -> dict[str, object]:
             "final_navigation": compact_summary(final_navigation),
             "persistent_delivery": persistent,
             "final_policy_hash": final_policy_hash,
+            "claim_status": (
+                "EXPLORATORY_INTERMEDIATE_CHECKPOINT_ENERGY_ABLATION_NOT_FORMAL"
+                if args.intermediate_checkpoint_energy_ablation
+                else "FORMAL_JSEB_1M"
+            ),
             "claim_boundary_risks": [
                 "J is local and masked at active-set or coordinate-map switches",
                 "HOCBF remains the final hard safety layer",
