@@ -164,6 +164,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--phase1-episode-max-steps", type=int, default=4000)
     parser.add_argument("--phase2-episode-max-steps", type=int, default=20_000)
     parser.add_argument("--eval-freq-transitions", type=int, default=100_000)
+    parser.add_argument(
+        "--phase-end-eval-only",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="disable periodic navigation evaluation and evaluate only after Phase 1",
+    )
     parser.add_argument("--checkpoint-freq-transitions", type=int, default=50_000)
     parser.add_argument("--log-freq-transitions", type=int, default=8_000)
     parser.add_argument("--gif-freq-transitions", type=int, default=500_000)
@@ -338,6 +344,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     if not args.lidar_enabled or not args.hocbf_enabled or args.num_obstacles != 24:
         parser.error("JSEB requires static obstacles, LiDAR, and HOCBF")
     if not (args.smoke or args.pilot):
+        if not args.phase_end_eval_only:
+            parser.error("formal JSEB requires phase-end-only evaluation")
         if args.ablation != "D" or not args.projection_geometry_enabled:
             parser.error("formal JSEB requires full ablation D with projection geometry")
         total = sum(
@@ -1423,6 +1431,17 @@ def formal_config(args: argparse.Namespace) -> dict[str, object]:
                 ]
             ),
             "evaluation_transitions_excluded": True,
+        },
+        "evaluation_protocol": {
+            "phase_end_eval_only": bool(args.phase_end_eval_only),
+            "periodic_navigation_evaluation_enabled": not bool(
+                args.phase_end_eval_only
+            ),
+            "legacy_eval_frequency_transitions": args.eval_freq_transitions,
+            "phase1_final_navigation_tasks": args.eval_navigation_tasks,
+            "phase2a_evaluation": "phase_end",
+            "phase2b_evaluation": "phase_end",
+            "phase2c_evaluation": "phase_end",
         },
         "environment": {
             "map_m": [4000.0, 4000.0, 400.0],

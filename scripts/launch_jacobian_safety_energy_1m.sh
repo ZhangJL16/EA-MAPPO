@@ -22,6 +22,7 @@ CMD=(
   --phase2a-transitions 100000
   --phase2b-transitions 300000
   --phase2c-transitions 100000
+  --phase-end-eval-only
   --device cuda
   --seed 0
   --ablation D

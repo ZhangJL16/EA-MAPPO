@@ -498,6 +498,11 @@ The exact training budget is
 Evaluation, GIF, calibration-test, and persistent-delivery evaluation
 transitions are recorded separately and never included in this sum.
 
+Formal navigation evaluation is phase-end-only. Intermediate 50k checkpoints
+are retained for recovery and diagnostics, but the 500-task navigation suite is
+not run during Phase 1. Phase 2A, Phase 2B, and Phase 2C likewise evaluate only
+after their respective training/collection stage ends.
+
 ## Ablations
 
 | ID | Navigation bridge | Energy context | Jacobian energy gradient |

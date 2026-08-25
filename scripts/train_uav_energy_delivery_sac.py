@@ -615,6 +615,9 @@ class NavigationBudgetCallback(BaseCallback):
         self.stable_convergence_transition: int | None = None
         self.final_evaluation: dict[str, object] | None = None
         self._gate_streak = 0
+        self.phase_end_eval_only = bool(
+            getattr(args, "phase_end_eval_only", False)
+        )
         self._next_eval = int(args.eval_freq_transitions)
         self._next_checkpoint = int(args.checkpoint_freq_transitions)
         self._next_gif = int(args.gif_freq_transitions)
@@ -651,6 +654,8 @@ class NavigationBudgetCallback(BaseCallback):
             self.model.save(checkpoint)
             self._next_checkpoint += self.args.checkpoint_freq_transitions
         if (
+            not self.phase_end_eval_only
+            and
             self.num_timesteps >= self._next_eval
             and self._next_eval < self.args.phase1_transition_budget
         ):
@@ -799,6 +804,8 @@ class NavigationBudgetCallback(BaseCallback):
             "first_convergence_transition": self.first_convergence_transition,
             "stable_convergence_transition": self.stable_convergence_transition,
             "final_evaluation": self.final_evaluation,
+            "phase_end_eval_only": self.phase_end_eval_only,
+            "periodic_navigation_evaluation_enabled": not self.phase_end_eval_only,
         }
 
 

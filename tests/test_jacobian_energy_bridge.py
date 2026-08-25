@@ -326,6 +326,18 @@ def test_formal_runner_has_exact_static_one_million_transition_contract(
     assert args.num_obstacles == 24
     assert (args.lidar_horizontal_sectors, args.lidar_vertical_sectors) == (128, 8)
     assert args.projection_geometry_enabled
+    assert args.phase_end_eval_only
+
+
+def test_formal_runner_rejects_periodic_navigation_evaluation(tmp_path: Path) -> None:
+    with pytest.raises(SystemExit):
+        parse_args(
+            [
+                "--output-dir",
+                str(tmp_path / "formal"),
+                "--no-phase-end-eval-only",
+            ]
+        )
 
 
 def test_smoke_energy_schedule_reaches_nonzero_bridge_weight(tmp_path: Path) -> None:
