@@ -35,6 +35,10 @@ from scripts.run_jacobian_safety_energy_1m import (
     split_by_mission_units,
     split_goal_trajectories,
 )
+from scripts.evaluate_jseb_checkpoints import (
+    checkpoint_transition,
+    discover_checkpoints,
+)
 from scripts.train_uav_energy_delivery_sac import HeuristicGoalPolicy
 
 
@@ -431,3 +435,13 @@ def test_formal_launcher_has_valid_shell_syntax() -> None:
         text=True,
     )
     assert result.returncode == 0, result.stderr
+
+
+def test_checkpoint_sweep_discovers_transition_order(tmp_path: Path) -> None:
+    root = tmp_path / "artifact" / "phase1_navigation"
+    root.mkdir(parents=True)
+    for transition in (150_000, 50_000, 100_000):
+        (root / f"checkpoint_transition_{transition:06d}.zip").touch()
+    discovered = discover_checkpoints(tmp_path / "artifact")
+    assert [transition for transition, _ in discovered] == [50_000, 100_000, 150_000]
+    assert checkpoint_transition(discovered[-1][1]) == 150_000
