@@ -165,6 +165,13 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--device", default="cuda")
     parser.add_argument("--num-envs", type=int, default=8)
+    parser.add_argument(
+        "--evaluation-num-envs",
+        type=int,
+        default=6,
+        help="parallel CPU environments with central batched GPU policy inference",
+    )
+    parser.add_argument("--evaluation-progress-interval-tasks", type=int, default=10)
     parser.add_argument("--phase1-transitions", type=int, default=FORMAL_PHASE1_TRANSITIONS)
     parser.add_argument("--phase2a-transitions", type=int, default=FORMAL_PHASE2A_TRANSITIONS)
     parser.add_argument("--phase2b-transitions", type=int, default=FORMAL_PHASE2B_TRANSITIONS)
@@ -279,6 +286,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     elif args.resume_phase1_checkpoint or args.source_phase1_transition is not None:
         parser.error("resume options require --intermediate-checkpoint-energy-ablation")
     if args.smoke:
+        args.evaluation_num_envs = 1
         args.phase1_transitions = 2_000
         args.phase2a_transitions = 500
         args.phase2b_transitions = 1_000
@@ -308,6 +316,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         args.log_freq_transitions = 400
         args.gif_freq_transitions = 2_000
     elif args.pilot:
+        args.evaluation_num_envs = 1
         args.phase1_transitions = 25_000
         args.phase2a_transitions = 5_000
         args.phase2b_transitions = 15_000
@@ -357,6 +366,10 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     ):
         if getattr(args, name) <= 0:
             parser.error(f"{name.replace('_', '-')} must be positive")
+    if args.evaluation_num_envs <= 0:
+        parser.error("evaluation-num-envs must be positive")
+    if args.evaluation_progress_interval_tasks <= 0:
+        parser.error("evaluation-progress-interval-tasks must be positive")
     if args.phase1_transitions % args.num_envs != 0 or args.phase2b_transitions % args.num_envs != 0:
         parser.error("Phase 1 and Phase 2B budgets must be divisible by num-envs")
     if not args.lidar_enabled or not args.hocbf_enabled or args.num_obstacles != 24:
@@ -1599,6 +1612,13 @@ def formal_config(args: argparse.Namespace) -> dict[str, object]:
             "phase2a_evaluation": "phase_end",
             "phase2b_evaluation": "phase_end",
             "phase2c_evaluation": "phase_end",
+            "parallel_environment_workers": args.evaluation_num_envs,
+            "policy_inference": (
+                "central_batched_gpu"
+                if args.evaluation_num_envs > 1
+                else "single_observation"
+            ),
+            "progress_interval_tasks": args.evaluation_progress_interval_tasks,
         },
         "environment": {
             "map_m": [4000.0, 4000.0, 400.0],

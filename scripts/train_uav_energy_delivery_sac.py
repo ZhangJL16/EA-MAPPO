@@ -7,6 +7,7 @@ import json
 import os
 import platform
 import subprocess
+import time
 from collections import deque
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -32,6 +33,7 @@ from envs.UAVEnergyDeliverySAC import (
     SACTrainingPhase,
     UAVEnergyDeliverySACEnv,
 )
+from experiments.uav_energy_parallel import ParallelUAVEnvPool, WorkerReset
 from review_bundle.envs.navigation.telemetry_cost import TelemetryCostConfig
 
 
@@ -169,42 +171,11 @@ def environment_from_args(
     battery_capacity: float | None = None,
 ) -> UAVEnergyDeliverySACEnv:
     environment = UAVEnergyDeliverySACEnv(
-        phase=phase,
-        render_mode=render_mode,
-        minimum_task_distance=args.minimum_task_distance,
-        xy_sampling_margin=args.xy_sampling_margin,
-        task_z_min=args.task_z_min,
-        task_z_max=args.task_z_max,
-        max_steps_per_task=args.phase1_episode_max_steps,
-        phase1_episode_max_policy_steps=args.phase1_episode_max_steps,
-        phase2_episode_limit=args.phase2_episode_max_steps,
-        operational_energy_capacity=None,
-        energy_reserve_fraction=args.energy_reserve_fraction,
-        telemetry_cost_config=telemetry_config_from_args(args),
-        render_vertical_exaggeration=args.render_vertical_exaggeration,
-        lidar_enabled=bool(getattr(args, "lidar_enabled", False)),
-        lidar_max_range=float(getattr(args, "lidar_range", 100.0)),
-        lidar_horizontal_sectors=int(getattr(args, "lidar_horizontal_sectors", 128)),
-        lidar_vertical_sectors=int(getattr(args, "lidar_vertical_sectors", 8)),
-        num_obstacles=int(getattr(args, "num_obstacles", 0)),
-        obstacle_radius_min=float(getattr(args, "obstacle_radius_min", 25.0)),
-        obstacle_radius_max=float(getattr(args, "obstacle_radius_max", 60.0)),
-        obstacle_sampling_margin=float(getattr(args, "obstacle_sampling_margin", 20.0)),
-        obstacle_collision_penalty=float(getattr(args, "obstacle_collision_penalty", 1.2)),
-        repeat_collision_scale=float(getattr(args, "repeat_collision_scale", 0.35)),
-        safety_intervention_penalty=float(
-            getattr(args, "safety_intervention_penalty", 0.05)
-        ),
-        cbf_enabled=bool(getattr(args, "hocbf_enabled", False)),
-        hocbf_k1=float(getattr(args, "hocbf_k1", 1.0)),
-        hocbf_k2=float(getattr(args, "hocbf_k2", 1.0)),
-        hocbf_uncertainty_margin=float(
-            getattr(args, "hocbf_uncertainty_margin", 1.0)
-        ),
-        hocbf_top_k=getattr(args, "hocbf_top_k", None),
-        projection_geometry_enabled=bool(
-            getattr(args, "projection_geometry_enabled", False)
-        ),
+        **environment_kwargs_from_args(
+            args,
+            phase=phase,
+            render_mode=render_mode,
+        )
     )
     if battery_capacity is not None:
         environment.configure_calibrated_battery(
@@ -213,6 +184,62 @@ def environment_from_args(
             source="phase1_frozen_policy_calibration",
         )
     return environment
+
+
+def environment_kwargs_from_args(
+    args: argparse.Namespace,
+    *,
+    phase: SACTrainingPhase,
+    render_mode: str | None = None,
+) -> dict[str, object]:
+    return {
+        "phase": phase,
+        "render_mode": render_mode,
+        "minimum_task_distance": args.minimum_task_distance,
+        "xy_sampling_margin": args.xy_sampling_margin,
+        "task_z_min": args.task_z_min,
+        "task_z_max": args.task_z_max,
+        "max_steps_per_task": args.phase1_episode_max_steps,
+        "phase1_episode_max_policy_steps": args.phase1_episode_max_steps,
+        "phase2_episode_limit": args.phase2_episode_max_steps,
+        "operational_energy_capacity": None,
+        "energy_reserve_fraction": args.energy_reserve_fraction,
+        "telemetry_cost_config": telemetry_config_from_args(args),
+        "render_vertical_exaggeration": args.render_vertical_exaggeration,
+        "lidar_enabled": bool(getattr(args, "lidar_enabled", False)),
+        "lidar_max_range": float(getattr(args, "lidar_range", 100.0)),
+        "lidar_horizontal_sectors": int(
+            getattr(args, "lidar_horizontal_sectors", 128)
+        ),
+        "lidar_vertical_sectors": int(
+            getattr(args, "lidar_vertical_sectors", 8)
+        ),
+        "num_obstacles": int(getattr(args, "num_obstacles", 0)),
+        "obstacle_radius_min": float(getattr(args, "obstacle_radius_min", 25.0)),
+        "obstacle_radius_max": float(getattr(args, "obstacle_radius_max", 60.0)),
+        "obstacle_sampling_margin": float(
+            getattr(args, "obstacle_sampling_margin", 20.0)
+        ),
+        "obstacle_collision_penalty": float(
+            getattr(args, "obstacle_collision_penalty", 1.2)
+        ),
+        "repeat_collision_scale": float(
+            getattr(args, "repeat_collision_scale", 0.35)
+        ),
+        "safety_intervention_penalty": float(
+            getattr(args, "safety_intervention_penalty", 0.05)
+        ),
+        "cbf_enabled": bool(getattr(args, "hocbf_enabled", False)),
+        "hocbf_k1": float(getattr(args, "hocbf_k1", 1.0)),
+        "hocbf_k2": float(getattr(args, "hocbf_k2", 1.0)),
+        "hocbf_uncertainty_margin": float(
+            getattr(args, "hocbf_uncertainty_margin", 1.0)
+        ),
+        "hocbf_top_k": getattr(args, "hocbf_top_k", None),
+        "projection_geometry_enabled": bool(
+            getattr(args, "projection_geometry_enabled", False)
+        ),
+    }
 
 
 def navigation_observation_dim(args: argparse.Namespace) -> int:
@@ -1053,6 +1080,8 @@ def run_battery_calibration(
     tasks: list[NavigationTask],
     output: Path,
 ) -> dict[str, object]:
+    if int(getattr(args, "evaluation_num_envs", 1)) > 1:
+        return run_parallel_battery_calibration(policy, args, tasks, output)
     if isinstance(policy, SAC) and any(parameter.requires_grad for parameter in policy.policy.parameters()):
         raise RuntimeError("battery calibration requires a frozen SAC policy")
     environment = environment_from_args(args, phase=SACTrainingPhase.NAVIGATION)
@@ -1109,6 +1138,37 @@ def run_battery_calibration(
                 )
                 break
     after_hash = _policy_parameter_hash(policy)
+    policy_dt = float(environment.policy_dt)
+    environment.close()
+    return _finalize_battery_calibration(
+        policy_dt=policy_dt,
+        policy_hash_before=before_hash,
+        policy_hash_after=after_hash,
+        task_records=task_records,
+        full_policy_step_energies=full_policy_step_energies,
+        calibration_transitions=calibration_transitions,
+        args=args,
+        output=output,
+        execution={
+            "parallel": False,
+            "num_workers": 1,
+            "policy_inference": "single_observation",
+        },
+    )
+
+
+def _finalize_battery_calibration(
+    *,
+    policy_dt: float,
+    policy_hash_before: str | None,
+    policy_hash_after: str | None,
+    task_records: list[dict[str, object]],
+    full_policy_step_energies: list[float],
+    calibration_transitions: int,
+    args: argparse.Namespace,
+    output: Path,
+    execution: dict[str, object],
+) -> dict[str, object]:
     successful = [row for row in task_records if row["success"]]
     failed = [row for row in task_records if not row["success"]]
     if not successful:
@@ -1181,16 +1241,17 @@ def run_battery_calibration(
         ),
         "target_nominal_endurance_minutes": args.target_nominal_endurance_minutes,
         **capacities,
-        "equivalent_nominal_steps_20min": int(round(20.0 * 60.0 / environment.policy_dt)),
-        "equivalent_nominal_steps_30min": int(round(30.0 * 60.0 / environment.policy_dt)),
-        "equivalent_nominal_steps_40min": int(round(40.0 * 60.0 / environment.policy_dt)),
+        "equivalent_nominal_steps_20min": int(round(20.0 * 60.0 / policy_dt)),
+        "equivalent_nominal_steps_30min": int(round(30.0 * 60.0 / policy_dt)),
+        "equivalent_nominal_steps_40min": int(round(40.0 * 60.0 / policy_dt)),
         "sac_deterministic": True,
         "sac_training": False,
         "td_training": False,
         "td_replay_writes": 0,
-        "policy_parameter_hash_before": before_hash,
-        "policy_parameter_hash_after": after_hash,
-        "policy_unchanged": before_hash == after_hash,
+        "policy_parameter_hash_before": policy_hash_before,
+        "policy_parameter_hash_after": policy_hash_after,
+        "policy_unchanged": policy_hash_before == policy_hash_after,
+        "execution": execution,
         "tasks": task_records,
     }
     write_json(output / "battery_calibration.json", summary)
@@ -1212,10 +1273,196 @@ def run_battery_calibration(
     print(f"Selected battery capacity: {capacities['calibrated_battery_capacity']:.6f}")
     print(
         "Equivalent nominal policy steps: "
-        f"{args.target_nominal_endurance_minutes * 60.0 / environment.policy_dt:.0f}"
+        f"{args.target_nominal_endurance_minutes * 60.0 / policy_dt:.0f}"
     )
-    environment.close()
     return summary
+
+
+def _batched_policy_actions(
+    policy: DeterministicPolicy,
+    observations: list[np.ndarray],
+) -> np.ndarray:
+    batch = np.stack(observations).astype(np.float32)
+    actions, _ = policy.predict(batch, deterministic=True)
+    result = np.asarray(actions, dtype=np.float32)
+    if result.shape != (len(observations), 3):
+        raise RuntimeError(
+            f"batched policy returned shape {result.shape}, expected ({len(observations)}, 3)"
+        )
+    return result
+
+
+def run_parallel_battery_calibration(
+    policy: DeterministicPolicy,
+    args: argparse.Namespace,
+    tasks: list[NavigationTask],
+    output: Path,
+) -> dict[str, object]:
+    if isinstance(policy, SAC) and any(
+        parameter.requires_grad for parameter in policy.policy.parameters()
+    ):
+        raise RuntimeError("battery calibration requires a frozen SAC policy")
+    worker_count = min(int(args.evaluation_num_envs), len(tasks))
+    if worker_count <= 1:
+        raise ValueError("parallel battery calibration requires at least two workers")
+    contract_environment = environment_from_args(
+        args,
+        phase=SACTrainingPhase.NAVIGATION,
+    )
+    policy_dt = float(contract_environment.policy_dt)
+    contract_environment.close()
+    before_hash = _policy_parameter_hash(policy)
+    task_records: list[dict[str, object]] = []
+    full_policy_step_energies: list[float] = []
+    calibration_transitions = 0
+    next_task_index = 0
+    active: dict[int, dict[str, object]] = {}
+    started = time.perf_counter()
+    progress_path = output / "battery_calibration_progress.jsonl"
+    last_progress_count = 0
+
+    def assign(pool: ParallelUAVEnvPool, worker_ids: list[int]) -> None:
+        nonlocal next_task_index
+        requests: list[WorkerReset] = []
+        assignments: dict[int, tuple[int, NavigationTask]] = {}
+        for worker_id in worker_ids:
+            if next_task_index >= len(tasks):
+                continue
+            task_index = next_task_index
+            task = tasks[task_index]
+            next_task_index += 1
+            assignments[worker_id] = (task_index, task)
+            requests.append(
+                WorkerReset(
+                    worker_id=worker_id,
+                    seed=args.battery_calibration_seed + task_index,
+                    options={
+                        "start_position": task.start_position,
+                        "start_velocity": task.initial_velocity,
+                        "task_point": task.goal_position,
+                    },
+                )
+            )
+        if not requests:
+            return
+        reset_results = pool.reset_many(requests)
+        for worker_id, result in reset_results.items():
+            task_index, task = assignments[worker_id]
+            active[worker_id] = {
+                "task_index": task_index,
+                "task": task,
+                "observation": result.observation,
+                "previous_position": result.position,
+                "total_energy": 0.0,
+                "total_time": 0.0,
+                "path_length": 0.0,
+                "physics_steps": 0,
+                "speed_sum": 0.0,
+                "speed_count": 0,
+                "max_speed": 0.0,
+            }
+
+    environment_kwargs = environment_kwargs_from_args(
+        args,
+        phase=SACTrainingPhase.NAVIGATION,
+    )
+    with ParallelUAVEnvPool(
+        environment_kwargs,
+        num_workers=worker_count,
+    ) as pool:
+        assign(pool, list(range(worker_count)))
+        while active:
+            worker_ids = sorted(active)
+            actions = _batched_policy_actions(
+                policy,
+                [np.asarray(active[index]["observation"]) for index in worker_ids],
+            )
+            results = pool.step_many(worker_ids, actions)
+            free_workers: list[int] = []
+            for worker_id in worker_ids:
+                state = active[worker_id]
+                result = results[worker_id]
+                info = result.info
+                calibration_transitions += 1
+                energy = float(info["realized_energy_cost"])
+                transition_dt = float(info["transition_dt"])
+                speed = float(np.linalg.norm(result.velocity))
+                state["total_energy"] = float(state["total_energy"]) + energy
+                state["total_time"] = float(state["total_time"]) + transition_dt
+                state["path_length"] = float(state["path_length"]) + float(
+                    np.linalg.norm(result.position - np.asarray(state["previous_position"]))
+                )
+                state["previous_position"] = result.position
+                state["physics_steps"] = int(state["physics_steps"]) + int(
+                    info["physics_substeps"]
+                )
+                state["speed_sum"] = float(state["speed_sum"]) + speed
+                state["speed_count"] = int(state["speed_count"]) + 1
+                state["max_speed"] = max(float(state["max_speed"]), speed)
+                state["observation"] = result.observation
+                if np.isclose(transition_dt, policy_dt):
+                    full_policy_step_energies.append(energy)
+                if result.terminated or result.truncated:
+                    task = state["task"]
+                    task_records.append(
+                        {
+                            **task.as_dict(),
+                            "task_index": int(state["task_index"]),
+                            "success": bool(info["is_success"]),
+                            "actual_path_length": float(state["path_length"]),
+                            "simulation_flight_time": float(state["total_time"]),
+                            "policy_steps": int(result.current_step),
+                            "physics_steps": int(state["physics_steps"]),
+                            "total_realized_energy": float(state["total_energy"]),
+                            "mean_realized_power": float(state["total_energy"])
+                            / max(float(state["total_time"]), 1e-12),
+                            "mean_speed": float(state["speed_sum"])
+                            / max(int(state["speed_count"]), 1),
+                            "max_speed": float(state["max_speed"]),
+                            "end_reason": info["end_reason"],
+                        }
+                    )
+                    del active[worker_id]
+                    free_workers.append(worker_id)
+            if free_workers:
+                assign(pool, free_workers)
+            if len(task_records) != last_progress_count and (
+                len(task_records) % args.evaluation_progress_interval_tasks == 0
+                or len(task_records) == len(tasks)
+            ):
+                append_jsonl(
+                    progress_path,
+                    {
+                        "completed_tasks": len(task_records),
+                        "total_tasks": len(tasks),
+                        "environment_transitions": calibration_transitions,
+                        "wall_clock_seconds": time.perf_counter() - started,
+                        "workers": worker_count,
+                        "gpu_policy_batch_size": worker_count,
+                    },
+                )
+                last_progress_count = len(task_records)
+
+    task_records.sort(key=lambda row: int(row["task_index"]))
+    after_hash = _policy_parameter_hash(policy)
+    return _finalize_battery_calibration(
+        policy_dt=policy_dt,
+        policy_hash_before=before_hash,
+        policy_hash_after=after_hash,
+        task_records=task_records,
+        full_policy_step_energies=full_policy_step_energies,
+        calibration_transitions=calibration_transitions,
+        args=args,
+        output=output,
+        execution={
+            "parallel": True,
+            "num_workers": worker_count,
+            "policy_inference": "central_batched_gpu" if isinstance(policy, SAC) else "central_batched",
+            "worker_omp_threads": 1,
+            "worker_mkl_threads": 1,
+            "wall_clock_seconds": time.perf_counter() - started,
+        },
+    )
 
 
 def run_battery_validation(
@@ -1225,6 +1472,13 @@ def run_battery_validation(
     battery_capacity: float,
     output: Path,
 ) -> dict[str, object]:
+    if int(getattr(args, "evaluation_num_envs", 1)) > 1:
+        return run_parallel_battery_validation(
+            policy,
+            args,
+            battery_capacity=battery_capacity,
+            output=output,
+        )
     records: list[dict[str, object]] = []
     validation_transitions = 0
     for run_index in range(args.battery_validation_runs):
@@ -1289,11 +1543,206 @@ def run_battery_validation(
         "relative_endurance_error": relative_error,
         "all_runs_depleted": all_depleted,
         "battery_calibration_valid": calibration_valid,
+        "execution": {
+            "parallel": False,
+            "num_workers": 1,
+            "policy_inference": "single_observation",
+        },
         "records": records,
     }
     write_json(output / "battery_validation.json", summary)
     figure, axis = plt.subplots(figsize=(7, 4))
     axis.hist(depletion_times / 60.0, bins=min(20, max(5, len(depletion_times))), color="#70ad47")
+    axis.axvline(args.target_nominal_endurance_minutes, color="black", linestyle="--")
+    axis.set_xlabel("Depletion time (simulation minutes)")
+    axis.set_ylabel("Runs")
+    figure.tight_layout()
+    figure.savefig(output / "battery_validation_depletion_time.png", dpi=160)
+    plt.close(figure)
+    print("\n=== BATTERY VALIDATION ===")
+    print(f"Target nominal endurance: {expected_seconds:.3f} s")
+    print(f"Observed mean depletion time: {observed_mean:.3f} s")
+    print(f"Observed median depletion time: {np.median(depletion_times):.3f} s")
+    print(
+        "Mean policy transitions to depletion: "
+        f"{summary['mean_policy_steps_to_depletion']:.2f}"
+    )
+    print(f"Mean tasks before depletion: {summary['mean_tasks_before_depletion']:.2f}")
+    print(f"Mean distance before depletion: {summary['mean_distance_before_depletion']:.2f} m")
+    print(f"Relative endurance error: {relative_error:.3%}")
+    print(f"Calibration sanity: {'PASS' if calibration_valid else 'FAIL'}")
+    return summary
+
+
+def run_parallel_battery_validation(
+    policy: DeterministicPolicy,
+    args: argparse.Namespace,
+    *,
+    battery_capacity: float,
+    output: Path,
+) -> dict[str, object]:
+    worker_count = min(
+        int(args.evaluation_num_envs),
+        int(args.battery_validation_runs),
+    )
+    if worker_count <= 1:
+        raise ValueError("parallel battery validation requires at least two workers")
+    records: list[dict[str, object]] = []
+    validation_transitions = 0
+    next_run_index = 0
+    active: dict[int, dict[str, object]] = {}
+    started = time.perf_counter()
+    progress_path = output / "battery_validation_progress.jsonl"
+    last_progress_count = 0
+
+    def assign(pool: ParallelUAVEnvPool, worker_ids: list[int]) -> None:
+        nonlocal next_run_index
+        requests: list[WorkerReset] = []
+        assignments: dict[int, int] = {}
+        for worker_id in worker_ids:
+            if next_run_index >= args.battery_validation_runs:
+                continue
+            run_index = next_run_index
+            next_run_index += 1
+            assignments[worker_id] = run_index
+            requests.append(
+                WorkerReset(
+                    worker_id=worker_id,
+                    seed=args.battery_validation_seed + run_index,
+                )
+            )
+        if not requests:
+            return
+        reset_results = pool.reset_many(requests)
+        for worker_id, result in reset_results.items():
+            active[worker_id] = {
+                "run_index": assignments[worker_id],
+                "observation": result.observation,
+                "previous_position": result.position,
+                "distance_flown": 0.0,
+            }
+
+    environment_kwargs = environment_kwargs_from_args(
+        args,
+        phase=SACTrainingPhase.NAVIGATION,
+    )
+    with ParallelUAVEnvPool(
+        environment_kwargs,
+        num_workers=worker_count,
+        battery_capacity=battery_capacity,
+        battery_validation=True,
+    ) as pool:
+        assign(pool, list(range(worker_count)))
+        while active:
+            worker_ids = sorted(active)
+            actions = _batched_policy_actions(
+                policy,
+                [np.asarray(active[index]["observation"]) for index in worker_ids],
+            )
+            results = pool.step_many(worker_ids, actions)
+            free_workers: list[int] = []
+            for worker_id in worker_ids:
+                state = active[worker_id]
+                result = results[worker_id]
+                validation_transitions += 1
+                state["distance_flown"] = float(state["distance_flown"]) + float(
+                    np.linalg.norm(result.position - np.asarray(state["previous_position"]))
+                )
+                state["previous_position"] = result.position
+                state["observation"] = result.observation
+                if result.terminated or result.truncated:
+                    info = result.info
+                    records.append(
+                        {
+                            "run_index": int(state["run_index"]),
+                            "actual_depletion_time": float(result.simulation_time),
+                            "actual_policy_steps_to_depletion": int(result.current_step),
+                            "tasks_before_depletion": int(result.tasks_completed),
+                            "distance_before_depletion": float(state["distance_flown"]),
+                            "energy_exhausted": bool(
+                                result.terminated
+                                and info["end_reason"] == "energy_exhausted"
+                            ),
+                            "truncated": bool(result.truncated),
+                            "end_reason": info["end_reason"],
+                        }
+                    )
+                    del active[worker_id]
+                    free_workers.append(worker_id)
+            if free_workers:
+                assign(pool, free_workers)
+            if len(records) != last_progress_count and (
+                len(records) % args.evaluation_progress_interval_tasks == 0
+                or len(records) == args.battery_validation_runs
+            ):
+                append_jsonl(
+                    progress_path,
+                    {
+                        "completed_runs": len(records),
+                        "total_runs": args.battery_validation_runs,
+                        "environment_transitions": validation_transitions,
+                        "wall_clock_seconds": time.perf_counter() - started,
+                        "workers": worker_count,
+                        "gpu_policy_batch_size": worker_count,
+                    },
+                )
+                last_progress_count = len(records)
+
+    records.sort(key=lambda row: int(row["run_index"]))
+    depletion_times = np.asarray(
+        [row["actual_depletion_time"] for row in records],
+        dtype=np.float64,
+    )
+    expected_seconds = args.target_nominal_endurance_minutes * 60.0
+    observed_mean = float(np.mean(depletion_times))
+    relative_error = (observed_mean - expected_seconds) / expected_seconds
+    all_depleted = all(row["energy_exhausted"] for row in records)
+    calibration_valid = bool(all_depleted and abs(relative_error) <= 0.20)
+    summary = {
+        "stage": "battery_endurance_validation",
+        "engineering_calibration_tolerance_fraction": 0.20,
+        "target_nominal_endurance_minutes": args.target_nominal_endurance_minutes,
+        "target_nominal_endurance_seconds": expected_seconds,
+        "battery_capacity": battery_capacity,
+        "battery_validation_runs": len(records),
+        "battery_validation_env_transitions": validation_transitions,
+        "mean_depletion_time": observed_mean,
+        "median_depletion_time": float(np.median(depletion_times)),
+        "std_depletion_time": float(np.std(depletion_times)),
+        "p10_depletion_time": float(np.quantile(depletion_times, 0.10)),
+        "p25_depletion_time": float(np.quantile(depletion_times, 0.25)),
+        "p50_depletion_time": float(np.quantile(depletion_times, 0.50)),
+        "p75_depletion_time": float(np.quantile(depletion_times, 0.75)),
+        "p90_depletion_time": float(np.quantile(depletion_times, 0.90)),
+        "mean_policy_steps_to_depletion": float(
+            np.mean([row["actual_policy_steps_to_depletion"] for row in records])
+        ),
+        "mean_tasks_before_depletion": float(
+            np.mean([row["tasks_before_depletion"] for row in records])
+        ),
+        "mean_distance_before_depletion": float(
+            np.mean([row["distance_before_depletion"] for row in records])
+        ),
+        "relative_endurance_error": relative_error,
+        "all_runs_depleted": all_depleted,
+        "battery_calibration_valid": calibration_valid,
+        "execution": {
+            "parallel": True,
+            "num_workers": worker_count,
+            "policy_inference": "central_batched_gpu" if isinstance(policy, SAC) else "central_batched",
+            "worker_omp_threads": 1,
+            "worker_mkl_threads": 1,
+            "wall_clock_seconds": time.perf_counter() - started,
+        },
+        "records": records,
+    }
+    write_json(output / "battery_validation.json", summary)
+    figure, axis = plt.subplots(figsize=(7, 4))
+    axis.hist(
+        depletion_times / 60.0,
+        bins=min(20, max(5, len(depletion_times))),
+        color="#70ad47",
+    )
     axis.axvline(args.target_nominal_endurance_minutes, color="black", linestyle="--")
     axis.set_xlabel("Depletion time (simulation minutes)")
     axis.set_ylabel("Runs")
@@ -2090,6 +2539,13 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--device", default="cuda")
     parser.add_argument("--num-envs", type=int, default=8)
+    parser.add_argument(
+        "--evaluation-num-envs",
+        type=int,
+        default=6,
+        help="parallel CPU environments with central batched GPU policy inference",
+    )
+    parser.add_argument("--evaluation-progress-interval-tasks", type=int, default=10)
     parser.add_argument("--phase1-transition-budget", type=int, default=FORMAL_PHASE1_TRANSITION_BUDGET)
     parser.add_argument("--phase1b-transition-budget", type=int, default=FORMAL_PHASE1B_TRANSITION_BUDGET)
     parser.add_argument("--phase2-transition-budget", type=int, default=FORMAL_PHASE2_TRANSITION_BUDGET)
@@ -2211,6 +2667,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     elif args.source_phase1_transition is not None:
         parser.error("--source-phase1-transition is only valid with --intermediate-checkpoint-energy-ablation")
     if args.smoke:
+        args.evaluation_num_envs = 1
         args.phase1_transition_budget = 8000
         args.phase1b_transition_budget = 2000
         args.phase2_transition_budget = 5000
@@ -2231,6 +2688,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         args.energy_batch_size = min(args.energy_batch_size, 64)
         args.target_nominal_endurance_minutes = min(args.target_nominal_endurance_minutes, 2.0)
     elif args.validation:
+        args.evaluation_num_envs = 1
         args.phase1_transition_budget = 50_000
         args.phase1b_transition_budget = 5000
         args.eval_freq_transitions = 25_000
@@ -2244,6 +2702,10 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         args.target_nominal_endurance_minutes = min(args.target_nominal_endurance_minutes, 2.0)
     if args.num_envs <= 0:
         parser.error("num-envs must be positive")
+    if args.evaluation_num_envs <= 0:
+        parser.error("evaluation-num-envs must be positive")
+    if args.evaluation_progress_interval_tasks <= 0:
+        parser.error("evaluation-progress-interval-tasks must be positive")
     if args.navigation_eval_max_steps is not None and args.navigation_eval_max_steps <= 0:
         parser.error("navigation-eval-max-steps must be positive when configured")
     if args.phase1_transition_budget % args.num_envs != 0:
@@ -2415,6 +2877,13 @@ def train(args: argparse.Namespace) -> dict[str, object]:
                 else "phase1_frozen_policy_realized_telemetry_power"
             ),
             "technical_policy_override": bool(args.smoke or args.validation),
+            "parallel_environment_workers": args.evaluation_num_envs,
+            "policy_inference": (
+                "central_batched_gpu"
+                if args.evaluation_num_envs > 1
+                else "single_observation"
+            ),
+            "progress_interval_tasks": args.evaluation_progress_interval_tasks,
         },
         "phase1b": {
             "transition_budget": args.phase1b_transition_budget,

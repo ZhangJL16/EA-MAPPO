@@ -471,6 +471,7 @@ def test_intermediate_jseb_parser_requires_exact_500k_downstream_budget() -> Non
     )
     assert args.source_phase1_transition == 100_000
     assert args.phase2a_transitions + args.phase2b_transitions + args.phase2c_transitions == 500_000
+    assert args.evaluation_num_envs == 6
 
 
 def test_intermediate_jseb_loads_100k_checkpoint_without_phase1_dataset(

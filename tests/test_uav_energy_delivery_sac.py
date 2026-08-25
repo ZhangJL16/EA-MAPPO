@@ -1258,6 +1258,55 @@ def test_battery_calibration_uses_realized_telemetry_and_does_not_write_td(tmp_p
     assert (output / "battery_calibration_power_distribution.png").exists()
 
 
+def test_parallel_battery_calibration_matches_serial_task_results(tmp_path: Path) -> None:
+    args = parse_args(["--output-dir", str(tmp_path / "unused"), "--smoke", "--device", "cpu"])
+    args.target_nominal_endurance_minutes = 0.1
+    args.minimum_task_distance = 5.0
+    args.evaluation_progress_interval_tasks = 1
+    starts = (
+        np.array([1000.0, 1000.0, 100.0], dtype=np.float32),
+        np.array([2000.0, 2000.0, 150.0], dtype=np.float32),
+    )
+    tasks = [
+        NavigationTask(
+            start,
+            start + np.array([20.0, 0.0, 0.0], dtype=np.float32),
+            np.zeros(3, dtype=np.float32),
+            20.0,
+            "100-500",
+        )
+        for start in starts
+    ]
+    serial_output = tmp_path / "serial"
+    parallel_output = tmp_path / "parallel"
+    serial_output.mkdir()
+    parallel_output.mkdir()
+    args.evaluation_num_envs = 1
+    serial = run_battery_calibration(
+        HeuristicGoalPolicy(),
+        args,
+        tasks,
+        serial_output,
+    )
+    args.evaluation_num_envs = 2
+    parallel = run_battery_calibration(
+        HeuristicGoalPolicy(),
+        args,
+        tasks,
+        parallel_output,
+    )
+    assert parallel["execution"]["parallel"] is True
+    assert parallel["execution"]["num_workers"] == 2
+    assert parallel["battery_calibration_env_transitions"] == serial[
+        "battery_calibration_env_transitions"
+    ]
+    assert parallel["total_realized_energy"] == pytest.approx(
+        serial["total_realized_energy"]
+    )
+    assert parallel["mean_power"] == pytest.approx(serial["mean_power"])
+    assert (parallel_output / "battery_calibration_progress.jsonl").exists()
+
+
 def test_calibration_audits_failed_rollouts_instead_of_dropping_them(tmp_path: Path) -> None:
     args = parse_args(["--output-dir", str(tmp_path / "unused"), "--smoke", "--device", "cpu"])
     args.minimum_task_distance = 5.0
@@ -1359,6 +1408,27 @@ def test_battery_validation_runs_to_depletion_and_writes_report(tmp_path: Path) 
     assert (output / "battery_validation_depletion_time.png").exists()
 
 
+def test_parallel_battery_validation_uses_batched_workers_and_progress(tmp_path: Path) -> None:
+    args = parse_args(["--output-dir", str(tmp_path / "unused"), "--smoke", "--device", "cpu"])
+    args.battery_validation_runs = 2
+    args.target_nominal_endurance_minutes = 0.01
+    args.evaluation_num_envs = 2
+    args.evaluation_progress_interval_tasks = 1
+    output = tmp_path / "validation_parallel"
+    output.mkdir()
+    summary = run_battery_validation(
+        HeuristicGoalPolicy(),
+        args,
+        battery_capacity=0.06,
+        output=output,
+    )
+    assert summary["execution"]["parallel"] is True
+    assert summary["execution"]["num_workers"] == 2
+    assert summary["battery_validation_runs"] == 2
+    assert summary["all_runs_depleted"] is True
+    assert (output / "battery_validation_progress.jsonl").exists()
+
+
 def test_capacity_relative_reserve_and_remaining_fraction() -> None:
     environment = UAVEnergyDeliverySACEnv()
     environment.configure_calibrated_battery(250.0, reserve_fraction=0.15)
@@ -1437,3 +1507,11 @@ def test_calibration_failure_requires_explicit_override_flag() -> None:
     override = parse_args(["--output-dir", "/tmp/x", "--allow-failed-battery-calibration"])
     assert default.allow_failed_battery_calibration is False
     assert override.allow_failed_battery_calibration is True
+
+
+def test_formal_parallel_evaluation_defaults_fit_dual_run_cpu_budget() -> None:
+    formal = parse_args(["--output-dir", "/tmp/formal-parallel-eval"])
+    smoke = parse_args(["--output-dir", "/tmp/smoke-parallel-eval", "--smoke"])
+    assert formal.evaluation_num_envs == 6
+    assert formal.evaluation_progress_interval_tasks == 10
+    assert smoke.evaluation_num_envs == 1
