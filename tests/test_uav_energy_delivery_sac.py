@@ -1029,6 +1029,69 @@ def test_evaluation_transitions_are_separate_from_training(tmp_path: Path) -> No
     assert summary["overall_success_rate"] == 1.0
 
 
+def test_parallel_navigation_evaluation_matches_serial_contract(tmp_path: Path) -> None:
+    tasks = [
+        NavigationTask(
+            np.asarray([1000.0, 1000.0, 100.0], dtype=np.float32),
+            np.asarray([1120.0, 1000.0, 100.0], dtype=np.float32),
+            np.zeros(3, dtype=np.float32),
+            120.0,
+            "100-500",
+        ),
+        NavigationTask(
+            np.asarray([1500.0, 1500.0, 200.0], dtype=np.float32),
+            np.asarray([1500.0, 1650.0, 200.0], dtype=np.float32),
+            np.zeros(3, dtype=np.float32),
+            150.0,
+            "100-500",
+        ),
+    ]
+    serial_args = parse_args(
+        ["--output-dir", str(tmp_path / "serial-run"), "--smoke", "--device", "cpu"]
+    )
+    serial_args.evaluation_num_envs = 1
+    serial_args.eval_task_seed = 701
+    parallel_args = parse_args(
+        ["--output-dir", str(tmp_path / "parallel-run"), "--smoke", "--device", "cpu"]
+    )
+    parallel_args.evaluation_num_envs = 2
+    parallel_args.eval_task_seed = 701
+    serial = evaluate_navigation_tasks(
+        HeuristicGoalPolicy(),
+        serial_args,
+        tasks,
+        global_env_transitions=8000,
+    )
+    output_path = tmp_path / "parallel.json"
+    parallel = evaluate_navigation_tasks(
+        HeuristicGoalPolicy(),
+        parallel_args,
+        tasks,
+        global_env_transitions=8000,
+        output_path=output_path,
+    )
+    for key in [
+        "global_env_transitions",
+        "evaluation_env_transitions",
+        "num_tasks",
+        "overall_success_rate",
+        "mean_steps_per_task",
+        "mean_path_ratio",
+        "boundary_contact_step_rate",
+        "obstacle_collision_steps",
+        "hocbf_intervention_steps",
+        "mean_reward",
+    ]:
+        assert parallel[key] == pytest.approx(serial[key])
+    assert parallel["distance_bucket_success"] == serial["distance_bucket_success"]
+    assert parallel["records"] == serial["records"]
+    assert serial["execution"]["parallel"] is False
+    assert parallel["execution"]["parallel"] is True
+    assert parallel["execution"]["num_workers"] == 2
+    assert output_path.is_file()
+    assert (tmp_path / "parallel_progress.jsonl").is_file()
+
+
 def test_navigation_boundary_episode_metrics() -> None:
     args = parse_args(["--output-dir", "/tmp/not-used", "--smoke", "--device", "cpu"])
     args.phase1_episode_max_steps = 3

@@ -366,6 +366,14 @@ def evaluate_navigation_tasks(
     global_env_transitions: int,
     output_path: Path | None = None,
 ) -> dict[str, object]:
+    if int(getattr(args, "evaluation_num_envs", 1)) > 1:
+        return evaluate_navigation_tasks_parallel(
+            policy,
+            args,
+            tasks,
+            global_env_transitions=global_env_transitions,
+            output_path=output_path,
+        )
     environment = environment_from_args(args, phase=SACTrainingPhase.NAVIGATION)
     navigation_eval_max_steps = getattr(args, "navigation_eval_max_steps", None)
     if navigation_eval_max_steps is not None:
@@ -480,6 +488,31 @@ def evaluate_navigation_tasks(
                     }
                 )
                 break
+    summary = _summarize_navigation_records(
+        records,
+        evaluation_transitions=evaluation_transitions,
+        global_env_transitions=global_env_transitions,
+        execution={
+            "parallel": False,
+            "num_workers": 1,
+            "policy_inference": "serial_deterministic",
+        },
+    )
+    if output_path is not None:
+        write_json(output_path, summary)
+    environment.close()
+    return summary
+
+
+def _summarize_navigation_records(
+    records: list[dict[str, object]],
+    *,
+    evaluation_transitions: int,
+    global_env_transitions: int,
+    execution: dict[str, object],
+) -> dict[str, object]:
+    if not records:
+        raise ValueError("navigation evaluation requires at least one completed task")
     bucket_success = {}
     for bucket_name, _, _ in DISTANCE_BUCKETS:
         subset = [row for row in records if row["distance_bucket"] == bucket_name]
@@ -578,11 +611,297 @@ def evaluate_navigation_tasks(
         "projection_rank_histogram": total_rank_counts,
         "mean_reward": float(np.mean([row["reward"] for row in records])),
         "records": records,
+        "execution": execution,
     }
+    return summary
+
+
+def evaluate_navigation_tasks_parallel(
+    policy: DeterministicPolicy,
+    args: argparse.Namespace,
+    tasks: list[NavigationTask],
+    *,
+    global_env_transitions: int,
+    output_path: Path | None = None,
+) -> dict[str, object]:
+    worker_count = min(int(args.evaluation_num_envs), len(tasks))
+    if worker_count <= 1:
+        raise ValueError("parallel navigation evaluation requires at least two workers")
+    environment_kwargs = environment_kwargs_from_args(
+        args,
+        phase=SACTrainingPhase.NAVIGATION,
+    )
+    navigation_eval_max_steps = getattr(args, "navigation_eval_max_steps", None)
+    if navigation_eval_max_steps is not None:
+        environment_kwargs["phase1_episode_max_policy_steps"] = int(
+            navigation_eval_max_steps
+        )
+    records: list[dict[str, object]] = []
+    evaluation_transitions = 0
+    next_task_index = 0
+    active: dict[int, dict[str, object]] = {}
+    started = time.perf_counter()
+    progress_interval = max(
+        1,
+        int(getattr(args, "evaluation_progress_interval_tasks", 25)),
+    )
+    progress_path = (
+        None
+        if output_path is None
+        else output_path.with_name(f"{output_path.stem}_progress.jsonl")
+    )
+    last_progress_count = 0
+
+    def assign(pool: ParallelUAVEnvPool, worker_ids: list[int]) -> None:
+        nonlocal next_task_index
+        requests: list[WorkerReset] = []
+        assignments: dict[int, tuple[int, NavigationTask]] = {}
+        for worker_id in worker_ids:
+            if next_task_index >= len(tasks):
+                continue
+            task_index = next_task_index
+            task = tasks[task_index]
+            next_task_index += 1
+            assignments[worker_id] = (task_index, task)
+            requests.append(
+                WorkerReset(
+                    worker_id=worker_id,
+                    seed=args.eval_task_seed + task_index,
+                    options={
+                        "start_position": task.start_position,
+                        "start_velocity": task.initial_velocity,
+                        "task_point": task.goal_position,
+                    },
+                )
+            )
+        if not requests:
+            return
+        reset_results = pool.reset_many(requests)
+        for worker_id, result in reset_results.items():
+            task_index, task = assignments[worker_id]
+            active[worker_id] = {
+                "task_index": task_index,
+                "task": task,
+                "observation": result.observation,
+                "reward": 0.0,
+                "boundary_contacts": 0,
+                "obstacle_collision_steps": 0,
+                "hocbf_intervention_steps": 0,
+                "hocbf_emergency_brake_steps": 0,
+                "projection_valid_steps": 0,
+                "nominal_safe_steps": 0,
+                "projection_active_set_switches": 0,
+                "projection_authorities": [],
+                "projection_normal_fractions": [],
+                "intervention_norms": [],
+                "projection_ranks": [],
+                "consecutive_boundary_contacts": 0,
+                "max_consecutive_boundary_contacts": 0,
+            }
+
+    with ParallelUAVEnvPool(
+        environment_kwargs,
+        num_workers=worker_count,
+    ) as pool:
+        assign(pool, list(range(worker_count)))
+        while active:
+            worker_ids = sorted(active)
+            actions = _batched_policy_actions(
+                policy,
+                [
+                    np.asarray(active[worker_id]["observation"])
+                    for worker_id in worker_ids
+                ],
+            )
+            results = pool.step_many(worker_ids, actions)
+            free_workers: list[int] = []
+            for worker_id in worker_ids:
+                state = active[worker_id]
+                result = results[worker_id]
+                info = result.info
+                evaluation_transitions += 1
+                state["observation"] = result.observation
+                state["reward"] = float(state["reward"]) + float(result.reward)
+                contact = bool(info["boundary_contact"])
+                state["boundary_contacts"] = int(state["boundary_contacts"]) + int(
+                    contact
+                )
+                consecutive = (
+                    int(state["consecutive_boundary_contacts"]) + 1
+                    if contact
+                    else 0
+                )
+                state["consecutive_boundary_contacts"] = consecutive
+                state["max_consecutive_boundary_contacts"] = max(
+                    int(state["max_consecutive_boundary_contacts"]),
+                    consecutive,
+                )
+                state["obstacle_collision_steps"] = int(
+                    state["obstacle_collision_steps"]
+                ) + int(bool(info["obstacle_collision"]))
+                state["hocbf_intervention_steps"] = int(
+                    state["hocbf_intervention_steps"]
+                ) + int(bool(info.get("hocbf_intervened", False)))
+                state["hocbf_emergency_brake_steps"] = int(
+                    state["hocbf_emergency_brake_steps"]
+                ) + int(bool(info.get("hocbf_emergency_brake", False)))
+                geometry = info.get("projection_geometry")
+                if isinstance(geometry, dict):
+                    valid_geometry = bool(
+                        geometry.get("valid", False)
+                        and geometry.get("active_set_stable", False)
+                        and geometry.get("coordinate_map_stable", False)
+                    )
+                    state["projection_valid_steps"] = int(
+                        state["projection_valid_steps"]
+                    ) + int(valid_geometry)
+                    state["nominal_safe_steps"] = int(
+                        state["nominal_safe_steps"]
+                    ) + int(bool(geometry.get("nominal_safe", False)))
+                    state["projection_active_set_switches"] = int(
+                        state["projection_active_set_switches"]
+                    ) + int(bool(info.get("active_set_changed", False)))
+                    state["projection_authorities"].append(
+                        float(geometry.get("action_authority", 0.0))
+                    )
+                    state["projection_normal_fractions"].append(
+                        float(geometry.get("normal_action_fraction", 0.0))
+                    )
+                    state["projection_ranks"].append(int(geometry.get("rank", 0)))
+                state["intervention_norms"].append(
+                    float(info.get("hocbf_intervention_norm", 0.0))
+                )
+                if not (result.terminated or result.truncated):
+                    continue
+                task = state["task"]
+                policy_steps = int(result.current_step)
+                projection_authorities = np.asarray(
+                    state["projection_authorities"],
+                    dtype=np.float64,
+                )
+                projection_normal_fractions = np.asarray(
+                    state["projection_normal_fractions"],
+                    dtype=np.float64,
+                )
+                intervention_norms = np.asarray(
+                    state["intervention_norms"],
+                    dtype=np.float64,
+                )
+                projection_ranks = np.asarray(
+                    state["projection_ranks"],
+                    dtype=np.int64,
+                )
+                actual_path = float(result.current_goal_path_length)
+                records.append(
+                    {
+                        "task_index": int(state["task_index"]),
+                        "distance_bucket": task.distance_bucket,
+                        "straight_line_distance": task.straight_line_distance,
+                        "success": bool(info["is_success"]),
+                        "policy_steps": policy_steps,
+                        "path_length": actual_path,
+                        "path_ratio": actual_path
+                        / max(task.straight_line_distance, 1e-8),
+                        "reward": float(state["reward"]),
+                        "boundary_contact_steps": int(state["boundary_contacts"]),
+                        "had_boundary_contact": bool(state["boundary_contacts"]),
+                        "max_consecutive_boundary_contacts": int(
+                            state["max_consecutive_boundary_contacts"]
+                        ),
+                        "obstacle_collision_steps": int(
+                            state["obstacle_collision_steps"]
+                        ),
+                        "had_obstacle_collision": bool(
+                            state["obstacle_collision_steps"]
+                        ),
+                        "hocbf_intervention_steps": int(
+                            state["hocbf_intervention_steps"]
+                        ),
+                        "hocbf_intervention_rate": float(
+                            int(state["hocbf_intervention_steps"])
+                            / max(policy_steps, 1)
+                        ),
+                        "hocbf_emergency_brake_steps": int(
+                            state["hocbf_emergency_brake_steps"]
+                        ),
+                        "projection_valid_steps": int(
+                            state["projection_valid_steps"]
+                        ),
+                        "nominal_safe_steps": int(state["nominal_safe_steps"]),
+                        "projection_active_set_switches": int(
+                            state["projection_active_set_switches"]
+                        ),
+                        "mean_projection_authority": float(
+                            np.mean(projection_authorities)
+                        ),
+                        "mean_normal_action_fraction": float(
+                            np.mean(projection_normal_fractions)
+                        ),
+                        "mean_intervention_norm": float(
+                            np.mean(intervention_norms)
+                        ),
+                        "p90_intervention_norm": float(
+                            np.quantile(intervention_norms, 0.9)
+                        ),
+                        "projection_rank_histogram": {
+                            str(rank): int(np.sum(projection_ranks == rank))
+                            for rank in range(4)
+                        },
+                        "end_reason": info["end_reason"],
+                    }
+                )
+                del active[worker_id]
+                free_workers.append(worker_id)
+            if free_workers:
+                assign(pool, free_workers)
+            if (
+                progress_path is not None
+                and len(records) != last_progress_count
+                and (
+                    len(records) % progress_interval == 0
+                    or len(records) == len(tasks)
+                )
+            ):
+                append_jsonl(
+                    progress_path,
+                    {
+                        "completed_tasks": len(records),
+                        "total_tasks": len(tasks),
+                        "environment_transitions": evaluation_transitions,
+                        "wall_clock_seconds": time.perf_counter() - started,
+                        "workers": worker_count,
+                        "policy_batch_size": len(active),
+                    },
+                )
+                last_progress_count = len(records)
+    records.sort(key=lambda row: int(row["task_index"]))
+    summary = _summarize_navigation_records(
+        records,
+        evaluation_transitions=evaluation_transitions,
+        global_env_transitions=global_env_transitions,
+        execution={
+            "parallel": True,
+            "num_workers": worker_count,
+            "policy_inference": _parallel_policy_inference_label(policy),
+            "worker_omp_threads": 1,
+            "worker_mkl_threads": 1,
+            "wall_clock_seconds": time.perf_counter() - started,
+        },
+    )
     if output_path is not None:
         write_json(output_path, summary)
-    environment.close()
     return summary
+
+
+def _parallel_policy_inference_label(policy: DeterministicPolicy) -> str:
+    if not isinstance(policy, SAC):
+        return "central_batched"
+    device = str(getattr(policy, "device", "cpu"))
+    return (
+        "central_batched_gpu"
+        if device.startswith("cuda")
+        else "central_batched_cpu"
+    )
 
 
 def navigation_energy_gate_passed(summary: dict[str, object]) -> bool:

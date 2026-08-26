@@ -287,6 +287,13 @@ not silently reused in this setting. Historical JSEB commands containing the old
 Phase2A/2B/2C budgets are migrated explicitly to their unified summed energy
 budget; all other unknown historical arguments remain errors.
 
+The formal 500-task navigation checkpoint Gate supports parallel environments
+through `--evaluation-num-envs` (default 6). Each worker keeps an independent
+environment and task seed while one central deterministic policy call batches the
+active observations. Evaluation interactions remain excluded from training
+transitions and replay, task records are restored to their original fixed-set
+order, and a progress JSONL is emitted every 25 completed tasks by default.
+
 The 2k runner smoke at
 `artifacts/quantile_td_checkpoint_smoke_200107` reached the exact budget, preserved
 the frozen policy hash, made 1,303 TD updates, retained 1,814 replay transitions,

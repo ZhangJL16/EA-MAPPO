@@ -22,7 +22,10 @@ from scripts.run_return_decision_stage_b import (
     parse_args,
     stage_b_completion_contract,
 )
-from scripts.evaluate_jseb_checkpoints import select_checkpoints
+from scripts.evaluate_jseb_checkpoints import (
+    parse_args as parse_checkpoint_evaluator_args,
+    select_checkpoints,
+)
 from scripts.calibrate_battery_for_navigation_checkpoint import (
     navigation_readiness_failures,
 )
@@ -156,6 +159,19 @@ def test_formal_defaults_provide_exact_minimum_gate_cycles() -> None:
         == 100
     )
     assert args.battery_capacity is None
+
+
+def test_checkpoint_evaluator_defaults_to_parallel_deterministic_workers() -> None:
+    args = parse_checkpoint_evaluator_args(["--artifact", "/tmp/artifact"])
+    assert args.evaluation_num_envs == 6
+    assert args.evaluation_progress_interval_tasks == 25
+
+
+def test_checkpoint_evaluator_rejects_nonpositive_worker_count() -> None:
+    with pytest.raises(SystemExit):
+        parse_checkpoint_evaluator_args(
+            ["--artifact", "/tmp/artifact", "--evaluation-num-envs", "0"]
+        )
 
 
 def test_formal_stage_b_rejects_clustered_cycles_as_independent_wilson_units(

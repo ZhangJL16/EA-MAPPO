@@ -195,7 +195,7 @@ def write_summary_csv(path: Path, rows: list[dict]) -> None:
             writer.writerow({field: row[field] for field in fields})
 
 
-def parse_args() -> argparse.Namespace:
+def parse_args(arguments: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Evaluate every JSEB Phase-1 checkpoint on one held-out task set"
     )
@@ -211,8 +211,29 @@ def parse_args() -> argparse.Namespace:
         help="evaluate only the named environment-transition checkpoints",
     )
     parser.add_argument("--torch-threads", type=int, default=1)
+    parser.add_argument(
+        "--evaluation-num-envs",
+        type=int,
+        default=6,
+        help=(
+            "parallel environment workers; policy inference remains central and "
+            "deterministic"
+        ),
+    )
+    parser.add_argument(
+        "--evaluation-progress-interval-tasks",
+        type=int,
+        default=25,
+    )
     parser.add_argument("--dry-run", action="store_true")
-    return parser.parse_args()
+    args = parser.parse_args(arguments)
+    if args.torch_threads <= 0:
+        parser.error("--torch-threads must be positive")
+    if args.evaluation_num_envs <= 0:
+        parser.error("--evaluation-num-envs must be positive")
+    if args.evaluation_progress_interval_tasks <= 0:
+        parser.error("--evaluation-progress-interval-tasks must be positive")
+    return args
 
 
 def main() -> int:
@@ -247,6 +268,10 @@ def main() -> int:
         device=cli.device,
         seed=cli.selection_seed,
     )
+    environment_args.evaluation_num_envs = int(cli.evaluation_num_envs)
+    environment_args.evaluation_progress_interval_tasks = int(
+        cli.evaluation_progress_interval_tasks
+    )
     tasks = generate_stratified_navigation_tasks(
         num_tasks=cli.num_tasks,
         seed=cli.selection_seed,
@@ -277,6 +302,15 @@ def main() -> int:
         "td_updates": False,
         "device": cli.device,
         "torch_threads": cli.torch_threads,
+        "evaluation_num_envs": cli.evaluation_num_envs,
+        "evaluation_execution": (
+            "parallel_environments_central_batched_deterministic_policy"
+            if cli.evaluation_num_envs > 1
+            else "serial_environment_deterministic_policy"
+        ),
+        "evaluation_progress_interval_tasks": (
+            cli.evaluation_progress_interval_tasks
+        ),
         "exact_command": sys.argv,
     }
     write_json(output / "RUNNING.json", protocol)
