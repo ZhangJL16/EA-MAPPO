@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import multiprocessing as mp
 import subprocess
 import sys
 from pathlib import Path
@@ -33,6 +34,10 @@ from review_bundle.safety.switching import (
     QuantileEnergyReturnManager,
 )
 from scripts.train_uav_energy_delivery_sac import HeuristicGoalPolicy
+
+
+_STAGE_B_WORKER_ARGS: argparse.Namespace | None = None
+_STAGE_B_WORKER_POLICY: FrozenPolicy | None = None
 
 
 class FrozenPolicy:
@@ -74,6 +79,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="passed Oracle headroom Gate inherited by post-Gate learned-method comparisons",
     )
     parser.add_argument("--cycles-per-point", type=int, default=20)
+    parser.add_argument(
+        "--evaluation-num-envs",
+        type=int,
+        default=1,
+        help="independent evaluation seeds executed concurrently",
+    )
     parser.add_argument("--minimum-cycles-for-gate", type=int, default=100)
     parser.add_argument("--oracle-stranding-ceiling", type=float, default=0.05)
     parser.add_argument(
@@ -146,6 +157,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         parser.error("--hocbf-enabled requires --lidar-enabled")
     if (
         args.cycles_per_point <= 0
+        or args.evaluation_num_envs <= 0
         or args.minimum_cycles_for_gate <= 0
         or args.p0_clone_rollouts < 2
         or args.decision_interval_policy_steps <= 0
@@ -422,6 +434,66 @@ def evaluate_method(
     return outcome, audit, cycle_records
 
 
+def _initialize_stage_b_worker(args: argparse.Namespace) -> None:
+    global _STAGE_B_WORKER_ARGS, _STAGE_B_WORKER_POLICY
+    _STAGE_B_WORKER_ARGS = args
+    probe = environment_from_args(args, reserve_fraction=0.0)
+    _STAGE_B_WORKER_POLICY = load_policy(args, probe)
+    probe.close()
+
+
+def _evaluate_stage_b_seed_job(
+    job: tuple[str, float, int],
+) -> tuple[dict[str, object], dict[str, object], list[dict[str, object]]]:
+    if _STAGE_B_WORKER_ARGS is None or _STAGE_B_WORKER_POLICY is None:
+        raise RuntimeError("Stage-B worker was not initialized")
+    method, parameter, evaluation_seed = job
+    outcome, audit, cycle_records = evaluate_method(
+        _STAGE_B_WORKER_ARGS,
+        _STAGE_B_WORKER_POLICY,
+        method=method,
+        parameter=parameter,
+        evaluation_seed=evaluation_seed,
+    )
+    return outcome.as_dict(), audit, cycle_records
+
+
+def evaluate_parameter_across_seeds(
+    args: argparse.Namespace,
+    policy: FrozenPolicy,
+    *,
+    method: str,
+    parameter: float,
+) -> list[tuple[ReturnDecisionOutcome, dict[str, object], list[dict[str, object]]]]:
+    if args.evaluation_num_envs == 1 or len(args.evaluation_seeds) == 1:
+        return [
+            evaluate_method(
+                args,
+                policy,
+                method=method,
+                parameter=parameter,
+                evaluation_seed=evaluation_seed,
+            )
+            for evaluation_seed in args.evaluation_seeds
+        ]
+    process_count = min(args.evaluation_num_envs, len(args.evaluation_seeds))
+    jobs = [
+        (method, float(parameter), int(evaluation_seed))
+        for evaluation_seed in args.evaluation_seeds
+    ]
+    context = mp.get_context("spawn")
+    with context.Pool(
+        processes=process_count,
+        initializer=_initialize_stage_b_worker,
+        initargs=(args,),
+    ) as pool:
+        raw_results = pool.map(_evaluate_stage_b_seed_job, jobs)
+    return [
+        (ReturnDecisionOutcome(**outcome), audit, cycle_records)
+        for outcome, audit, cycle_records in raw_results
+    ]
+
+
 def aggregate_seed_audits(
     *,
     method: str,
@@ -618,6 +690,8 @@ def write_results(
         ),
         "cycles_per_seed": int(args.cycles_per_point),
         "evaluation_seeds": list(args.evaluation_seeds),
+        "evaluation_num_envs": int(args.evaluation_num_envs),
+        "seed_parallelism_semantics": "independent_seed_processes_same_config_and_budget",
         "minimum_cycles_per_point": int(args.minimum_cycles_for_gate),
         "actual_cycles_per_point": {
             f"{method}|{parameter}": count
@@ -867,14 +941,13 @@ def main(argv: list[str] | None = None) -> None:
         all_cycle_records: list[dict[str, object]] = []
         for method, parameter in parameter_grid(args):
             point_seed_audits: list[dict[str, object]] = []
-            for evaluation_seed in args.evaluation_seeds:
-                _, seed_audit, cycle_records = evaluate_method(
-                    args,
-                    policy,
-                    method=method,
-                    parameter=parameter,
-                    evaluation_seed=evaluation_seed,
-                )
+            point_results = evaluate_parameter_across_seeds(
+                args,
+                policy,
+                method=method,
+                parameter=parameter,
+            )
+            for _, seed_audit, cycle_records in point_results:
                 point_seed_audits.append(seed_audit)
                 all_seed_audits.append(seed_audit)
                 all_cycle_records.extend(cycle_records)

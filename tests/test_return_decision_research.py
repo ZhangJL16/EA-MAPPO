@@ -15,7 +15,10 @@ from experiments.energy_mc.return_decision import (
 from scripts.run_return_decision_stage_b import (
     aggregate_seed_audits,
     derive_successful_energy_per_meter,
+    environment_from_args,
+    evaluate_parameter_across_seeds,
     load_passed_oracle_headroom_gate,
+    load_policy,
     parse_args,
 )
 from scripts.evaluate_jseb_checkpoints import select_checkpoints
@@ -193,6 +196,35 @@ def test_post_gate_comparison_rejects_nonpassing_gate(tmp_path) -> None:
     )
     with pytest.raises(RuntimeError, match="requires an evaluable PASS"):
         load_passed_oracle_headroom_gate(failed_path)
+
+
+def test_stage_b_parallel_seed_evaluation_preserves_exact_cycle_accounting(tmp_path) -> None:
+    args = parse_args(
+        [
+            "--output-dir",
+            str(tmp_path / "parallel_stage_b"),
+            "--smoke",
+            "--evaluation-num-envs",
+            "2",
+        ]
+    )
+    args.evaluation_seeds = [301, 302]
+    args.cycles_per_point = 1
+    args.minimum_cycles_for_gate = 2
+    probe = environment_from_args(args, reserve_fraction=0.0)
+    policy = load_policy(args, probe)
+    probe.close()
+    results = evaluate_parameter_across_seeds(
+        args,
+        policy,
+        method="soc",
+        parameter=0.20,
+    )
+    assert len(results) == 2
+    audits = [audit for _, audit, _ in results]
+    assert [audit["evaluation_seed"] for audit in audits] == [301, 302]
+    assert sum(audit["attempted_cycles"] for audit in audits) == 2
+    assert all(audit["attempted_cycles"] == 1 for audit in audits)
 
 
 def valid_gate_b_prerequisites() -> tuple[dict, dict, dict]:

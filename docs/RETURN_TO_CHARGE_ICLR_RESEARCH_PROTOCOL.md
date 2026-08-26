@@ -185,6 +185,13 @@ failure fraction. In particular, zero failures in two smoke cycles has an upper
 bound of approximately 0.658 and is correctly recorded as
 `PENDING_INSUFFICIENT_CYCLES`, not as evidence of safety.
 
+Formal seed rollouts can be executed concurrently with `--evaluation-num-envs`.
+Parallelism is only across independent paired seeds; each worker reconstructs the
+same frozen checkpoint, environment contract, method parameter, and cycle budget.
+Aggregation remains cycle exact. The queued five-seed Gate uses five workers, so
+parallel execution changes wall-clock cost but not the preregistered 100-cycle
+evidence unit.
+
 The deterministic Oracle caches the first exact task rollout and reuses suffix
 energy when the live state follows that trace. It still recomputes `RETURN NOW` at
 every decision. The latest smoke recorded 109 exact suffix hits and 33 misses;
