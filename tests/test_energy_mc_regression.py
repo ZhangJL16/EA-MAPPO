@@ -287,6 +287,73 @@ def test_model_rollout_oracle_supplies_direct_joint_mission_cost() -> None:
     environment.close()
 
 
+def test_model_rollout_oracle_reuses_exact_task_suffix_without_changing_result() -> None:
+    environment = UAVEnergyDeliverySACEnv(
+        phase=SACTrainingPhase.TD_PRETRAINING,
+        mission_decision_interval_policy_steps=10,
+        charger_position=np.asarray([400.0, 400.0, 200.0], dtype=np.float32),
+    )
+    observation, _ = environment.reset(
+        seed=23,
+        options={
+            "start_position": np.asarray([500.0, 500.0, 200.0], dtype=np.float32),
+            "start_velocity": np.zeros(3, dtype=np.float32),
+            "task_point": np.asarray([650.0, 500.0, 200.0], dtype=np.float32),
+        },
+    )
+    policy = HeuristicGoalPolicy()
+    cached_oracle = ModelBasedEnergyRolloutEstimator(policy, max_policy_steps=500)
+    cached_oracle.estimate_mission_bundle(environment, environment.current_task_point)
+    first_diagnostics = cached_oracle.cache_diagnostics()
+    action, _ = policy.predict(observation, deterministic=True)
+    environment.step(action)
+    cached_bundle = cached_oracle.estimate_mission_bundle(
+        environment,
+        environment.current_task_point,
+    )
+    fresh_oracle = ModelBasedEnergyRolloutEstimator(
+        policy,
+        max_policy_steps=500,
+        cache_mission_suffixes=False,
+    )
+    fresh_bundle = fresh_oracle.estimate_mission_bundle(
+        environment,
+        environment.current_task_point,
+    )
+    for cached_prediction, fresh_prediction in zip(cached_bundle, fresh_bundle):
+        assert cached_prediction.prediction == pytest.approx(
+            fresh_prediction.prediction,
+            abs=1e-8,
+        )
+        assert cached_prediction.upper95 == pytest.approx(
+            fresh_prediction.upper95,
+            abs=1e-8,
+        )
+    diagnostics = cached_oracle.cache_diagnostics()
+    assert first_diagnostics["mission_cache_misses"] == 1
+    assert diagnostics["mission_cache_hits"] == 1
+    assert diagnostics["mission_cache_misses"] == 1
+    assert diagnostics["rollout_request_count"] == 4
+    assert fresh_oracle.cache_diagnostics()["rollout_request_count"] == 3
+    environment.close()
+
+
+def test_model_rollout_oracle_disables_suffix_cache_for_per_step_decisions() -> None:
+    environment = UAVEnergyDeliverySACEnv(
+        phase=SACTrainingPhase.TD_PRETRAINING,
+        mission_decision_interval_policy_steps=1,
+    )
+    environment.reset(seed=29)
+    oracle = ModelBasedEnergyRolloutEstimator(HeuristicGoalPolicy(), max_policy_steps=1000)
+    oracle.estimate_mission_bundle(environment, environment.current_task_point)
+    oracle.estimate_mission_bundle(environment, environment.current_task_point)
+    diagnostics = oracle.cache_diagnostics()
+    assert diagnostics["mission_cache_hits"] == 0
+    assert diagnostics["mission_cache_misses"] == 2
+    assert diagnostics["rollout_request_count"] == 6
+    environment.close()
+
+
 class UpperOnlyEstimator:
     estimator_type = "upper_only_test"
     update_count = 0

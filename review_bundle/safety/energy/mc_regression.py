@@ -670,6 +670,22 @@ class DistanceEnergyEstimator:
         return np.maximum(0.0, values[:, -1]) * self.d_max * self.energy_per_meter
 
 
+@dataclass(frozen=True)
+class _DeterministicRolloutTrace:
+    prediction: GoalEnergyPrediction
+    positions: np.ndarray
+    velocities: np.ndarray
+    suffix_energies: np.ndarray
+
+
+@dataclass(frozen=True)
+class _MissionRolloutCache:
+    signature: tuple[object, ...]
+    start_task_step: int
+    task_trace: _DeterministicRolloutTrace
+    return_after: GoalEnergyPrediction
+
+
 class ModelBasedEnergyRolloutEstimator:
     estimator_type = "model_based_energy_rollout_oracle"
     bootstrapping = False
@@ -681,14 +697,21 @@ class ModelBasedEnergyRolloutEstimator:
         policy: DeterministicGoalPolicy,
         *,
         max_policy_steps: int = 4000,
+        cache_mission_suffixes: bool = True,
     ) -> None:
         if max_policy_steps <= 0:
             raise ValueError("max_policy_steps must be positive")
         self.policy = policy
         self.max_policy_steps = int(max_policy_steps)
+        self.cache_mission_suffixes = bool(cache_mission_suffixes)
         self.update_count = 0
         self.replay: tuple[()] = ()
         self.last_loss = None
+        self.rollout_request_count = 0
+        self.full_rollout_count = 0
+        self.mission_cache_hits = 0
+        self.mission_cache_misses = 0
+        self._mission_cache: _MissionRolloutCache | None = None
 
     def estimate_context(
         self,
@@ -725,18 +748,33 @@ class ModelBasedEnergyRolloutEstimator:
         GoalEnergyPrediction,
         GoalEnergyPrediction,
     ]:
-        task, endpoint_position, _ = self._rollout_context(
-            environment,
-            task_goal,
-            position=environment.agent.pos,
-            velocity=environment.agent.vel,
-        )
-        return_after, _, _ = self._rollout_context(
-            environment,
-            environment.charger_position,
-            position=endpoint_position,
-            velocity=np.zeros(3, dtype=np.float32),
-        )
+        cached = self._cached_task_and_return(environment, task_goal)
+        if cached is None:
+            self.mission_cache_misses += 1
+            task_trace = self._rollout_trace(
+                environment,
+                task_goal,
+                position=environment.agent.pos,
+                velocity=environment.agent.vel,
+            )
+            task = task_trace.prediction
+            endpoint_position = task_trace.positions[-1]
+            return_after, _, _ = self._rollout_context(
+                environment,
+                environment.charger_position,
+                position=endpoint_position,
+                velocity=np.zeros(3, dtype=np.float32),
+            )
+            if self._mission_cache_allowed(environment):
+                self._mission_cache = _MissionRolloutCache(
+                    self._mission_signature(environment, task_goal),
+                    int(environment.steps_in_current_task),
+                    task_trace,
+                    return_after,
+                )
+        else:
+            self.mission_cache_hits += 1
+            task, return_after = cached
         return_now, _, _ = self._rollout_context(
             environment,
             environment.charger_position,
@@ -752,6 +790,75 @@ class ModelBasedEnergyRolloutEstimator:
         )
         return task, return_after, return_now, mission
 
+    def cache_diagnostics(self) -> dict[str, int | bool]:
+        return {
+            "cache_mission_suffixes": self.cache_mission_suffixes,
+            "rollout_request_count": self.rollout_request_count,
+            "full_rollout_count": self.full_rollout_count,
+            "mission_cache_hits": self.mission_cache_hits,
+            "mission_cache_misses": self.mission_cache_misses,
+        }
+
+    def _cached_task_and_return(
+        self,
+        environment,
+        task_goal: np.ndarray,
+    ) -> tuple[GoalEnergyPrediction, GoalEnergyPrediction] | None:
+        cache = self._mission_cache
+        if cache is None or not self._mission_cache_allowed(environment):
+            return None
+        if cache.signature != self._mission_signature(environment, task_goal):
+            return None
+        trace_index = int(environment.steps_in_current_task) - cache.start_task_step
+        if not 0 <= trace_index < cache.task_trace.positions.shape[0]:
+            return None
+        if not np.allclose(
+            environment.agent.pos,
+            cache.task_trace.positions[trace_index],
+            rtol=0.0,
+            atol=1e-4,
+        ) or not np.allclose(
+            environment.agent.vel,
+            cache.task_trace.velocities[trace_index],
+            rtol=0.0,
+            atol=1e-4,
+        ):
+            return None
+        remaining_energy = float(cache.task_trace.suffix_energies[trace_index])
+        remaining_steps = int(
+            cache.task_trace.positions.shape[0] - 1 - trace_index
+        )
+        task = GoalEnergyPrediction(
+            remaining_energy,
+            remaining_energy,
+            remaining_steps,
+            0.0,
+        )
+        return task, cache.return_after
+
+    def _mission_cache_allowed(self, environment) -> bool:
+        return bool(
+            self.cache_mission_suffixes
+            and int(environment.mission_decision_interval_policy_steps) > 1
+        )
+
+    @staticmethod
+    def _mission_signature(environment, task_goal: np.ndarray) -> tuple[object, ...]:
+        obstacle_signature = tuple(
+            (
+                float(obstacle.pos[0]),
+                float(obstacle.pos[1]),
+                float(obstacle.radius),
+            )
+            for obstacle in environment.obstacles
+        )
+        return (
+            id(environment),
+            np.asarray(task_goal, dtype=np.float32).tobytes(),
+            np.asarray(environment.charger_position, dtype=np.float32).tobytes(),
+            obstacle_signature,
+        )
+
     def _rollout_context(
         self,
         environment,
@@ -760,6 +867,23 @@ class ModelBasedEnergyRolloutEstimator:
         position: np.ndarray | None = None,
         velocity: np.ndarray | None = None,
     ) -> tuple[GoalEnergyPrediction, np.ndarray, np.ndarray]:
+        trace = self._rollout_trace(
+            environment,
+            goal,
+            position=position,
+            velocity=velocity,
+        )
+        return trace.prediction, trace.positions[-1].copy(), trace.velocities[-1].copy()
+
+    def _rollout_trace(
+        self,
+        environment,
+        goal: np.ndarray,
+        *,
+        position: np.ndarray | None = None,
+        velocity: np.ndarray | None = None,
+    ) -> _DeterministicRolloutTrace:
+        self.rollout_request_count += 1
         start_position = environment.agent.pos.copy() if position is None else np.asarray(position, dtype=np.float32)
         start_velocity = environment.agent.vel.copy() if velocity is None else np.asarray(velocity, dtype=np.float32)
         horizontal_speed = float(np.linalg.norm(start_velocity[:2]))
@@ -773,11 +897,13 @@ class ModelBasedEnergyRolloutEstimator:
             environment.vertical_v_max,
         )
         if float(np.linalg.norm(np.asarray(goal, dtype=np.float32) - start_position)) <= environment.goal_tolerance:
-            return (
+            return _DeterministicRolloutTrace(
                 GoalEnergyPrediction(0.0, 0.0, 0, 0.0),
-                start_position.copy(),
-                start_velocity.copy(),
+                start_position[None, :].copy(),
+                start_velocity[None, :].copy(),
+                np.zeros(1, dtype=np.float64),
             )
+        self.full_rollout_count += 1
         clone = self._make_rollout_environment(
             environment,
             start_position=start_position,
@@ -788,23 +914,33 @@ class ModelBasedEnergyRolloutEstimator:
         total_energy = 0.0
         started = time.perf_counter()
         steps = 0
+        positions = [clone.agent.pos.copy()]
+        velocities = [clone.agent.vel.copy()]
+        step_energies: list[float] = []
         while steps < self.max_policy_steps:
             action, _ = self.policy.predict(observation, deterministic=True)
             observation, _, terminated, truncated, info = clone.step(action)
-            total_energy += float(info["realized_energy_cost"])
+            step_energy = float(info["realized_energy_cost"])
+            total_energy += step_energy
+            step_energies.append(step_energy)
+            positions.append(clone.agent.pos.copy())
+            velocities.append(clone.agent.vel.copy())
             steps += 1
             if terminated or truncated:
                 if not bool(info["is_success"]):
                     clone.close()
                     raise RuntimeError(f"model-based energy rollout failed: {info['end_reason']}")
                 elapsed = time.perf_counter() - started
-                final_position = clone.agent.pos.copy()
-                final_velocity = clone.agent.vel.copy()
                 clone.close()
-                return (
+                suffix_energies = np.zeros(steps + 1, dtype=np.float64)
+                suffix_energies[:-1] = np.cumsum(
+                    np.asarray(step_energies, dtype=np.float64)[::-1]
+                )[::-1]
+                return _DeterministicRolloutTrace(
                     GoalEnergyPrediction(total_energy, total_energy, steps, elapsed),
-                    final_position,
-                    final_velocity,
+                    np.asarray(positions, dtype=np.float32),
+                    np.asarray(velocities, dtype=np.float32),
+                    suffix_energies,
                 )
         clone.close()
         raise RuntimeError("model-based energy rollout exceeded max_policy_steps")

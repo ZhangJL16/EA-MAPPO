@@ -401,6 +401,10 @@ def evaluate_method(
         "hocbf_interventions": int(environment.safety_interventions),
         "obstacle_collision_count": int(environment.obstacle_collision_count),
     }
+    if hasattr(environment.energy_estimator, "cache_diagnostics"):
+        audit["oracle_cache_diagnostics"] = (
+            environment.energy_estimator.cache_diagnostics()
+        )
     environment.close()
     return outcome, audit, cycle_records
 
@@ -461,6 +465,34 @@ def aggregate_seed_audits(
             int(item["obstacle_collision_count"]) for item in seed_audits
         ),
     }
+    oracle_diagnostics = [
+        item["oracle_cache_diagnostics"]
+        for item in seed_audits
+        if "oracle_cache_diagnostics" in item
+    ]
+    if oracle_diagnostics:
+        aggregate["oracle_cache_diagnostics"] = {
+            "cache_mission_suffixes": all(
+                bool(item["cache_mission_suffixes"])
+                for item in oracle_diagnostics
+            ),
+            "rollout_request_count": sum(
+                int(item["rollout_request_count"])
+                for item in oracle_diagnostics
+            ),
+            "full_rollout_count": sum(
+                int(item["full_rollout_count"])
+                for item in oracle_diagnostics
+            ),
+            "mission_cache_hits": sum(
+                int(item["mission_cache_hits"])
+                for item in oracle_diagnostics
+            ),
+            "mission_cache_misses": sum(
+                int(item["mission_cache_misses"])
+                for item in oracle_diagnostics
+            ),
+        }
     return outcome, aggregate
 
 
