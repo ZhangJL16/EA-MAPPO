@@ -393,6 +393,7 @@ def test_custom_sac_executes_nonzero_energy_bridge_gradient(tmp_path: Path) -> N
     model.learn(total_timesteps=12, callback=callback, progress_bar=False)
     metrics = model.bridge_training_metrics()
     assert metrics["bridge_gradient_steps"] > 0
+    assert metrics["bridge_audit_steps"] > 0
     assert metrics["energy_nonzero_steps"] > 0
     assert metrics["mean_energy_loss"] > 0.0
     assert metrics["mean_pretrust_valid_fraction"] >= metrics["mean_posttrust_valid_fraction"]

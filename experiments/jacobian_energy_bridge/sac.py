@@ -49,6 +49,7 @@ class JacobianBridgeSAC(SAC):
         self._bridge_training_totals = {
             "actor_gradient_steps": 0,
             "bridge_gradient_steps": 0,
+            "bridge_audit_steps": 0,
             "shield_loss_sum": 0.0,
             "shield_nonzero_steps": 0,
             "energy_loss_sum": 0.0,
@@ -112,6 +113,7 @@ class JacobianBridgeSAC(SAC):
 
     def _ensure_bridge_counter_schema(self) -> None:
         for key in (
+            "bridge_audit_steps",
             "pretrust_valid_fraction_sum",
             "action_delta_p50_sum",
             "action_delta_p90_sum",
@@ -135,11 +137,13 @@ class JacobianBridgeSAC(SAC):
         totals: dict[str, float | int],
     ) -> dict[str, float | int]:
         bridge_steps = int(totals["bridge_gradient_steps"])
+        audit_steps = int(totals.get("bridge_audit_steps", 0))
         actor_steps = int(totals["actor_gradient_steps"])
-        mean = lambda key: float(totals.get(key, 0.0)) / max(bridge_steps, 1)
+        mean_audit = lambda key: float(totals.get(key, 0.0)) / max(audit_steps, 1)
         return {
             "actor_gradient_steps": actor_steps,
             "bridge_gradient_steps": bridge_steps,
+            "bridge_audit_steps": audit_steps,
             "bridge_gradient_step_fraction": bridge_steps / max(actor_steps, 1),
             "mean_shield_loss": float(totals["shield_loss_sum"]) / max(bridge_steps, 1),
             "shield_nonzero_steps": int(totals["shield_nonzero_steps"]),
@@ -152,17 +156,17 @@ class JacobianBridgeSAC(SAC):
                 bridge_steps,
                 1,
             ),
-            "mean_pretrust_valid_fraction": mean("pretrust_valid_fraction_sum"),
+            "mean_pretrust_valid_fraction": mean_audit("pretrust_valid_fraction_sum"),
             "mean_posttrust_valid_fraction": float(totals["valid_fraction_sum"]) / max(
                 bridge_steps,
                 1,
             ),
-            "mean_action_delta_p50": mean("action_delta_p50_sum"),
-            "mean_action_delta_p90": mean("action_delta_p90_sum"),
-            "mean_action_delta_p95": mean("action_delta_p95_sum"),
-            "mean_sample_age_p50": mean("sample_age_p50_sum"),
-            "mean_sample_age_p90": mean("sample_age_p90_sum"),
-            "mean_sample_age_p95": mean("sample_age_p95_sum"),
+            "mean_action_delta_p50": mean_audit("action_delta_p50_sum"),
+            "mean_action_delta_p90": mean_audit("action_delta_p90_sum"),
+            "mean_action_delta_p95": mean_audit("action_delta_p95_sum"),
+            "mean_sample_age_p50": mean_audit("sample_age_p50_sum"),
+            "mean_sample_age_p90": mean_audit("sample_age_p90_sum"),
+            "mean_sample_age_p95": mean_audit("sample_age_p95_sum"),
             "mean_energy_weight_when_bridge_ready": float(
                 totals["energy_weight_sum"]
             ) / max(bridge_steps, 1),
@@ -262,10 +266,6 @@ class JacobianBridgeSAC(SAC):
                 assert self.bridge_replay is not None
                 bridge = self.bridge_replay.sample(self.bridge_batch_size, self.device)
                 bridge_actions = self.actor(bridge.observations, deterministic=True)
-                action_deltas = th.linalg.vector_norm(
-                    bridge_actions - bridge.nominal_actions,
-                    dim=1,
-                )
                 shield_loss, projected_actions, valid_mask = shield_consistency_loss(
                     bridge_actions,
                     bridge.nominal_actions,
@@ -276,28 +276,33 @@ class JacobianBridgeSAC(SAC):
                 )
                 actor_loss = actor_loss + self.shield_loss_weight * shield_loss
                 shield_losses.append(float(shield_loss.detach().cpu()))
-                bridge_pretrust_valid_fractions.append(
-                    float(bridge.valid_masks.float().mean().detach().cpu())
-                )
                 bridge_valid_fractions.append(float(valid_mask.float().mean().detach().cpu()))
-                quantile_levels = th.as_tensor(
-                    [0.50, 0.90, 0.95],
-                    dtype=action_deltas.dtype,
-                    device=action_deltas.device,
-                )
-                action_delta_quantiles = (
-                    th.quantile(action_deltas, quantile_levels).detach().cpu().tolist()
-                )
-                bridge_action_delta_p50.append(float(action_delta_quantiles[0]))
-                bridge_action_delta_p90.append(float(action_delta_quantiles[1]))
-                bridge_action_delta_p95.append(float(action_delta_quantiles[2]))
-                sample_ages = bridge.sample_ages.to(dtype=th.float32)
-                sample_age_quantiles = (
-                    th.quantile(sample_ages, quantile_levels).detach().cpu().tolist()
-                )
-                bridge_sample_age_p50.append(float(sample_age_quantiles[0]))
-                bridge_sample_age_p90.append(float(sample_age_quantiles[1]))
-                bridge_sample_age_p95.append(float(sample_age_quantiles[2]))
+                if gradient_step == 0:
+                    action_deltas = th.linalg.vector_norm(
+                        bridge_actions.detach() - bridge.nominal_actions,
+                        dim=1,
+                    )
+                    bridge_pretrust_valid_fractions.append(
+                        float(bridge.valid_masks.float().mean().detach().cpu())
+                    )
+                    quantile_levels = th.as_tensor(
+                        [0.50, 0.90, 0.95],
+                        dtype=action_deltas.dtype,
+                        device=action_deltas.device,
+                    )
+                    action_delta_quantiles = (
+                        th.quantile(action_deltas, quantile_levels).detach().cpu().tolist()
+                    )
+                    bridge_action_delta_p50.append(float(action_delta_quantiles[0]))
+                    bridge_action_delta_p90.append(float(action_delta_quantiles[1]))
+                    bridge_action_delta_p95.append(float(action_delta_quantiles[2]))
+                    sample_ages = bridge.sample_ages.to(dtype=th.float32)
+                    sample_age_quantiles = (
+                        th.quantile(sample_ages, quantile_levels).detach().cpu().tolist()
+                    )
+                    bridge_sample_age_p50.append(float(sample_age_quantiles[0]))
+                    bridge_sample_age_p90.append(float(sample_age_quantiles[1]))
+                    bridge_sample_age_p95.append(float(sample_age_quantiles[2]))
                 if self.bridge_energy_critic is not None and energy_weight > 0.0:
                     predicted_energy = self.bridge_energy_critic.energy(
                         bridge.compact_energy_states,
@@ -346,6 +351,9 @@ class JacobianBridgeSAC(SAC):
         )
         self._bridge_training_totals["valid_fraction_sum"] += float(
             np.sum(bridge_valid_fractions)
+        )
+        self._bridge_training_totals["bridge_audit_steps"] += len(
+            bridge_pretrust_valid_fractions
         )
         self._bridge_training_totals["pretrust_valid_fraction_sum"] += float(
             np.sum(bridge_pretrust_valid_fractions)
