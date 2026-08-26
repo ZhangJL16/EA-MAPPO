@@ -1130,7 +1130,23 @@ def test_parallel_navigation_evaluation_matches_serial_contract(tmp_path: Path) 
     assert parallel["execution"]["parallel"] is True
     assert parallel["execution"]["num_workers"] == 2
     assert output_path.is_file()
-    assert (tmp_path / "parallel_progress.jsonl").is_file()
+    progress_path = tmp_path / "parallel_progress.jsonl"
+    assert progress_path.is_file()
+    progress_rows = [
+        json.loads(line)
+        for line in progress_path.read_text(encoding="utf-8").splitlines()
+    ]
+    assert progress_rows[-1]["completed_tasks"] == len(tasks)
+    assert progress_rows[-1]["formal_gate_evaluable"] is False
+    assert progress_rows[-1]["progress_metric_scope"] == (
+        "completed_tasks_only_length_biased_until_final"
+    )
+    assert progress_rows[-1]["partial_success_rate"] == pytest.approx(
+        parallel["overall_success_rate"]
+    )
+    assert progress_rows[-1]["partial_obstacle_collision_steps"] == parallel[
+        "obstacle_collision_steps"
+    ]
 
 
 def test_navigation_boundary_episode_metrics() -> None:

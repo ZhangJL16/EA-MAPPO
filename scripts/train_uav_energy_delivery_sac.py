@@ -858,10 +858,25 @@ def evaluate_navigation_tasks_parallel(
                 progress_path is not None
                 and len(records) != last_progress_count
                 and (
-                    len(records) % progress_interval == 0
+                    len(records) - last_progress_count >= progress_interval
                     or len(records) == len(tasks)
                 )
             ):
+                completed_successes = sum(bool(row["success"]) for row in records)
+                bucket_completed = {
+                    bucket_name: sum(
+                        row["distance_bucket"] == bucket_name for row in records
+                    )
+                    for bucket_name, _, _ in DISTANCE_BUCKETS
+                }
+                bucket_successes = {
+                    bucket_name: sum(
+                        bool(row["success"])
+                        and row["distance_bucket"] == bucket_name
+                        for row in records
+                    )
+                    for bucket_name, _, _ in DISTANCE_BUCKETS
+                }
                 append_jsonl(
                     progress_path,
                     {
@@ -871,6 +886,59 @@ def evaluate_navigation_tasks_parallel(
                         "wall_clock_seconds": time.perf_counter() - started,
                         "workers": worker_count,
                         "policy_batch_size": len(active),
+                        "progress_metric_scope": (
+                            "completed_tasks_only_length_biased_until_final"
+                        ),
+                        "formal_gate_evaluable": False,
+                        "partial_successes": int(completed_successes),
+                        "partial_success_rate": float(
+                            completed_successes / max(len(records), 1)
+                        ),
+                        "partial_mean_path_ratio": float(
+                            np.mean([row["path_ratio"] for row in records])
+                        ),
+                        "partial_boundary_contact_steps": int(
+                            sum(int(row["boundary_contact_steps"]) for row in records)
+                        ),
+                        "partial_boundary_contact_step_rate": float(
+                            sum(
+                                int(row["boundary_contact_steps"])
+                                for row in records
+                            )
+                            / max(evaluation_transitions, 1)
+                        ),
+                        "partial_obstacle_collision_steps": int(
+                            sum(int(row["obstacle_collision_steps"]) for row in records)
+                        ),
+                        "partial_hocbf_intervention_step_rate": float(
+                            sum(
+                                int(row["hocbf_intervention_steps"])
+                                for row in records
+                            )
+                            / max(evaluation_transitions, 1)
+                        ),
+                        "partial_max_consecutive_boundary_contacts": int(
+                            max(
+                                (
+                                    int(row["max_consecutive_boundary_contacts"])
+                                    for row in records
+                                ),
+                                default=0,
+                            )
+                        ),
+                        "partial_distance_bucket_completed": bucket_completed,
+                        "partial_distance_bucket_successes": bucket_successes,
+                        "partial_distance_bucket_success_rate": {
+                            bucket_name: (
+                                None
+                                if bucket_completed[bucket_name] == 0
+                                else float(
+                                    bucket_successes[bucket_name]
+                                    / bucket_completed[bucket_name]
+                                )
+                            )
+                            for bucket_name, _, _ in DISTANCE_BUCKETS
+                        },
                     },
                 )
                 last_progress_count = len(records)
