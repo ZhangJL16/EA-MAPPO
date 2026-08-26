@@ -49,6 +49,7 @@ from scripts.run_jacobian_safety_energy_1m import (
 from scripts.evaluate_jseb_checkpoints import (
     checkpoint_transition,
     discover_checkpoints,
+    migrate_legacy_jseb_command,
 )
 from scripts.train_uav_energy_delivery_sac import HeuristicGoalPolicy
 
@@ -76,6 +77,33 @@ def _geometry(jacobian: np.ndarray | None = None) -> dict[str, object]:
         "coordinate_map_stable": True,
         "reason": "test",
     }
+
+
+def test_legacy_jseb_phase_budgets_migrate_to_unified_energy_budget() -> None:
+    migrated, audit = migrate_legacy_jseb_command(
+        [
+            "--output-dir",
+            "/tmp/output",
+            "--phase2a-transitions",
+            "100000",
+            "--phase2b-transitions",
+            "300000",
+            "--phase2c-transitions",
+            "100000",
+            "--phase-end-eval-only",
+        ]
+    )
+    assert "--phase2a-transitions" not in migrated
+    assert migrated[-2:] == ["--phase2-energy-transitions", "500000"]
+    assert audit["legacy_phase2_budget_migrated"] is True
+    assert audit["unified_phase2_energy_transitions"] == 500000
+
+
+def test_legacy_jseb_phase_budget_migration_rejects_partial_set() -> None:
+    with pytest.raises(ValueError, match="incomplete legacy phase2 budget set"):
+        migrate_legacy_jseb_command(
+            ["--phase2a-transitions", "100000", "--phase2b-transitions", "300000"]
+        )
 
 
 def test_calibrated_compact_estimator_checkpoint_round_trip(tmp_path: Path) -> None:

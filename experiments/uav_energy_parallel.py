@@ -9,7 +9,10 @@ from typing import Iterable
 
 import numpy as np
 
-from envs.UAVEnergyDeliverySAC import UAVEnergyDeliverySACEnv
+from envs.UAVEnergyDeliverySAC import (
+    GoalConditionedQuantileTDEnergyEstimator,
+    UAVEnergyDeliverySACEnv,
+)
 
 
 _LIGHT_INFO_KEYS = (
@@ -81,11 +84,25 @@ def _worker_main(
     environment_kwargs: dict[str, object],
     battery_capacity: float | None,
     battery_validation: bool,
+    energy_estimator_checkpoint: str | None,
 ) -> None:
     os.environ["OMP_NUM_THREADS"] = "1"
     os.environ["MKL_NUM_THREADS"] = "1"
     try:
         environment = UAVEnergyDeliverySACEnv(**environment_kwargs)
+        if energy_estimator_checkpoint is not None:
+            estimator = GoalConditionedQuantileTDEnergyEstimator.load(
+                energy_estimator_checkpoint,
+                device="cpu",
+            )
+            environment.bind_energy_learning(
+                energy_estimator=estimator,
+                goal_action_provider=lambda _observation: np.zeros(
+                    3,
+                    dtype=np.float32,
+                ),
+                training_enabled=False,
+            )
         if battery_capacity is not None:
             environment.configure_calibrated_battery(
                 battery_capacity,
@@ -153,6 +170,7 @@ class ParallelUAVEnvPool:
         num_workers: int,
         battery_capacity: float | None = None,
         battery_validation: bool = False,
+        energy_estimator_checkpoint: str | None = None,
     ) -> None:
         if num_workers <= 0:
             raise ValueError("num_workers must be positive")
@@ -169,6 +187,7 @@ class ParallelUAVEnvPool:
                     environment_kwargs,
                     battery_capacity,
                     battery_validation,
+                    energy_estimator_checkpoint,
                 ),
                 name=f"uav-eval-worker-{worker_id}",
                 daemon=True,

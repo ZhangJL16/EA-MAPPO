@@ -24,6 +24,11 @@ from scripts.train_uav_energy_delivery_sac import (
 
 DEFAULT_SELECTION_SEED = 170_001
 DEFAULT_SELECTION_TASKS = 500
+LEGACY_PHASE2_BUDGET_FLAGS = (
+    "--phase2a-transitions",
+    "--phase2b-transitions",
+    "--phase2c-transitions",
+)
 
 
 def write_json(path: Path, payload: object) -> None:
@@ -76,13 +81,61 @@ def select_checkpoints(
     return [(transition, available[transition]) for transition in requested]
 
 
+def migrate_legacy_jseb_command(arguments: list[str]) -> tuple[list[str], dict[str, object]]:
+    migrated: list[str] = []
+    legacy_budgets: dict[str, int] = {}
+    index = 0
+    while index < len(arguments):
+        argument = arguments[index]
+        if argument not in LEGACY_PHASE2_BUDGET_FLAGS:
+            migrated.append(argument)
+            index += 1
+            continue
+        if argument in legacy_budgets:
+            raise ValueError(f"duplicate legacy argument: {argument}")
+        if index + 1 >= len(arguments):
+            raise ValueError(f"legacy argument is missing its value: {argument}")
+        try:
+            value = int(arguments[index + 1])
+        except ValueError as error:
+            raise ValueError(f"legacy budget must be an integer: {argument}") from error
+        if value < 0:
+            raise ValueError(f"legacy budget must be nonnegative: {argument}")
+        legacy_budgets[argument] = value
+        index += 2
+    if legacy_budgets:
+        if "--phase2-energy-transitions" in migrated:
+            raise ValueError(
+                "artifact command mixes legacy phase2 budgets with the unified budget"
+            )
+        missing = set(LEGACY_PHASE2_BUDGET_FLAGS) - set(legacy_budgets)
+        if missing:
+            raise ValueError(
+                "artifact command has an incomplete legacy phase2 budget set: "
+                + ", ".join(sorted(missing))
+            )
+        unified_budget = sum(legacy_budgets.values())
+        migrated.extend(["--phase2-energy-transitions", str(unified_budget)])
+    else:
+        unified_budget = None
+    audit = {
+        "legacy_phase2_budget_migrated": bool(legacy_budgets),
+        "legacy_phase2_budgets": legacy_budgets,
+        "unified_phase2_energy_transitions": unified_budget,
+    }
+    return migrated, audit
+
+
 def reconstruct_environment_args(artifact: Path, *, device: str, seed: int):
     config = json.loads((artifact / "config.json").read_text(encoding="utf-8"))
     command = list(config["exact_command"])
-    args = parse_jseb_args(command[1:])
+    migrated_command, migration_audit = migrate_legacy_jseb_command(command[1:])
+    args = parse_jseb_args(migrated_command)
     args.device = device
     args.eval_task_seed = seed
     args.eval_navigation_tasks = DEFAULT_SELECTION_TASKS
+    config = dict(config)
+    config["command_migration"] = migration_audit
     return args, config
 
 

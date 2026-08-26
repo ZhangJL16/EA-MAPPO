@@ -7,6 +7,7 @@ import json
 import os
 import platform
 import subprocess
+import tempfile
 import time
 from collections import deque
 from dataclasses import dataclass
@@ -1780,6 +1781,15 @@ def evaluate_energy_tasks(
     global_td_transitions: int,
     output_path: Path | None = None,
 ) -> dict[str, object]:
+    if int(getattr(args, "evaluation_num_envs", 1)) > 1:
+        return evaluate_energy_tasks_parallel(
+            policy,
+            estimator,
+            args,
+            tasks,
+            global_td_transitions=global_td_transitions,
+            output_path=output_path,
+        )
     environment = environment_from_args(args, phase=SACTrainingPhase.TD_PRETRAINING)
     if bool(getattr(args, "smoke", False)):
         environment.phase1_episode_max_policy_steps = 300
@@ -1864,6 +1874,171 @@ def evaluate_energy_tasks(
     if output_path is not None:
         write_json(output_path, summary)
     environment.close()
+    return summary
+
+
+def evaluate_energy_tasks_parallel(
+    policy: DeterministicPolicy,
+    estimator: GoalConditionedQuantileTDEnergyEstimator,
+    args: argparse.Namespace,
+    tasks: list[NavigationTask],
+    *,
+    global_td_transitions: int,
+    output_path: Path | None = None,
+) -> dict[str, object]:
+    worker_count = min(int(args.evaluation_num_envs), len(tasks))
+    if worker_count <= 1:
+        raise ValueError("parallel TD evaluation requires at least two workers")
+    replay_size_before = len(estimator.replay)
+    trainable_replay_size_before = len(estimator.trainable_replay)
+    update_count_before = estimator.update_count
+    parameter_hash_before = _estimator_parameter_hash(estimator)
+    evaluation_transitions = 0
+    next_task_index = 0
+    active: dict[int, dict[str, object]] = {}
+    successful_records: list[dict[str, object]] = []
+    task_records: list[dict[str, object]] = []
+    started = time.perf_counter()
+
+    def assign(pool: ParallelUAVEnvPool, worker_ids: list[int]) -> None:
+        nonlocal next_task_index
+        requests: list[WorkerReset] = []
+        assignments: dict[int, tuple[int, NavigationTask]] = {}
+        for worker_id in worker_ids:
+            if next_task_index >= len(tasks):
+                continue
+            task_index = next_task_index
+            task = tasks[task_index]
+            next_task_index += 1
+            assignments[worker_id] = (task_index, task)
+            requests.append(
+                WorkerReset(
+                    worker_id=worker_id,
+                    seed=args.energy_eval_seed + task_index,
+                    options={
+                        "start_position": task.start_position,
+                        "start_velocity": task.initial_velocity,
+                        "task_point": task.goal_position,
+                    },
+                )
+            )
+        if not requests:
+            return
+        reset_results = pool.reset_many(requests)
+        for worker_id, result in reset_results.items():
+            task_index, task = assignments[worker_id]
+            active[worker_id] = {
+                "task_index": task_index,
+                "task": task,
+                "observation": result.observation,
+            }
+
+    environment_kwargs = environment_kwargs_from_args(
+        args,
+        phase=SACTrainingPhase.TD_PRETRAINING,
+    )
+    if bool(getattr(args, "smoke", False)):
+        environment_kwargs["phase1_episode_max_policy_steps"] = 300
+    with tempfile.TemporaryDirectory(prefix="td-heldout-") as temporary_directory:
+        checkpoint = Path(temporary_directory) / "td_energy_snapshot.pt"
+        estimator.save(checkpoint)
+        with ParallelUAVEnvPool(
+            environment_kwargs,
+            num_workers=worker_count,
+            energy_estimator_checkpoint=str(checkpoint),
+        ) as pool:
+            assign(pool, list(range(worker_count)))
+            while active:
+                worker_ids = sorted(active)
+                actions = _batched_policy_actions(
+                    policy,
+                    [
+                        np.asarray(active[worker_id]["observation"])
+                        for worker_id in worker_ids
+                    ],
+                )
+                results = pool.step_many(worker_ids, actions)
+                free_workers: list[int] = []
+                for worker_id in worker_ids:
+                    result = results[worker_id]
+                    evaluation_transitions += 1
+                    active[worker_id]["observation"] = result.observation
+                    if not (result.terminated or result.truncated):
+                        continue
+                    state = active.pop(worker_id)
+                    task = state["task"]
+                    info = result.info
+                    success = bool(info["is_success"])
+                    completed = info["completed_goal_evaluation"]
+                    task_records.append(
+                        {
+                            "task_index": int(state["task_index"]),
+                            "distance_bucket": task.distance_bucket,
+                            "straight_line_distance": task.straight_line_distance,
+                            "success": success,
+                            "policy_steps": int(result.current_step),
+                            "end_reason": info["end_reason"],
+                        }
+                    )
+                    if success and completed is not None:
+                        record = dict(completed)
+                        record["distance_bucket"] = task.distance_bucket
+                        successful_records.append(record)
+                    free_workers.append(worker_id)
+                if free_workers:
+                    assign(pool, free_workers)
+
+    parameter_hash_after = _estimator_parameter_hash(estimator)
+    if len(estimator.replay) != replay_size_before:
+        raise RuntimeError("parallel held-out TD evaluation wrote to replay")
+    if len(estimator.trainable_replay) != trainable_replay_size_before:
+        raise RuntimeError("parallel held-out TD evaluation wrote to trainable replay")
+    if estimator.update_count != update_count_before:
+        raise RuntimeError("parallel held-out TD evaluation changed update count")
+    if parameter_hash_after != parameter_hash_before:
+        raise RuntimeError("parallel held-out TD evaluation updated the energy critic")
+    task_records.sort(key=lambda row: int(row["task_index"]))
+    metrics = aggregate_goal_evaluations(successful_records)
+    overall_metrics = metrics["overall"]
+    summary = {
+        "global_td_collection_transitions": int(global_td_transitions),
+        "energy_eval_env_transitions": int(evaluation_transitions),
+        "num_tasks": len(tasks),
+        "successful_tasks": len(successful_records),
+        "failed_tasks": len(tasks) - len(successful_records),
+        "success_rate": float(len(successful_records) / max(len(tasks), 1)),
+        "td_optimizer_enabled": False,
+        "td_replay_writes": 0,
+        "sac_deterministic": True,
+        "MAE": overall_metrics.get("td_mae"),
+        "RMSE": overall_metrics.get("td_rmse"),
+        "bias": overall_metrics.get("td_bias"),
+        "underestimation_rate": overall_metrics.get("td_underestimation_rate"),
+        "mean_underestimation_magnitude": overall_metrics.get(
+            "td_mean_underestimation_magnitude"
+        ),
+        "Q50_coverage": overall_metrics.get("q50_coverage"),
+        "Q90_coverage": overall_metrics.get("q90_coverage"),
+        "Q95_coverage": overall_metrics.get("q95_coverage"),
+        "Q99_coverage": overall_metrics.get("q99_coverage"),
+        "distance_bucket_metrics": metrics["by_initial_goal_distance"],
+        "boundary_contact_metrics": metrics["by_boundary_contact"],
+        "metrics": metrics,
+        "tasks": task_records,
+        "execution": {
+            "parallel": True,
+            "num_workers": worker_count,
+            "policy_inference": "central_batched_gpu"
+            if isinstance(policy, SAC)
+            else "central_batched",
+            "td_inference": "frozen_worker_snapshot_cpu",
+            "worker_omp_threads": 1,
+            "worker_mkl_threads": 1,
+            "wall_clock_seconds": time.perf_counter() - started,
+        },
+    }
+    if output_path is not None:
+        write_json(output_path, summary)
     return summary
 
 

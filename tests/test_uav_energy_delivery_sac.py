@@ -1491,6 +1491,76 @@ def test_heldout_energy_evaluation_is_read_only_and_seed_separate(tmp_path: Path
     assert output.exists()
 
 
+def test_parallel_heldout_energy_evaluation_uses_frozen_worker_snapshots(
+    tmp_path: Path,
+) -> None:
+    args = parse_args(
+        ["--output-dir", str(tmp_path / "unused"), "--smoke", "--device", "cpu"]
+    )
+    args.minimum_task_distance = 5.0
+    args.evaluation_num_envs = 2
+    estimator = GoalConditionedQuantileTDEnergyEstimator(
+        hidden_dim=8,
+        batch_size=2,
+        replay_capacity=16,
+        learning_starts=2,
+    )
+    state = np.zeros(7, dtype=np.float32)
+    action = np.zeros(3, dtype=np.float32)
+    estimator.observe_transition(
+        state,
+        action,
+        1.0,
+        state,
+        state,
+        action,
+        True,
+        "TASK",
+    )
+    parameter_before = [
+        parameter.detach().clone() for parameter in estimator.model.parameters()
+    ]
+    replay_before = len(estimator.replay)
+    update_before = estimator.update_count
+    tasks = []
+    for task_index in range(2):
+        start = np.array(
+            [1000.0, 1000.0 + 20.0 * task_index, 100.0],
+            dtype=np.float32,
+        )
+        tasks.append(
+            NavigationTask(
+                start,
+                start + np.array([5.5, 0.0, 0.0], dtype=np.float32),
+                np.array([20.0, 0.0, 0.0], dtype=np.float32),
+                5.5,
+                "100-500",
+            )
+        )
+    output = tmp_path / "parallel_heldout.json"
+    summary = evaluate_energy_tasks(
+        HeuristicGoalPolicy(),
+        estimator,
+        args,
+        tasks,
+        global_td_transitions=50_000,
+        output_path=output,
+    )
+    assert summary["successful_tasks"] == 2
+    assert summary["execution"]["parallel"] is True
+    assert summary["execution"]["num_workers"] == 2
+    assert summary["execution"]["td_inference"] == "frozen_worker_snapshot_cpu"
+    assert len(estimator.replay) == replay_before
+    assert estimator.update_count == update_before
+    for before, after in zip(
+        parameter_before,
+        estimator.model.parameters(),
+        strict=True,
+    ):
+        torch.testing.assert_close(after, before)
+    assert output.exists()
+
+
 def test_battery_validation_runs_to_depletion_and_writes_report(tmp_path: Path) -> None:
     args = parse_args(["--output-dir", str(tmp_path / "unused"), "--smoke", "--device", "cpu"])
     args.battery_validation_runs = 2

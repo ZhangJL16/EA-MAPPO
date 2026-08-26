@@ -156,7 +156,7 @@ first step of a newly sampled task; the old environment default remains every st
 Latest code-path artifact:
 
 ```text
-artifacts/return_decision_stage_b_smoke_20260826_v6
+artifacts/return_decision_stage_b_smoke_20260826_cache_194739
 ```
 
 This used a heuristic policy, a 400 m smoke map, no obstacles, two battery cycles,
@@ -164,9 +164,9 @@ and one parameter per method. It only validates the code path:
 
 | Method | Stranding | Tasks/cycle | Tasks/simulated hour | Arrival energy fraction |
 |---|---:|---:|---:|---:|
-| SOC 0.20 | 0.00 | 12.0 | 195.03 | 0.134 |
-| distance | 0.50 | 14.5 | 200.48 | 0.010 among successful returns |
-| Oracle | 0.00 | 14.5 | 227.43 | 0.123 |
+| SOC 0.20 | 0.00 | 14.5 | 226.83 | 0.140 |
+| distance | 0.00 | 16.0 | 225.62 | 0.032 |
+| Oracle | 0.00 | 15.5 | 230.98 | 0.084 |
 
 The apparent Oracle headroom is encouraging but cannot support a scientific claim:
 the sample has only two cycles, no trained SAC, no obstacles, and one seed.
@@ -178,6 +178,13 @@ stranding. The formal gate uses the Wilson upper bound rather than the observed
 failure fraction. In particular, zero failures in two smoke cycles has an upper
 bound of approximately 0.658 and is correctly recorded as
 `PENDING_INSUFFICIENT_CYCLES`, not as evidence of safety.
+
+The deterministic Oracle caches the first exact task rollout and reuses suffix
+energy when the live state follows that trace. It still recomputes `RETURN NOW` at
+every decision. The latest smoke recorded 109 exact suffix hits and 33 misses;
+208 rollout requests were needed instead of 426 requests without suffix reuse.
+Caching is disabled for per-step decision cadence, where a step can invoke the
+decision rule both before and after motion.
 
 ### Gate B
 
@@ -208,6 +215,34 @@ Only after Gate B passes:
 All methods receive the same frozen SAC, HOCBF operator, source trajectories,
 target-policy query privileges, evaluation seeds, and training budget. The generic
 executed-action ensemble is the main simple-method threat.
+
+The Quantile-TD preparation runner is:
+
+```text
+scripts/train_quantile_td_for_navigation_checkpoint.py
+```
+
+It is fail-closed: a formal run requires the 500k navigation readiness JSON and a
+statistically evaluable `PASS` from the Oracle headroom gate. It then collects
+exactly 500k TD transitions under the frozen 500k JSEB policy and runs ten
+held-out evaluations at 50k intervals, each on the same independent 500-task set.
+Held-out environments run in parallel, use central batched deterministic policy
+inference, and load frozen CPU snapshots of the TD critic. The live critic's
+optimizer, replay, update count, and parameters are audited before and after every
+evaluation.
+
+The current LiDAR/HOCBF contract produces a 2055D Energy-TD state (7 goal-motion
+features plus 1024 ranges and 1024 validity values). A 7D checkpoint is therefore
+not silently reused in this setting. Historical JSEB commands containing the old
+Phase2A/2B/2C budgets are migrated explicitly to their unified summed energy
+budget; all other unknown historical arguments remain errors.
+
+The 2k runner smoke at
+`artifacts/quantile_td_checkpoint_smoke_200107` reached the exact budget, preserved
+the frozen policy hash, made 1,303 TD updates, retained 1,814 replay transitions,
+and completed two parallel held-out evaluations. It correctly stopped with
+`TD_NOT_READY` because the deliberately short smoke did not complete the far
+distance bucket. This is a mechanics result, not Energy-TD evidence.
 
 ## 8. Stage D: Decision Baselines
 
