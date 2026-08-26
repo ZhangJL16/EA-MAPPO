@@ -25,7 +25,13 @@ from envs.UAVEnergyDeliverySAC import (
 )
 from review_bundle.envs.navigation.state import NavigationState
 from review_bundle.envs.navigation.telemetry_cost import TelemetryCostConfig, TelemetryCostModel
-from review_bundle.safety.switching import SortieMode
+from review_bundle.safety.switching import (
+    DistanceEnergyReturnManager,
+    FixedSOCThresholdReturnManager,
+    QuantileEnergyReturnManager,
+    ReturnDecisionContext,
+    SortieMode,
+)
 from scripts.train_uav_energy_delivery_sac import (
     HeuristicGoalPolicy,
     NavigationTask,
@@ -737,6 +743,10 @@ def test_mission_composition_and_commitment_are_correct_and_irreversible() -> No
     assert estimate.task_q95 == 4.0
     assert estimate.return_after_task_q95 == 4.0
     assert estimate.mission_q95_composition == 8.0
+    assert estimate.mission_upper_bound_semantics == (
+        "sum_of_component_q95_not_joint_mission_q95"
+    )
+    assert estimate.mission_nominal_coverage_lower_bound is None
     assert estimate.return_now_q95 == 4.0
     environment.agent.energy = 9.0
     assert environment._refresh_mission_decision() is True
@@ -744,6 +754,98 @@ def test_mission_composition_and_commitment_are_correct_and_irreversible() -> No
     environment.agent.energy = 10.0
     assert environment._refresh_mission_decision() is False
     assert environment.mode is SortieMode.CHARGER_COMMITTED
+
+
+def test_quantile_return_manager_reproduces_legacy_two_boundary_rule() -> None:
+    manager = QuantileEnergyReturnManager()
+    common = dict(
+        mode=SortieMode.TASK,
+        battery_capacity=10.0,
+        reserve=1.0,
+        distance_to_charger=100.0,
+        distance_to_task=100.0,
+        task_to_charger_distance=100.0,
+        return_now_requirement=4.0,
+        task_then_return_requirement=8.0,
+    )
+    continue_decision = manager.decide(
+        ReturnDecisionContext(remaining_energy=10.0, **common)
+    )
+    assert continue_decision.commit is False
+    assert continue_decision.immediate_margin == pytest.approx(5.0)
+    assert continue_decision.mission_margin == pytest.approx(1.0)
+    mission_decision = manager.decide(
+        ReturnDecisionContext(remaining_energy=9.0, **common)
+    )
+    assert mission_decision.commit is True
+    assert mission_decision.reason == "task_then_return_energy_boundary"
+    immediate_decision = manager.decide(
+        ReturnDecisionContext(remaining_energy=5.0, **common)
+    )
+    assert immediate_decision.commit is True
+    assert immediate_decision.reason == "immediate_return_energy_boundary"
+
+
+def test_component_risk_allocation_uses_union_bound_not_fake_joint_q95() -> None:
+    estimator = RecordingEstimator(4.0)
+    estimator.coverage = 0.975
+    environment = UAVEnergyDeliverySACEnv()
+    environment.bind_energy_learning(
+        energy_estimator=estimator,
+        goal_action_provider=zero_policy,
+        training_enabled=False,
+    )
+    environment.reset(seed=16)
+    estimate = environment.mission_energy_estimate()
+    assert estimate.mission_upper_bound_semantics == (
+        "component_upper_bound_sum_with_union_bound"
+    )
+    assert estimate.mission_nominal_coverage_lower_bound == pytest.approx(0.95)
+    environment.close()
+
+
+def test_return_manager_baselines_share_one_way_decision_contract() -> None:
+    context = ReturnDecisionContext(
+        mode=SortieMode.TASK,
+        remaining_energy=2.0,
+        battery_capacity=10.0,
+        reserve=0.0,
+        distance_to_charger=10.0,
+        distance_to_task=8.0,
+        task_to_charger_distance=12.0,
+    )
+    soc = FixedSOCThresholdReturnManager(0.25).decide(context)
+    assert soc.commit is True
+    assert soc.reason == "soc_threshold_reached"
+    distance = DistanceEnergyReturnManager(0.1).decide(context)
+    assert distance.commit is True
+    assert distance.reason == "distance_task_then_return_boundary"
+    assert distance.mission_margin == pytest.approx(0.0)
+    absorbing = FixedSOCThresholdReturnManager(0.0).decide(
+        ReturnDecisionContext(
+            **{**context.__dict__, "mode": SortieMode.CHARGER_COMMITTED}
+        )
+    )
+    assert absorbing.commit is False
+    assert absorbing.reason == "commitment_is_absorbing"
+
+
+def test_soc_return_manager_runs_phase2_without_energy_estimator() -> None:
+    environment = UAVEnergyDeliverySACEnv(
+        operational_energy_capacity=10.0,
+        energy_reserve_fraction=0.0,
+    )
+    environment.bind_navigation_policy(zero_policy)
+    environment.bind_return_manager(FixedSOCThresholdReturnManager(0.25))
+    environment.enable_phase_two()
+    environment.reset(seed=24)
+    environment.agent.energy = 2.0
+    assert environment._refresh_mission_decision() is True
+    event = environment.switching_events[-1]
+    assert event["return_manager_type"] == "fixed_soc_threshold"
+    assert event["mission_energy_upper_bound"] is None
+    assert event["reason"] == "soc_threshold_reached"
+    environment.close()
 
 
 def test_parallel_environment_seeds_and_transition_count() -> None:

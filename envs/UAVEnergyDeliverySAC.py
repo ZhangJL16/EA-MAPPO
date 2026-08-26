@@ -38,7 +38,12 @@ from review_bundle.safety.collision.projection_geometry import (
 from review_bundle.safety.energy.critics import MonotoneQuantileCritic
 from review_bundle.safety.energy.mc_regression import GoalEnergyPrediction
 from review_bundle.safety.energy.td import quantile_atom_weights, quantile_huber_loss, quantile_ssp_target
-from review_bundle.safety.switching import SortieMode
+from review_bundle.safety.switching import (
+    QuantileEnergyReturnManager,
+    ReturnDecisionContext,
+    ReturnManager,
+    SortieMode,
+)
 
 
 ENERGY_UNIT = "synthetic_simulation_energy_units"
@@ -100,6 +105,8 @@ class MissionEnergyEstimate:
     mission_prediction: float
     calibrated_mission_upper95: float
     component_upper95_sum: float
+    mission_upper_bound_semantics: str
+    mission_nominal_coverage_lower_bound: float | None
 
     @property
     def mission_upper95(self) -> float:
@@ -115,6 +122,7 @@ class MissionEnergyEstimate:
 
     @property
     def mission_q95_composition(self) -> float:
+        """Legacy alias; the value is not necessarily a joint mission q95."""
         return self.mission_upper95
 
     @property
@@ -464,6 +472,7 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         max_steps_per_task: int = 4000,
         phase1_episode_max_policy_steps: int = 4000,
         phase2_episode_limit: int = 20_000,
+        mission_decision_interval_policy_steps: int = 1,
         task_completion_reward: float = 100.0,
         progress_reward_weight: float = 1.0,
         velocity_reward_weight: float = 0.1,
@@ -516,7 +525,12 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
             raise ValueError("xy_sampling_margin leaves no legal XY interior")
         if not safe_radius <= task_z_min < task_z_max <= height - safe_radius:
             raise ValueError("task altitude range is invalid")
-        if min(max_steps_per_task, phase1_episode_max_policy_steps, phase2_episode_limit) <= 0:
+        if min(
+            max_steps_per_task,
+            phase1_episode_max_policy_steps,
+            phase2_episode_limit,
+            mission_decision_interval_policy_steps,
+        ) <= 0:
             raise ValueError("policy-step guards must be positive")
         if operational_energy_capacity is not None and operational_energy_capacity <= 0.0:
             raise ValueError("operational_energy_capacity must be positive when configured")
@@ -578,6 +592,9 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         self.max_steps_per_task = int(max_steps_per_task)
         self.phase1_episode_max_policy_steps = int(phase1_episode_max_policy_steps)
         self.phase2_episode_limit = int(phase2_episode_limit)
+        self.mission_decision_interval_policy_steps = int(
+            mission_decision_interval_policy_steps
+        )
         self.max_cycles = self.phase1_episode_max_policy_steps
         self.task_completion_reward = float(task_completion_reward)
         self.progress_reward_weight = float(progress_reward_weight)
@@ -660,6 +677,7 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         self.mode = SortieMode.TASK
         self.energy_estimator: object | None = None
         self.goal_action_provider: GoalActionProvider | None = None
+        self.return_manager: ReturnManager = QuantileEnergyReturnManager()
         self.energy_learning_enabled = False
         self.action_space = spaces.Box(-1.0, 1.0, shape=(3,), dtype=np.float32)
         observation_low = [-1.0] * 6 + [0.0]
@@ -742,10 +760,24 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         energy_estimator: object,
         goal_action_provider: GoalActionProvider,
         training_enabled: bool,
+        return_manager: ReturnManager | None = None,
     ) -> None:
         self.energy_estimator = energy_estimator
         self.goal_action_provider = goal_action_provider
         self.energy_learning_enabled = bool(training_enabled)
+        if return_manager is not None:
+            self.return_manager = return_manager
+
+    def bind_navigation_policy(
+        self,
+        goal_action_provider: GoalActionProvider,
+    ) -> None:
+        self.goal_action_provider = goal_action_provider
+
+    def bind_return_manager(self, return_manager: ReturnManager) -> None:
+        if not hasattr(return_manager, "decide"):
+            raise TypeError("return_manager must implement decide(context)")
+        self.return_manager = return_manager
 
     def set_phase(self, phase: int | SACTrainingPhase) -> None:
         self.phase = SACTrainingPhase(int(phase))
@@ -777,8 +809,12 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
             self.agent.energy = selected_capacity
 
     def enable_phase_two(self, *, reserve: float | None = None) -> None:
-        if self.energy_estimator is None or self.goal_action_provider is None:
-            raise RuntimeError("Phase 2 requires a frozen navigation policy and energy estimator")
+        if self.goal_action_provider is None:
+            raise RuntimeError("Phase 2 requires a frozen navigation policy")
+        if bool(getattr(self.return_manager, "requires_energy_estimate", True)) and (
+            self.energy_estimator is None
+        ):
+            raise RuntimeError("selected Phase 2 ReturnManager requires an energy estimator")
         if self.operational_energy_capacity is None:
             raise RuntimeError("Phase 2 requires calibrated battery capacity")
         if reserve is not None:
@@ -940,7 +976,17 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         self.last_battery_cycle_record = None
         mode_before_decision = self.mode
         switched_at_step_start = False
-        if self.finite_energy_enabled and self.mission_switching_enabled and self.mode is SortieMode.TASK:
+        decision_due_at_step_start = bool(
+            self.mission_decision_interval_policy_steps == 1
+            or self.steps_in_current_task == 1
+            or (self.current_step - 1) % self.mission_decision_interval_policy_steps == 0
+        )
+        if (
+            self.finite_energy_enabled
+            and self.mission_switching_enabled
+            and self.mode is SortieMode.TASK
+            and decision_due_at_step_start
+        ):
             switched_at_step_start = self._refresh_mission_decision()
             if switched_at_step_start:
                 self._finalize_goal_trajectory(success=False, censored_reason="task_interrupted_by_charger_commitment")
@@ -1129,6 +1175,7 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         if (
             self.finite_energy_enabled
             and self.mission_switching_enabled
+            and self.mission_decision_interval_policy_steps == 1
             and not any((energy_exhausted, task_stuck, episode_guard, charger_reached_now))
         ):
             if self.mode is SortieMode.TASK and not task_completed_now:
@@ -1472,36 +1519,95 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
     def mission_energy_estimate(self) -> MissionEnergyEstimate:
         if self.energy_estimator is None or self.goal_action_provider is None:
             raise RuntimeError("mission estimation requires energy estimator and frozen navigation policy")
-        task = self._goal_energy_prediction(self.current_task_point, goal_type="TASK")
-        return_position = self.current_task_point.copy()
-        return_velocity = np.zeros(3, dtype=np.float32)
-        return_after = self._goal_energy_prediction(
-            self.charger_position,
-            goal_type="TASK_ENDPOINT_TO_CHARGER",
-            position=return_position,
-            velocity=return_velocity,
-        )
-        return_now = self._goal_energy_prediction(
-            self.charger_position,
-            goal_type="CHARGER",
-        )
-        mission_prediction = task.prediction + return_after.prediction
-        component_upper95_sum = task.upper95 + return_after.upper95
-        if hasattr(self.energy_estimator, "estimate_mission_context"):
-            mission = self.energy_estimator.estimate_mission_context(
+        bundled_mission = None
+        if hasattr(self.energy_estimator, "estimate_mission_bundle"):
+            values = self.energy_estimator.estimate_mission_bundle(
                 self,
                 self.current_task_point,
             )
+            if not isinstance(values, tuple) or len(values) != 4 or not all(
+                isinstance(value, GoalEnergyPrediction) for value in values
+            ):
+                raise TypeError(
+                    "estimate_mission_bundle must return four GoalEnergyPrediction values"
+                )
+            task, return_after, return_now, bundled_mission = values
+        else:
+            task = self._goal_energy_prediction(self.current_task_point, goal_type="TASK")
+            return_position = self.current_task_point.copy()
+            return_velocity = np.zeros(3, dtype=np.float32)
+            return_after = self._goal_energy_prediction(
+                self.charger_position,
+                goal_type="TASK_ENDPOINT_TO_CHARGER",
+                position=return_position,
+                velocity=return_velocity,
+            )
+            return_now = self._goal_energy_prediction(
+                self.charger_position,
+                goal_type="CHARGER",
+            )
+        mission_prediction = task.prediction + return_after.prediction
+        component_upper95_sum = task.upper95 + return_after.upper95
+        if bundled_mission is not None or hasattr(
+            self.energy_estimator,
+            "estimate_mission_context",
+        ):
+            mission = (
+                bundled_mission
+                if bundled_mission is not None
+                else self.energy_estimator.estimate_mission_context(
+                    self,
+                    self.current_task_point,
+                )
+            )
+            mission_prediction = mission.prediction
             mission_upper95 = mission.upper95
+            if bool(
+                getattr(self.energy_estimator, "returns_deterministic_exact", False)
+            ):
+                mission_upper_bound_semantics = "deterministic_oracle_joint_mission_cost"
+                mission_nominal_coverage = 1.0
+            else:
+                mission_upper_bound_semantics = "direct_joint_mission_upper_bound"
+                mission_nominal_coverage = getattr(
+                    self.energy_estimator,
+                    "mission_coverage",
+                    getattr(self.energy_estimator, "coverage", None),
+                )
         elif hasattr(self.energy_estimator, "estimate_mission"):
             mission = self.energy_estimator.estimate_mission(
                 task.prediction,
                 return_after.prediction,
                 task_distance=float(np.linalg.norm(self.current_task_point - self.agent.pos)),
             )
+            mission_prediction = mission.prediction
             mission_upper95 = mission.upper95
+            mission_upper_bound_semantics = "direct_mission_upper_bound"
+            mission_nominal_coverage = getattr(
+                self.energy_estimator,
+                "mission_coverage",
+                getattr(self.energy_estimator, "coverage", None),
+            )
         else:
             mission_upper95 = component_upper95_sum
+            component_coverage = getattr(
+                self.energy_estimator,
+                "goal_coverage",
+                getattr(self.energy_estimator, "coverage", None),
+            )
+            if component_coverage is None:
+                mission_upper_bound_semantics = (
+                    "sum_of_component_q95_not_joint_mission_q95"
+                )
+                mission_nominal_coverage = None
+            else:
+                coverage = float(component_coverage)
+                if not 0.0 < coverage < 1.0:
+                    raise ValueError("component coverage must lie in (0, 1)")
+                mission_upper_bound_semantics = (
+                    "component_upper_bound_sum_with_union_bound"
+                )
+                mission_nominal_coverage = max(0.0, 2.0 * coverage - 1.0)
         return MissionEnergyEstimate(
             task.prediction,
             task.upper95,
@@ -1512,23 +1618,49 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
             mission_prediction,
             mission_upper95,
             component_upper95_sum,
+            mission_upper_bound_semantics,
+            None
+            if mission_nominal_coverage is None
+            else float(mission_nominal_coverage),
         )
 
     def _refresh_mission_decision(self) -> bool:
         if self.mode is SortieMode.CHARGER_COMMITTED:
             self.agent.goal = self.charger_position
             return False
-        estimate = self.mission_energy_estimate()
+        estimate = (
+            self.mission_energy_estimate()
+            if bool(getattr(self.return_manager, "requires_energy_estimate", True))
+            else None
+        )
         self.last_mission_estimate = estimate
         remaining = float(self.agent.energy)
-        immediate_margin = remaining - estimate.return_now_upper95 - self.energy_reserve
-        mission_margin = remaining - estimate.mission_upper95 - self.energy_reserve
-        reason = None
-        if immediate_margin <= 0.0:
-            reason = "immediate_return_energy_boundary"
-        elif mission_margin <= 0.0:
-            reason = "compositional_mission_energy_boundary"
-        if reason is None:
+        if self.operational_energy_capacity is None or self.energy_reserve is None:
+            raise RuntimeError("return decisions require configured battery capacity and reserve")
+        decision = self.return_manager.decide(
+            ReturnDecisionContext(
+                mode=self.mode,
+                remaining_energy=remaining,
+                battery_capacity=float(self.operational_energy_capacity),
+                reserve=float(self.energy_reserve),
+                distance_to_charger=float(
+                    np.linalg.norm(self.charger_position - self.agent.pos)
+                ),
+                distance_to_task=float(
+                    np.linalg.norm(self.current_task_point - self.agent.pos)
+                ),
+                task_to_charger_distance=float(
+                    np.linalg.norm(self.charger_position - self.current_task_point)
+                ),
+                return_now_requirement=(
+                    None if estimate is None else estimate.return_now_upper95
+                ),
+                task_then_return_requirement=(
+                    None if estimate is None else estimate.mission_upper95
+                ),
+            )
+        )
+        if not decision.commit:
             return False
         self.mode = SortieMode.CHARGER_COMMITTED
         self.task_to_charger_count += 1
@@ -1541,29 +1673,67 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
             "task_goal": self.current_task_point.copy(),
             "distance_to_charger": float(np.linalg.norm(self.charger_position - self.agent.pos)),
             "remaining_energy": remaining,
-            "E_task_95": estimate.task_q95,
-            "E_return_after_task_95": estimate.return_after_task_q95,
-            "E_mission_95": estimate.mission_q95_composition,
-            "E_return_now_95": estimate.return_now_q95,
+            "E_task_95": None if estimate is None else estimate.task_q95,
+            "E_return_after_task_95": None
+            if estimate is None
+            else estimate.return_after_task_q95,
+            "E_mission_95": None
+            if estimate is None
+            else estimate.mission_q95_composition,
+            "E_return_now_95": None if estimate is None else estimate.return_now_q95,
             "energy_estimator_type": getattr(
                 self.energy_estimator,
                 "estimator_type",
                 "legacy_goal_conditioned_quantile_td",
             ),
-            "task_energy_prediction": estimate.task_prediction,
-            "task_energy_upper95": estimate.task_upper95,
-            "return_after_task_energy_prediction": estimate.return_after_task_prediction,
-            "return_after_task_energy_upper95": estimate.return_after_task_upper95,
-            "return_now_energy_prediction": estimate.return_now_prediction,
-            "return_now_energy_upper95": estimate.return_now_upper95,
-            "mission_energy_upper95": estimate.mission_upper95,
-            "mission_energy_prediction": estimate.mission_prediction,
-            "mission_component_upper95_sum": estimate.component_upper95_sum,
+            "task_energy_prediction": None if estimate is None else estimate.task_prediction,
+            "task_energy_upper95": None if estimate is None else estimate.task_upper95,
+            "return_after_task_energy_prediction": None
+            if estimate is None
+            else estimate.return_after_task_prediction,
+            "return_after_task_energy_upper95": None
+            if estimate is None
+            else estimate.return_after_task_upper95,
+            "return_now_energy_prediction": None
+            if estimate is None
+            else estimate.return_now_prediction,
+            "return_now_energy_upper95": None
+            if estimate is None
+            else estimate.return_now_upper95,
+            "mission_energy_upper95": None if estimate is None else estimate.mission_upper95,
+            "mission_energy_upper_bound": None
+            if estimate is None
+            else estimate.mission_upper95,
+            "mission_upper_bound_semantics": None
+            if estimate is None
+            else estimate.mission_upper_bound_semantics,
+            "mission_nominal_coverage_lower_bound": (
+                None
+                if estimate is None
+                else estimate.mission_nominal_coverage_lower_bound
+            ),
+            "mission_energy_prediction": None
+            if estimate is None
+            else estimate.mission_prediction,
+            "mission_component_upper95_sum": None
+            if estimate is None
+            else estimate.component_upper95_sum,
             "reserve": self.energy_reserve,
-            "continuation_margin": min(immediate_margin, mission_margin),
+            "immediate_margin": decision.immediate_margin,
+            "mission_margin": decision.mission_margin,
+            "continuation_margin": min(
+                decision.immediate_margin,
+                decision.mission_margin,
+            ),
+            "return_manager_type": getattr(
+                self.return_manager,
+                "manager_type",
+                type(self.return_manager).__name__,
+            ),
+            "decision_statistic": decision.decision_statistic,
             "mode_before": SortieMode.TASK.value,
             "mode_after": SortieMode.CHARGER_COMMITTED.value,
-            "reason": reason,
+            "reason": decision.reason,
         }
         self.return_commit_record = event.copy()
         self.switching_events.append(event)
@@ -2407,6 +2577,20 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
             if estimate is None
             else estimate.return_now_upper95,
             "mission_energy_upper95": None if estimate is None else estimate.mission_upper95,
+            "mission_energy_upper_bound": None
+            if estimate is None
+            else estimate.mission_upper95,
+            "mission_upper_bound_semantics": None
+            if estimate is None
+            else estimate.mission_upper_bound_semantics,
+            "mission_nominal_coverage_lower_bound": None
+            if estimate is None
+            else estimate.mission_nominal_coverage_lower_bound,
+            "return_manager_type": getattr(
+                self.return_manager,
+                "manager_type",
+                type(self.return_manager).__name__,
+            ),
             "mission_energy_prediction": None
             if estimate is None
             else estimate.mission_prediction,

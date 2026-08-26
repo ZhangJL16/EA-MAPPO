@@ -256,6 +256,23 @@ class FlexibleEnergyRegressor(nn.Module):
         destination.parent.mkdir(parents=True, exist_ok=True)
         torch.save(self.checkpoint_payload(), destination)
 
+    @classmethod
+    def from_checkpoint_payload(
+        cls,
+        payload: Mapping[str, object],
+        *,
+        device: str | torch.device = "cpu",
+    ) -> "FlexibleEnergyRegressor":
+        model = cls(
+            int(payload["input_dim"]),
+            hidden_dim=int(payload["hidden_dim"]),
+            energy_scale=float(payload["energy_scale"]),
+        )
+        model.load_state_dict(payload["state_dict"])
+        model.to(device)
+        model.eval()
+        return model
+
 
 class ActionConditionedEnergyCritic(FlexibleEnergyRegressor):
     def __init__(
@@ -335,6 +352,8 @@ class CalibratedCompactEnergyEstimator:
         self.goal_calibration = goal_calibration
         self.mission_calibration = mission_calibration
         self.device = torch.device(device)
+        self.coverage = float(goal_calibration.coverage_target)
+        self.mission_coverage = float(mission_calibration.coverage_target)
         self.update_count = 0
         self.replay: tuple[()] = ()
         self.trainable_replay: tuple[()] = ()
@@ -442,6 +461,27 @@ class CalibratedCompactEnergyEstimator:
                 "mission_calibration": self.mission_calibration.as_dict(),
             },
             destination,
+        )
+
+    @classmethod
+    def load(
+        cls,
+        path: str | Path,
+        *,
+        device: str = "cpu",
+    ) -> "CalibratedCompactEnergyEstimator":
+        payload = torch.load(Path(path), map_location=device, weights_only=False)
+        if payload.get("estimator_type") != cls.estimator_type:
+            raise ValueError("checkpoint is not a calibrated compact JSEB estimator")
+        point_model = FlexibleEnergyRegressor.from_checkpoint_payload(
+            payload["point_model"],
+            device=device,
+        )
+        return cls(
+            point_model,
+            HierarchicalConformalCalibration.from_dict(payload["goal_calibration"]),
+            MissionConformalCalibration.from_dict(payload["mission_calibration"]),
+            device=device,
         )
 
 

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import math
 import time
 from dataclasses import asdict, dataclass
@@ -673,6 +674,7 @@ class ModelBasedEnergyRolloutEstimator:
     estimator_type = "model_based_energy_rollout_oracle"
     bootstrapping = False
     gamma = None
+    returns_deterministic_exact = True
 
     def __init__(
         self,
@@ -698,6 +700,66 @@ class ModelBasedEnergyRolloutEstimator:
         goal_type: str | None = None,
     ) -> GoalEnergyPrediction:
         del goal_type
+        result = self._rollout_context(
+            environment,
+            goal,
+            position=position,
+            velocity=velocity,
+        )
+        return result[0]
+
+    def estimate_mission_context(
+        self,
+        environment,
+        task_goal: np.ndarray,
+    ) -> GoalEnergyPrediction:
+        return self.estimate_mission_bundle(environment, task_goal)[3]
+
+    def estimate_mission_bundle(
+        self,
+        environment,
+        task_goal: np.ndarray,
+    ) -> tuple[
+        GoalEnergyPrediction,
+        GoalEnergyPrediction,
+        GoalEnergyPrediction,
+        GoalEnergyPrediction,
+    ]:
+        task, endpoint_position, _ = self._rollout_context(
+            environment,
+            task_goal,
+            position=environment.agent.pos,
+            velocity=environment.agent.vel,
+        )
+        return_after, _, _ = self._rollout_context(
+            environment,
+            environment.charger_position,
+            position=endpoint_position,
+            velocity=np.zeros(3, dtype=np.float32),
+        )
+        return_now, _, _ = self._rollout_context(
+            environment,
+            environment.charger_position,
+            position=environment.agent.pos,
+            velocity=environment.agent.vel,
+        )
+        total = float(task.prediction + return_after.prediction)
+        mission = GoalEnergyPrediction(
+            total,
+            total,
+            int(task.rollout_steps + return_after.rollout_steps),
+            float(task.wall_clock_seconds + return_after.wall_clock_seconds),
+        )
+        return task, return_after, return_now, mission
+
+    def _rollout_context(
+        self,
+        environment,
+        goal: np.ndarray,
+        *,
+        position: np.ndarray | None = None,
+        velocity: np.ndarray | None = None,
+    ) -> tuple[GoalEnergyPrediction, np.ndarray, np.ndarray]:
         start_position = environment.agent.pos.copy() if position is None else np.asarray(position, dtype=np.float32)
         start_velocity = environment.agent.vel.copy() if velocity is None else np.asarray(velocity, dtype=np.float32)
         horizontal_speed = float(np.linalg.norm(start_velocity[:2]))
@@ -711,7 +773,50 @@ class ModelBasedEnergyRolloutEstimator:
             environment.vertical_v_max,
         )
         if float(np.linalg.norm(np.asarray(goal, dtype=np.float32) - start_position)) <= environment.goal_tolerance:
-            return GoalEnergyPrediction(0.0, 0.0, 0, 0.0)
+            return (
+                GoalEnergyPrediction(0.0, 0.0, 0, 0.0),
+                start_position.copy(),
+                start_velocity.copy(),
+            )
+        clone = self._make_rollout_environment(
+            environment,
+            start_position=start_position,
+            start_velocity=start_velocity,
+            goal=np.asarray(goal, dtype=np.float32),
+        )
+        observation = clone._active_goal_sac_observation()
+        total_energy = 0.0
+        started = time.perf_counter()
+        steps = 0
+        while steps < self.max_policy_steps:
+            action, _ = self.policy.predict(observation, deterministic=True)
+            observation, _, terminated, truncated, info = clone.step(action)
+            total_energy += float(info["realized_energy_cost"])
+            steps += 1
+            if terminated or truncated:
+                if not bool(info["is_success"]):
+                    clone.close()
+                    raise RuntimeError(f"model-based energy rollout failed: {info['end_reason']}")
+                elapsed = time.perf_counter() - started
+                final_position = clone.agent.pos.copy()
+                final_velocity = clone.agent.vel.copy()
+                clone.close()
+                return (
+                    GoalEnergyPrediction(total_energy, total_energy, steps, elapsed),
+                    final_position,
+                    final_velocity,
+                )
+        clone.close()
+        raise RuntimeError("model-based energy rollout exceeded max_policy_steps")
+
+    @staticmethod
+    def _make_rollout_environment(
+        environment,
+        *,
+        start_position: np.ndarray,
+        start_velocity: np.ndarray,
+        goal: np.ndarray,
+    ):
         clone = environment.__class__(
             length=environment.length,
             width=environment.width,
@@ -731,36 +836,52 @@ class ModelBasedEnergyRolloutEstimator:
             max_steps_per_task=environment.max_steps_per_task,
             phase1_episode_max_policy_steps=environment.phase1_episode_max_policy_steps,
             phase2_episode_limit=environment.phase2_episode_limit,
+            mission_decision_interval_policy_steps=(
+                environment.mission_decision_interval_policy_steps
+            ),
             safe_radius=environment.safe_radius,
+            task_completion_reward=environment.task_completion_reward,
+            progress_reward_weight=environment.progress_reward_weight,
+            velocity_reward_weight=environment.velocity_reward_weight,
+            time_penalty=environment.time_penalty,
+            boundary_penalty=environment.boundary_penalty,
+            obstacle_collision_penalty=environment.obstacle_collision_penalty,
+            repeat_collision_scale=environment.repeat_collision_scale,
+            safety_intervention_penalty=environment.safety_intervention_penalty,
             telemetry_cost_config=environment.telemetry_cost_model.config,
             charger_position=environment.charger_position,
+            lidar_enabled=environment.lidar_enabled,
+            lidar_max_range=environment.lidar_max_range,
+            lidar_min_range=environment.lidar_min_range,
+            lidar_horizontal_fov=environment.lidar_horizontal_fov,
+            lidar_vertical_fov=environment.lidar_vertical_fov,
+            lidar_frequency=environment.lidar_frequency,
+            lidar_horizontal_sectors=environment.lidar_horizontal_sectors,
+            lidar_vertical_sectors=environment.lidar_vertical_sectors,
+            num_obstacles=0,
+            obstacle_radius_min=environment.obstacle_radius_min,
+            obstacle_radius_max=environment.obstacle_radius_max,
+            obstacle_sampling_margin=environment.obstacle_sampling_margin,
+            cbf_enabled=environment.cbf_enabled,
+            cbf_frequency=environment.cbf_frequency,
+            hocbf_k1=environment.hocbf_k1,
+            hocbf_k2=environment.hocbf_k2,
+            hocbf_uncertainty_margin=environment.hocbf_uncertainty_margin,
+            hocbf_top_k=environment.hocbf_top_k,
+            projection_geometry_enabled=environment.projection_geometry_enabled,
             phase=2,
         )
-        observation, _ = clone.reset(
+        clone.reset(
             seed=0,
             options={
                 "start_position": start_position,
                 "start_velocity": start_velocity,
-                "task_point": np.asarray(goal, dtype=np.float32),
+                "task_point": goal,
             },
         )
-        total_energy = 0.0
-        started = time.perf_counter()
-        steps = 0
-        while steps < self.max_policy_steps:
-            action, _ = self.policy.predict(observation, deterministic=True)
-            observation, _, terminated, truncated, info = clone.step(action)
-            total_energy += float(info["realized_energy_cost"])
-            steps += 1
-            if terminated or truncated:
-                if not bool(info["is_success"]):
-                    clone.close()
-                    raise RuntimeError(f"model-based energy rollout failed: {info['end_reason']}")
-                elapsed = time.perf_counter() - started
-                clone.close()
-                return GoalEnergyPrediction(total_energy, total_energy, steps, elapsed)
-        clone.close()
-        raise RuntimeError("model-based energy rollout exceeded max_policy_steps")
+        clone.obstacles = copy.deepcopy(environment.obstacles)
+        clone._update_lidar()
+        return clone
 
 
 def energy_regression_metrics(

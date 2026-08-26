@@ -60,6 +60,22 @@ def discover_checkpoints(artifact: Path) -> list[tuple[int, Path]]:
     return checkpoints
 
 
+def select_checkpoints(
+    checkpoints: list[tuple[int, Path]],
+    requested_transitions: list[int] | None,
+) -> list[tuple[int, Path]]:
+    if requested_transitions is None:
+        return checkpoints
+    requested = [int(value) for value in requested_transitions]
+    if len(set(requested)) != len(requested):
+        raise ValueError("checkpoint transitions must be unique")
+    available = {transition: path for transition, path in checkpoints}
+    missing = sorted(set(requested) - set(available))
+    if missing:
+        raise FileNotFoundError(f"requested checkpoints are missing: {missing}")
+    return [(transition, available[transition]) for transition in requested]
+
+
 def reconstruct_environment_args(artifact: Path, *, device: str, seed: int):
     config = json.loads((artifact / "config.json").read_text(encoding="utf-8"))
     command = list(config["exact_command"])
@@ -135,6 +151,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--device", default="cuda")
     parser.add_argument("--selection-seed", type=int, default=DEFAULT_SELECTION_SEED)
     parser.add_argument("--num-tasks", type=int, default=DEFAULT_SELECTION_TASKS)
+    parser.add_argument(
+        "--checkpoint-transitions",
+        type=int,
+        nargs="+",
+        help="evaluate only the named environment-transition checkpoints",
+    )
     parser.add_argument("--torch-threads", type=int, default=1)
     parser.add_argument("--dry-run", action="store_true")
     return parser.parse_args()
@@ -148,7 +170,10 @@ def main() -> int:
         if cli.output_dir
         else artifact / "checkpoint_selection_500tasks"
     )
-    checkpoints = discover_checkpoints(artifact)
+    checkpoints = select_checkpoints(
+        discover_checkpoints(artifact),
+        cli.checkpoint_transitions,
+    )
     if cli.num_tasks != DEFAULT_SELECTION_TASKS:
         raise ValueError("the formal checkpoint-selection sweep requires exactly 500 tasks")
     if cli.dry_run:

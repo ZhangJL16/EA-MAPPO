@@ -7,7 +7,11 @@ import pytest
 import torch
 from stable_baselines3 import SAC
 
-from envs.UAVEnergyDeliverySAC import SACTrainingPhase, UAVEnergyDeliverySACEnv
+from envs.UAVEnergyDeliverySAC import (
+    SACTrainingPhase,
+    StaticCylinderObstacle,
+    UAVEnergyDeliverySACEnv,
+)
 from experiments.energy_mc.core import (
     ENERGY_GOAL_TYPES,
     EnergyGoalSpec,
@@ -208,6 +212,78 @@ def test_model_rollout_oracle_accepts_saturated_live_velocity() -> None:
     oracle = ModelBasedEnergyRolloutEstimator(HeuristicGoalPolicy(), max_policy_steps=500)
     prediction = oracle.estimate_context(environment, environment.current_task_point)
     assert prediction.prediction > 0.0
+    environment.close()
+
+
+def test_model_rollout_oracle_clone_preserves_obstacles_lidar_and_hocbf() -> None:
+    environment = UAVEnergyDeliverySACEnv(
+        phase=SACTrainingPhase.TD_PRETRAINING,
+        lidar_enabled=True,
+        lidar_horizontal_sectors=8,
+        lidar_vertical_sectors=2,
+        num_obstacles=0,
+        cbf_enabled=True,
+        hocbf_top_k=4,
+        projection_geometry_enabled=True,
+    )
+    environment.reset(
+        seed=17,
+        options={
+            "start_position": np.asarray([500.0, 500.0, 200.0], dtype=np.float32),
+            "start_velocity": np.zeros(3, dtype=np.float32),
+            "task_point": np.asarray([650.0, 500.0, 200.0], dtype=np.float32),
+        },
+    )
+    environment.obstacles = [
+        StaticCylinderObstacle(np.asarray([575.0, 550.0], dtype=np.float32), 20.0)
+    ]
+    environment._update_lidar()
+    oracle = ModelBasedEnergyRolloutEstimator(HeuristicGoalPolicy(), max_policy_steps=500)
+    clone = oracle._make_rollout_environment(
+        environment,
+        start_position=environment.agent.pos.copy(),
+        start_velocity=environment.agent.vel.copy(),
+        goal=environment.current_task_point.copy(),
+    )
+    assert clone is not environment
+    assert clone.cbf_enabled is True
+    assert clone.lidar_enabled is True
+    assert clone.projection_geometry_enabled is True
+    assert len(clone.obstacles) == 1
+    assert clone.obstacles[0] is not environment.obstacles[0]
+    np.testing.assert_allclose(clone.obstacles[0].pos, environment.obstacles[0].pos)
+    clone.close()
+    environment.close()
+
+
+def test_model_rollout_oracle_supplies_direct_joint_mission_cost() -> None:
+    environment = UAVEnergyDeliverySACEnv(
+        phase=SACTrainingPhase.TD_PRETRAINING,
+        charger_position=np.asarray([500.0, 500.0, 200.0], dtype=np.float32),
+    )
+    environment.reset(
+        seed=19,
+        options={
+            "start_position": np.asarray([500.0, 500.0, 200.0], dtype=np.float32),
+            "start_velocity": np.zeros(3, dtype=np.float32),
+            "task_point": np.asarray([650.0, 500.0, 200.0], dtype=np.float32),
+        },
+    )
+    oracle = ModelBasedEnergyRolloutEstimator(HeuristicGoalPolicy(), max_policy_steps=500)
+    environment.bind_energy_learning(
+        energy_estimator=oracle,
+        goal_action_provider=lambda observation: np.zeros(3, dtype=np.float32),
+        training_enabled=False,
+    )
+    estimate = environment.mission_energy_estimate()
+    assert estimate.mission_prediction > 0.0
+    assert estimate.mission_upper95 == pytest.approx(estimate.mission_prediction)
+    assert estimate.mission_upper_bound_semantics == (
+        "deterministic_oracle_joint_mission_cost"
+    )
+    assert estimate.mission_nominal_coverage_lower_bound == pytest.approx(1.0)
+    assert oracle.update_count == 0
+    assert len(oracle.replay) == 0
     environment.close()
 
 

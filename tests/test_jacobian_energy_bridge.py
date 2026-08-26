@@ -15,7 +15,15 @@ from experiments.jacobian_energy_bridge.dataset import (
     concatenate_bridge_datasets,
     load_bridge_dataset,
 )
-from experiments.jacobian_energy_bridge.energy_model import ActionConditionedEnergyCritic
+from experiments.jacobian_energy_bridge.energy_model import (
+    ActionConditionedEnergyCritic,
+    CalibratedCompactEnergyEstimator,
+    FlexibleEnergyRegressor,
+)
+from review_bundle.safety.energy.mc_regression import (
+    HierarchicalConformalCalibration,
+    MissionConformalCalibration,
+)
 from experiments.jacobian_energy_bridge.losses import (
     local_projected_action,
     masked_energy_bridge_loss,
@@ -68,6 +76,38 @@ def _geometry(jacobian: np.ndarray | None = None) -> dict[str, object]:
         "coordinate_map_stable": True,
         "reason": "test",
     }
+
+
+def test_calibrated_compact_estimator_checkpoint_round_trip(tmp_path: Path) -> None:
+    point = FlexibleEnergyRegressor(7, hidden_dim=8, energy_scale=20.0)
+    goal = HierarchicalConformalCalibration.fit(
+        np.asarray([0.0, 0.0, 0.0]),
+        np.asarray([1.0, 2.0, 3.0]),
+        np.asarray([0, 1, 2]),
+        np.asarray(["TASK", "TASK", "CHARGER"]),
+        np.asarray(["100-500", "500-1500", "100-500"]),
+        coverage=0.90,
+    )
+    mission = MissionConformalCalibration.fit(
+        np.asarray([1.0, 2.0]),
+        np.asarray(["100-500", "500-1500"]),
+        coverage=0.90,
+    )
+    estimator = CalibratedCompactEnergyEstimator(
+        point,
+        goal,
+        mission,
+        device="cpu",
+    )
+    checkpoint = tmp_path / "estimator.pt"
+    estimator.save(checkpoint)
+    restored = CalibratedCompactEnergyEstimator.load(checkpoint, device="cpu")
+    state = np.zeros(7, dtype=np.float32)
+    assert restored.point_model.predict(state, device="cpu") == pytest.approx(
+        estimator.point_model.predict(state, device="cpu")
+    )
+    assert restored.coverage == pytest.approx(0.90)
+    assert restored.mission_coverage == pytest.approx(0.90)
 
 
 def _info(*, terminal: bool = False, jacobian: np.ndarray | None = None) -> dict[str, object]:

@@ -261,6 +261,7 @@ def test_environment_prefers_direct_mission_context_when_available() -> None:
     estimate = environment.mission_energy_estimate()
     assert estimate.mission_prediction == 2.0
     assert estimate.mission_upper95 == 7.0
+    assert estimate.mission_upper_bound_semantics == "direct_joint_mission_upper_bound"
     environment.close()
 
 
