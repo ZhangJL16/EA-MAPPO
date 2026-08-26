@@ -30,6 +30,7 @@ from review_bundle.safety.switching import (
     FixedSOCThresholdReturnManager,
     QuantileEnergyReturnManager,
     ReturnDecisionContext,
+    ReturnManagerDecision,
     SortieMode,
 )
 from scripts.train_uav_energy_delivery_sac import (
@@ -784,6 +785,86 @@ def test_quantile_return_manager_reproduces_legacy_two_boundary_rule() -> None:
     )
     assert immediate_decision.commit is True
     assert immediate_decision.reason == "immediate_return_energy_boundary"
+
+
+def test_quantile_return_manager_preserves_seeded_legacy_switch_step() -> None:
+    class LegacyInlineReturnManager:
+        manager_type = "legacy_inline_two_boundary_rule"
+        requires_energy_estimate = True
+
+        def decide(self, context: ReturnDecisionContext) -> ReturnManagerDecision:
+            immediate_margin = (
+                context.remaining_energy
+                - float(context.return_now_requirement)
+                - context.reserve
+            )
+            mission_margin = (
+                context.remaining_energy
+                - float(context.task_then_return_requirement)
+                - context.reserve
+            )
+            commit = immediate_margin <= 0.0 or mission_margin <= 0.0
+            return ReturnManagerDecision(
+                commit=commit,
+                reason="legacy_inline_commit" if commit else "legacy_inline_continue",
+                immediate_margin=immediate_margin,
+                mission_margin=mission_margin,
+                decision_statistic=float(context.task_then_return_requirement),
+            )
+
+    common = dict(
+        operational_energy_capacity=10.0,
+        energy_reserve_fraction=0.10,
+        mission_decision_interval_policy_steps=1,
+    )
+    refactored = UAVEnergyDeliverySACEnv(**common)
+    legacy = UAVEnergyDeliverySACEnv(**common)
+    for environment, manager in (
+        (refactored, QuantileEnergyReturnManager()),
+        (legacy, LegacyInlineReturnManager()),
+    ):
+        environment.bind_energy_learning(
+            energy_estimator=RecordingEstimator(4.0),
+            goal_action_provider=zero_policy,
+            training_enabled=False,
+            return_manager=manager,
+        )
+        environment.enable_phase_two()
+
+    observations = [environment.reset(seed=1401)[0] for environment in (refactored, legacy)]
+    np.testing.assert_allclose(observations[0], observations[1])
+    switch_steps: list[int | None] = [None, None]
+    for _ in range(200):
+        for index, environment in enumerate((refactored, legacy)):
+            observation, _, terminated, truncated, _ = environment.step(
+                np.zeros(3, dtype=np.float32)
+            )
+            observations[index] = observation
+            assert terminated is False
+            assert truncated is False
+            if (
+                switch_steps[index] is None
+                and environment.mode is SortieMode.CHARGER_COMMITTED
+            ):
+                switch_steps[index] = environment.current_step
+        np.testing.assert_allclose(refactored.agent.pos, legacy.agent.pos)
+        np.testing.assert_allclose(refactored.agent.vel, legacy.agent.vel)
+        assert refactored.agent.energy == pytest.approx(legacy.agent.energy)
+        assert refactored.mode is legacy.mode
+        if switch_steps[0] is not None or switch_steps[1] is not None:
+            break
+
+    assert switch_steps[0] is not None
+    assert switch_steps[0] == switch_steps[1]
+    assert refactored.switching_events[0]["global_step"] == legacy.switching_events[0][
+        "global_step"
+    ]
+    np.testing.assert_allclose(
+        refactored.switching_events[0]["position"],
+        legacy.switching_events[0]["position"],
+    )
+    refactored.close()
+    legacy.close()
 
 
 def test_component_risk_allocation_uses_union_bound_not_fake_joint_q95() -> None:

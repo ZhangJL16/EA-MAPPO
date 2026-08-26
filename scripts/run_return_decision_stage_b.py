@@ -68,6 +68,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--navigation-evaluation-json", type=Path)
     parser.add_argument("--battery-calibration-json", type=Path)
     parser.add_argument("--battery-validation-json", type=Path)
+    parser.add_argument(
+        "--oracle-headroom-json",
+        type=Path,
+        help="passed Oracle headroom Gate inherited by post-Gate learned-method comparisons",
+    )
     parser.add_argument("--cycles-per-point", type=int, default=20)
     parser.add_argument("--minimum-cycles-for-gate", type=int, default=100)
     parser.add_argument("--oracle-stranding-ceiling", type=float, default=0.05)
@@ -163,6 +168,14 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
             "formal Oracle headroom evaluation is underpowered: "
             "cycles-per-point * evaluation-seeds must reach minimum-cycles-for-gate"
         )
+    if not args.smoke and args.oracle_headroom_json is None:
+        if "oracle" not in args.methods or not {"soc", "distance"}.intersection(
+            args.methods
+        ):
+            parser.error(
+                "a formal headroom run must include Oracle and at least one SOC/distance "
+                "heuristic, or inherit a passed --oracle-headroom-json"
+            )
     return args
 
 
@@ -543,6 +556,7 @@ def write_results(
     aggregate_audits: list[dict[str, object]],
     seed_audits: list[dict[str, object]],
     cycle_records: list[dict[str, object]],
+    inherited_oracle_gate: dict[str, object] | None,
 ) -> None:
     (output / "probability_semantics_audit.json").write_text(
         json.dumps(p0, indent=2, sort_keys=True) + "\n",
@@ -561,21 +575,31 @@ def write_results(
         )
         for item in aggregate_audits
     }
-    gate = oracle_headroom_gate(
-        outcomes,
-        cycles_per_point=cycles_per_point,
-        stranding_upper_bounds=stranding_upper_bounds,
-        minimum_cycles_per_point=args.minimum_cycles_for_gate,
-        stranding_ceiling=args.oracle_stranding_ceiling,
-        minimum_throughput_gain_fraction=(
-            args.oracle_min_throughput_gain_fraction
-        ),
-    )
-    gate_payload = {
-        **gate.as_dict(),
-        "stranding_statistic": "two_sided_wilson_95_upper_bound",
-        "point_estimates_not_used_as_safety_gate": True,
-    }
+    if inherited_oracle_gate is None:
+        gate = oracle_headroom_gate(
+            outcomes,
+            cycles_per_point=cycles_per_point,
+            stranding_upper_bounds=stranding_upper_bounds,
+            minimum_cycles_per_point=args.minimum_cycles_for_gate,
+            stranding_ceiling=args.oracle_stranding_ceiling,
+            minimum_throughput_gain_fraction=(
+                args.oracle_min_throughput_gain_fraction
+            ),
+        )
+        gate_payload = {
+            **gate.as_dict(),
+            "stranding_statistic": "two_sided_wilson_95_upper_bound",
+            "point_estimates_not_used_as_safety_gate": True,
+            "gate_source": "computed_from_current_soc_distance_oracle_outcomes",
+        }
+        gate_passed = gate.passed
+    else:
+        gate_payload = {
+            **inherited_oracle_gate,
+            "gate_source": str(args.oracle_headroom_json),
+            "inherited_for_post_gate_comparison": True,
+        }
+        gate_passed = True
     (output / "oracle_headroom_gate.json").write_text(
         json.dumps(gate_payload, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
@@ -617,9 +641,13 @@ def write_results(
             "SMOKE_ONLY_NOT_FORMAL_EVIDENCE"
             if args.smoke
             else (
+                "POST_ORACLE_HEADROOM_DECISION_COMPARISON"
+                if inherited_oracle_gate is not None
+                else (
                 "ORACLE_HEADROOM_GATE_PASS"
-                if gate.passed is True
+                if gate_passed is True
                 else "STOP_AFTER_ORACLE_HEADROOM_GATE"
+                )
             )
         ),
     }
@@ -763,6 +791,21 @@ def load_prerequisite_audit(args: argparse.Namespace) -> GateBPrerequisiteAudit:
     return audit
 
 
+def load_passed_oracle_headroom_gate(path: Path) -> dict[str, object]:
+    if not path.is_file():
+        raise FileNotFoundError(path)
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        raise TypeError("Oracle headroom Gate JSON must contain an object")
+    if (
+        payload.get("status") != "PASS"
+        or payload.get("evaluable") is not True
+        or payload.get("passed") is not True
+    ):
+        raise RuntimeError("post-Gate comparison requires an evaluable PASS Gate")
+    return payload
+
+
 def derive_successful_energy_per_meter(
     calibration: dict[str, object],
 ) -> float:
@@ -809,6 +852,11 @@ def main(argv: list[str] | None = None) -> None:
                 "formal Gate-B prerequisites failed: "
                 + "; ".join(prerequisite.failures)
             )
+        inherited_oracle_gate = (
+            None
+            if args.oracle_headroom_json is None
+            else load_passed_oracle_headroom_gate(args.oracle_headroom_json)
+        )
         probe = environment_from_args(args, reserve_fraction=0.0)
         policy = load_policy(args, probe)
         probe.close()
@@ -848,6 +896,7 @@ def main(argv: list[str] | None = None) -> None:
             aggregate_audits=aggregate_audits,
             seed_audits=all_seed_audits,
             cycle_records=all_cycle_records,
+            inherited_oracle_gate=inherited_oracle_gate,
         )
     except Exception as error:
         (args.output_dir / "FAILED.json").write_text(

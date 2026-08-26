@@ -124,6 +124,12 @@ Commitment remains absorbing until the charger is reached. SOC and distance
 managers can run without an Energy estimator, which makes the decision comparison
 fair and avoids unnecessary estimator calls.
 
+The extraction is guarded by a seeded trajectory regression: a test-only copy of
+the former inline two-boundary rule and the pluggable Quantile manager receive the
+same initial state, task, actions, frozen estimator outputs, battery dynamics, and
+seed. Their state trajectories and exact `CHARGER_COMMITTED` switching step must
+match.
+
 ## 6. Stage B: Oracle Decision Headroom
 
 Before training PCM, world models, ensembles, or a new reliability network, the
@@ -200,6 +206,12 @@ paper-level safety certificate.
 - If Oracle does not materially dominate SOC and distance frontiers, stop using
   return-to-charge as the ICLR headline.
 - If Oracle shows stable headroom, proceed to learned estimators.
+
+Post-Gate learned-method runs may evaluate only Frozen/Online TD or later learned
+estimators, but they must explicitly inherit the formal `oracle_headroom_gate.json`.
+The runner rejects TD-only formal runs without that artifact and rejects inherited
+Gate files unless `status=PASS`, `evaluable=true`, and `passed=true`; it never
+recomputes an empty Oracle Gate from a learned-method-only table.
 
 ## 7. Stage C: Minimal Prediction Baselines
 

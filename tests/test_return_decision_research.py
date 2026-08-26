@@ -15,6 +15,7 @@ from experiments.energy_mc.return_decision import (
 from scripts.run_return_decision_stage_b import (
     aggregate_seed_audits,
     derive_successful_energy_per_meter,
+    load_passed_oracle_headroom_gate,
     parse_args,
 )
 from scripts.evaluate_jseb_checkpoints import select_checkpoints
@@ -151,6 +152,47 @@ def test_formal_defaults_provide_exact_minimum_gate_cycles() -> None:
         == 100
     )
     assert args.battery_capacity is None
+
+
+def test_post_gate_td_comparison_requires_explicit_passed_gate(tmp_path) -> None:
+    with pytest.raises(SystemExit):
+        parse_args(
+            [
+                "--output-dir",
+                str(tmp_path / "invalid"),
+                "--methods",
+                "td_frozen",
+            ]
+        )
+    passed_path = tmp_path / "oracle_gate.json"
+    passed_path.write_text(
+        '{"status":"PASS","evaluable":true,"passed":true}\n',
+        encoding="utf-8",
+    )
+    args = parse_args(
+        [
+            "--output-dir",
+            str(tmp_path / "valid"),
+            "--methods",
+            "td_frozen",
+            "td_online",
+            "--oracle-headroom-json",
+            str(passed_path),
+        ]
+    )
+    assert args.methods == ["td_frozen", "td_online"]
+    assert load_passed_oracle_headroom_gate(passed_path)["status"] == "PASS"
+
+
+def test_post_gate_comparison_rejects_nonpassing_gate(tmp_path) -> None:
+    failed_path = tmp_path / "oracle_gate.json"
+    failed_path.write_text(
+        '{"status":"FAIL_INSUFFICIENT_ORACLE_HEADROOM",'
+        '"evaluable":true,"passed":false}\n',
+        encoding="utf-8",
+    )
+    with pytest.raises(RuntimeError, match="requires an evaluable PASS"):
+        load_passed_oracle_headroom_gate(failed_path)
 
 
 def valid_gate_b_prerequisites() -> tuple[dict, dict, dict]:
