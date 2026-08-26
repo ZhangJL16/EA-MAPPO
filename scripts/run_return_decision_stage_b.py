@@ -629,7 +629,7 @@ def write_results(
     seed_audits: list[dict[str, object]],
     cycle_records: list[dict[str, object]],
     inherited_oracle_gate: dict[str, object] | None,
-) -> None:
+) -> dict[str, object]:
     (output / "probability_semantics_audit.json").write_text(
         json.dumps(p0, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
@@ -761,6 +761,24 @@ def write_results(
     figure.tight_layout()
     figure.savefig(output / "stranding_throughput_pareto.png", dpi=180)
     plt.close(figure)
+    return gate_payload
+
+
+def stage_b_completion_contract(
+    args: argparse.Namespace,
+    gate_payload: dict[str, object],
+) -> tuple[str, int, str]:
+    if args.smoke:
+        return "SMOKE_COMPLETED.json", 0, "SMOKE_ONLY_NOT_FORMAL_EVIDENCE"
+    if args.oracle_headroom_json is not None:
+        return "COMPLETED.json", 0, "POST_ORACLE_HEADROOM_DECISION_COMPARISON"
+    if gate_payload.get("passed") is True and gate_payload.get("status") == "PASS":
+        return "COMPLETED.json", 0, "ORACLE_HEADROOM_GATE_PASS"
+    return (
+        "STOPPED_AFTER_ORACLE_HEADROOM_GATE.json",
+        4,
+        str(gate_payload.get("status", "UNKNOWN_GATE_STATUS")),
+    )
 
 
 def write_csv(path: Path, rows: list[dict[str, object]]) -> None:
@@ -960,7 +978,7 @@ def main(argv: list[str] | None = None) -> None:
             outcomes.append(outcome)
             aggregate_audits.append(aggregate)
             print(json.dumps(aggregate, sort_keys=True), flush=True)
-        write_results(
+        gate_payload = write_results(
             args.output_dir,
             args=args,
             p0=p0,
@@ -971,6 +989,26 @@ def main(argv: list[str] | None = None) -> None:
             cycle_records=all_cycle_records,
             inherited_oracle_gate=inherited_oracle_gate,
         )
+        sentinel_name, exit_code, status = stage_b_completion_contract(
+            args,
+            gate_payload,
+        )
+        (args.output_dir / sentinel_name).write_text(
+            json.dumps(
+                {
+                    "protocol": "stage_b_oracle_decision_headroom",
+                    "status": status,
+                    "exit_code": exit_code,
+                    "oracle_headroom_gate": gate_payload,
+                },
+                indent=2,
+                sort_keys=True,
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        if exit_code:
+            raise SystemExit(exit_code)
     except Exception as error:
         (args.output_dir / "FAILED.json").write_text(
             json.dumps(

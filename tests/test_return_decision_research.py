@@ -20,6 +20,7 @@ from scripts.run_return_decision_stage_b import (
     load_passed_oracle_headroom_gate,
     load_policy,
     parse_args,
+    stage_b_completion_contract,
 )
 from scripts.evaluate_jseb_checkpoints import select_checkpoints
 from scripts.calibrate_battery_for_navigation_checkpoint import (
@@ -225,6 +226,44 @@ def test_stage_b_parallel_seed_evaluation_preserves_exact_cycle_accounting(tmp_p
     assert [audit["evaluation_seed"] for audit in audits] == [301, 302]
     assert sum(audit["attempted_cycles"] for audit in audits) == 2
     assert all(audit["attempted_cycles"] == 1 for audit in audits)
+
+
+def test_formal_oracle_gate_failure_stops_downstream_without_failed_artifact() -> None:
+    args = parse_args(["--output-dir", "/tmp/formal_stage_b_contract"])
+    sentinel, exit_code, status = stage_b_completion_contract(
+        args,
+        {
+            "status": "FAIL_INSUFFICIENT_ORACLE_HEADROOM",
+            "evaluable": True,
+            "passed": False,
+        },
+    )
+    assert sentinel == "STOPPED_AFTER_ORACLE_HEADROOM_GATE.json"
+    assert exit_code == 4
+    assert status == "FAIL_INSUFFICIENT_ORACLE_HEADROOM"
+
+
+def test_passed_and_post_gate_stage_b_contracts_complete(tmp_path) -> None:
+    formal = parse_args(["--output-dir", str(tmp_path / "formal")])
+    assert stage_b_completion_contract(
+        formal,
+        {"status": "PASS", "evaluable": True, "passed": True},
+    ) == ("COMPLETED.json", 0, "ORACLE_HEADROOM_GATE_PASS")
+    inherited_path = tmp_path / "gate.json"
+    post_gate = parse_args(
+        [
+            "--output-dir",
+            str(tmp_path / "post_gate"),
+            "--methods",
+            "td_frozen",
+            "--oracle-headroom-json",
+            str(inherited_path),
+        ]
+    )
+    assert stage_b_completion_contract(
+        post_gate,
+        {"status": "PASS", "evaluable": True, "passed": True},
+    ) == ("COMPLETED.json", 0, "POST_ORACLE_HEADROOM_DECISION_COMPARISON")
 
 
 def valid_gate_b_prerequisites() -> tuple[dict, dict, dict]:

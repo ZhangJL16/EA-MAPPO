@@ -214,6 +214,12 @@ paper-level safety certificate.
   return-to-charge as the ICLR headline.
 - If Oracle shows stable headroom, proceed to learned estimators.
 
+A formal Gate failure is a scientific stop, not an implementation crash. The
+runner writes `STOPPED_AFTER_ORACLE_HEADROOM_GATE.json` and exits with code 4;
+it does not write `FAILED.json` or return success. A passed Gate writes
+`COMPLETED.json`. Consequently every queued Stage-C process stops before model
+training when Oracle headroom is absent.
+
 Post-Gate learned-method runs may evaluate only Frozen/Online TD or later learned
 estimators, but they must explicitly inherit the formal `oracle_headroom_gate.json`.
 The runner rejects TD-only formal runs without that artifact and rejects inherited
