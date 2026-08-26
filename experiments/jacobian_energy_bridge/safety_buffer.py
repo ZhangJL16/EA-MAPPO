@@ -69,6 +69,7 @@ class SafetyBridgeBatch:
     safety_contexts: torch.Tensor
     valid_masks: torch.Tensor
     sample_ages: torch.Tensor
+    base_noises: torch.Tensor
 
 
 class SafetyBridgeReplay:
@@ -81,6 +82,9 @@ class SafetyBridgeReplay:
         observation_dtype: np.dtype = np.float16,
         maximum_barrier_constraints: int = 16,
         slack_scale: float = 5.0,
+        sampling_policy: str = "uniform",
+        recency_window: int | None = None,
+        require_base_noise: bool = False,
     ) -> None:
         if capacity <= 0 or observation_dim <= 0:
             raise ValueError("capacity and observation_dim must be positive")
@@ -88,6 +92,15 @@ class SafetyBridgeReplay:
         self.observation_dim = int(observation_dim)
         self.maximum_barrier_constraints = int(maximum_barrier_constraints)
         self.slack_scale = float(slack_scale)
+        if sampling_policy not in {"uniform", "recent_window"}:
+            raise ValueError("unsupported safety bridge sampling policy")
+        if sampling_policy == "recent_window" and (
+            recency_window is None or recency_window <= 0
+        ):
+            raise ValueError("recent-window sampling requires a positive window")
+        self.sampling_policy = sampling_policy
+        self.recency_window = None if recency_window is None else int(recency_window)
+        self.require_base_noise = bool(require_base_noise)
         self.rng = np.random.default_rng(seed)
         self.observations = np.empty(
             (capacity, observation_dim),
@@ -103,6 +116,7 @@ class SafetyBridgeReplay:
         )
         self.valid_masks = np.empty(capacity, dtype=np.bool_)
         self.insertion_ids = np.empty(capacity, dtype=np.int64)
+        self.base_noises = np.zeros((capacity, 3), dtype=np.float32)
         self.position = 0
         self.size = 0
         self.total_added = 0
@@ -144,6 +158,15 @@ class SafetyBridgeReplay:
             maximum_barrier_constraints=self.maximum_barrier_constraints,
             slack_scale=self.slack_scale,
         )
+        base_noise_value = info.get("bridge_base_noise")
+        if base_noise_value is None:
+            if self.require_base_noise:
+                raise ValueError("noise-coupled bridge replay requires bridge_base_noise")
+            base_noise = np.zeros(3, dtype=np.float32)
+        else:
+            base_noise = np.asarray(base_noise_value, dtype=np.float32)
+            if base_noise.shape != (3,) or not np.all(np.isfinite(base_noise)):
+                raise ValueError("bridge_base_noise must be a finite 3-vector")
         index = self.position
         self.observations[index] = observation
         self.compact_energy_states[index] = compact_state
@@ -153,6 +176,7 @@ class SafetyBridgeReplay:
         self.safety_contexts[index] = context
         self.valid_masks[index] = valid
         self.insertion_ids[index] = self.total_added
+        self.base_noises[index] = base_noise
         self.position = (self.position + 1) % self.capacity
         self.size = min(self.size + 1, self.capacity)
         self.total_added += 1
@@ -162,7 +186,14 @@ class SafetyBridgeReplay:
             raise ValueError("batch_size must be positive")
         if self.size == 0:
             raise RuntimeError("cannot sample an empty safety bridge replay")
-        indices = self.rng.integers(0, self.size, size=batch_size)
+        candidates = np.arange(self.size, dtype=np.int64)
+        if self.sampling_policy == "recent_window":
+            assert self.recency_window is not None
+            current_ages = (self.total_added - 1) - self.insertion_ids[: self.size]
+            candidates = candidates[current_ages < self.recency_window]
+            if candidates.size == 0:
+                raise RuntimeError("recent safety bridge window contains no samples")
+        indices = self.rng.choice(candidates, size=batch_size, replace=True)
 
         def tensor(values: np.ndarray, *, dtype: torch.dtype = torch.float32) -> torch.Tensor:
             return torch.as_tensor(values[indices], dtype=dtype, device=device)
@@ -180,6 +211,7 @@ class SafetyBridgeReplay:
             safety_contexts=tensor(self.safety_contexts),
             valid_masks=tensor(self.valid_masks, dtype=torch.bool),
             sample_ages=torch.as_tensor(sample_ages, dtype=torch.int64, device=device),
+            base_noises=tensor(self.base_noises),
         )
 
     def metadata(self) -> dict[str, object]:
@@ -211,4 +243,17 @@ class SafetyBridgeReplay:
             "safety_context_dim": SAFETY_CONTEXT_DIM,
             "maximum_barrier_constraints": self.maximum_barrier_constraints,
             "slack_scale": self.slack_scale,
+            "sampling_policy": self.sampling_policy,
+            "recency_window": self.recency_window,
+            "eligible_sample_count": (
+                self.size
+                if self.sampling_policy == "uniform" or self.size == 0
+                else int(
+                    np.sum(
+                        ((self.total_added - 1) - self.insertion_ids[: self.size])
+                        < int(self.recency_window)
+                    )
+                )
+            ),
+            "require_base_noise": self.require_base_noise,
         }

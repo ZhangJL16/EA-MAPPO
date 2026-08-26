@@ -10,7 +10,7 @@ from torch.nn import functional as F
 
 from .energy_model import ActionConditionedEnergyCritic
 from .losses import masked_energy_bridge_loss, shield_consistency_loss
-from .safety_buffer import SafetyBridgeReplay
+from .safety_buffer import SafetyBridgeBatch, SafetyBridgeReplay
 
 
 class JacobianBridgeSAC(SAC):
@@ -23,6 +23,7 @@ class JacobianBridgeSAC(SAC):
         bridge_learning_starts: int = 10_000,
         bridge_trust_region: float = 0.35,
         bridge_gradient_clip: float = 10.0,
+        bridge_noise_coupling: bool = False,
         **kwargs: Any,
     ) -> None:
         if min(
@@ -40,6 +41,7 @@ class JacobianBridgeSAC(SAC):
         self.bridge_learning_starts = int(bridge_learning_starts)
         self.bridge_trust_region = float(bridge_trust_region)
         self.bridge_gradient_clip = float(bridge_gradient_clip)
+        self.bridge_noise_coupling = bool(bridge_noise_coupling)
         self.bridge_replay: SafetyBridgeReplay | None = None
         self.bridge_energy_critic: ActionConditionedEnergyCritic | None = None
         self.bridge_energy_scale = 1.0
@@ -86,6 +88,38 @@ class JacobianBridgeSAC(SAC):
     def set_bridge_replay(self, replay: SafetyBridgeReplay | None) -> None:
         self.bridge_replay = replay
 
+    def infer_bridge_base_noise(
+        self,
+        observations: np.ndarray,
+        nominal_actions: np.ndarray,
+    ) -> np.ndarray:
+        observation_tensor = th.as_tensor(
+            observations,
+            dtype=th.float32,
+            device=self.device,
+        )
+        scaled_actions = self.policy.scale_action(
+            np.asarray(nominal_actions, dtype=np.float32)
+        )
+        action_tensor = th.as_tensor(
+            np.clip(scaled_actions, -1.0 + 1e-6, 1.0 - 1e-6),
+            dtype=th.float32,
+            device=self.device,
+        )
+        with th.no_grad():
+            mean_actions, log_std, _ = self.actor.get_action_dist_params(
+                observation_tensor
+            )
+            pre_tanh_actions = th.atanh(action_tensor)
+            base_noise = (pre_tanh_actions - mean_actions) / th.exp(log_std)
+        return base_noise.clamp(-10.0, 10.0).cpu().numpy().astype(np.float32)
+
+    def coupled_bridge_actions(self, bridge: SafetyBridgeBatch) -> th.Tensor:
+        mean_actions, log_std, _ = self.actor.get_action_dist_params(
+            bridge.observations
+        )
+        return th.tanh(mean_actions + th.exp(log_std) * bridge.base_noises)
+
     def set_energy_bridge(
         self,
         critic: ActionConditionedEnergyCritic | None,
@@ -112,6 +146,8 @@ class JacobianBridgeSAC(SAC):
         return self.energy_loss_weight * ramp
 
     def _ensure_bridge_counter_schema(self) -> None:
+        if not hasattr(self, "bridge_noise_coupling"):
+            self.bridge_noise_coupling = False
         for key in (
             "bridge_audit_steps",
             "pretrust_valid_fraction_sum",
@@ -265,7 +301,11 @@ class JacobianBridgeSAC(SAC):
             if bridge_ready:
                 assert self.bridge_replay is not None
                 bridge = self.bridge_replay.sample(self.bridge_batch_size, self.device)
-                bridge_actions = self.actor(bridge.observations, deterministic=True)
+                bridge_actions = (
+                    self.coupled_bridge_actions(bridge)
+                    if self.bridge_noise_coupling
+                    else self.actor(bridge.observations, deterministic=True)
+                )
                 shield_loss, projected_actions, valid_mask = shield_consistency_loss(
                     bridge_actions,
                     bridge.nominal_actions,

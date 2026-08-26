@@ -34,6 +34,7 @@ from experiments.jacobian_energy_bridge.energy_model import (
     SafetyBridgeEncoder,
     fit_result_dict,
 )
+from experiments.jacobian_energy_bridge.features import StructuredLidarFeatureExtractor
 from experiments.jacobian_energy_bridge.sac import JacobianBridgeSAC
 from experiments.jacobian_energy_bridge.safety_buffer import SafetyBridgeReplay
 from review_bundle.safety.energy.mc_regression import (
@@ -51,6 +52,7 @@ from scripts.train_uav_energy_delivery_sac import (
     freeze_navigation_policy,
     generate_navigation_curves,
     generate_stratified_navigation_tasks,
+    load_navigation_tasks,
     make_navigation_vec_env,
     navigation_energy_gate_passed,
     navigation_observation_dim,
@@ -249,6 +251,19 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--bridge-trust-region", type=float, default=0.35)
     parser.add_argument("--bridge-gradient-clip", type=float, default=10.0)
     parser.add_argument("--bridge-slack-scale", type=float, default=5.0)
+    parser.add_argument(
+        "--navigation-repair-variant",
+        choices=("R1", "R2", "R3", "R4"),
+        help="preregistered navigation-only repair variant",
+    )
+    parser.add_argument(
+        "--bridge-recency-window",
+        type=int,
+        default=512,
+        help="maximum insertion age eligible for R3 auxiliary bridge sampling",
+    )
+    parser.add_argument("--repair-source-navigation-evaluation")
+    parser.add_argument("--repair-evaluation-tasks")
     parser.add_argument("--energy-hidden-dim", type=int, default=128)
     parser.add_argument("--energy-epochs", type=int, default=30)
     parser.add_argument("--energy-batch-size", type=int, default=256)
@@ -355,6 +370,14 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     elif args.ablation in {"B", "C"}:
         args.shield_loss_weight = max(float(args.shield_loss_weight), 0.0)
         args.energy_loss_weight = 0.0
+    if args.navigation_repair_variant is not None:
+        args.energy_loss_weight = 0.0
+        if args.navigation_repair_variant == "R1":
+            args.shield_loss_weight = 0.0
+        else:
+            args.shield_loss_weight = max(float(args.shield_loss_weight), 0.0)
+        if args.bridge_recency_window <= 0:
+            parser.error("bridge-recency-window must be positive")
     for name in ("phase1_transitions", "phase2_energy_transitions"):
         if getattr(args, name) <= 0:
             parser.error(f"{name.replace('_', '-')} must be positive")
@@ -366,7 +389,22 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         parser.error("Phase 1 budget must be divisible by num-envs")
     if not args.lidar_enabled or not args.hocbf_enabled or args.num_obstacles != 24:
         parser.error("JSEB requires static obstacles, LiDAR, and HOCBF")
-    if not (args.smoke or args.pilot):
+    if not (args.smoke or args.pilot) and args.navigation_repair_variant is not None:
+        if not args.phase_end_eval_only:
+            parser.error("formal navigation repair requires phase-end-only evaluation")
+        if args.phase1_transitions != FORMAL_PHASE1_TRANSITIONS:
+            parser.error("formal navigation repair requires exactly 500000 transitions")
+        if args.eval_navigation_tasks != 500:
+            parser.error("formal navigation repair requires exactly 500 evaluation tasks")
+        if not args.repair_source_navigation_evaluation:
+            parser.error("formal navigation repair requires the failed source evaluation")
+        if not args.repair_evaluation_tasks:
+            parser.error("formal navigation repair requires the immutable selection task set")
+        if (args.lidar_horizontal_sectors, args.lidar_vertical_sectors) != (128, 8):
+            parser.error("formal navigation repair requires 128 x 8 LiDAR")
+        if (args.obstacle_radius_min, args.obstacle_radius_max) != (50.0, 120.0):
+            parser.error("formal navigation repair requires obstacle radii 50-120 m")
+    elif not (args.smoke or args.pilot):
         if not args.phase_end_eval_only:
             parser.error("formal JSEB requires phase-end-only evaluation")
         if args.ablation != "D" or not args.projection_geometry_enabled:
@@ -439,12 +477,24 @@ def paired_navigation_comparison(
 
 
 def make_bridge_replay(args: argparse.Namespace, *, seed_offset: int = 0) -> SafetyBridgeReplay:
+    sampling_policy = (
+        "recent_window"
+        if getattr(args, "navigation_repair_variant", None) in {"R3", "R4"}
+        else "uniform"
+    )
     return SafetyBridgeReplay(
         capacity=args.bridge_replay_capacity,
         observation_dim=navigation_observation_dim(args),
         seed=args.seed + seed_offset,
         maximum_barrier_constraints=args.hocbf_top_k,
         slack_scale=args.bridge_slack_scale,
+        sampling_policy=sampling_policy,
+        recency_window=(
+            args.bridge_recency_window if sampling_policy == "recent_window" else None
+        ),
+        require_base_noise=(
+            getattr(args, "navigation_repair_variant", None) == "R4"
+        ),
     )
 
 
@@ -1615,7 +1665,276 @@ def formal_config(args: argparse.Namespace) -> dict[str, object]:
     }
 
 
+def navigation_repair_source_failures(evaluation: dict[str, object]) -> list[str]:
+    failures: list[str] = []
+    if int(evaluation.get("num_tasks", -1)) != 500:
+        failures.append("source navigation evaluation must contain 500 tasks")
+    if int(evaluation.get("global_env_transitions", -1)) != 500_000:
+        failures.append("source navigation evaluation must use the 500k checkpoint")
+    if navigation_energy_gate_passed(evaluation) and navigation_safety_gate_passed(
+        evaluation
+    ):
+        failures.append("repair protocol requires a failed source navigation Gate")
+    return failures
+
+
+def structured_navigation_policy_kwargs(args: argparse.Namespace) -> dict[str, object]:
+    return {
+        "features_extractor_class": StructuredLidarFeatureExtractor,
+        "features_extractor_kwargs": {
+            "horizontal_sectors": int(args.lidar_horizontal_sectors),
+            "vertical_sectors": int(args.lidar_vertical_sectors),
+        },
+        "net_arch": [256, 256],
+        "share_features_extractor": False,
+    }
+
+
+def run_navigation_repair(args: argparse.Namespace) -> dict[str, object]:
+    long_run = not (args.smoke or args.pilot)
+    if long_run and (args.allow_dirty or not git_clean()):
+        raise RuntimeError(
+            "long navigation repair runs require a clean worktree and forbid --allow-dirty"
+        )
+    output = prepare_output_directory(args.output_dir)
+    for directory in ("phase1_navigation", "phase1_safety_bridge", "eval", "gifs"):
+        (output / directory).mkdir()
+    source_evaluation = None
+    source_failures: list[str] = []
+    source_path = None
+    task_path = None
+    if long_run:
+        source_path = Path(args.repair_source_navigation_evaluation).resolve()
+        task_path = Path(args.repair_evaluation_tasks).resolve()
+        for path in (source_path, task_path):
+            if not path.is_file():
+                raise FileNotFoundError(path)
+        source_evaluation = json.loads(source_path.read_text(encoding="utf-8"))
+        source_failures = navigation_repair_source_failures(source_evaluation)
+        if source_failures:
+            raise ValueError("; ".join(source_failures))
+        eval_tasks = load_navigation_tasks(task_path)
+        if len(eval_tasks) != 500:
+            raise ValueError("formal navigation repair requires the immutable 500-task set")
+    else:
+        eval_tasks = generate_stratified_navigation_tasks(
+            num_tasks=args.eval_navigation_tasks,
+            seed=args.eval_task_seed,
+        )
+    save_navigation_tasks(
+        output / "eval_navigation_tasks.json",
+        eval_tasks,
+        seed=args.eval_task_seed,
+        role="navigation_repair_model_selection_not_final_paper_test",
+    )
+    bridge_enabled = args.navigation_repair_variant in {"R2", "R3", "R4"}
+    replay = make_bridge_replay(args) if bridge_enabled else None
+    vector_environment = make_navigation_vec_env(args)
+    model = JacobianBridgeSAC(
+        "MlpPolicy",
+        vector_environment,
+        seed=args.seed,
+        device=args.device,
+        learning_rate=args.learning_rate,
+        buffer_size=args.buffer_size,
+        learning_starts=args.learning_starts,
+        batch_size=args.batch_size,
+        tau=args.tau,
+        gamma=args.gamma,
+        train_freq=(1, "step"),
+        gradient_steps=args.gradient_steps,
+        shield_loss_weight=args.shield_loss_weight,
+        energy_loss_weight=0.0,
+        bridge_batch_size=args.bridge_batch_size,
+        bridge_learning_starts=args.bridge_learning_starts,
+        bridge_trust_region=args.bridge_trust_region,
+        bridge_gradient_clip=args.bridge_gradient_clip,
+        bridge_noise_coupling=args.navigation_repair_variant == "R4",
+        policy_kwargs=structured_navigation_policy_kwargs(args),
+        verbose=1,
+        tensorboard_log=str(output / "tensorboard"),
+    )
+    model.set_bridge_replay(replay)
+    navigation_callback = NavigationBudgetCallback(
+        args=args,
+        output=output,
+        eval_tasks=eval_tasks,
+    )
+    callbacks: list[object] = [navigation_callback]
+    bridge_callback = None
+    if bridge_enabled:
+        bridge_callback = SafetyBridgeCollectionCallback(
+            replay=replay,
+            trajectory_writer=None,
+            metrics_path=output / "phase1_safety_bridge" / "metrics.jsonl",
+            log_frequency_transitions=args.log_freq_transitions,
+        )
+        callbacks.append(bridge_callback)
+    config = {
+        "status": "RUNNING",
+        "protocol": "JSEB_NAVIGATION_GATE_REPAIR_R1_R3",
+        "variant": args.navigation_repair_variant,
+        "seed": args.seed,
+        "git_sha": git_output("rev-parse", "HEAD"),
+        "git_status": subprocess.check_output(
+            ["git", "status", "--porcelain"], text=True
+        ).splitlines(),
+        "exact_command": sys.argv,
+        "fixed_training_budget": {
+            "unit": "environment_transition",
+            "requested": args.phase1_transitions,
+            "num_envs": args.num_envs,
+            "expected_vector_steps": args.phase1_transitions // args.num_envs,
+            "finish_last_episode": False,
+        },
+        "controlled_factors": {
+            "world_m": [4000.0, 4000.0, 400.0],
+            "static_obstacles": args.num_obstacles,
+            "obstacle_radius_m": [args.obstacle_radius_min, args.obstacle_radius_max],
+            "lidar_shape": [args.lidar_vertical_sectors, args.lidar_horizontal_sectors],
+            "lidar_channels": ["normalized_range", "hit_valid"],
+            "hocbf_final_hard_layer": True,
+            "actor_action_dim": 3,
+            "gradient_steps": args.gradient_steps,
+            "phase_end_evaluation_only": args.phase_end_eval_only,
+        },
+        "changed_factors": {
+            "structured_lidar_encoder": True,
+            "jacobian_bridge_enabled": bridge_enabled,
+            "bridge_sampling_policy": (
+                None if replay is None else replay.sampling_policy
+            ),
+            "bridge_recency_window": (
+                None if replay is None else replay.recency_window
+            ),
+            "bridge_trust_region": args.bridge_trust_region,
+            "bridge_noise_coupling": args.navigation_repair_variant == "R4",
+            "shield_loss_weight": args.shield_loss_weight,
+        },
+        "source_failed_gate": (
+            None
+            if source_path is None
+            else {
+                "path": str(source_path),
+                "sha256": file_sha256(source_path),
+                "overall_success_rate": source_evaluation["overall_success_rate"],
+                "mean_path_ratio": source_evaluation["mean_path_ratio"],
+            }
+        ),
+        "immutable_selection_tasks": (
+            None
+            if task_path is None
+            else {"path": str(task_path), "sha256": file_sha256(task_path)}
+        ),
+    }
+    write_json(output / "config.json", config)
+    write_json(
+        output / "RUNNING.json",
+        {"status": "RUNNING", "pid": os.getpid(), "started_at": utc_now()},
+    )
+    try:
+        started = time.perf_counter()
+        model.learn(
+            total_timesteps=args.phase1_transitions,
+            callback=CallbackList(callbacks),
+            reset_num_timesteps=True,
+            progress_bar=False,
+        )
+        elapsed = time.perf_counter() - started
+        if int(model.num_timesteps) != int(args.phase1_transitions):
+            raise RuntimeError("navigation repair did not match the exact transition budget")
+        final_evaluation = evaluate_navigation_tasks(
+            model,
+            args,
+            eval_tasks,
+            global_env_transitions=args.phase1_transitions,
+            output_path=output
+            / "eval"
+            / f"eval_transition_{args.phase1_transitions:06d}.json",
+        )
+        navigation_callback.final_evaluation = final_evaluation
+        navigation_callback.evaluation_env_transitions += int(
+            final_evaluation["evaluation_env_transitions"]
+        )
+        checkpoint = (
+            output
+            / "phase1_navigation"
+            / f"checkpoint_transition_{args.phase1_transitions:06d}.zip"
+        )
+        model.save(checkpoint)
+        actor_extractor = model.actor.features_extractor
+        extractor_audit = (
+            actor_extractor.architecture_audit()
+            if isinstance(actor_extractor, StructuredLidarFeatureExtractor)
+            else {"class": type(actor_extractor).__name__}
+        )
+        energy_ready = navigation_energy_gate_passed(final_evaluation)
+        safety_ready = navigation_safety_gate_passed(final_evaluation)
+        gate_passed = bool(energy_ready and safety_ready)
+        summary = {
+            "status": "COMPLETED" if gate_passed else "STOPPED_NAVIGATION_NOT_READY",
+            "completion_semantics": "fixed_budget_training_and_phase_end_evaluation_completed",
+            "variant": args.navigation_repair_variant,
+            "seed": args.seed,
+            "requested_transition_budget": args.phase1_transitions,
+            "actual_training_transitions": int(model.num_timesteps),
+            "exact_budget_match": int(model.num_timesteps) == args.phase1_transitions,
+            "vector_env_steps": navigation_callback.vector_env_steps,
+            "training_stop_reason": "transition_budget_reached",
+            "actual_gradient_updates": int(model._n_updates),
+            "gradient_update_to_transition_ratio": float(
+                model._n_updates / max(model.num_timesteps, 1)
+            ),
+            "wall_clock_seconds": elapsed,
+            "checkpoint": str(checkpoint),
+            "checkpoint_sha256": file_sha256(checkpoint),
+            "policy_parameter_count": sum(
+                parameter.numel() for parameter in model.policy.parameters()
+            ),
+            "feature_extractor": extractor_audit,
+            "bridge_replay": None if replay is None else replay.metadata(),
+            "bridge_training": model.bridge_training_metrics(),
+            "bridge_collection": (
+                None if bridge_callback is None else bridge_callback.metrics()
+            ),
+            "navigation_training_audit": navigation_callback.audit(),
+            "final_navigation": compact_summary(final_evaluation),
+            "navigation_energy_ready": energy_ready,
+            "navigation_safety_ready": safety_ready,
+            "navigation_gate_passed": gate_passed,
+            "downstream_navigation_ready": gate_passed,
+            "downstream_stages_authorized": gate_passed,
+        }
+        write_json(output / "phase1_navigation" / "summary.json", summary)
+        write_json(output / "EVALUATION_COMPLETED.json", summary)
+        sentinel = (
+            output / "COMPLETED.json"
+            if gate_passed
+            else output / "STOPPED_NAVIGATION_NOT_READY.json"
+        )
+        write_json(sentinel, summary)
+        (output / "RUNNING.json").unlink(missing_ok=True)
+        generate_navigation_curves(output)
+        vector_environment.close()
+        return summary
+    except Exception as error:
+        vector_environment.close()
+        write_json(
+            output / "FAILED.json",
+            {
+                "status": "FAILED",
+                "failed_at": utc_now(),
+                "error_type": type(error).__name__,
+                "error": str(error),
+            },
+        )
+        (output / "RUNNING.json").unlink(missing_ok=True)
+        raise
+
+
 def run(args: argparse.Namespace) -> dict[str, object]:
+    if args.navigation_repair_variant is not None:
+        return run_navigation_repair(args)
     long_run = not (args.smoke or args.pilot)
     formal = long_run and not args.intermediate_checkpoint_energy_ablation
     if long_run and (args.allow_dirty or not git_clean()):

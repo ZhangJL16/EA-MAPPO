@@ -6,6 +6,7 @@ import subprocess
 import numpy as np
 import pytest
 import torch
+from gymnasium import spaces
 from stable_baselines3.common.vec_env import DummyVecEnv
 
 from envs.UAVEnergyDeliverySAC import SACTrainingPhase, UAVEnergyDeliverySACEnv
@@ -20,6 +21,7 @@ from experiments.jacobian_energy_bridge.energy_model import (
     CalibratedCompactEnergyEstimator,
     FlexibleEnergyRegressor,
 )
+from experiments.jacobian_energy_bridge.features import StructuredLidarFeatureExtractor
 from review_bundle.safety.energy.mc_regression import (
     HierarchicalConformalCalibration,
     MissionConformalCalibration,
@@ -41,6 +43,7 @@ from scripts.run_jacobian_safety_energy_1m import (
     formal_config,
     load_intermediate_phase1,
     make_bridge_replay,
+    navigation_repair_source_failures,
     parse_args,
     prepare_output_directory,
     split_by_mission_units,
@@ -104,6 +107,48 @@ def test_legacy_jseb_phase_budget_migration_rejects_partial_set() -> None:
         migrate_legacy_jseb_command(
             ["--phase2a-transitions", "100000", "--phase2b-transitions", "300000"]
         )
+
+
+def test_navigation_repair_formal_contract_and_variant_mapping() -> None:
+    common = [
+        "--output-dir",
+        "/tmp/navigation_repair",
+        "--repair-source-navigation-evaluation",
+        "/tmp/failed_navigation.json",
+        "--repair-evaluation-tasks",
+        "/tmp/selection_tasks.json",
+    ]
+    r1 = parse_args([*common, "--navigation-repair-variant", "R1"])
+    assert r1.phase1_transitions == 500_000
+    assert r1.eval_navigation_tasks == 500
+    assert r1.shield_loss_weight == 0.0
+    assert r1.energy_loss_weight == 0.0
+    r4 = parse_args([*common, "--navigation-repair-variant", "R4"])
+    assert r4.bridge_recency_window == 512
+    replay = make_bridge_replay(r4)
+    assert replay.sampling_policy == "recent_window"
+    assert replay.recency_window == 512
+    assert replay.require_base_noise is True
+
+
+def test_navigation_repair_requires_a_completed_failed_gate() -> None:
+    failed = {
+        "num_tasks": 500,
+        "global_env_transitions": 500_000,
+        "overall_success_rate": 0.84,
+        "distance_bucket_success": {"a": 0.84},
+        "mean_path_ratio": 1.63,
+        "boundary_contact_step_rate": 0.0,
+        "obstacle_collision_steps": 0,
+    }
+    assert navigation_repair_source_failures(failed) == []
+    passed = dict(failed)
+    passed["overall_success_rate"] = 1.0
+    passed["distance_bucket_success"] = {"a": 1.0}
+    passed["mean_path_ratio"] = 1.0
+    assert navigation_repair_source_failures(passed) == [
+        "repair protocol requires a failed source navigation Gate"
+    ]
 
 
 def test_calibrated_compact_estimator_checkpoint_round_trip(tmp_path: Path) -> None:
@@ -178,7 +223,186 @@ def test_environment_exposes_actor_and_compact_energy_anchors() -> None:
     assert np.asarray(info["anchor_sac_observation"]).shape == (23,)
     assert np.asarray(info["anchor_compact_energy_state"]).shape == (7,)
     assert np.asarray(info["projection_geometry"]["jacobian_total"]).shape == (3, 3)
+
+
+def _structured_extractor(horizontal: int = 8, vertical: int = 2):
+    dimension = 7 + 2 * horizontal * vertical
+    observation_space = spaces.Box(
+        low=np.zeros(dimension, dtype=np.float32),
+        high=np.ones(dimension, dtype=np.float32),
+        dtype=np.float32,
+    )
+    return StructuredLidarFeatureExtractor(
+        observation_space,
+        horizontal_sectors=horizontal,
+        vertical_sectors=vertical,
+    )
+
+
+def test_structured_lidar_extractor_slices_contract_and_backpropagates() -> None:
+    extractor = _structured_extractor()
+    observations = torch.linspace(0.0, 1.0, 39).repeat(3, 1).requires_grad_(True)
+    goal, lidar = extractor.split_observation(observations)
+    assert goal.shape == (3, 7)
+    assert lidar.shape == (3, 2, 2, 8)
+    assert torch.equal(goal, observations[:, :7])
+    assert torch.equal(lidar[:, 0].reshape(3, -1), observations[:, 7:23])
+    assert torch.equal(lidar[:, 1].reshape(3, -1), observations[:, 23:39])
+    features = extractor(observations)
+    assert features.shape == (3, extractor.features_dim)
+    assert torch.isfinite(features).all()
+    features.sum().backward()
+    assert observations.grad is not None
+    assert torch.isfinite(observations.grad).all()
+
+
+def test_structured_lidar_convolution_preserves_azimuth_wrap_equivariance() -> None:
+    torch.manual_seed(5)
+    extractor = _structured_extractor()
+    lidar = torch.randn(2, 2, 2, 8)
+    shift = 3
+    original = extractor.lidar_feature_map(lidar)
+    shifted = extractor.lidar_feature_map(torch.roll(lidar, shift, dims=-1))
+    assert torch.allclose(
+        shifted,
+        torch.roll(original, shift, dims=-1),
+        atol=1e-6,
+        rtol=1e-5,
+    )
+
+
+def test_structured_lidar_keeps_invalid_and_zero_distance_hits_distinct() -> None:
+    torch.manual_seed(7)
+    extractor = _structured_extractor()
+    invalid = torch.zeros(1, 39)
+    occupied = invalid.clone()
+    occupied[:, 23] = 1.0
+    _, invalid_lidar = extractor.split_observation(invalid)
+    _, occupied_lidar = extractor.split_observation(occupied)
+    assert not torch.allclose(
+        extractor.lidar_feature_map(invalid_lidar),
+        extractor.lidar_feature_map(occupied_lidar),
+    )
+
+
+def test_structured_lidar_policy_checkpoint_round_trip(tmp_path: Path) -> None:
+    environment = DummyVecEnv(
+        [
+            lambda: UAVEnergyDeliverySACEnv(
+                phase=SACTrainingPhase.NAVIGATION,
+                lidar_enabled=True,
+                lidar_horizontal_sectors=8,
+                lidar_vertical_sectors=2,
+                num_obstacles=0,
+                cbf_enabled=False,
+            )
+        ]
+    )
+    model = JacobianBridgeSAC(
+        "MlpPolicy",
+        environment,
+        seed=11,
+        device="cpu",
+        policy_kwargs={
+            "features_extractor_class": StructuredLidarFeatureExtractor,
+            "features_extractor_kwargs": {
+                "horizontal_sectors": 8,
+                "vertical_sectors": 2,
+            },
+        },
+    )
+    observation = environment.reset()
+    action_before, _ = model.predict(observation, deterministic=True)
+    checkpoint = tmp_path / "structured_policy.zip"
+    model.save(checkpoint)
+    restored = JacobianBridgeSAC.load(checkpoint, device="cpu")
+    action_after, _ = restored.predict(observation, deterministic=True)
+    assert np.array_equal(action_before, action_after)
     environment.close()
+
+
+def test_recent_bridge_sampling_enforces_age_window() -> None:
+    replay = SafetyBridgeReplay(
+        capacity=64,
+        observation_dim=7,
+        seed=13,
+        sampling_policy="recent_window",
+        recency_window=8,
+    )
+    for _ in range(40):
+        replay.add_from_info(_info())
+    batch = replay.sample(512, "cpu")
+    assert int(torch.max(batch.sample_ages)) < 8
+    metadata = replay.metadata()
+    assert metadata["sampling_policy"] == "recent_window"
+    assert metadata["recency_window"] == 8
+    assert metadata["eligible_sample_count"] == 8
+
+
+def test_noise_coupled_bridge_reconstructs_collected_sac_action() -> None:
+    environment = DummyVecEnv(
+        [
+            lambda: UAVEnergyDeliverySACEnv(
+                phase=SACTrainingPhase.NAVIGATION,
+                lidar_enabled=True,
+                lidar_horizontal_sectors=8,
+                lidar_vertical_sectors=2,
+                num_obstacles=0,
+                cbf_enabled=False,
+            )
+        ]
+    )
+    model = JacobianBridgeSAC(
+        "MlpPolicy",
+        environment,
+        seed=17,
+        device="cpu",
+        bridge_noise_coupling=True,
+        policy_kwargs={
+            "features_extractor_class": StructuredLidarFeatureExtractor,
+            "features_extractor_kwargs": {
+                "horizontal_sectors": 8,
+                "vertical_sectors": 2,
+            },
+        },
+    )
+    observation = environment.reset()
+    with torch.no_grad():
+        sampled_action = model.actor(
+            torch.as_tensor(observation, dtype=torch.float32),
+            deterministic=False,
+        ).numpy()
+    base_noise = model.infer_bridge_base_noise(observation, sampled_action)
+    replay = SafetyBridgeReplay(
+        capacity=4,
+        observation_dim=39,
+        seed=19,
+        require_base_noise=True,
+    )
+    info = _info()
+    info["anchor_sac_observation"] = observation[0]
+    info["nominal_action"] = sampled_action[0]
+    info["bridge_base_noise"] = base_noise[0]
+    replay.add_from_info(info)
+    reconstructed = model.coupled_bridge_actions(replay.sample(1, "cpu"))
+    assert torch.allclose(
+        reconstructed,
+        torch.as_tensor(sampled_action),
+        atol=2e-5,
+        rtol=2e-5,
+    )
+    environment.close()
+
+
+def test_noise_coupled_replay_rejects_missing_base_noise() -> None:
+    replay = SafetyBridgeReplay(
+        capacity=4,
+        observation_dim=7,
+        seed=23,
+        require_base_noise=True,
+    )
+    with pytest.raises(ValueError, match="requires bridge_base_noise"):
+        replay.add_from_info(_info())
 
 
 def test_projection_context_is_compact_and_finite() -> None:

@@ -18,6 +18,8 @@ from scripts.run_jacobian_safety_energy_1m import parse_args as parse_jseb_args
 from scripts.train_uav_energy_delivery_sac import (
     evaluate_navigation_tasks,
     generate_stratified_navigation_tasks,
+    navigation_energy_gate_passed,
+    navigation_safety_gate_passed,
     save_navigation_tasks,
 )
 
@@ -145,11 +147,19 @@ def compact_result(transition: int, checkpoint: Path, result: dict, elapsed: flo
         for value in result["distance_bucket_success"].values()
         if value is not None
     ]
+    energy_gate_passed = navigation_energy_gate_passed(result)
+    safety_gate_passed = navigation_safety_gate_passed(result)
+    gate_failures = []
+    if not energy_gate_passed:
+        gate_failures.append("navigation_energy_readiness_gate_failed")
+    if not safety_gate_passed:
+        gate_failures.append("navigation_collision_boundary_gate_failed")
     return {
         "checkpoint_transition": transition,
         "checkpoint": str(checkpoint),
         "checkpoint_sha256": file_sha256(checkpoint),
         "num_tasks": int(result["num_tasks"]),
+        "global_env_transitions": int(result["global_env_transitions"]),
         "evaluation_env_transitions": int(result["evaluation_env_transitions"]),
         "overall_success_rate": float(result["overall_success_rate"]),
         "minimum_distance_bucket_success": min(bucket_values),
@@ -168,6 +178,10 @@ def compact_result(transition: int, checkpoint: Path, result: dict, elapsed: flo
         ),
         "nominal_safe_action_rate": float(result["nominal_safe_action_rate"]),
         "projection_valid_step_rate": float(result["projection_valid_step_rate"]),
+        "navigation_energy_gate_passed": energy_gate_passed,
+        "navigation_safety_gate_passed": safety_gate_passed,
+        "navigation_gate_passed": energy_gate_passed and safety_gate_passed,
+        "navigation_gate_failures": gate_failures,
         "wall_clock_seconds": elapsed,
     }
 
@@ -185,6 +199,9 @@ def write_summary_csv(path: Path, rows: list[dict]) -> None:
         "hocbf_emergency_brake_step_rate",
         "nominal_safe_action_rate",
         "projection_valid_step_rate",
+        "navigation_energy_gate_passed",
+        "navigation_safety_gate_passed",
+        "navigation_gate_passed",
         "evaluation_env_transitions",
         "wall_clock_seconds",
     ]
@@ -354,6 +371,7 @@ def main() -> int:
         )
         summary = {
             "status": "COMPLETED",
+            "completion_semantics": "evaluation_completed_not_automatic_gate_pass",
             "selection_warning": (
                 "The selected checkpoint must be evaluated on a fresh final test set; "
                 "these 500 tasks are now validation data."
@@ -365,8 +383,30 @@ def main() -> int:
             "best_checkpoint_by_selection_rule": ranked[0],
             "results": rows,
         }
+        formal_500k = next(
+            (row for row in rows if row["checkpoint_transition"] == 500_000),
+            None,
+        )
+        summary["navigation_training_completed"] = formal_500k is not None
+        summary["downstream_navigation_ready"] = (
+            None
+            if formal_500k is None
+            else bool(formal_500k["navigation_gate_passed"])
+        )
+        summary["formal_500k_navigation_gate"] = formal_500k
         write_json(output / "checkpoint_summary.json", summary)
         write_json(output / "COMPLETED.json", summary)
+        if formal_500k is not None and not formal_500k["navigation_gate_passed"]:
+            write_json(
+                output / "STOPPED_NAVIGATION_NOT_READY.json",
+                {
+                    "status": "STOPPED_NAVIGATION_NOT_READY",
+                    "navigation_training_completed": True,
+                    "downstream_navigation_ready": False,
+                    "formal_500k_navigation_gate": formal_500k,
+                    "downstream_stages_authorized": False,
+                },
+            )
         (output / "RUNNING.json").unlink(missing_ok=True)
         return 0
     except Exception as error:

@@ -13,8 +13,8 @@ class SafetyBridgeCollectionCallback(BaseCallback):
     def __init__(
         self,
         *,
-        replay: SafetyBridgeReplay,
-        trajectory_writer: SafetyBridgeTrajectoryWriter,
+        replay: SafetyBridgeReplay | None,
+        trajectory_writer: SafetyBridgeTrajectoryWriter | None,
         metrics_path: str | Path | None = None,
         log_frequency_transitions: int = 10_000,
     ) -> None:
@@ -43,9 +43,27 @@ class SafetyBridgeCollectionCallback(BaseCallback):
     def _on_step(self) -> bool:
         infos = self.locals["infos"]
         dones = np.asarray(self.locals["dones"], dtype=bool)
+        if self.replay is not None and self.replay.require_base_noise:
+            observations = np.stack(
+                [
+                    np.asarray(info["anchor_sac_observation"], dtype=np.float32)
+                    for info in infos
+                ]
+            )
+            nominal_actions = np.stack(
+                [np.asarray(info["nominal_action"], dtype=np.float32) for info in infos]
+            )
+            infer_noise = getattr(self.model, "infer_bridge_base_noise", None)
+            if infer_noise is None:
+                raise RuntimeError("noise-coupled bridge requires a compatible SAC model")
+            base_noises = infer_noise(observations, nominal_actions)
+            for info, base_noise in zip(infos, base_noises, strict=True):
+                info["bridge_base_noise"] = base_noise
         for env_index, info in enumerate(infos):
-            self.replay.add_from_info(info)
-            self.trajectory_writer.observe(env_index, info, bool(dones[env_index]))
+            if self.replay is not None:
+                self.replay.add_from_info(info)
+            if self.trajectory_writer is not None:
+                self.trajectory_writer.observe(env_index, info, bool(dones[env_index]))
             geometry = info["projection_geometry"]
             valid = bool(
                 geometry.get("valid", False)
@@ -135,6 +153,10 @@ class SafetyBridgeCollectionCallback(BaseCallback):
                 if self._filter_total_seconds
                 else 0.0
             ),
-            "replay": self.replay.metadata(),
-            "trajectory_dataset": self.trajectory_writer.metadata(),
+            "replay": None if self.replay is None else self.replay.metadata(),
+            "trajectory_dataset": (
+                None
+                if self.trajectory_writer is None
+                else self.trajectory_writer.metadata()
+            ),
         }

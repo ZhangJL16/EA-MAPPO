@@ -25,6 +25,15 @@ obstacle size/count, increasing LiDAR range, weakening episode censoring,
 counting HOCBF intervention as actor success, or continuing the current failed
 checkpoint beyond the fixed comparison budget.
 
+The protocol was activated by the completed 500-task evaluation at
+`artifacts/jseb500k_navigation_gate_parallel_20260826_211448`.  The frozen
+500k checkpoint achieved 0.84 overall success, 0.82 minimum bucket success,
+and 1.63125 mean path ratio.  It passed the safety predicates with zero
+obstacle-collision steps and a boundary-contact step rate of `3.3311e-06`, but
+failed every navigation/readiness predicate.  Battery calibration therefore
+stopped with `STOPPED_NAVIGATION_NOT_READY`; no Oracle, TD, or return-decision
+result was produced from this checkpoint.
+
 ## Evidence-Motivated Hypotheses
 
 ### H1: Flat LiDAR representation is sample-inefficient
@@ -68,6 +77,24 @@ records a 0.9899 update/transition ratio at 496k.  This rules out the previously
 identified `gradient_steps=1` vector-environment bug as the primary explanation
 for this run.
 
+### H4: The original bridge compared different SAC action samples
+
+Recency-only smokes exposed a second, more fundamental issue.  The projection
+Jacobian was collected at the stochastic SAC rollout action, while the bridge
+loss evaluated the current deterministic actor mean.  Even after restricting
+sample-age p95 to 58.6 transitions, actor-to-anchor action-delta p50 remained
+0.98 and post-trust validity remained 1.67%.  Therefore replay age alone cannot
+repair the local linearization semantics.
+
+R4 uses common-random-number coupling.  At collection time it infers the base
+Gaussian noise that generated the executed stochastic SAC action.  During the
+bridge update, the current actor is evaluated with that same base noise before
+the unchanged 0.35 trust test is applied.  This compares the same policy-noise
+quantile across actor versions; it does not widen the local Jacobian region.  A
+2k mechanics smoke with a 512-transition recency window raised mean post-trust
+validity from about 1.7% to 95.5%, with action-delta p95 0.175.  These are
+implementation diagnostics, not navigation-performance evidence.
+
 ## Minimal Controlled Comparison
 
 Only one factor changes at a time.
@@ -78,11 +105,17 @@ Only one factor changes at a time.
 | R1 | structured 2D ray encoder | off | none | does representation alone fix navigation? |
 | R2 | structured 2D ray encoder | current | uniform 50k replay | does the current Jacobian add value after representation is fixed? |
 | R3 | structured 2D ray encoder | current | recency-controlled, same 0.35 trust region | does valid local bridge coverage add value? |
+| R4 | structured 2D ray encoder | noise-coupled current bridge | recency-controlled, same 0.35 trust region | does matched stochastic-action supervision add value? |
 
-R0 is the archived run and is not extended.  R1--R3 use the same seed/task
+R0 is the archived run and is not extended.  R1--R4 use the same seed/task
 sampling protocol, replay capacity for SAC, optimizer budget, rewards, physics,
 obstacles, HOCBF, and evaluation tasks.  R1 disables only the auxiliary bridge;
 HOCBF still executes as the hard final safety layer in every method.
+
+R3 is retained as the recency-only control even though its mechanics smoke did
+not restore coverage.  R4 changes only action-sample correspondence relative to
+R3.  Thus R3 versus R4 isolates common-random-noise coupling rather than
+confounding it with the structured encoder or replay window.
 
 The first pilot may use seed 0 to kill implausible variants.  Any method that is
 promoted as a research result must subsequently use at least three preregistered
@@ -104,7 +137,7 @@ and adaptive pooling.  The 7D branch uses a small MLP; the branch embeddings are
 concatenated before the actor/critic heads.
 
 The parameter count and downstream actor/critic widths must be recorded.  R1,
-R2, and R3 use the identical extractor and comparable optimization settings, so
+R2, R3, and R4 use the identical extractor and comparable optimization settings, so
 the Jacobian comparison is not confounded by model capacity.
 
 Required extractor tests:
@@ -139,6 +172,12 @@ A recency choice is acceptable only if it increases post-trust valid coverage
 without increasing held-out collision steps or degrading navigation.  It must
 not select samples using future episode success labels.
 
+For R4, replay additionally stores the inferred three-dimensional base Gaussian
+noise.  With unchanged actor parameters, the coupled action must reconstruct
+the collected normalized SAC action.  Tests cover reconstruction, missing-noise
+rejection, finite stored noise, and checkpoint round trips.  The coupled action
+remains differentiable through the current actor mean and standard deviation.
+
 ## Evaluation and Gates
 
 Mechanics are first checked with a short smoke that is explicitly non-scientific.
@@ -171,6 +210,8 @@ architecture and hyperparameters are frozen.
   value beyond representation.
 - **R3 improves R2 while preserving safety:** replay-policy drift was a material
   limitation of local bridge supervision.
+- **R3 remains invalid but R4 restores coverage/performance:** stochastic action
+  mismatch, rather than replay age alone, was the material bridge defect.
 - **No candidate passes:** stop downstream return-to-charge experiments and
   revisit the navigation formulation; do not spend Energy-TD compute on an
   unready policy.

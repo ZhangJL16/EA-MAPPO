@@ -23,6 +23,7 @@ from scripts.run_return_decision_stage_b import (
     stage_b_completion_contract,
 )
 from scripts.evaluate_jseb_checkpoints import (
+    compact_result,
     parse_args as parse_checkpoint_evaluator_args,
     select_checkpoints,
 )
@@ -172,6 +173,39 @@ def test_checkpoint_evaluator_rejects_nonpositive_worker_count() -> None:
         parse_checkpoint_evaluator_args(
             ["--artifact", "/tmp/artifact", "--evaluation-num-envs", "0"]
         )
+
+
+def test_checkpoint_evaluator_distinguishes_completion_from_gate_pass(tmp_path) -> None:
+    checkpoint = tmp_path / "checkpoint_transition_500000.zip"
+    checkpoint.write_bytes(b"checkpoint")
+    result = {
+        "num_tasks": 500,
+        "global_env_transitions": 500_000,
+        "evaluation_env_transitions": 10_000,
+        "overall_success_rate": 0.90,
+        "distance_bucket_success": {
+            "100-500": 1.0,
+            "500-1500": 0.90,
+            "1500-2500": 0.90,
+            "2500-4000": 0.90,
+            ">4000": 0.80,
+        },
+        "mean_path_ratio": 1.4,
+        "obstacle_collision_steps": 0,
+        "obstacle_collision_episode_rate": 0.0,
+        "boundary_contact_step_rate": 0.0,
+        "hocbf_intervention_step_rate": 0.2,
+        "hocbf_emergency_brake_step_rate": 0.01,
+        "nominal_safe_action_rate": 0.8,
+        "projection_valid_step_rate": 1.0,
+    }
+    row = compact_result(500_000, checkpoint, result, elapsed=1.0)
+    assert row["navigation_energy_gate_passed"] is False
+    assert row["navigation_safety_gate_passed"] is True
+    assert row["navigation_gate_passed"] is False
+    assert row["navigation_gate_failures"] == [
+        "navigation_energy_readiness_gate_failed"
+    ]
 
 
 def test_formal_stage_b_rejects_clustered_cycles_as_independent_wilson_units(
