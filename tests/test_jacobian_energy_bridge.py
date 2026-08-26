@@ -30,6 +30,7 @@ from scripts.run_jacobian_safety_energy_1m import (
     FORMAL_TOTAL_TRANSITIONS,
     collect_mission_budget,
     disjoint_bridge_and_energy_data,
+    formal_config,
     load_intermediate_phase1,
     make_bridge_replay,
     parse_args,
@@ -347,6 +348,25 @@ def test_smoke_uses_frozen_policy_energy_collection_only(tmp_path: Path) -> None
     )
     assert args.phase2_energy_transitions == 2_000
     assert args.phase2_transition_budget == 0
+
+
+def test_battery_calibration_is_deferred_until_after_energy_learning(
+    tmp_path: Path,
+) -> None:
+    args = parse_args(
+        ["--output-dir", str(tmp_path / "formal")]
+    )
+    config = formal_config(args)
+    stage_order = config["stage_order"]
+    assert stage_order.index("phase2_frozen_energy_learning") < stage_order.index(
+        "battery_calibration"
+    )
+    assert config["battery_calibration_protocol"] == {
+        "ordered_after_energy_learning": True,
+        "training_budget_contribution": 0,
+        "uses_td_predictions": False,
+        "purpose": "set synthetic-unit battery capacity for downstream switching evaluation",
+    }
 
 
 def test_pilot_keeps_50k_learning_budget_but_bounds_diagnostic_rollouts(

@@ -1566,6 +1566,20 @@ def formal_config(args: argparse.Namespace) -> dict[str, object]:
             "reason": "observed navigation degradation under joint policy fine-tuning",
             "energy_learning_only": True,
         },
+        "stage_order": [
+            "frozen_navigation_checkpoint",
+            "phase2_frozen_energy_learning",
+            "energy_model_fit_and_heldout_evaluation",
+            "battery_calibration",
+            "battery_endurance_validation",
+            "persistent_delivery_evaluation",
+        ],
+        "battery_calibration_protocol": {
+            "ordered_after_energy_learning": True,
+            "training_budget_contribution": 0,
+            "uses_td_predictions": False,
+            "purpose": "set synthetic-unit battery capacity for downstream switching evaluation",
+        },
         "packages": {
             "python": platform.python_version(),
             "numpy": np.__version__,
@@ -1639,38 +1653,6 @@ def run(args: argparse.Namespace) -> dict[str, object]:
             return stopped
 
         freeze_navigation_policy(model)
-        calibration_policy = model if long_run else HeuristicGoalPolicy()
-        calibration_tasks = generate_stratified_navigation_tasks(
-            num_tasks=args.battery_calibration_tasks,
-            seed=args.battery_calibration_seed,
-        )
-        calibration = run_battery_calibration(
-            calibration_policy,
-            args,
-            calibration_tasks,
-            output / "battery_calibration",
-        )
-        capacity = float(calibration["calibrated_battery_capacity"])
-        validation = run_battery_validation(
-            calibration_policy,
-            args,
-            battery_capacity=capacity,
-            output=output / "battery_calibration",
-        )
-        if long_run and not args.allow_failed_battery_calibration and (
-            not calibration["battery_calibration_navigation_valid"]
-            or not validation["battery_calibration_valid"]
-        ):
-            stopped = {
-                "status": "STOPPED_AFTER_BATTERY_CALIBRATION",
-                "battery_calibration": compact_summary(calibration),
-                "battery_validation": compact_summary(validation),
-            }
-            write_json(output / "STOPPED_AFTER_BATTERY_CALIBRATION.json", stopped)
-            (output / "RUNNING.json").unlink(missing_ok=True)
-            return stopped
-
-        freeze_navigation_policy(model)
         frozen_policy_hash_before = policy_hash(model)
         energy_replay = make_bridge_replay(args, seed_offset=20_000)
         energy_collection_policy = HeuristicGoalPolicy() if args.smoke else model
@@ -1725,6 +1707,43 @@ def run(args: argparse.Namespace) -> dict[str, object]:
                 final_models_summary["phase_dataset_trajectory_count"] > 0
             ),
         )
+        if estimator is None and long_run:
+            raise RuntimeError(
+                "formal JSEB requires complete mission calibration before switching"
+            )
+
+        calibration_policy = model if long_run else HeuristicGoalPolicy()
+        calibration_tasks = generate_stratified_navigation_tasks(
+            num_tasks=args.battery_calibration_tasks,
+            seed=args.battery_calibration_seed,
+        )
+        calibration = run_battery_calibration(
+            calibration_policy,
+            args,
+            calibration_tasks,
+            output / "battery_calibration",
+        )
+        capacity = float(calibration["calibrated_battery_capacity"])
+        validation = run_battery_validation(
+            calibration_policy,
+            args,
+            battery_capacity=capacity,
+            output=output / "battery_calibration",
+        )
+        if long_run and not args.allow_failed_battery_calibration and (
+            not calibration["battery_calibration_navigation_valid"]
+            or not validation["battery_calibration_valid"]
+        ):
+            stopped = {
+                "status": "STOPPED_AFTER_BATTERY_CALIBRATION",
+                "energy_learning_completed": True,
+                "battery_calibration": compact_summary(calibration),
+                "battery_validation": compact_summary(validation),
+            }
+            write_json(output / "STOPPED_AFTER_BATTERY_CALIBRATION.json", stopped)
+            (output / "RUNNING.json").unlink(missing_ok=True)
+            return stopped
+
         final_navigation = evaluate_navigation_tasks(
             model,
             args,
@@ -1746,10 +1765,6 @@ def run(args: argparse.Namespace) -> dict[str, object]:
             output_path=output / "eval" / "final_policy_navigation.json",
         )
         if estimator is None:
-            if long_run:
-                raise RuntimeError(
-                    "formal JSEB requires complete mission calibration before switching"
-                )
             persistent = {
                 "status": "NOT_RUN_NO_COMPLETE_MISSION_CALIBRATION",
                 "evaluation_env_transitions": 0,
