@@ -105,6 +105,28 @@ environments.  After the learning-start delay, the cumulative update ratio
 approaches one update per collected transition, as intended by
 `train_freq=(1, "step")` and `gradient_steps=-1`.
 
+### Post-hoc instrumentation smoke
+
+Commit `f456a6e236228b55eaddf03481801bd1f737a0df` added sample-age and
+pre/post-trust diagnostics without changing replay sampling, the bridge loss,
+SAC actions, or HOCBF.  A deliberately non-scientific 2k smoke wrote the new
+fields before being intentionally stopped during GIF generation to release CPU
+for the formal Gate.  At the last 1,600-transition log row it reported:
+
+- pre-trust valid-Jacobian fraction: `0.9922`;
+- post-trust valid fraction: `0.03125`;
+- actor-to-anchor action-delta p95: `1.4393`;
+- sampled transition-age p95: `1487.12` transitions.
+
+Artifact:
+`artifacts/jseb_bridge_drift_audit_smoke_20260826_221928/STOPPED_AFTER_BRIDGE_DRIFT_AUDIT.json`.
+The run is not a navigation result, and its tiny task budget cannot be compared
+with the 500k checkpoint.  It does, however, mechanically confirm that the
+configured local trust-region mask can discard most otherwise valid Jacobian
+examples when a uniformly sampled replay contains stale policy anchors.  A
+recency-controlled comparison is therefore evidence-motivated rather than an
+unmeasured explanation invented after the formal result.
+
 ## Preregistered Formal Gate
 
 The independent 500-task evaluation must satisfy all of:

@@ -50,6 +50,12 @@ the mean valid fraction after applying the 0.35 actor-to-anchor trust region was
 only 11.1%.  The bridge loss ran on almost every optimizer step, yet most replay
 samples did not provide valid local Jacobian supervision to the current actor.
 
+After the protocol was drafted, a logging-only 2k smoke directly measured the
+same mechanism in a sampled batch: `0.9922` pre-trust validity fell to `0.03125`
+post-trust validity, with action-delta p95 `1.4393` and sample-age p95 `1487.12`.
+This smoke establishes instrumentation and the existence of coverage collapse;
+it does not establish that recency sampling improves navigation.
+
 The local trust region must not simply be widened: the linearized projection is
 not justified arbitrarily far from its anchor.  The hypothesis is instead that
 recency-aware sampling can increase local coverage without violating the same
