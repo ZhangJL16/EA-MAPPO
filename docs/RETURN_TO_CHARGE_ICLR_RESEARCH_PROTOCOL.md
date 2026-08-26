@@ -269,6 +269,14 @@ inference, and load frozen CPU snapshots of the TD critic. The live critic's
 optimizer, replay, update count, and parameters are audited before and after every
 evaluation.
 
+TD readiness is an engineering evidence Gate, not a stochastic-coverage claim.
+The final independent 500-task evaluation must complete at least 95% overall and
+95 of the 100 tasks in every distance bucket, produce finite ordered predictions,
+report far-distance error, keep overall and far-distance MAE no worse than the
+mean-energy scale of a zero-energy predictor, and avoid an underestimation rate
+above 75%. Failure writes `STOPPED_TD_NOT_READY.json` and prevents TD decision
+evaluation.
+
 The current LiDAR/HOCBF contract produces a 2055D Energy-TD state (7 goal-motion
 features plus 1024 ranges and 1024 validity values). A 7D checkpoint is therefore
 not silently reused in this setting. Historical JSEB commands containing the old

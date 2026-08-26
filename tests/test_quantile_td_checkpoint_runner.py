@@ -7,6 +7,7 @@ from scripts.train_quantile_td_for_navigation_checkpoint import (
     parse_args,
     prerequisite_failures,
 )
+from scripts.train_uav_energy_delivery_sac import td_readiness_audit
 
 
 def passing_navigation() -> dict[str, object]:
@@ -69,3 +70,56 @@ def test_quantile_td_rejects_navigation_not_ready() -> None:
         {"evaluable": True, "passed": True, "status": "PASS"},
     )
     assert "navigation energy/readiness gate failed" in failures
+
+
+def heldout_td_summary(*, completed_per_bucket: int = 100) -> dict[str, object]:
+    bucket = {
+        "num_completed_goals": completed_per_bucket,
+        "finite_predictions": True,
+        "quantile_ordering_valid": True,
+        "mean_true_total_energy": 10.0,
+        "td_mae": 2.0,
+        "td_rmse": 3.0,
+        "td_bias": 0.1,
+        "td_underestimation_rate": 0.4,
+        "q95_coverage": 0.6,
+    }
+    return {
+        "num_tasks": 500,
+        "metrics": {
+            "overall": {**bucket, "num_completed_goals": completed_per_bucket * 5},
+            "by_initial_goal_distance": {
+                name: dict(bucket)
+                for name in [
+                    "100-500",
+                    "500-1500",
+                    "1500-2500",
+                    "2500-4000",
+                    ">4000",
+                ]
+            },
+        },
+    }
+
+
+def test_td_readiness_requires_complete_stratified_heldout_evidence() -> None:
+    audit = td_readiness_audit(heldout_td_summary())
+    assert audit["td_energy_ready"] is True
+    assert audit["minimum_completed_goals_per_distance_bucket"] == 95
+    assert audit["failures"] == []
+    selected = heldout_td_summary(completed_per_bucket=94)
+    audit = td_readiness_audit(selected)
+    assert audit["td_energy_ready"] is False
+    assert audit["heldout_navigation_coverage_valid"] is False
+
+
+def test_td_readiness_rejects_zero_predictor_scale_and_dominant_underestimation() -> None:
+    selected = heldout_td_summary()
+    selected["metrics"]["overall"]["td_mae"] = 11.0
+    selected["metrics"]["overall"]["td_underestimation_rate"] = 0.8
+    selected["metrics"]["by_initial_goal_distance"][">4000"]["td_mae"] = 11.0
+    audit = td_readiness_audit(selected)
+    assert audit["td_energy_ready"] is False
+    assert audit["overall_error_better_than_zero_predictor"] is False
+    assert audit["catastrophic_far_distance_error"] is True
+    assert audit["underestimation_not_dominant"] is False

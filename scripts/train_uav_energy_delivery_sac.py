@@ -2202,7 +2202,26 @@ def aggregate_goal_evaluations(records: list[dict[str, object]]) -> dict[str, ob
 def td_readiness_audit(summary: dict[str, object]) -> dict[str, object]:
     metrics = summary["metrics"]
     overall = metrics["overall"]
-    far_distance = metrics["by_initial_goal_distance"][">4000"]
+    distance_metrics = metrics["by_initial_goal_distance"]
+    far_distance = distance_metrics[">4000"]
+    num_tasks = int(summary.get("num_tasks", 0))
+    bucket_count = len(DISTANCE_BUCKETS)
+    expected_tasks_per_bucket = num_tasks // bucket_count if bucket_count else 0
+    minimum_completed_per_bucket = int(np.ceil(0.95 * expected_tasks_per_bucket))
+    minimum_completed_overall = int(np.ceil(0.95 * num_tasks))
+    completed_overall = int(overall.get("num_completed_goals", 0))
+    bucket_completed = {
+        bucket_name: int(distance_metrics[bucket_name].get("num_completed_goals", 0))
+        for bucket_name, _, _ in DISTANCE_BUCKETS
+    }
+    heldout_navigation_coverage_valid = bool(
+        num_tasks > 0
+        and completed_overall >= minimum_completed_overall
+        and all(
+            count >= minimum_completed_per_bucket
+            for count in bucket_completed.values()
+        )
+    )
     required_values = (
         overall.get("td_mae"),
         overall.get("td_rmse"),
@@ -2224,18 +2243,64 @@ def td_readiness_audit(summary: dict[str, object]) -> dict[str, object]:
     far_mae_to_mean_energy_ratio = (
         float(far_mae / far_mean_energy) if far_mean_energy > 0.0 else float("inf")
     )
+    maximum_mae_to_mean_energy_ratio = 1.0
     catastrophic_far_distance_error = bool(
         not np.isfinite(far_mae_to_mean_energy_ratio)
-        or far_mae_to_mean_energy_ratio > 10.0
+        or far_mae_to_mean_energy_ratio > maximum_mae_to_mean_energy_ratio
     )
+    overall_mean_energy = float(overall.get("mean_true_total_energy", 0.0) or 0.0)
+    overall_mae = float(overall.get("td_mae", np.inf) or np.inf)
+    overall_mae_to_mean_energy_ratio = (
+        float(overall_mae / overall_mean_energy)
+        if overall_mean_energy > 0.0
+        else float("inf")
+    )
+    overall_error_better_than_zero_predictor = bool(
+        np.isfinite(overall_mae_to_mean_energy_ratio)
+        and overall_mae_to_mean_energy_ratio <= maximum_mae_to_mean_energy_ratio
+    )
+    underestimation_rate = float(overall.get("td_underestimation_rate", np.inf))
+    maximum_underestimation_rate = 0.75
+    underestimation_not_dominant = bool(
+        np.isfinite(underestimation_rate)
+        and underestimation_rate <= maximum_underestimation_rate
+    )
+    failures: list[str] = []
+    if not heldout_navigation_coverage_valid:
+        failures.append("held-out goal completion coverage is below 95% overall or in a distance bucket")
+    if not finite_predictions:
+        failures.append("held-out TD predictions or required metrics are non-finite")
+    if not quantile_ordering_valid:
+        failures.append("predicted quantiles are not ordered")
+    if not far_distance_error_reported:
+        failures.append("far-distance TD error is unavailable")
+    if catastrophic_far_distance_error:
+        failures.append("far-distance MAE is not better than the zero-energy predictor scale")
+    if not overall_error_better_than_zero_predictor:
+        failures.append("overall MAE is not better than the zero-energy predictor scale")
+    if not underestimation_not_dominant:
+        failures.append("TD underestimates more than the preregistered 75% ceiling")
     ready = bool(
-        finite_predictions
+        heldout_navigation_coverage_valid
+        and finite_predictions
         and quantile_ordering_valid
         and far_distance_error_reported
         and not catastrophic_far_distance_error
+        and overall_error_better_than_zero_predictor
+        and underestimation_not_dominant
     )
     return {
         "td_energy_ready": ready,
+        "readiness_semantics": (
+            "deterministic_point_etg_engineering_gate_not_stochastic_coverage_claim"
+        ),
+        "failures": failures,
+        "num_heldout_tasks": num_tasks,
+        "completed_heldout_goals": completed_overall,
+        "minimum_completed_heldout_goals": minimum_completed_overall,
+        "completed_goals_by_distance_bucket": bucket_completed,
+        "minimum_completed_goals_per_distance_bucket": minimum_completed_per_bucket,
+        "heldout_navigation_coverage_valid": heldout_navigation_coverage_valid,
         "finite_predictions": finite_predictions,
         "quantile_ordering_valid": quantile_ordering_valid,
         "q95_empirical_coverage_reported": overall.get("q95_coverage") is not None,
@@ -2250,7 +2315,26 @@ def td_readiness_audit(summary: dict[str, object]) -> dict[str, object]:
             else far_mae_to_mean_energy_ratio
         ),
         "catastrophic_far_distance_error": catastrophic_far_distance_error,
-        "catastrophic_ratio_guard": 10.0,
+        "far_distance_mae_to_mean_energy_ratio_ceiling": (
+            maximum_mae_to_mean_energy_ratio
+        ),
+        "overall_mae": None if not np.isfinite(overall_mae) else overall_mae,
+        "overall_mean_true_total_energy": (
+            None if overall_mean_energy <= 0.0 else overall_mean_energy
+        ),
+        "overall_mae_to_mean_energy_ratio": (
+            None
+            if not np.isfinite(overall_mae_to_mean_energy_ratio)
+            else overall_mae_to_mean_energy_ratio
+        ),
+        "overall_error_better_than_zero_predictor": (
+            overall_error_better_than_zero_predictor
+        ),
+        "underestimation_rate": (
+            None if not np.isfinite(underestimation_rate) else underestimation_rate
+        ),
+        "maximum_underestimation_rate": maximum_underestimation_rate,
+        "underestimation_not_dominant": underestimation_not_dominant,
     }
 
 
