@@ -261,6 +261,26 @@ def test_replay_and_completed_trajectory_dataset(tmp_path: Path) -> None:
     assert dataset.unique_trajectory_ids == {0}
 
 
+def test_replay_sample_age_is_exact_after_ring_buffer_wrap() -> None:
+    replay = SafetyBridgeReplay(capacity=4, observation_dim=7, seed=17)
+    for insertion_id in range(6):
+        info = _info()
+        observation = np.asarray(info["anchor_sac_observation"], dtype=np.float32).copy()
+        observation[0] = float(insertion_id)
+        info["anchor_sac_observation"] = observation
+        replay.add_from_info(info)
+    batch = replay.sample(256, "cpu")
+    sampled_insertion_ids = torch.round(batch.observations[:, 0]).to(dtype=torch.int64)
+    torch.testing.assert_close(batch.sample_ages, 5 - sampled_insertion_ids)
+    assert batch.sample_ages.dtype == torch.int64
+    metadata = replay.metadata()
+    assert metadata["sample_age_min"] == 0
+    assert metadata["sample_age_p50"] == pytest.approx(1.5)
+    assert metadata["sample_age_p90"] == pytest.approx(2.7)
+    assert metadata["sample_age_p95"] == pytest.approx(2.85)
+    assert metadata["sample_age_max"] == 3
+
+
 def test_invalid_jacobian_is_retained_for_diagnostics_but_masked() -> None:
     info = _info()
     info["projection_geometry"] = {**info["projection_geometry"], "valid": False}
@@ -375,8 +395,35 @@ def test_custom_sac_executes_nonzero_energy_bridge_gradient(tmp_path: Path) -> N
     assert metrics["bridge_gradient_steps"] > 0
     assert metrics["energy_nonzero_steps"] > 0
     assert metrics["mean_energy_loss"] > 0.0
+    assert metrics["mean_pretrust_valid_fraction"] >= metrics["mean_posttrust_valid_fraction"]
+    assert metrics["mean_sample_age_p95"] >= metrics["mean_sample_age_p50"] >= 0.0
+    assert model.last_bridge_metrics["action_delta_p95"] >= model.last_bridge_metrics[
+        "action_delta_p50"
+    ]
+    assert model.last_bridge_metrics["sample_age_p95"] >= model.last_bridge_metrics[
+        "sample_age_p50"
+    ]
     assert model.num_timesteps == 12
     vector_environment.close()
+
+
+def test_bridge_training_summary_loads_legacy_counter_schema() -> None:
+    summary = JacobianBridgeSAC.summarize_bridge_training(
+        {
+            "actor_gradient_steps": 10,
+            "bridge_gradient_steps": 5,
+            "shield_loss_sum": 1.0,
+            "shield_nonzero_steps": 4,
+            "energy_loss_sum": 0.0,
+            "energy_nonzero_steps": 0,
+            "valid_fraction_sum": 2.5,
+            "energy_weight_sum": 0.0,
+        }
+    )
+    assert summary["mean_valid_fraction"] == pytest.approx(0.5)
+    assert summary["mean_pretrust_valid_fraction"] == 0.0
+    assert summary["mean_action_delta_p95"] == 0.0
+    assert summary["mean_sample_age_p95"] == 0.0
 
 
 def test_formal_runner_has_exact_static_one_million_transition_contract(

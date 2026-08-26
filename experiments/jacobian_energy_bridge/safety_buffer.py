@@ -68,6 +68,7 @@ class SafetyBridgeBatch:
     jacobians: torch.Tensor
     safety_contexts: torch.Tensor
     valid_masks: torch.Tensor
+    sample_ages: torch.Tensor
 
 
 class SafetyBridgeReplay:
@@ -101,6 +102,7 @@ class SafetyBridgeReplay:
             dtype=np.float32,
         )
         self.valid_masks = np.empty(capacity, dtype=np.bool_)
+        self.insertion_ids = np.empty(capacity, dtype=np.int64)
         self.position = 0
         self.size = 0
         self.total_added = 0
@@ -150,6 +152,7 @@ class SafetyBridgeReplay:
         self.jacobians[index] = jacobian
         self.safety_contexts[index] = context
         self.valid_masks[index] = valid
+        self.insertion_ids[index] = self.total_added
         self.position = (self.position + 1) % self.capacity
         self.size = min(self.size + 1, self.capacity)
         self.total_added += 1
@@ -164,6 +167,10 @@ class SafetyBridgeReplay:
         def tensor(values: np.ndarray, *, dtype: torch.dtype = torch.float32) -> torch.Tensor:
             return torch.as_tensor(values[indices], dtype=dtype, device=device)
 
+        sample_ages = (self.total_added - 1) - self.insertion_ids[indices]
+        if np.any(sample_ages < 0):
+            raise RuntimeError("safety bridge replay produced a negative sample age")
+
         return SafetyBridgeBatch(
             observations=tensor(self.observations),
             compact_energy_states=tensor(self.compact_energy_states),
@@ -172,10 +179,16 @@ class SafetyBridgeReplay:
             jacobians=tensor(self.jacobians),
             safety_contexts=tensor(self.safety_contexts),
             valid_masks=tensor(self.valid_masks, dtype=torch.bool),
+            sample_ages=torch.as_tensor(sample_ages, dtype=torch.int64, device=device),
         )
 
     def metadata(self) -> dict[str, object]:
         valid_count = int(np.sum(self.valid_masks[: self.size]))
+        current_ages = (
+            np.empty(0, dtype=np.int64)
+            if self.size == 0
+            else (self.total_added - 1) - self.insertion_ids[: self.size]
+        )
         return {
             "capacity": self.capacity,
             "observation_dim": self.observation_dim,
@@ -183,6 +196,17 @@ class SafetyBridgeReplay:
             "total_added": self.total_added,
             "valid_count": valid_count,
             "valid_fraction": float(valid_count / max(self.size, 1)),
+            "sample_age_min": None if self.size == 0 else int(np.min(current_ages)),
+            "sample_age_p50": (
+                None if self.size == 0 else float(np.quantile(current_ages, 0.50))
+            ),
+            "sample_age_p90": (
+                None if self.size == 0 else float(np.quantile(current_ages, 0.90))
+            ),
+            "sample_age_p95": (
+                None if self.size == 0 else float(np.quantile(current_ages, 0.95))
+            ),
+            "sample_age_max": None if self.size == 0 else int(np.max(current_ages)),
             "observation_storage_dtype": str(self.observations.dtype),
             "safety_context_dim": SAFETY_CONTEXT_DIM,
             "maximum_barrier_constraints": self.maximum_barrier_constraints,

@@ -46,7 +46,6 @@ class JacobianBridgeSAC(SAC):
         self.bridge_energy_phase_start = 0
         self.bridge_energy_warmup = 0
         self.bridge_energy_ramp = 1
-        self.last_bridge_metrics: dict[str, float] = {}
         self._bridge_training_totals = {
             "actor_gradient_steps": 0,
             "bridge_gradient_steps": 0,
@@ -55,7 +54,28 @@ class JacobianBridgeSAC(SAC):
             "energy_loss_sum": 0.0,
             "energy_nonzero_steps": 0,
             "valid_fraction_sum": 0.0,
+            "pretrust_valid_fraction_sum": 0.0,
+            "action_delta_p50_sum": 0.0,
+            "action_delta_p90_sum": 0.0,
+            "action_delta_p95_sum": 0.0,
+            "sample_age_p50_sum": 0.0,
+            "sample_age_p90_sum": 0.0,
+            "sample_age_p95_sum": 0.0,
             "energy_weight_sum": 0.0,
+        }
+        self.last_bridge_metrics: dict[str, float] = {
+            "shield_loss": 0.0,
+            "energy_loss": 0.0,
+            "pretrust_valid_fraction": 0.0,
+            "posttrust_valid_fraction": 0.0,
+            "valid_fraction": 0.0,
+            "action_delta_p50": 0.0,
+            "action_delta_p90": 0.0,
+            "action_delta_p95": 0.0,
+            "sample_age_p50": 0.0,
+            "sample_age_p90": 0.0,
+            "sample_age_p95": 0.0,
+            "energy_weight": 0.0,
         }
         super().__init__(*args, **kwargs)
 
@@ -90,10 +110,24 @@ class JacobianBridgeSAC(SAC):
         ramp = float(np.clip(elapsed / self.bridge_energy_ramp, 0.0, 1.0))
         return self.energy_loss_weight * ramp
 
+    def _ensure_bridge_counter_schema(self) -> None:
+        for key in (
+            "pretrust_valid_fraction_sum",
+            "action_delta_p50_sum",
+            "action_delta_p90_sum",
+            "action_delta_p95_sum",
+            "sample_age_p50_sum",
+            "sample_age_p90_sum",
+            "sample_age_p95_sum",
+        ):
+            self._bridge_training_totals.setdefault(key, 0.0)
+
     def bridge_training_metrics(self) -> dict[str, float | int]:
+        self._ensure_bridge_counter_schema()
         return self.summarize_bridge_training(self._bridge_training_totals)
 
     def bridge_training_counters(self) -> dict[str, float | int]:
+        self._ensure_bridge_counter_schema()
         return dict(self._bridge_training_totals)
 
     @staticmethod
@@ -102,6 +136,7 @@ class JacobianBridgeSAC(SAC):
     ) -> dict[str, float | int]:
         bridge_steps = int(totals["bridge_gradient_steps"])
         actor_steps = int(totals["actor_gradient_steps"])
+        mean = lambda key: float(totals.get(key, 0.0)) / max(bridge_steps, 1)
         return {
             "actor_gradient_steps": actor_steps,
             "bridge_gradient_steps": bridge_steps,
@@ -117,12 +152,24 @@ class JacobianBridgeSAC(SAC):
                 bridge_steps,
                 1,
             ),
+            "mean_pretrust_valid_fraction": mean("pretrust_valid_fraction_sum"),
+            "mean_posttrust_valid_fraction": float(totals["valid_fraction_sum"]) / max(
+                bridge_steps,
+                1,
+            ),
+            "mean_action_delta_p50": mean("action_delta_p50_sum"),
+            "mean_action_delta_p90": mean("action_delta_p90_sum"),
+            "mean_action_delta_p95": mean("action_delta_p95_sum"),
+            "mean_sample_age_p50": mean("sample_age_p50_sum"),
+            "mean_sample_age_p90": mean("sample_age_p90_sum"),
+            "mean_sample_age_p95": mean("sample_age_p95_sum"),
             "mean_energy_weight_when_bridge_ready": float(
                 totals["energy_weight_sum"]
             ) / max(bridge_steps, 1),
         }
 
     def train(self, gradient_steps: int, batch_size: int = 64) -> None:
+        self._ensure_bridge_counter_schema()
         self.policy.set_training_mode(True)
         optimizers = [self.actor.optimizer, self.critic.optimizer]
         if self.ent_coef_optimizer is not None:
@@ -135,7 +182,14 @@ class JacobianBridgeSAC(SAC):
         critic_losses: list[float] = []
         shield_losses: list[float] = []
         energy_losses: list[float] = []
+        bridge_pretrust_valid_fractions: list[float] = []
         bridge_valid_fractions: list[float] = []
+        bridge_action_delta_p50: list[float] = []
+        bridge_action_delta_p90: list[float] = []
+        bridge_action_delta_p95: list[float] = []
+        bridge_sample_age_p50: list[float] = []
+        bridge_sample_age_p90: list[float] = []
+        bridge_sample_age_p95: list[float] = []
         energy_weight = (
             self._energy_weight_now()
             if self.bridge_energy_critic is not None
@@ -208,6 +262,10 @@ class JacobianBridgeSAC(SAC):
                 assert self.bridge_replay is not None
                 bridge = self.bridge_replay.sample(self.bridge_batch_size, self.device)
                 bridge_actions = self.actor(bridge.observations, deterministic=True)
+                action_deltas = th.linalg.vector_norm(
+                    bridge_actions - bridge.nominal_actions,
+                    dim=1,
+                )
                 shield_loss, projected_actions, valid_mask = shield_consistency_loss(
                     bridge_actions,
                     bridge.nominal_actions,
@@ -218,7 +276,28 @@ class JacobianBridgeSAC(SAC):
                 )
                 actor_loss = actor_loss + self.shield_loss_weight * shield_loss
                 shield_losses.append(float(shield_loss.detach().cpu()))
+                bridge_pretrust_valid_fractions.append(
+                    float(bridge.valid_masks.float().mean().detach().cpu())
+                )
                 bridge_valid_fractions.append(float(valid_mask.float().mean().detach().cpu()))
+                quantile_levels = th.as_tensor(
+                    [0.50, 0.90, 0.95],
+                    dtype=action_deltas.dtype,
+                    device=action_deltas.device,
+                )
+                action_delta_quantiles = (
+                    th.quantile(action_deltas, quantile_levels).detach().cpu().tolist()
+                )
+                bridge_action_delta_p50.append(float(action_delta_quantiles[0]))
+                bridge_action_delta_p90.append(float(action_delta_quantiles[1]))
+                bridge_action_delta_p95.append(float(action_delta_quantiles[2]))
+                sample_ages = bridge.sample_ages.to(dtype=th.float32)
+                sample_age_quantiles = (
+                    th.quantile(sample_ages, quantile_levels).detach().cpu().tolist()
+                )
+                bridge_sample_age_p50.append(float(sample_age_quantiles[0]))
+                bridge_sample_age_p90.append(float(sample_age_quantiles[1]))
+                bridge_sample_age_p95.append(float(sample_age_quantiles[2]))
                 if self.bridge_energy_critic is not None and energy_weight > 0.0:
                     predicted_energy = self.bridge_energy_critic.energy(
                         bridge.compact_energy_states,
@@ -268,14 +347,61 @@ class JacobianBridgeSAC(SAC):
         self._bridge_training_totals["valid_fraction_sum"] += float(
             np.sum(bridge_valid_fractions)
         )
+        self._bridge_training_totals["pretrust_valid_fraction_sum"] += float(
+            np.sum(bridge_pretrust_valid_fractions)
+        )
+        self._bridge_training_totals["action_delta_p50_sum"] += float(
+            np.sum(bridge_action_delta_p50)
+        )
+        self._bridge_training_totals["action_delta_p90_sum"] += float(
+            np.sum(bridge_action_delta_p90)
+        )
+        self._bridge_training_totals["action_delta_p95_sum"] += float(
+            np.sum(bridge_action_delta_p95)
+        )
+        self._bridge_training_totals["sample_age_p50_sum"] += float(
+            np.sum(bridge_sample_age_p50)
+        )
+        self._bridge_training_totals["sample_age_p90_sum"] += float(
+            np.sum(bridge_sample_age_p90)
+        )
+        self._bridge_training_totals["sample_age_p95_sum"] += float(
+            np.sum(bridge_sample_age_p95)
+        )
         self._bridge_training_totals["energy_weight_sum"] += float(
             energy_weight * len(shield_losses)
         )
         self.last_bridge_metrics = {
             "shield_loss": float(np.mean(shield_losses)) if shield_losses else 0.0,
             "energy_loss": float(np.mean(energy_losses)) if energy_losses else 0.0,
+            "pretrust_valid_fraction": (
+                float(np.mean(bridge_pretrust_valid_fractions))
+                if bridge_pretrust_valid_fractions
+                else 0.0
+            ),
+            "posttrust_valid_fraction": (
+                float(np.mean(bridge_valid_fractions)) if bridge_valid_fractions else 0.0
+            ),
             "valid_fraction": (
                 float(np.mean(bridge_valid_fractions)) if bridge_valid_fractions else 0.0
+            ),
+            "action_delta_p50": (
+                float(np.mean(bridge_action_delta_p50)) if bridge_action_delta_p50 else 0.0
+            ),
+            "action_delta_p90": (
+                float(np.mean(bridge_action_delta_p90)) if bridge_action_delta_p90 else 0.0
+            ),
+            "action_delta_p95": (
+                float(np.mean(bridge_action_delta_p95)) if bridge_action_delta_p95 else 0.0
+            ),
+            "sample_age_p50": (
+                float(np.mean(bridge_sample_age_p50)) if bridge_sample_age_p50 else 0.0
+            ),
+            "sample_age_p90": (
+                float(np.mean(bridge_sample_age_p90)) if bridge_sample_age_p90 else 0.0
+            ),
+            "sample_age_p95": (
+                float(np.mean(bridge_sample_age_p95)) if bridge_sample_age_p95 else 0.0
             ),
             "energy_weight": float(energy_weight),
         }
@@ -285,7 +411,21 @@ class JacobianBridgeSAC(SAC):
         self.logger.record("train/critic_loss", np.mean(critic_losses))
         self.logger.record("jseb/shield_loss", self.last_bridge_metrics["shield_loss"])
         self.logger.record("jseb/energy_loss", self.last_bridge_metrics["energy_loss"])
+        self.logger.record(
+            "jseb/pretrust_valid_fraction",
+            self.last_bridge_metrics["pretrust_valid_fraction"],
+        )
+        self.logger.record(
+            "jseb/posttrust_valid_fraction",
+            self.last_bridge_metrics["posttrust_valid_fraction"],
+        )
         self.logger.record("jseb/valid_fraction", self.last_bridge_metrics["valid_fraction"])
+        self.logger.record("jseb/action_delta_p50", self.last_bridge_metrics["action_delta_p50"])
+        self.logger.record("jseb/action_delta_p90", self.last_bridge_metrics["action_delta_p90"])
+        self.logger.record("jseb/action_delta_p95", self.last_bridge_metrics["action_delta_p95"])
+        self.logger.record("jseb/sample_age_p50", self.last_bridge_metrics["sample_age_p50"])
+        self.logger.record("jseb/sample_age_p90", self.last_bridge_metrics["sample_age_p90"])
+        self.logger.record("jseb/sample_age_p95", self.last_bridge_metrics["sample_age_p95"])
         self.logger.record("jseb/energy_weight", self.last_bridge_metrics["energy_weight"])
         if ent_coef_losses:
             self.logger.record("train/ent_coef_loss", np.mean(ent_coef_losses))

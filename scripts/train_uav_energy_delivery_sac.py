@@ -1189,6 +1189,24 @@ class NavigationBudgetCallback(BaseCallback):
                     None if not self._episode_rewards else float(np.mean(self._episode_rewards))
                 ),
             }
+            bridge_metrics = getattr(self.model, "last_bridge_metrics", None)
+            if isinstance(bridge_metrics, dict):
+                for metric_name in (
+                    "shield_loss",
+                    "energy_loss",
+                    "pretrust_valid_fraction",
+                    "posttrust_valid_fraction",
+                    "action_delta_p50",
+                    "action_delta_p90",
+                    "action_delta_p95",
+                    "sample_age_p50",
+                    "sample_age_p90",
+                    "sample_age_p95",
+                    "energy_weight",
+                ):
+                    row[f"bridge_{metric_name}"] = float(
+                        bridge_metrics.get(metric_name, 0.0)
+                    )
             for component_name in component_names:
                 row[component_name] = float(
                     np.mean(
