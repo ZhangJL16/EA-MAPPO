@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import inspect
 from collections import deque
 from pathlib import Path
 
@@ -63,6 +64,7 @@ from scripts.evaluate_energy_managed_scene_gif import (
     collect_energy_managed_scene,
     render_energy_managed_gif,
 )
+from experiments.uav_energy_parallel import _worker_main
 
 
 class RecordingEstimator:
@@ -82,6 +84,13 @@ class RecordingEstimator:
     def observe_transition(self, *args, **kwargs):
         self.replay.append((args, kwargs))
         return None
+
+
+def test_parallel_worker_keeps_backward_compatible_optional_estimator_argument() -> None:
+    parameter = inspect.signature(_worker_main).parameters[
+        "energy_estimator_checkpoint"
+    ]
+    assert parameter.default is None
 
 
 class ZeroPredictPolicy:

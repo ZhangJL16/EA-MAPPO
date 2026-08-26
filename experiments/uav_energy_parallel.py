@@ -84,7 +84,7 @@ def _worker_main(
     environment_kwargs: dict[str, object],
     battery_capacity: float | None,
     battery_validation: bool,
-    energy_estimator_checkpoint: str | None,
+    energy_estimator_checkpoint: str | None = None,
 ) -> None:
     os.environ["OMP_NUM_THREADS"] = "1"
     os.environ["MKL_NUM_THREADS"] = "1"
@@ -287,7 +287,7 @@ class ParallelUAVEnvPool:
             if process.is_alive():
                 try:
                     self._decode(worker_id, connection.recv())
-                except (EOFError, BrokenPipeError):
+                except (EOFError, BrokenPipeError, ConnectionResetError):
                     pass
             process.join(timeout=5.0)
             if process.is_alive():

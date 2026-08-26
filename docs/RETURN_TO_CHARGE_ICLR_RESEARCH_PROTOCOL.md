@@ -226,6 +226,19 @@ The runner rejects TD-only formal runs without that artifact and rejects inherit
 Gate files unless `status=PASS`, `evaluable=true`, and `passed=true`; it never
 recomputes an empty Oracle Gate from a learned-method-only table.
 
+### Historical 100k control classification
+
+The frozen-100k control completed all 500 calibration tasks, but only 400 reached
+their goals (`calibration_success_rate=0.80`; bucket rates 0.75--0.87). It therefore
+fails the navigation/calibration prerequisite independently of later software
+execution. Battery validation then encountered a separate implementation failure:
+the long-running parent process had loaded the pre-extension worker call signature,
+while newly spawned children imported the updated signature from a mutable worktree.
+This hot-code mismatch is not an Energy-learning result. The artifact is retained as
+a dual classification: insufficient 100k navigation and post-calibration worker
+launch failure. Formal jobs run from the immutable clean worktree, and the worker's
+new estimator-checkpoint argument now has a backwards-compatible default.
+
 ## 7. Stage C: Minimal Prediction Baselines
 
 Only after Gate B passes:
