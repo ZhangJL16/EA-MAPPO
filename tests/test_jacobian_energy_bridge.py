@@ -445,6 +445,13 @@ def test_formal_runner_has_exact_static_one_million_transition_contract(
     assert (args.lidar_horizontal_sectors, args.lidar_vertical_sectors) == (128, 8)
     assert args.projection_geometry_enabled
     assert args.phase_end_eval_only
+    config = formal_config(args)
+    audit = config["jacobian_bridge_audit"]
+    assert audit["sampling_distribution_changed"] is False
+    assert audit["loss_changed"] is False
+    assert audit["bridge_trust_region"] == pytest.approx(args.bridge_trust_region)
+    assert audit["reported_quantiles"] == [0.50, 0.90, 0.95]
+    assert audit["quantile_audit_frequency"] == "first_gradient_step_per_vector_collection"
 
 
 def test_formal_runner_rejects_periodic_navigation_evaluation(tmp_path: Path) -> None:
