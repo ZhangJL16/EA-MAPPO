@@ -370,12 +370,29 @@ The minimum aligned theory package is:
 No learned estimator is promoted to an unconditional hard energy-safety
 certificate.
 
+The corrected statements, assumptions, counterexample construction, and proof
+obligations are written in `docs/RETURN_TO_CHARGE_PROOF_PACKAGE.md`.  The package
+is provisional: its transport theorem explicitly assumes measurable one-step
+couplings and Lipschitz continuation laws, while the return-failure corollary
+requires a measured decision-interval overshoot bound.  An attempted fresh-agent
+proof audit did not return a result and is recorded as reviewer-infrastructure
+failure, not proof acceptance.
+
+The environment now records the previous decision check, the margin drop at
+commitment, threshold-crossing overshoot, energy consumed between checks, change
+in governing required energy, and whether the configured reserve covered the
+observed interval drift.  Energy drift is logged only for managers whose margin
+unit is `synthetic_simulation_energy_units`; SOC margins remain explicitly
+dimensionless fractions.
+
 ## 12. Evidence Status
 
 ```text
 Stage A pluggable ReturnManager: IMPLEMENTED, TARGETED TESTS PASS
 Stage B probability-semantics audit: IMPLEMENTED, CURRENT ENVIRONMENT DETERMINISTIC
 Stage B Oracle runner: IMPLEMENTED, MULTI-SEED/CYCLE AUDIT SMOKE PASS
+Decision-interval overshoot telemetry: IMPLEMENTED, 114 RELATED TESTS PASS
+Theory proof package: DRAFTED, PROVISIONAL, INDEPENDENT REVIEW NOT COMPLETED
 Formal 500-task navigation prerequisite: RUNNING, NO RESULT YET
 Formal battery calibration and validation: WAITING ON NAVIGATION GATE
 Formal Oracle headroom gate: WAITING ON CALIBRATION

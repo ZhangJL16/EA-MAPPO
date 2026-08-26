@@ -935,6 +935,7 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         self.cycle_distance_flown = 0.0
         self.simulation_time = 0.0
         self.return_commit_record: dict[str, object] | None = None
+        self._last_return_decision_audit: dict[str, object] | None = None
         self.agent.goal = self.current_task_point.copy()
         self.agent.reached = False
         self.agent_paths = [[start.copy()]]
@@ -1660,8 +1661,73 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
                 ),
             )
         )
+        manager_type = getattr(
+            self.return_manager,
+            "manager_type",
+            type(self.return_manager).__name__,
+        )
+        margin_unit = getattr(self.return_manager, "margin_unit", "unknown")
+        continuation_margin = min(
+            decision.immediate_margin,
+            decision.mission_margin,
+        )
+        governing_requirement = (
+            remaining - float(self.energy_reserve) - continuation_margin
+            if margin_unit == ENERGY_UNIT
+            else None
+        )
+        current_decision_audit = {
+            "global_step": int(self.current_step),
+            "remaining_energy": remaining,
+            "continuation_margin": float(continuation_margin),
+            "governing_requirement": governing_requirement,
+            "margin_unit": margin_unit,
+        }
         if not decision.commit:
+            self._last_return_decision_audit = current_decision_audit
             return False
+        previous_decision = self._last_return_decision_audit
+        previous_step = (
+            None if previous_decision is None else int(previous_decision["global_step"])
+        )
+        interval_steps = (
+            None if previous_step is None else int(self.current_step - previous_step)
+        )
+        previous_margin = (
+            None
+            if previous_decision is None
+            else float(previous_decision["continuation_margin"])
+        )
+        margin_drop = (
+            None
+            if previous_margin is None
+            else float(previous_margin - continuation_margin)
+        )
+        energy_consumed_since_check = None
+        requirement_increase_since_check = None
+        observed_energy_requirement_drift = None
+        reserve_covers_observed_drift = None
+        if (
+            previous_decision is not None
+            and margin_unit == ENERGY_UNIT
+            and previous_decision.get("margin_unit") == ENERGY_UNIT
+            and governing_requirement is not None
+            and previous_decision.get("governing_requirement") is not None
+        ):
+            energy_consumed_since_check = float(
+                float(previous_decision["remaining_energy"]) - remaining
+            )
+            requirement_increase_since_check = float(
+                governing_requirement
+                - float(previous_decision["governing_requirement"])
+            )
+            observed_energy_requirement_drift = float(
+                energy_consumed_since_check + requirement_increase_since_check
+            )
+            reserve_covers_observed_drift = bool(
+                float(self.energy_reserve)
+                >= max(0.0, observed_energy_requirement_drift)
+            )
         self.mode = SortieMode.CHARGER_COMMITTED
         self.task_to_charger_count += 1
         self.agent.goal = self.charger_position
@@ -1721,21 +1787,34 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
             "reserve": self.energy_reserve,
             "immediate_margin": decision.immediate_margin,
             "mission_margin": decision.mission_margin,
-            "continuation_margin": min(
-                decision.immediate_margin,
-                decision.mission_margin,
+            "continuation_margin": continuation_margin,
+            "decision_margin_unit": margin_unit,
+            "governing_required_energy": governing_requirement,
+            "threshold_crossing_overshoot": max(0.0, -float(continuation_margin)),
+            "previous_decision_step": previous_step,
+            "previous_continuation_margin": previous_margin,
+            "decision_check_interval_steps": interval_steps,
+            "decision_margin_drop_since_previous_check": margin_drop,
+            "energy_consumed_since_previous_decision_check": (
+                energy_consumed_since_check
             ),
-            "return_manager_type": getattr(
-                self.return_manager,
-                "manager_type",
-                type(self.return_manager).__name__,
+            "required_energy_increase_since_previous_decision_check": (
+                requirement_increase_since_check
             ),
+            "observed_decision_interval_energy_requirement_drift": (
+                observed_energy_requirement_drift
+            ),
+            "reserve_covers_observed_decision_interval_drift": (
+                reserve_covers_observed_drift
+            ),
+            "return_manager_type": manager_type,
             "decision_statistic": decision.decision_statistic,
             "mode_before": SortieMode.TASK.value,
             "mode_after": SortieMode.CHARGER_COMMITTED.value,
             "reason": decision.reason,
         }
         self.return_commit_record = event.copy()
+        self._last_return_decision_audit = current_decision_audit
         self.switching_events.append(event)
         return True
 
@@ -1777,6 +1856,18 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
             "E_mission_95_at_switch": commit.get("E_mission_95"),
             "E_return_now_95_at_switch": commit.get("E_return_now_95"),
             "reserve_at_commit": commit.get("reserve"),
+            "decision_check_interval_steps_at_commit": commit.get(
+                "decision_check_interval_steps"
+            ),
+            "threshold_crossing_overshoot_at_commit": commit.get(
+                "threshold_crossing_overshoot"
+            ),
+            "observed_decision_interval_energy_requirement_drift_at_commit": commit.get(
+                "observed_decision_interval_energy_requirement_drift"
+            ),
+            "reserve_covers_observed_decision_interval_drift_at_commit": commit.get(
+                "reserve_covers_observed_decision_interval_drift"
+            ),
             "charger_reached": True,
             "energy_exhausted": False,
             "emergency_time_limit": False,
@@ -1794,6 +1885,7 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         self.cycle_policy_steps = 0
         self.cycle_distance_flown = 0.0
         self.return_commit_record = None
+        self._last_return_decision_audit = None
         self.task_to_charger_count = 0
         self.agent.vel[:] = 0.0
         self.agent.energy = self.operational_energy_capacity
@@ -1846,6 +1938,18 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
             "E_mission_95_at_switch": commit.get("E_mission_95"),
             "E_return_now_95_at_switch": commit.get("E_return_now_95"),
             "reserve_at_commit": commit.get("reserve"),
+            "decision_check_interval_steps_at_commit": commit.get(
+                "decision_check_interval_steps"
+            ),
+            "threshold_crossing_overshoot_at_commit": commit.get(
+                "threshold_crossing_overshoot"
+            ),
+            "observed_decision_interval_energy_requirement_drift_at_commit": commit.get(
+                "observed_decision_interval_energy_requirement_drift"
+            ),
+            "reserve_covers_observed_decision_interval_drift_at_commit": commit.get(
+                "reserve_covers_observed_decision_interval_drift"
+            ),
             "charger_reached": False,
             "energy_exhausted": reason == "energy_exhausted",
             "emergency_time_limit": reason == "episode_emergency_step_guard",

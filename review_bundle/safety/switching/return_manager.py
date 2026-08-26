@@ -32,6 +32,7 @@ class ReturnManagerDecision:
 
 class ReturnManager(Protocol):
     manager_type: str
+    margin_unit: str
 
     def decide(self, context: ReturnDecisionContext) -> ReturnManagerDecision: ...
 
@@ -40,6 +41,7 @@ class QuantileEnergyReturnManager:
     """One-way return manager using externally supplied resource upper bounds."""
 
     manager_type = "quantile_energy_boundary"
+    margin_unit = "synthetic_simulation_energy_units"
     requires_energy_estimate = True
 
     def decide(self, context: ReturnDecisionContext) -> ReturnManagerDecision:
@@ -89,6 +91,7 @@ class QuantileEnergyReturnManager:
 
 class FixedSOCThresholdReturnManager:
     manager_type = "fixed_soc_threshold"
+    margin_unit = "fraction_of_capacity"
     requires_energy_estimate = False
 
     def __init__(self, threshold: float) -> None:
@@ -119,6 +122,7 @@ class FixedSOCThresholdReturnManager:
 
 class DistanceEnergyReturnManager:
     manager_type = "distance_energy_boundary"
+    margin_unit = "synthetic_simulation_energy_units"
     requires_energy_estimate = False
 
     def __init__(self, energy_per_meter: float) -> None:

@@ -933,8 +933,49 @@ def test_soc_return_manager_runs_phase2_without_energy_estimator() -> None:
     assert environment._refresh_mission_decision() is True
     event = environment.switching_events[-1]
     assert event["return_manager_type"] == "fixed_soc_threshold"
+    assert event["decision_margin_unit"] == "fraction_of_capacity"
+    assert event["governing_required_energy"] is None
+    assert event["observed_decision_interval_energy_requirement_drift"] is None
     assert event["mission_energy_upper_bound"] is None
     assert event["reason"] == "soc_threshold_reached"
+    environment.close()
+
+
+def test_energy_return_manager_logs_decision_interval_overshoot() -> None:
+    environment = UAVEnergyDeliverySACEnv(
+        operational_energy_capacity=10.0,
+        energy_reserve_fraction=0.0,
+    )
+    environment.bind_navigation_policy(zero_policy)
+    environment.bind_return_manager(DistanceEnergyReturnManager(0.001))
+    environment.enable_phase_two()
+    environment.reset(seed=25)
+    environment.current_step = 1
+    environment.agent.energy = 10.0
+    assert environment._refresh_mission_decision() is False
+    previous_audit = dict(environment._last_return_decision_audit)
+
+    environment.current_step = 5
+    environment.agent.energy = 0.0
+    assert environment._refresh_mission_decision() is True
+    event = environment.switching_events[-1]
+    current_requirement = float(event["governing_required_energy"])
+    previous_requirement = float(previous_audit["governing_requirement"])
+
+    assert event["decision_margin_unit"] == ENERGY_UNIT
+    assert event["previous_decision_step"] == 1
+    assert event["decision_check_interval_steps"] == 4
+    assert event["energy_consumed_since_previous_decision_check"] == pytest.approx(10.0)
+    assert event["required_energy_increase_since_previous_decision_check"] == pytest.approx(
+        current_requirement - previous_requirement
+    )
+    assert event["observed_decision_interval_energy_requirement_drift"] == pytest.approx(
+        10.0 + current_requirement - previous_requirement
+    )
+    assert event["threshold_crossing_overshoot"] == pytest.approx(
+        -float(event["continuation_margin"])
+    )
+    assert event["reserve_covers_observed_decision_interval_drift"] is False
     environment.close()
 
 
