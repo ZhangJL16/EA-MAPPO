@@ -376,8 +376,11 @@ certificate.
 Stage A pluggable ReturnManager: IMPLEMENTED, TARGETED TESTS PASS
 Stage B probability-semantics audit: IMPLEMENTED, CURRENT ENVIRONMENT DETERMINISTIC
 Stage B Oracle runner: IMPLEMENTED, MULTI-SEED/CYCLE AUDIT SMOKE PASS
-Formal Oracle headroom gate: PENDING
-Learned baseline suite: PENDING
+Formal 500-task navigation prerequisite: RUNNING, NO RESULT YET
+Formal battery calibration and validation: WAITING ON NAVIGATION GATE
+Formal Oracle headroom gate: WAITING ON CALIBRATION
+Current Quantile-TD baseline: IMPLEMENTED, WAITING ON ORACLE GATE
+MC-IQN / PCM-Executed / executed-WM / ensemble suite: GATED, NOT STARTED
 2x2 compositional shift: PENDING
 Reliability method: NOT YET JUSTIFIED
 CMDP decision track: PENDING
@@ -385,5 +388,10 @@ Second safety family/domain: PENDING
 ICLR-level claim status: PENDING
 ```
 
-The active historical JSEB/Quantile-TD long run remains a control experiment. It is
-not evidence that this new return-first protocol has passed Gate B.
+The formal chain is fail-closed and uses the frozen 500k JSEB navigation checkpoint.
+The 500-task navigation prerequisite runs with six independent environment workers,
+central deterministic policy inference, fixed seed 170001, and no replay or policy
+updates. Its downstream calibration, 100-independent-cycle Oracle comparison, exact
+500k Quantile-TD collection, and TD decision comparison start only after their named
+predecessor writes a passing artifact. A live process, `RUNNING.json`, smoke, or
+historical control is not evidence that Gate B passed.
