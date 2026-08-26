@@ -204,11 +204,15 @@ decision rule both before and after motion.
 Run the frozen learned navigation policy with calibrated capacity, HOCBF obstacles,
 paired seeds, reserve/SOC sweeps, and enough battery cycles for confidence intervals.
 
-The preregistered first gate uses at least 100 cycles per method/parameter point,
-a common 5% Wilson-upper stranding ceiling, and requires the Oracle to improve the
-best eligible SOC/distance throughput by at least 5%. These are engineering pilot
-thresholds for deciding whether to invest in learned baselines, not a theorem or a
-paper-level safety certificate.
+The preregistered first gate uses 100 independent evaluation seeds and exactly one
+battery cycle from each seed per method/parameter point. This avoids treating 20
+correlated continuous cycles from each of only five worlds as 100 independent
+Bernoulli observations. It uses a common 5% Wilson-upper stranding ceiling and
+requires the Oracle to improve the best eligible SOC/distance throughput by at
+least 5%. These are engineering pilot thresholds for deciding whether to invest in
+learned baselines, not a theorem or a paper-level safety certificate. Multi-cycle
+continuous recharge remains covered by mechanics tests and later mission runs; it
+is not misused as the independence unit for this Gate.
 
 - If Oracle does not materially dominate SOC and distance frontiers, stop using
   return-to-charge as the ICLR headline.

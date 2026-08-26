@@ -148,14 +148,34 @@ def test_seed_aggregation_counts_cycles_and_transitions_exactly() -> None:
 
 def test_formal_defaults_provide_exact_minimum_gate_cycles() -> None:
     args = parse_args(["--output-dir", "/tmp/stage_b_gate_test"])
-    assert args.cycles_per_point == 20
-    assert args.evaluation_seeds == [0, 1, 2, 3, 4]
+    assert args.cycles_per_point == 1
+    assert args.evaluation_seeds == list(range(110_001, 110_101))
     assert (
         args.cycles_per_point * len(args.evaluation_seeds)
         == args.minimum_cycles_for_gate
         == 100
     )
     assert args.battery_capacity is None
+
+
+def test_formal_stage_b_rejects_clustered_cycles_as_independent_wilson_units(
+    tmp_path,
+) -> None:
+    with pytest.raises(SystemExit):
+        parse_args(
+            [
+                "--output-dir",
+                str(tmp_path / "clustered"),
+                "--cycles-per-point",
+                "20",
+                "--evaluation-seeds",
+                "0",
+                "1",
+                "2",
+                "3",
+                "4",
+            ]
+        )
 
 
 def test_post_gate_td_comparison_requires_explicit_passed_gate(tmp_path) -> None:

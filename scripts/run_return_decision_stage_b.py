@@ -38,6 +38,7 @@ from scripts.train_uav_energy_delivery_sac import HeuristicGoalPolicy
 
 _STAGE_B_WORKER_ARGS: argparse.Namespace | None = None
 _STAGE_B_WORKER_POLICY: FrozenPolicy | None = None
+FORMAL_EVALUATION_SEEDS = list(range(110_001, 110_101))
 
 
 class FrozenPolicy:
@@ -66,8 +67,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--evaluation-seeds",
         type=int,
         nargs="+",
-        default=[0, 1, 2, 3, 4],
-        help="paired evaluation seeds shared by every method/parameter point",
+        default=FORMAL_EVALUATION_SEEDS,
+        help=(
+            "independent battery-cycle seeds shared by every method/parameter "
+            "point"
+        ),
     )
     parser.add_argument("--battery-capacity", type=float)
     parser.add_argument("--navigation-evaluation-json", type=Path)
@@ -78,7 +82,15 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         type=Path,
         help="passed Oracle headroom Gate inherited by post-Gate learned-method comparisons",
     )
-    parser.add_argument("--cycles-per-point", type=int, default=20)
+    parser.add_argument(
+        "--cycles-per-point",
+        type=int,
+        default=1,
+        help=(
+            "cycles executed per evaluation seed; formal evidence requires one "
+            "cycle so Wilson intervals use independent seeded units"
+        ),
+    )
     parser.add_argument(
         "--evaluation-num-envs",
         type=int,
@@ -179,6 +191,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         parser.error(
             "formal Oracle headroom evaluation is underpowered: "
             "cycles-per-point * evaluation-seeds must reach minimum-cycles-for-gate"
+        )
+    if not args.smoke and args.cycles_per_point != 1:
+        parser.error(
+            "formal Stage-B evidence requires exactly one battery cycle per "
+            "independent evaluation seed"
         )
     if not args.smoke and args.oracle_headroom_json is None:
         if "oracle" not in args.methods or not {"soc", "distance"}.intersection(
@@ -691,7 +708,17 @@ def write_results(
         "cycles_per_seed": int(args.cycles_per_point),
         "evaluation_seeds": list(args.evaluation_seeds),
         "evaluation_num_envs": int(args.evaluation_num_envs),
-        "seed_parallelism_semantics": "independent_seed_processes_same_config_and_budget",
+        "cycle_evidence_unit": (
+            "independent_seeded_battery_cycle"
+            if args.cycles_per_point == 1
+            else "smoke_only_continuous_cycles_within_seed"
+        ),
+        "wilson_interval_independence_design": bool(
+            not args.smoke and args.cycles_per_point == 1
+        ),
+        "seed_parallelism_semantics": (
+            "independent_seed_processes_same_config_and_one_cycle_budget"
+        ),
         "minimum_cycles_per_point": int(args.minimum_cycles_for_gate),
         "actual_cycles_per_point": {
             f"{method}|{parameter}": count
