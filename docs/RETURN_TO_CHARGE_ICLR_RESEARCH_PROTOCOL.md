@@ -19,6 +19,10 @@ learning problem is therefore not energy prediction in isolation:
 The intended headline evidence is a better stranding--throughput Pareto frontier,
 not a lower prediction MAE alone.
 
+Requirement-by-requirement completion evidence is tracked in
+`docs/RETURN_TO_CHARGE_COMPLETION_LEDGER.md`; a live process or smoke never marks
+a gated research stage complete.
+
 ## 2. Fixed System Roles
 
 ```text
