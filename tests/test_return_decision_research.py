@@ -12,7 +12,11 @@ from experiments.energy_mc.return_decision import (
     pareto_frontier,
     wilson_interval,
 )
-from scripts.run_return_decision_stage_b import aggregate_seed_audits, parse_args
+from scripts.run_return_decision_stage_b import (
+    aggregate_seed_audits,
+    derive_successful_energy_per_meter,
+    parse_args,
+)
 from scripts.evaluate_jseb_checkpoints import select_checkpoints
 from scripts.calibrate_battery_for_navigation_checkpoint import (
     navigation_readiness_failures,
@@ -229,3 +233,26 @@ def test_battery_calibration_runner_rejects_nonready_navigation() -> None:
     failures = navigation_readiness_failures(navigation)
     assert "navigation energy/readiness gate failed" in failures
     assert "navigation collision/boundary gate failed" in failures
+
+
+def test_distance_baseline_uses_successful_calibration_energy_per_path_meter() -> None:
+    calibration = {
+        "tasks": [
+            {
+                "success": True,
+                "total_realized_energy": 10.0,
+                "actual_path_length": 100.0,
+            },
+            {
+                "success": True,
+                "total_realized_energy": 30.0,
+                "actual_path_length": 300.0,
+            },
+            {
+                "success": False,
+                "total_realized_energy": 1000.0,
+                "actual_path_length": 1.0,
+            },
+        ]
+    }
+    assert derive_successful_energy_per_meter(calibration) == pytest.approx(0.1)

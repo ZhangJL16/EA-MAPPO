@@ -80,7 +80,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--oracle-max-policy-steps", type=int, default=4000)
     parser.add_argument("--decision-interval-policy-steps", type=int, default=10)
     parser.add_argument("--p0-clone-rollouts", type=int, default=20)
-    parser.add_argument("--energy-per-meter", type=float, default=0.01)
+    parser.add_argument("--energy-per-meter", type=float)
     parser.add_argument("--soc-thresholds", type=float, nargs="+", default=[0.10, 0.20, 0.30, 0.40])
     parser.add_argument("--reserve-fractions", type=float, nargs="+", default=[0.0, 0.05, 0.10, 0.15])
     parser.add_argument(
@@ -554,6 +554,12 @@ def write_results(
         if args.navigation_checkpoint is None
         else str(args.navigation_checkpoint),
         "battery_capacity": float(args.battery_capacity),
+        "distance_baseline_energy_per_meter": float(args.energy_per_meter),
+        "distance_baseline_source": (
+            "smoke_constant"
+            if args.smoke
+            else "successful_calibration_total_energy_divided_by_total_path_length"
+        ),
         "cycles_per_seed": int(args.cycles_per_point),
         "evaluation_seeds": list(args.evaluation_seeds),
         "minimum_cycles_per_point": int(args.minimum_cycles_for_gate),
@@ -692,6 +698,7 @@ def load_prerequisite_audit(args: argparse.Namespace) -> GateBPrerequisiteAudit:
             raise TypeError(f"prerequisite JSON must contain an object: {path}")
         payloads.append(value)
     audit = audit_gate_b_prerequisites(*payloads)
+    calibration = payloads[1]
     calibrated_capacity = audit.calibrated_battery_capacity
     if audit.passed and calibrated_capacity is None:
         raise RuntimeError("passed prerequisite audit did not provide battery capacity")
@@ -710,7 +717,39 @@ def load_prerequisite_audit(args: argparse.Namespace) -> GateBPrerequisiteAudit:
         )
     if audit.passed:
         args.battery_capacity = calibrated_capacity
+        empirical_energy_per_meter = derive_successful_energy_per_meter(calibration)
+        if args.energy_per_meter is not None and not np.isclose(
+            args.energy_per_meter,
+            empirical_energy_per_meter,
+            rtol=1e-9,
+            atol=1e-12,
+        ):
+            raise ValueError(
+                "manual --energy-per-meter differs from the audited calibration estimate"
+            )
+        args.energy_per_meter = empirical_energy_per_meter
     return audit
+
+
+def derive_successful_energy_per_meter(
+    calibration: dict[str, object],
+) -> float:
+    tasks = calibration.get("tasks")
+    if not isinstance(tasks, list):
+        raise ValueError("calibration tasks are required for the distance baseline")
+    successful = [
+        item
+        for item in tasks
+        if isinstance(item, dict) and item.get("success") is True
+    ]
+    if not successful:
+        raise ValueError("calibration contains no successful distance-energy samples")
+    total_energy = sum(float(item["total_realized_energy"]) for item in successful)
+    total_path_length = sum(float(item["actual_path_length"]) for item in successful)
+    value = total_energy / total_path_length
+    if not np.isfinite(value) or value <= 0.0:
+        raise ValueError("empirical calibration energy per meter must be positive")
+    return float(value)
 
 
 def main(argv: list[str] | None = None) -> None:
