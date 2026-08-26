@@ -17,7 +17,7 @@ import gymnasium
 import numpy as np
 import stable_baselines3
 import torch
-from stable_baselines3.common.callbacks import CallbackList, CheckpointCallback
+from stable_baselines3.common.callbacks import CallbackList
 
 from envs.UAVEnergyDeliverySAC import SACTrainingPhase
 from experiments.jacobian_energy_bridge.callbacks import SafetyBridgeCollectionCallback
@@ -64,9 +64,7 @@ from scripts.train_uav_energy_delivery_sac import (
 
 
 FORMAL_PHASE1_TRANSITIONS = 500_000
-FORMAL_PHASE2A_TRANSITIONS = 100_000
-FORMAL_PHASE2B_TRANSITIONS = 300_000
-FORMAL_PHASE2C_TRANSITIONS = 100_000
+FORMAL_PHASE2_ENERGY_TRANSITIONS = 500_000
 FORMAL_TOTAL_TRANSITIONS = 1_000_000
 
 
@@ -160,7 +158,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         "--intermediate-checkpoint-energy-ablation",
         action="store_true",
-        help="reuse an explicitly named intermediate navigation checkpoint and run only Phase 2A/B/C",
+        help="reuse an explicitly named intermediate navigation checkpoint and run frozen-policy energy learning",
     )
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--device", default="cuda")
@@ -173,9 +171,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     )
     parser.add_argument("--evaluation-progress-interval-tasks", type=int, default=10)
     parser.add_argument("--phase1-transitions", type=int, default=FORMAL_PHASE1_TRANSITIONS)
-    parser.add_argument("--phase2a-transitions", type=int, default=FORMAL_PHASE2A_TRANSITIONS)
-    parser.add_argument("--phase2b-transitions", type=int, default=FORMAL_PHASE2B_TRANSITIONS)
-    parser.add_argument("--phase2c-transitions", type=int, default=FORMAL_PHASE2C_TRANSITIONS)
+    parser.add_argument(
+        "--phase2-energy-transitions",
+        type=int,
+        default=FORMAL_PHASE2_ENERGY_TRANSITIONS,
+        help="frozen-navigation mission transitions used only for Energy Model learning",
+    )
     parser.add_argument("--phase1-episode-max-steps", type=int, default=4000)
     parser.add_argument("--phase2-episode-max-steps", type=int, default=20_000)
     parser.add_argument("--eval-freq-transitions", type=int, default=100_000)
@@ -273,8 +274,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     args.lidar_sectors = args.lidar_horizontal_sectors * args.lidar_vertical_sectors
     args.legacy_lidar_alias_used = False
     args.phase1_transition_budget = args.phase1_transitions
-    args.phase1b_transition_budget = args.phase2a_transitions
-    args.phase2_transition_budget = args.phase2b_transitions + args.phase2c_transitions
+    args.phase1b_transition_budget = args.phase2_energy_transitions
+    args.phase2_transition_budget = 0
     args.max_steps_per_task = args.phase1_episode_max_steps
     if args.smoke and args.pilot:
         parser.error("--smoke and --pilot are mutually exclusive")
@@ -288,9 +289,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     if args.smoke:
         args.evaluation_num_envs = 1
         args.phase1_transitions = 2_000
-        args.phase2a_transitions = 500
-        args.phase2b_transitions = 1_000
-        args.phase2c_transitions = 500
+        args.phase2_energy_transitions = 2_000
         args.num_envs = 4
         args.lidar_horizontal_sectors = 8
         args.lidar_vertical_sectors = 2
@@ -318,9 +317,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     elif args.pilot:
         args.evaluation_num_envs = 1
         args.phase1_transitions = 25_000
-        args.phase2a_transitions = 5_000
-        args.phase2b_transitions = 15_000
-        args.phase2c_transitions = 5_000
+        args.phase2_energy_transitions = 25_000
         args.num_envs = 4
         args.eval_navigation_tasks = 10
         args.navigation_eval_max_steps = 1_200
@@ -340,11 +337,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         args.log_freq_transitions = 1_000
         args.gif_freq_transitions = 25_000
     args.phase1_transition_budget = args.phase1_transitions
-    args.phase1b_transition_budget = args.phase2a_transitions
-    args.phase2_transition_budget = args.phase2b_transitions + args.phase2c_transitions
+    args.phase1b_transition_budget = args.phase2_energy_transitions
+    args.phase2_transition_budget = 0
     args.energy_eval_tasks = max(5, args.eval_navigation_tasks)
     args.energy_eval_seed = 120_001
-    args.energy_eval_freq_transitions = max(args.phase2a_transitions, 1)
+    args.energy_eval_freq_transitions = max(args.phase2_energy_transitions, 1)
     args.td_collection_seed = 100_001
     args.run_phase2 = True
     args.run_td_pretraining = False
@@ -358,20 +355,15 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     elif args.ablation in {"B", "C"}:
         args.shield_loss_weight = max(float(args.shield_loss_weight), 0.0)
         args.energy_loss_weight = 0.0
-    for name in (
-        "phase1_transitions",
-        "phase2a_transitions",
-        "phase2b_transitions",
-        "phase2c_transitions",
-    ):
+    for name in ("phase1_transitions", "phase2_energy_transitions"):
         if getattr(args, name) <= 0:
             parser.error(f"{name.replace('_', '-')} must be positive")
     if args.evaluation_num_envs <= 0:
         parser.error("evaluation-num-envs must be positive")
     if args.evaluation_progress_interval_tasks <= 0:
         parser.error("evaluation-progress-interval-tasks must be positive")
-    if args.phase1_transitions % args.num_envs != 0 or args.phase2b_transitions % args.num_envs != 0:
-        parser.error("Phase 1 and Phase 2B budgets must be divisible by num-envs")
+    if args.phase1_transitions % args.num_envs != 0:
+        parser.error("Phase 1 budget must be divisible by num-envs")
     if not args.lidar_enabled or not args.hocbf_enabled or args.num_obstacles != 24:
         parser.error("JSEB requires static obstacles, LiDAR, and HOCBF")
     if not (args.smoke or args.pilot):
@@ -382,19 +374,17 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         total = sum(
             [
                 args.phase1_transitions,
-                args.phase2a_transitions,
-                args.phase2b_transitions,
-                args.phase2c_transitions,
+                args.phase2_energy_transitions,
             ]
         )
         expected_total = (
-            args.phase2a_transitions + args.phase2b_transitions + args.phase2c_transitions
+            args.phase2_energy_transitions
             if args.intermediate_checkpoint_energy_ablation
             else FORMAL_TOTAL_TRANSITIONS
         )
         if args.intermediate_checkpoint_energy_ablation:
             if expected_total != 500_000:
-                parser.error("intermediate JSEB energy ablation requires exactly 500000 Phase 2 transitions")
+                parser.error("intermediate frozen-policy energy run requires exactly 500000 Phase 2 transitions")
         elif total != FORMAL_TOTAL_TRANSITIONS:
             parser.error("formal JSEB training budget must equal exactly 1,000,000 transitions")
         if (args.lidar_horizontal_sectors, args.lidar_vertical_sectors) != (128, 8):
@@ -681,7 +671,7 @@ def disjoint_bridge_and_energy_data(
 ) -> tuple[PackedBridgeDataset, PackedBridgeDataset, list[dict[str, object]], dict[str, object]]:
     if len(mission_units) < 5:
         raise RuntimeError(
-            "100k JSEB downstream run needs at least five complete missions to make "
+            "frozen-navigation energy run needs at least five complete missions to make "
             "disjoint bridge-source and energy-model datasets"
         )
     rng = np.random.default_rng(seed)
@@ -706,7 +696,7 @@ def disjoint_bridge_and_energy_data(
     if bridge_ids & energy_ids:
         raise RuntimeError("bridge-source and energy-model trajectory sets overlap")
     audit = {
-        "protocol": "fresh_phase2a_disjoint_mission_split",
+        "protocol": "fresh_frozen_policy_disjoint_mission_split",
         "bridge_source_missions": len(bridge_units),
         "energy_model_missions": len(energy_units),
         "bridge_source_trajectory_ids": sorted(bridge_ids),
@@ -939,18 +929,25 @@ def split_by_mission_units(
     *,
     seed: int,
 ) -> tuple[dict[str, PackedBridgeDataset], dict[str, list[dict[str, object]]]]:
-    if len(mission_units) < 3:
+    if len(mission_units) < 4:
         raise RuntimeError(
-            "at least three complete TASK-to-CHARGER missions are required"
+            "at least four complete TASK-to-CHARGER missions are required"
         )
     rng = np.random.default_rng(seed)
     order = rng.permutation(len(mission_units))
-    train_end = max(1, int(np.floor(0.60 * len(order))))
-    calibration_end = max(train_end + 1, int(np.floor(0.80 * len(order))))
-    calibration_end = min(calibration_end, len(order) - 1)
+    test_count = max(1, int(np.floor(0.20 * len(order))))
+    calibration_count = max(1, int(np.floor(0.20 * len(order))))
+    validation_count = max(1, int(np.floor(0.10 * len(order))))
+    train_count = len(order) - test_count - calibration_count - validation_count
+    if train_count < 1:
+        raise RuntimeError("mission split cannot allocate four nonempty partitions")
+    train_end = train_count
+    validation_end = train_end + validation_count
+    calibration_end = validation_end + calibration_count
     indices = {
         "train": order[:train_end],
-        "calibration": order[train_end:calibration_end],
+        "validation": order[train_end:validation_end],
+        "calibration": order[validation_end:calibration_end],
         "test": order[calibration_end:],
     }
     unit_splits = {
@@ -979,16 +976,23 @@ def split_goal_trajectories(
     seed: int,
 ) -> dict[str, PackedBridgeDataset]:
     ids = np.asarray(sorted(dataset.unique_trajectory_ids), dtype=np.int64)
-    if ids.size < 3:
-        raise RuntimeError("at least three completed goal trajectories are required")
+    if ids.size < 4:
+        raise RuntimeError("at least four completed goal trajectories are required")
     rng = np.random.default_rng(seed)
     rng.shuffle(ids)
-    train_end = max(1, int(np.floor(0.60 * ids.size)))
-    calibration_end = max(train_end + 1, int(np.floor(0.80 * ids.size)))
-    calibration_end = min(calibration_end, ids.size - 1)
+    test_count = max(1, int(np.floor(0.20 * ids.size)))
+    calibration_count = max(1, int(np.floor(0.20 * ids.size)))
+    validation_count = max(1, int(np.floor(0.10 * ids.size)))
+    train_count = int(ids.size) - test_count - calibration_count - validation_count
+    if train_count < 1:
+        raise RuntimeError("goal split cannot allocate four nonempty partitions")
+    train_end = train_count
+    validation_end = train_end + validation_count
+    calibration_end = validation_end + calibration_count
     split_ids = {
         "train": set(int(value) for value in ids[:train_end]),
-        "calibration": set(int(value) for value in ids[train_end:calibration_end]),
+        "validation": set(int(value) for value in ids[train_end:validation_end]),
+        "calibration": set(int(value) for value in ids[validation_end:calibration_end]),
         "test": set(int(value) for value in ids[calibration_end:]),
     }
     if any(not values for values in split_ids.values()):
@@ -1088,7 +1092,12 @@ def fit_energy_models(
             else concatenate_bridge_datasets(phase1_dataset, dataset)
         )
         splits = split_goal_trajectories(diagnostic_dataset, seed=seed + 1)
-        unit_splits = {"train": [], "calibration": [], "test": []}
+        unit_splits = {
+            "train": [],
+            "validation": [],
+            "calibration": [],
+            "test": [],
+        }
         split_protocol = "diagnostic_real_goal_trajectories_no_mission_claim"
     else:
         raise RuntimeError(
@@ -1129,8 +1138,8 @@ def fit_energy_models(
         fit = model.fit_arrays(
             features(name, splits["train"]),
             splits["train"].energy_to_go,
-            features(name, splits["calibration"]),
-            splits["calibration"].energy_to_go,
+            features(name, splits["validation"]),
+            splits["validation"].energy_to_go,
             epochs=args.energy_epochs,
             batch_size=args.energy_batch_size,
             learning_rate=args.energy_learning_rate,
@@ -1164,8 +1173,8 @@ def fit_energy_models(
     critic_fit = critic.fit_arrays(
         critic_features(splits["train"]),
         splits["train"].energy_to_go,
-        critic_features(splits["calibration"]),
-        splits["calibration"].energy_to_go,
+        critic_features(splits["validation"]),
+        splits["validation"].energy_to_go,
         epochs=args.energy_epochs,
         batch_size=args.energy_batch_size,
         learning_rate=args.energy_learning_rate,
@@ -1215,6 +1224,12 @@ def fit_energy_models(
             name: sorted(split.unique_trajectory_ids) for name, split in splits.items()
         },
         "split_protocol": split_protocol,
+        "split_roles": {
+            "train": "model_parameter_fitting",
+            "validation": "model_selection_and_early_stopping",
+            "calibration": "conformal_margin_only",
+            "test": "held_out_reporting_only",
+        },
         "complete_mission_count": len(mission_units),
         "mission_claim_available": split_protocol == "complete_task_to_charger_missions",
         "phase_dataset_trajectory_count": phase_dataset_trajectory_count,
@@ -1234,90 +1249,6 @@ def fit_energy_models(
     return models, encoder, critic, splits, unit_splits, summary
 
 
-def train_phase2b(
-    model: JacobianBridgeSAC,
-    critic: ActionConditionedEnergyCritic,
-    replay: SafetyBridgeReplay,
-    args: argparse.Namespace,
-    output: Path,
-    *,
-    energy_scale: float,
-) -> dict[str, object]:
-    for parameter in model.policy.parameters():
-        parameter.requires_grad_(True)
-    environment = make_navigation_vec_env(args)
-    model.set_env(environment)
-    model.set_bridge_replay(replay)
-    model.set_energy_bridge(
-        critic,
-        energy_scale=energy_scale,
-        phase_start_transition=model.num_timesteps,
-        warmup_transitions=args.energy_warmup_transitions,
-        ramp_transitions=args.energy_ramp_transitions,
-    )
-    writer = SafetyBridgeTrajectoryWriter(
-        output / "trajectories",
-        num_envs=args.num_envs,
-        maximum_barrier_constraints=args.hocbf_top_k,
-        slack_scale=args.bridge_slack_scale,
-    )
-    bridge_callback = SafetyBridgeCollectionCallback(
-        replay=replay,
-        trajectory_writer=writer,
-        metrics_path=output / "metrics.jsonl",
-        log_frequency_transitions=args.log_freq_transitions,
-    )
-    checkpoint_callback = CheckpointCallback(
-        save_freq=max(1, args.checkpoint_freq_transitions // args.num_envs),
-        save_path=str(output / "checkpoints"),
-        name_prefix="phase2b",
-        save_replay_buffer=False,
-    )
-    start_num_timesteps = int(model.num_timesteps)
-    start_updates = int(model._n_updates)
-    start_bridge_counters = model.bridge_training_counters()
-    started = time.perf_counter()
-    model.learn(
-        total_timesteps=args.phase2b_transitions,
-        callback=CallbackList([bridge_callback, checkpoint_callback]),
-        reset_num_timesteps=False,
-        progress_bar=False,
-    )
-    actual = int(model.num_timesteps - start_num_timesteps)
-    if actual != args.phase2b_transitions:
-        raise RuntimeError("Phase 2B did not match the exact transition budget")
-    partials = writer.discard_partials()
-    checkpoint = output / "phase2b_final.zip"
-    model.save(checkpoint)
-    end_bridge_counters = model.bridge_training_counters()
-    phase_bridge_counters = {
-        key: end_bridge_counters[key] - start_bridge_counters[key]
-        for key in end_bridge_counters
-    }
-    summary = {
-        "requested_training_transitions": args.phase2b_transitions,
-        "actual_training_transitions": actual,
-        "exact_budget_match": actual == args.phase2b_transitions,
-        "gradient_updates": int(model._n_updates - start_updates),
-        "wall_clock_seconds": time.perf_counter() - started,
-        "partial_trajectories_at_budget_stop": partials,
-        "bridge_metrics": bridge_callback.metrics(),
-        "last_bridge_loss_metrics": model.last_bridge_metrics,
-        "bridge_training": model.summarize_bridge_training(phase_bridge_counters),
-        "energy_schedule": {
-            "weight": args.energy_loss_weight,
-            "warmup_transitions": args.energy_warmup_transitions,
-            "ramp_transitions": args.energy_ramp_transitions,
-            "trust_region": args.bridge_trust_region,
-        },
-        "checkpoint": str(checkpoint),
-        "checkpoint_sha256": file_sha256(checkpoint),
-    }
-    write_json(output / "summary.json", summary)
-    environment.close()
-    return summary
-
-
 def trajectory_initial_rows(dataset: PackedBridgeDataset) -> dict[int, int]:
     return {
         int(trajectory_id): int(np.flatnonzero(dataset.trajectory_ids == trajectory_id)[0])
@@ -1332,7 +1263,7 @@ def fit_final_conformal(
     args: argparse.Namespace,
     output: Path,
     *,
-    policy_shift_data_available: bool,
+    deployed_policy_data_available: bool,
 ) -> tuple[CalibratedCompactEnergyEstimator | None, dict[str, object]]:
     point_model = models["E0"]
     calibration = splits["calibration"]
@@ -1375,18 +1306,20 @@ def fit_final_conformal(
         "goal_mean_bound_width": float(np.mean(test_upper - test_predictions)),
         "goal_calibration": goal_calibration.as_dict(),
         "trajectory_disjoint": True,
-        "policy_shift_recalibrated_in_phase2c": bool(policy_shift_data_available),
+        "calibrated_on_deployed_frozen_policy": bool(
+            deployed_policy_data_available
+        ),
         "deployed_switching_point_model": "E0_compact_7D",
         "context_models_role": "prediction_ablation_only_because_future_goal_J_is_not_observed",
     }
     if (
-        not policy_shift_data_available
+        not deployed_policy_data_available
         or not unit_splits["calibration"]
         or not unit_splits["test"]
     ):
         reason = (
-            "pilot_phase2c_has_no_completed_final_policy_trajectory"
-            if not policy_shift_data_available
+            "no_completed_deployed_policy_trajectory"
+            if not deployed_policy_data_available
             else "pilot_has_no_complete_trajectory_disjoint_TASK_to_CHARGER_missions"
         )
         summary = {
@@ -1542,9 +1475,9 @@ def run_persistent_evaluation(
 def formal_config(args: argparse.Namespace) -> dict[str, object]:
     return {
         "protocol": (
-            "JSEB_100K_CHECKPOINT_ENERGY_ABLATION"
+            "FROZEN_NAVIGATION_100K_CHECKPOINT_ENERGY_LEARNING"
             if args.intermediate_checkpoint_energy_ablation
-            else "JACOBIAN_SAFETY_ENERGY_BRIDGE_STATIC_1M"
+            else "FROZEN_NAVIGATION_ENERGY_LEARNING_STATIC_1M"
         ),
         "ablation": {
             "id": args.ablation,
@@ -1569,9 +1502,7 @@ def formal_config(args: argparse.Namespace) -> dict[str, object]:
                 if args.intermediate_checkpoint_energy_ablation
                 else args.phase1_transitions
             ),
-            "phase2a": args.phase2a_transitions,
-            "phase2b": args.phase2b_transitions,
-            "phase2c": args.phase2c_transitions,
+            "phase2_frozen_energy_learning": args.phase2_energy_transitions,
             "total": sum(
                 [
                     (
@@ -1579,20 +1510,16 @@ def formal_config(args: argparse.Namespace) -> dict[str, object]:
                         if args.intermediate_checkpoint_energy_ablation
                         else args.phase1_transitions
                     ),
-                    args.phase2a_transitions,
-                    args.phase2b_transitions,
-                    args.phase2c_transitions,
+                    args.phase2_energy_transitions,
                 ]
             ),
             "evaluation_transitions_excluded": True,
-            "current_run_phase2_total": (
-                args.phase2a_transitions
-                + args.phase2b_transitions
-                + args.phase2c_transitions
-            ),
+            "current_run_phase2_total": args.phase2_energy_transitions,
             "source_navigation_reused": bool(
                 args.intermediate_checkpoint_energy_ablation
             ),
+            "navigation_policy_updates": 0,
+            "navigation_policy_frozen": True,
         },
         "source_checkpoint": {
             "path": args.resume_phase1_checkpoint,
@@ -1609,9 +1536,7 @@ def formal_config(args: argparse.Namespace) -> dict[str, object]:
             ),
             "legacy_eval_frequency_transitions": args.eval_freq_transitions,
             "phase1_final_navigation_tasks": args.eval_navigation_tasks,
-            "phase2a_evaluation": "phase_end",
-            "phase2b_evaluation": "phase_end",
-            "phase2c_evaluation": "phase_end",
+            "frozen_energy_evaluation": "phase_end",
             "parallel_environment_workers": args.evaluation_num_envs,
             "policy_inference": (
                 "central_batched_gpu"
@@ -1635,12 +1560,11 @@ def formal_config(args: argparse.Namespace) -> dict[str, object]:
             "observation_dim": navigation_observation_dim(args),
             "telemetry_cost": telemetry_config_from_args(args).__dict__,
         },
-        "losses": {
-            "shield_loss_weight": args.shield_loss_weight,
-            "energy_loss_weight": args.energy_loss_weight,
-            "trust_region": args.bridge_trust_region,
-            "energy_warmup_transitions": args.energy_warmup_transitions,
-            "energy_ramp_transitions": args.energy_ramp_transitions,
+        "policy_adaptation": {
+            "enabled": False,
+            "removed_stage": "phase2b_joint_finetune",
+            "reason": "observed navigation degradation under joint policy fine-tuning",
+            "energy_learning_only": True,
         },
         "packages": {
             "python": platform.python_version(),
@@ -1659,6 +1583,7 @@ def formal_config(args: argparse.Namespace) -> dict[str, object]:
             "intermediate_checkpoint_exploratory_only": bool(
                 args.intermediate_checkpoint_energy_ablation
             ),
+            "navigation_policy_frozen_during_energy_learning": True,
         },
     }
 
@@ -1672,9 +1597,7 @@ def run(args: argparse.Namespace) -> dict[str, object]:
     for directory in (
         "phase1_navigation",
         "phase1_safety_bridge",
-        "phase2a_energy_collection",
-        "phase2b_joint_finetune",
-        "phase2c_final_policy",
+        "phase2_frozen_energy_learning",
         "eval",
         "gifs",
         "persistent_evaluation",
@@ -1747,68 +1670,49 @@ def run(args: argparse.Namespace) -> dict[str, object]:
             (output / "RUNNING.json").unlink(missing_ok=True)
             return stopped
 
-        phase2_replay = make_bridge_replay(args, seed_offset=10_000)
-        phase2_collection_policy = HeuristicGoalPolicy() if args.smoke else model
-        phase2a_dataset, phase2a_units, phase2a_collection = collect_mission_budget(
-            phase2_collection_policy,
+        freeze_navigation_policy(model)
+        frozen_policy_hash_before = policy_hash(model)
+        energy_replay = make_bridge_replay(args, seed_offset=20_000)
+        energy_collection_policy = HeuristicGoalPolicy() if args.smoke else model
+        energy_dataset, energy_units, energy_collection = collect_mission_budget(
+            energy_collection_policy,
             args,
-            transition_budget=args.phase2a_transitions,
-            output=output / "phase2a_energy_collection",
-            seed=args.seed + 200_000,
-            replay=phase2_replay,
+            transition_budget=args.phase2_energy_transitions,
+            output=output / "phase2_frozen_energy_learning",
+            seed=args.seed + 400_000,
+            replay=energy_replay,
         )
-        if phase2a_dataset is None:
-            raise RuntimeError("Phase 2A produced no complete trajectory dataset")
+        if energy_dataset is None:
+            raise RuntimeError(
+                "frozen-policy energy collection produced no complete trajectory dataset"
+            )
+        frozen_policy_hash_after_collection = policy_hash(model)
+        if frozen_policy_hash_before != frozen_policy_hash_after_collection:
+            raise RuntimeError("navigation policy changed during frozen energy collection")
         if args.intermediate_checkpoint_energy_ablation:
-            bridge_source_dataset, phase2a_energy_dataset, phase2a_energy_units, split_audit = (
+            bridge_source_dataset, energy_model_dataset, energy_model_units, split_audit = (
                 disjoint_bridge_and_energy_data(
-                    phase2a_dataset,
-                    phase2a_units,
-                    seed=args.seed + 250_000,
+                    energy_dataset,
+                    energy_units,
+                    seed=args.seed + 450_000,
                 )
             )
             write_json(
-                output / "phase2a_energy_collection" / "fresh_data_split_audit.json",
+                output
+                / "phase2_frozen_energy_learning"
+                / "fresh_data_split_audit.json",
                 split_audit,
             )
         else:
             bridge_source_dataset = phase1_dataset
-            phase2a_energy_dataset = phase2a_dataset
-            phase2a_energy_units = phase2a_units
-        models, encoder, critic, _, _, phase2a_models = fit_energy_models(
-            bridge_source_dataset,
-            phase2a_energy_dataset,
-            phase2a_energy_units,
-            args,
-            output / "phase2a_energy_collection" / "models",
-            seed=args.seed + 300_000,
-        )
-        phase2b = train_phase2b(
-            model,
-            critic,
-            phase2_replay,
-            args,
-            output / "phase2b_joint_finetune",
-            energy_scale=float(phase2a_models["energy_scale"]),
-        )
-        freeze_navigation_policy(model)
-        final_policy_hash = policy_hash(model)
-        phase2c_replay = make_bridge_replay(args, seed_offset=20_000)
-        phase2c_collection_policy = HeuristicGoalPolicy() if args.smoke else model
-        phase2c_dataset, phase2c_units, phase2c_collection = collect_mission_budget(
-            phase2c_collection_policy,
-            args,
-            transition_budget=args.phase2c_transitions,
-            output=output / "phase2c_final_policy",
-            seed=args.seed + 400_000,
-            replay=phase2c_replay,
-        )
+            energy_model_dataset = energy_dataset
+            energy_model_units = energy_units
         final_models, final_encoder, final_critic, final_splits, final_unit_splits, final_models_summary = fit_energy_models(
             bridge_source_dataset,
-            phase2c_dataset,
-            phase2c_units,
+            energy_model_dataset,
+            energy_model_units,
             args,
-            output / "phase2c_final_policy" / "models",
+            output / "phase2_frozen_energy_learning" / "models",
             seed=args.seed + 500_000,
         )
         estimator, conformal = fit_final_conformal(
@@ -1816,8 +1720,8 @@ def run(args: argparse.Namespace) -> dict[str, object]:
             final_splits,
             final_unit_splits,
             args,
-            output / "phase2c_final_policy",
-            policy_shift_data_available=bool(
+            output / "phase2_frozen_energy_learning",
+            deployed_policy_data_available=bool(
                 final_models_summary["phase_dataset_trajectory_count"] > 0
             ),
         )
@@ -1835,9 +1739,7 @@ def run(args: argparse.Namespace) -> dict[str, object]:
                             if args.intermediate_checkpoint_energy_ablation
                             else args.phase1_transitions
                         ),
-                        args.phase2a_transitions,
-                        args.phase2b_transitions,
-                        args.phase2c_transitions,
+                        args.phase2_energy_transitions,
                     ]
                 )
             ),
@@ -1868,47 +1770,48 @@ def run(args: argparse.Namespace) -> dict[str, object]:
             if args.intermediate_checkpoint_energy_ablation
             else args.phase1_transitions
         )
-        phase2_training = sum(
-            [args.phase2a_transitions, args.phase2b_transitions, args.phase2c_transitions]
-        )
-        total_training = source_navigation_transitions + phase2_training
+        phase2_energy_interactions = args.phase2_energy_transitions
+        total_interactions = source_navigation_transitions + phase2_energy_interactions
         summary = {
             "status": "COMPLETED",
             "completed_at": utc_now(),
             "training_transition_accounting": {
                 "phase1": phase1["actual_training_transitions"],
-                "phase2a": phase2a_collection["actual_training_transitions"],
-                "phase2b": phase2b["actual_training_transitions"],
-                "phase2c": phase2c_collection["actual_training_transitions"],
-                "total": total_training,
-                "current_run_phase2_total": phase2_training,
-                "exact_phase2_500k": phase2_training == 500_000,
-                "exact_formal_1m": formal and total_training == FORMAL_TOTAL_TRANSITIONS,
+                "phase2_frozen_energy_learning": energy_collection[
+                    "actual_training_transitions"
+                ],
+                "total": total_interactions,
+                "current_run_phase2_total": phase2_energy_interactions,
+                "exact_phase2_500k": phase2_energy_interactions == 500_000,
+                "exact_formal_1m": formal
+                and total_interactions == FORMAL_TOTAL_TRANSITIONS,
                 "evaluation_transitions_excluded": True,
+                "phase2_navigation_gradient_updates": 0,
             },
             "phase1": compact_summary(phase1),
             "battery_calibration": compact_summary(calibration),
             "battery_validation": compact_summary(validation),
-            "phase2a_collection": phase2a_collection,
-            "phase2a_models": phase2a_models,
-            "phase2b": phase2b,
-            "phase2c_collection": phase2c_collection,
-            "phase2c_models": final_models_summary,
+            "frozen_energy_collection": energy_collection,
+            "frozen_energy_models": final_models_summary,
             "conformal": conformal,
             "final_navigation": compact_summary(final_navigation),
             "persistent_delivery": persistent,
-            "final_policy_hash": final_policy_hash,
+            "frozen_policy_hash_before": frozen_policy_hash_before,
+            "frozen_policy_hash_after": frozen_policy_hash_after_collection,
+            "navigation_policy_unchanged": (
+                frozen_policy_hash_before == frozen_policy_hash_after_collection
+            ),
             "claim_status": (
-                "EXPLORATORY_INTERMEDIATE_CHECKPOINT_ENERGY_ABLATION_NOT_FORMAL"
+                "EXPLORATORY_FROZEN_NAVIGATION_ENERGY_LEARNING"
                 if args.intermediate_checkpoint_energy_ablation
-                else "FORMAL_JSEB_1M"
+                else "FORMAL_FROZEN_NAVIGATION_ENERGY_LEARNING_1M"
             ),
             "claim_boundary_risks": [
-                "J is local and masked at active-set or coordinate-map switches",
                 "HOCBF remains the final hard safety layer",
                 "E1/E2 safety context is an ablation; deployed future-mission switching uses E0 because future J is not observed",
                 "coverage is finite-group and exchangeability-conditional",
                 "static obstacles only",
+                "energy learning does not improve or repair frozen navigation failures",
             ],
         }
         write_json(output / "summary.json", summary)

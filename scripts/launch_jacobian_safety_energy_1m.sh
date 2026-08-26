@@ -4,13 +4,13 @@ set -euo pipefail
 cd /home/zjl/mappo
 
 if [[ -n "$(git status --porcelain)" ]]; then
-  echo "formal JSEB launch requires a clean worktree" >&2
+  echo "formal frozen-navigation energy launch requires a clean worktree" >&2
   exit 2
 fi
 
 STAMP="$(date -u +%Y%m%d_%H%M%S)"
-OUT="artifacts/jacobian_safety_energy_static_1m_${STAMP}"
-SESSION="jseb_1m_${STAMP}"
+OUT="artifacts/frozen_navigation_energy_static_1m_${STAMP}"
+SESSION="frozen_nav_energy_1m_${STAMP}"
 PYTHON="/home/zjl/mappo/.venv/bin/python"
 
 mkdir -p "$OUT"
@@ -19,9 +19,7 @@ CMD=(
   "$PYTHON" -u scripts/run_jacobian_safety_energy_1m.py
   --output-dir "$OUT"
   --phase1-transitions 500000
-  --phase2a-transitions 100000
-  --phase2b-transitions 300000
-  --phase2c-transitions 100000
+  --phase2-energy-transitions 500000
   --phase-end-eval-only
   --device cuda
   --seed 0

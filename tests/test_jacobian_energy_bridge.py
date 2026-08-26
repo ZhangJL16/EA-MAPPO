@@ -317,18 +317,13 @@ def test_formal_runner_has_exact_static_one_million_transition_contract(
     total = sum(
         (
             args.phase1_transitions,
-            args.phase2a_transitions,
-            args.phase2b_transitions,
-            args.phase2c_transitions,
+            args.phase2_energy_transitions,
         )
     )
     assert total == FORMAL_TOTAL_TRANSITIONS == 1_000_000
     assert args.phase1_transitions == 500_000
-    assert (args.phase2a_transitions, args.phase2b_transitions, args.phase2c_transitions) == (
-        100_000,
-        300_000,
-        100_000,
-    )
+    assert args.phase2_energy_transitions == 500_000
+    assert args.phase2_transition_budget == 0
     assert args.num_obstacles == 24
     assert (args.lidar_horizontal_sectors, args.lidar_vertical_sectors) == (128, 8)
     assert args.projection_geometry_enabled
@@ -346,12 +341,12 @@ def test_formal_runner_rejects_periodic_navigation_evaluation(tmp_path: Path) ->
         )
 
 
-def test_smoke_energy_schedule_reaches_nonzero_bridge_weight(tmp_path: Path) -> None:
+def test_smoke_uses_frozen_policy_energy_collection_only(tmp_path: Path) -> None:
     args = parse_args(
         ["--output-dir", str(tmp_path / "smoke"), "--smoke", "--allow-dirty"]
     )
-    assert args.energy_warmup_transitions < args.phase2b_transitions
-    assert args.energy_warmup_transitions + args.energy_ramp_transitions <= args.phase2b_transitions
+    assert args.phase2_energy_transitions == 2_000
+    assert args.phase2_transition_budget == 0
 
 
 def test_pilot_keeps_50k_learning_budget_but_bounds_diagnostic_rollouts(
@@ -362,9 +357,7 @@ def test_pilot_keeps_50k_learning_budget_but_bounds_diagnostic_rollouts(
     )
     assert (
         args.phase1_transitions
-        + args.phase2a_transitions
-        + args.phase2b_transitions
-        + args.phase2c_transitions
+        + args.phase2_energy_transitions
     ) == 50_000
     assert args.eval_navigation_tasks == 10
     assert args.navigation_eval_max_steps == 1_200
@@ -374,7 +367,7 @@ def test_pilot_keeps_50k_learning_budget_but_bounds_diagnostic_rollouts(
 
 def test_formal_mission_split_rejects_single_trajectory_fallback(tmp_path: Path) -> None:
     writer = SafetyBridgeTrajectoryWriter(tmp_path / "dataset", num_envs=1)
-    for _ in range(3):
+    for _ in range(4):
         writer.observe(0, _info(terminal=True), True)
     dataset = load_bridge_dataset(tmp_path / "dataset")
     with pytest.raises(RuntimeError, match="complete TASK-to-CHARGER missions"):
@@ -384,6 +377,10 @@ def test_formal_mission_split_rejects_single_trajectory_fallback(tmp_path: Path)
     assert not (
         splits["calibration"].unique_trajectory_ids
         & splits["test"].unique_trajectory_ids
+    )
+    assert not (
+        splits["validation"].unique_trajectory_ids
+        & splits["calibration"].unique_trajectory_ids
     )
 
 
@@ -461,16 +458,13 @@ def test_intermediate_jseb_parser_requires_exact_500k_downstream_budget() -> Non
             "100000",
             "--phase1-transitions",
             "100000",
-            "--phase2a-transitions",
-            "100000",
-            "--phase2b-transitions",
-            "300000",
-            "--phase2c-transitions",
-            "100000",
+            "--phase2-energy-transitions",
+            "500000",
         ]
     )
     assert args.source_phase1_transition == 100_000
-    assert args.phase2a_transitions + args.phase2b_transitions + args.phase2c_transitions == 500_000
+    assert args.phase2_energy_transitions == 500_000
+    assert args.phase2_transition_budget == 0
     assert args.evaluation_num_envs == 6
 
 
