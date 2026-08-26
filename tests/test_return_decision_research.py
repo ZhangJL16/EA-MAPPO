@@ -14,6 +14,9 @@ from experiments.energy_mc.return_decision import (
 )
 from scripts.run_return_decision_stage_b import aggregate_seed_audits, parse_args
 from scripts.evaluate_jseb_checkpoints import select_checkpoints
+from scripts.calibrate_battery_for_navigation_checkpoint import (
+    navigation_readiness_failures,
+)
 
 
 def test_clone_rollout_audit_rejects_fake_distributional_claim() -> None:
@@ -215,3 +218,14 @@ def test_checkpoint_selection_can_run_only_formal_500k_policy(tmp_path) -> None:
     assert selected == [checkpoints[1]]
     with pytest.raises(FileNotFoundError):
         select_checkpoints(checkpoints, [450_000])
+
+
+def test_battery_calibration_runner_rejects_nonready_navigation() -> None:
+    navigation, _, _ = valid_gate_b_prerequisites()
+    navigation["global_env_transitions"] = 500_000
+    assert navigation_readiness_failures(navigation) == []
+    navigation["overall_success_rate"] = 0.80
+    navigation["boundary_contact_step_rate"] = 0.02
+    failures = navigation_readiness_failures(navigation)
+    assert "navigation energy/readiness gate failed" in failures
+    assert "navigation collision/boundary gate failed" in failures
