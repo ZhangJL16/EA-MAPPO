@@ -1,6 +1,0 @@
-{
-  "status": "INVALID_FOR_FORMAL_COMPARISON",
-  "audited_at": "2026-08-13",
-  "reason": "Run remained at INITIALIZED and terminated without raw data, estimator checkpoints, evaluation results, or a summary. The protocol also used the navigation baseline's nonterminating 1000-unit energy budget and did not implement finite-energy switching evaluation.",
-  "raw_data_policy": "No observations from this run are eligible for formal comparison."
-}

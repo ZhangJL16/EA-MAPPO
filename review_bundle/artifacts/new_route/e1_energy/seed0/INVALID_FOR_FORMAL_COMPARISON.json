@@ -1,6 +1,0 @@
-{
-  "status": "INVALID_FOR_FORMAL_COMPARISON",
-  "audited_at": "2026-08-13",
-  "reason": "Run terminated without COMPLETED or FAILED marker after 43 of 100 collection sorties; no estimator training, calibration, evaluation, model checkpoint, or summary was produced. The protocol also used the navigation baseline's nonterminating 1000-unit energy budget and did not implement finite-energy switching evaluation.",
-  "raw_data_policy": "Retain the 43-sortie partial JSONL for engineering diagnosis only; exclude it from all formal method comparisons and paper claims."
-}

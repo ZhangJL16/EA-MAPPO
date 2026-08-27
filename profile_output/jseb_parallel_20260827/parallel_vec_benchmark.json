@@ -1,0 +1,32 @@
+[
+  {
+    "implementation": "dummy",
+    "num_envs": 8,
+    "vector_steps": 100,
+    "transitions": 800,
+    "wall_seconds": 12.557606962975115,
+    "transitions_per_second": 63.7064053970412,
+    "worker_pids": []
+  },
+  {
+    "implementation": "subproc",
+    "num_envs": 8,
+    "vector_steps": 100,
+    "transitions": 800,
+    "wall_seconds": 5.231246200972237,
+    "transitions_per_second": 152.92723172756016,
+    "worker_pids": [
+      3327511,
+      3327512,
+      3327513,
+      3327514,
+      3327515,
+      3327516,
+      3327517,
+      3327518
+    ]
+  },
+  {
+    "speedup": 2.400500087463148
+  }
+]

@@ -1,0 +1,44 @@
+[
+  {
+    "case": "full_1024ray_hocbf",
+    "transitions": 200,
+    "physics_substeps": 800,
+    "wall_seconds": 7.900889478973113,
+    "transitions_per_second": 25.31360557975989,
+    "milliseconds_per_transition": 39.504447394865565,
+    "lidar_seconds": 0.6403198236366734,
+    "lidar_fraction": 0.08104401730220082,
+    "lidar_calls": 800,
+    "safety_seconds": 6.653316006762907,
+    "safety_fraction": 0.8420970859634965,
+    "safety_calls": 800
+  },
+  {
+    "case": "lidar_only_1024ray",
+    "transitions": 200,
+    "physics_substeps": 800,
+    "wall_seconds": 0.9825057850684971,
+    "transitions_per_second": 203.56114237643564,
+    "milliseconds_per_transition": 4.912528925342485,
+    "lidar_seconds": 0.4862152050482109,
+    "lidar_fraction": 0.49487261290203355,
+    "lidar_calls": 800,
+    "safety_seconds": 0.051725122961215675,
+    "safety_fraction": 0.05264612559773332,
+    "safety_calls": 800
+  },
+  {
+    "case": "no_lidar_no_hocbf",
+    "transitions": 200,
+    "physics_substeps": 800,
+    "wall_seconds": 0.39291550195775926,
+    "transitions_per_second": 509.015294645975,
+    "milliseconds_per_transition": 1.9645775097887963,
+    "lidar_seconds": 0.0003995185252279043,
+    "lidar_fraction": 0.0010168051991770355,
+    "lidar_calls": 800,
+    "safety_seconds": 0.041403086157515645,
+    "safety_fraction": 0.10537402049860257,
+    "safety_calls": 800
+  }
+]

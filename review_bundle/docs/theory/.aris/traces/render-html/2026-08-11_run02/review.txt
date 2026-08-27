@@ -1,7 +1,0 @@
-LEGACY / SUPERSEDED: historical provenance only; not active theory authority.
-
-PASS. The current HTML source hash matches PROOF_AUDIT.md; all headings,
-tables, lists, paragraphs, inline code, and PROOF_AUDIT.json sidecar content are
-preserved. The language attribute is English. No unsafe markup, event handler,
-unsafe URL, parser placeholder, or template placeholder remains. Review is
-same-family and provisional and covers render fidelity only.
