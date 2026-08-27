@@ -112,6 +112,23 @@ sampling protocol, replay capacity for SAC, optimizer budget, rewards, physics,
 obstacles, HOCBF, and evaluation tasks.  R1 disables only the auxiliary bridge;
 HOCBF still executes as the hard final safety layer in every method.
 
+Training execution uses eight `SubprocVecEnv` workers with `forkserver`, one
+worker process per environment, while SAC inference and optimization remain in
+the parent GPU process.  BLAS and PyTorch worker threads are fixed to one.  A
+formal repair command is rejected if it requests the serial `DummyVecEnv`.
+This changes only wall-clock execution: transition order within each worker,
+seed assignment, exact 500k aggregate transition accounting, update ratio,
+replay semantics, HOCBF calls, and the fixed evaluation task set are unchanged.
+
+The first R1--R4 queue launched at
+`artifacts/jseb_navigation_repair_seed0_20260827_012921` used `DummyVecEnv` and
+was stopped after R1 training but before its final evaluation completed.  Its
+partial evaluation is marked `STOPPED_BY_USER` and is not a formal result.  A
+full 128 x 8 LiDAR, 24-obstacle environment benchmark measured 63.7 transitions
+per second for the old serial vector environment and 152.9 transitions per
+second for eight subprocess workers (2.40x environment-side speedup).  This is
+a performance validation, not navigation evidence.
+
 R3 is retained as the recency-only control even though its mechanics smoke did
 not restore coverage.  R4 changes only action-sample correspondence relative to
 R3.  Thus R3 versus R4 isolates common-random-noise coupling rather than

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import inspect
+import os
 from collections import deque
 from pathlib import Path
 
@@ -10,6 +11,7 @@ import pytest
 import torch
 from PIL import Image
 from stable_baselines3 import SAC
+from stable_baselines3.common.vec_env import SubprocVecEnv
 
 from envs.UAVEnergyDelivery import (
     UAVEnv,
@@ -982,6 +984,11 @@ def test_energy_return_manager_logs_decision_interval_overshoot() -> None:
 def test_parallel_environment_seeds_and_transition_count() -> None:
     args = parse_args(["--output-dir", "/tmp/not-used", "--smoke"])
     vector_environment = make_navigation_vec_env(args)
+    assert isinstance(vector_environment, SubprocVecEnv)
+    worker_pids = [process.pid for process in vector_environment.processes]
+    assert len(worker_pids) == args.num_envs == 8
+    assert len(set(worker_pids)) == args.num_envs
+    assert os.getpid() not in worker_pids
     observations = vector_environment.reset()
     starts = vector_environment.get_attr("agent")
     positions = [agent.pos.copy() for agent in starts]
@@ -992,6 +999,21 @@ def test_parallel_environment_seeds_and_transition_count() -> None:
         actions = np.zeros((args.num_envs, 3), dtype=np.float32)
         vector_environment.step(actions)
     assert vector_steps * args.num_envs == 800
+    vector_environment.close()
+
+
+def test_dummy_vector_environment_requires_explicit_override() -> None:
+    args = parse_args(
+        [
+            "--output-dir",
+            "/tmp/not-used",
+            "--smoke",
+            "--training-vec-env",
+            "dummy",
+        ]
+    )
+    vector_environment = make_navigation_vec_env(args)
+    assert type(vector_environment).__name__ == "DummyVecEnv"
     vector_environment.close()
 
 

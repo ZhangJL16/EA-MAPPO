@@ -24,7 +24,7 @@ from PIL import Image
 from stable_baselines3 import SAC
 from stable_baselines3.common.callbacks import BaseCallback
 from stable_baselines3.common.env_checker import check_env
-from stable_baselines3.common.vec_env import DummyVecEnv
+from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv, VecEnv
 
 from envs.UAVEnergyDeliverySAC import (
     ENERGY_GAMMA,
@@ -990,19 +990,62 @@ def navigation_safety_gate_passed(summary: dict[str, object]) -> bool:
     )
 
 
-def make_navigation_vec_env(args: argparse.Namespace) -> DummyVecEnv:
+def _configure_navigation_worker_threads() -> None:
+    for variable in (
+        "OMP_NUM_THREADS",
+        "MKL_NUM_THREADS",
+        "OPENBLAS_NUM_THREADS",
+        "NUMEXPR_NUM_THREADS",
+    ):
+        os.environ[variable] = "1"
+    torch.set_num_threads(1)
+    try:
+        torch.set_num_interop_threads(1)
+    except RuntimeError:
+        pass
+
+
+def make_navigation_vec_env(args: argparse.Namespace) -> VecEnv:
     factories = []
     for env_index in range(args.num_envs):
         environment_seed = args.seed + env_index
 
         def factory(seed: int = environment_seed):
+            _configure_navigation_worker_threads()
             environment = environment_from_args(args, phase=SACTrainingPhase.NAVIGATION)
             environment.reset(seed=seed)
             environment.action_space.seed(seed)
             return environment
 
         factories.append(factory)
-    vector_environment = DummyVecEnv(factories)
+    implementation = str(getattr(args, "training_vec_env", "subproc"))
+    if implementation == "dummy":
+        vector_environment: VecEnv = DummyVecEnv(factories)
+    elif implementation == "subproc":
+        thread_variables = (
+            "OMP_NUM_THREADS",
+            "MKL_NUM_THREADS",
+            "OPENBLAS_NUM_THREADS",
+            "NUMEXPR_NUM_THREADS",
+        )
+        previous = {name: os.environ.get(name) for name in thread_variables}
+        try:
+            for name in thread_variables:
+                os.environ[name] = "1"
+            vector_environment = SubprocVecEnv(
+                factories,
+                start_method=str(
+                    getattr(args, "training_vec_start_method", "forkserver")
+                ),
+            )
+        finally:
+            for name, value in previous.items():
+                if value is None:
+                    os.environ.pop(name, None)
+                else:
+                    os.environ[name] = value
+    else:
+        raise ValueError(f"unsupported training vector environment: {implementation}")
     vector_environment.seed(args.seed)
     return vector_environment
 
@@ -1239,6 +1282,13 @@ class NavigationBudgetCallback(BaseCallback):
             "final_evaluation": self.final_evaluation,
             "phase_end_eval_only": self.phase_end_eval_only,
             "periodic_navigation_evaluation_enabled": not self.phase_end_eval_only,
+            "training_vec_env": str(
+                getattr(self.args, "training_vec_env", "subproc")
+            ),
+            "training_vec_start_method": str(
+                getattr(self.args, "training_vec_start_method", "forkserver")
+            ),
+            "worker_threads_per_environment": 1,
         }
 
 
@@ -3204,6 +3254,17 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--device", default="cuda")
     parser.add_argument("--num-envs", type=int, default=8)
     parser.add_argument(
+        "--training-vec-env",
+        choices=("subproc", "dummy"),
+        default="subproc",
+        help="subproc runs each training environment in a separate CPU process",
+    )
+    parser.add_argument(
+        "--training-vec-start-method",
+        choices=("forkserver", "spawn", "fork"),
+        default="forkserver",
+    )
+    parser.add_argument(
         "--evaluation-num-envs",
         type=int,
         default=6,
@@ -3516,6 +3577,9 @@ def train(args: argparse.Namespace) -> dict[str, object]:
             "transition_budget": args.phase1_transition_budget,
             "num_envs": args.num_envs,
             "vector_env_steps": args.phase1_transition_budget // args.num_envs,
+            "vector_environment": args.training_vec_env,
+            "vector_start_method": args.training_vec_start_method,
+            "worker_threads_per_environment": 1,
             "episode_semantics": "single_random_goal",
             "episode_max_policy_steps": args.phase1_episode_max_steps,
             "finish_last_episode_after_budget": False,

@@ -166,6 +166,17 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--device", default="cuda")
     parser.add_argument("--num-envs", type=int, default=8)
     parser.add_argument(
+        "--training-vec-env",
+        choices=("subproc", "dummy"),
+        default="subproc",
+        help="subproc runs each HOCBF training environment in a separate CPU process",
+    )
+    parser.add_argument(
+        "--training-vec-start-method",
+        choices=("forkserver", "spawn", "fork"),
+        default="forkserver",
+    )
+    parser.add_argument(
         "--evaluation-num-envs",
         type=int,
         default=6,
@@ -390,6 +401,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     if not args.lidar_enabled or not args.hocbf_enabled or args.num_obstacles != 24:
         parser.error("JSEB requires static obstacles, LiDAR, and HOCBF")
     if not (args.smoke or args.pilot) and args.navigation_repair_variant is not None:
+        if args.training_vec_env != "subproc":
+            parser.error("formal navigation repair requires --training-vec-env subproc")
         if not args.phase_end_eval_only:
             parser.error("formal navigation repair requires phase-end-only evaluation")
         if args.phase1_transitions != FORMAL_PHASE1_TRANSITIONS:
@@ -1796,6 +1809,9 @@ def run_navigation_repair(args: argparse.Namespace) -> dict[str, object]:
             "hocbf_final_hard_layer": True,
             "actor_action_dim": 3,
             "gradient_steps": args.gradient_steps,
+            "training_vec_env": args.training_vec_env,
+            "training_vec_start_method": args.training_vec_start_method,
+            "worker_threads_per_environment": 1,
             "phase_end_evaluation_only": args.phase_end_eval_only,
         },
         "changed_factors": {

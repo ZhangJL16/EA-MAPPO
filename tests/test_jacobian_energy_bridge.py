@@ -833,6 +833,26 @@ def test_intermediate_jseb_parser_requires_exact_500k_downstream_budget() -> Non
     assert args.phase2_energy_transitions == 500_000
     assert args.phase2_transition_budget == 0
     assert args.evaluation_num_envs == 6
+    assert args.training_vec_env == "subproc"
+    assert args.training_vec_start_method == "forkserver"
+
+
+def test_formal_navigation_repair_rejects_serial_dummy_vec_env() -> None:
+    with pytest.raises(SystemExit):
+        parse_args(
+            [
+                "--output-dir",
+                "/tmp/jseb-serial-repair",
+                "--navigation-repair-variant",
+                "R1",
+                "--repair-source-navigation-evaluation",
+                "/tmp/source.json",
+                "--repair-evaluation-tasks",
+                "/tmp/tasks.json",
+                "--training-vec-env",
+                "dummy",
+            ]
+        )
 
 
 def test_intermediate_jseb_loads_100k_checkpoint_without_phase1_dataset(
