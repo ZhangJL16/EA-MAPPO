@@ -128,16 +128,82 @@ def migrate_legacy_jseb_command(arguments: list[str]) -> tuple[list[str], dict[s
     return migrated, audit
 
 
+def normalize_environment_reconstruction_command(
+    arguments: list[str],
+) -> tuple[list[str], dict[str, object]]:
+    """Remove training-runtime flags while preserving the R5 environment.
+
+    R5 was launched by an orchestration wrapper with flags that the canonical
+    JSEB parser does not own. For reconstruction, its base parser contract is
+    R4 plus sampled-data robust HOCBF. The returned args are relabeled R5 after
+    parsing; no training is performed through this compatibility path.
+    """
+
+    flags_with_values = {
+        "--training-vec-env",
+        "--training-vec-start-method",
+    }
+    boolean_flags = {"--hocbf-sampled-data-robust"}
+    normalized: list[str] = []
+    removed: dict[str, object] = {}
+    source_variant: str | None = None
+    index = 0
+    while index < len(arguments):
+        flag = arguments[index]
+        if flag in flags_with_values:
+            if index + 1 >= len(arguments):
+                raise ValueError(f"source command is missing a value for {flag}")
+            removed[flag] = arguments[index + 1]
+            index += 2
+            continue
+        if flag in boolean_flags:
+            removed[flag] = True
+            index += 1
+            continue
+        if flag == "--navigation-repair-variant":
+            if index + 1 >= len(arguments):
+                raise ValueError(
+                    "source command is missing a navigation repair variant"
+                )
+            source_variant = arguments[index + 1]
+            normalized.extend(
+                [flag, "R4" if source_variant == "R5" else source_variant]
+            )
+            index += 2
+            continue
+        normalized.append(flag)
+        index += 1
+    return normalized, {
+        "source_navigation_repair_variant": source_variant,
+        "parser_compatibility_variant": (
+            "R4" if source_variant == "R5" else source_variant
+        ),
+        "evaluation_irrelevant_source_flags_removed": removed,
+        "sampled_data_robust_hocbf_preserved": bool(
+            removed.get("--hocbf-sampled-data-robust") is True
+        ),
+    }
+
+
 def reconstruct_environment_args(artifact: Path, *, device: str, seed: int):
     config = json.loads((artifact / "config.json").read_text(encoding="utf-8"))
     command = list(config["exact_command"])
     migrated_command, migration_audit = migrate_legacy_jseb_command(command[1:])
-    args = parse_jseb_args(migrated_command)
+    reconstruction_command, reconstruction_audit = (
+        normalize_environment_reconstruction_command(migrated_command)
+    )
+    args = parse_jseb_args(reconstruction_command)
+    if reconstruction_audit["source_navigation_repair_variant"] == "R5":
+        if not reconstruction_audit["sampled_data_robust_hocbf_preserved"]:
+            raise ValueError("R5 reconstruction requires sampled-data robust HOCBF")
+        args.navigation_repair_variant = "R5"
+        args.hocbf_sampled_data_robust = True
     args.device = device
     args.eval_task_seed = seed
     args.eval_navigation_tasks = DEFAULT_SELECTION_TASKS
     config = dict(config)
     config["command_migration"] = migration_audit
+    config["environment_reconstruction"] = reconstruction_audit
     return args, config
 
 

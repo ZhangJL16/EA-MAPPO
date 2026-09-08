@@ -22,6 +22,7 @@ from .hocbf import (
     hocbf_sampled_data_residual_bound,
     one_step_supporting_constraint,
     project_polyhedral_qp,
+    project_polyhedral_qp_constraint_generation,
     select_top_k_constraints,
     sphere_hocbf_constraint,
     strengthen_constraint_for_sample_hold,
@@ -149,6 +150,213 @@ class SafetyFilterOutput:
     projection_problem: ProjectionProblem | None = None
 
 
+@dataclass(frozen=True)
+class _BarrierConstraintBatch:
+    rows: np.ndarray
+    lower_bounds: np.ndarray
+    h: np.ndarray
+    h_dot: np.ndarray
+    psi1: np.ndarray
+    safe_distances: np.ndarray
+
+
+def _vectorized_hocbf_batch(
+    position: np.ndarray,
+    velocity: np.ndarray,
+    obstacles: list[SphericalObstacle],
+    config: HOCBFConfig,
+) -> _BarrierConstraintBatch:
+    """Build the ordinary spherical HOCBF constraints without Python objects."""
+
+    if not obstacles:
+        empty = np.empty(0, dtype=np.float64)
+        return _BarrierConstraintBatch(
+            rows=np.empty((0, 3), dtype=np.float64),
+            lower_bounds=empty,
+            h=empty,
+            h_dot=empty,
+            psi1=empty,
+            safe_distances=empty,
+        )
+    p = np.asarray(position, dtype=np.float64)
+    v = np.asarray(velocity, dtype=np.float64)
+    if p.shape != (3,) or v.shape != (3,) or not (
+        np.all(np.isfinite(p)) and np.all(np.isfinite(v))
+    ):
+        raise ValueError("position and velocity must be finite (3,) vectors")
+    centers = np.stack([obstacle.center for obstacle in obstacles])
+    obstacle_velocities = np.stack([obstacle.velocity for obstacle in obstacles])
+    obstacle_accelerations = np.stack([obstacle.acceleration for obstacle in obstacles])
+    radii = np.fromiter(
+        (obstacle.radius for obstacle in obstacles),
+        dtype=np.float64,
+        count=len(obstacles),
+    )
+    return _vectorized_hocbf_arrays(
+        p,
+        v,
+        centers=centers,
+        radii=radii,
+        obstacle_velocities=obstacle_velocities,
+        obstacle_accelerations=obstacle_accelerations,
+        config=config,
+    )
+
+
+def _vectorized_hocbf_arrays(
+    position: np.ndarray,
+    velocity: np.ndarray,
+    *,
+    centers: np.ndarray,
+    radii: np.ndarray,
+    obstacle_velocities: np.ndarray,
+    obstacle_accelerations: np.ndarray,
+    config: HOCBFConfig,
+) -> _BarrierConstraintBatch:
+    relative_position = position[None, :] - centers
+    relative_velocity = velocity[None, :] - obstacle_velocities
+    safe_distances = radii + config.uav_radius + config.uncertainty_margin
+    h = np.einsum("ij,ij->i", relative_position, relative_position) - (
+        safe_distances * safe_distances
+    )
+    h_dot = 2.0 * np.einsum(
+        "ij,ij->i",
+        relative_position,
+        relative_velocity,
+    )
+    drift = (
+        2.0 * np.einsum("ij,ij->i", relative_velocity, relative_velocity)
+        - 2.0
+        * np.einsum("ij,ij->i", relative_position, obstacle_accelerations)
+        + (config.k1 + config.k2) * h_dot
+        + config.k1 * config.k2 * h
+    )
+    return _BarrierConstraintBatch(
+        rows=2.0 * relative_position,
+        lower_bounds=-drift,
+        h=h,
+        h_dot=h_dot,
+        psi1=h_dot + config.k1 * h,
+        safe_distances=safe_distances,
+    )
+
+
+def _sampled_data_residual_bounds_arrays(
+    position: np.ndarray,
+    velocity: np.ndarray,
+    *,
+    centers: np.ndarray,
+    obstacle_velocities: np.ndarray,
+    obstacle_accelerations: np.ndarray,
+    config: HOCBFConfig,
+    hold_dt: float,
+    horizontal_acceleration_limit: float,
+    vertical_acceleration_limit: float,
+) -> np.ndarray:
+    """Vectorized form of ``hocbf_sampled_data_residual_bound``.
+
+    This is an algebraic batching of the scalar theorem implementation: no
+    approximation, obstacle selection, or change to the residual bound is made.
+    """
+
+    interval = float(hold_dt)
+    horizontal = float(horizontal_acceleration_limit)
+    vertical = float(vertical_acceleration_limit)
+    if not np.isfinite(interval) or interval <= 0.0:
+        raise ValueError("hold_dt must be finite and positive")
+    if not np.isfinite(horizontal) or horizontal <= 0.0:
+        raise ValueError(
+            "horizontal_acceleration_limit must be finite and positive"
+        )
+    if not np.isfinite(vertical) or vertical <= 0.0:
+        raise ValueError("vertical_acceleration_limit must be finite and positive")
+
+    relative_position = position[None, :] - centers
+    relative_velocity = velocity[None, :] - obstacle_velocities
+    uav_acceleration_bound = float(np.hypot(horizontal, vertical))
+    obstacle_acceleration_bound = np.linalg.norm(
+        obstacle_accelerations,
+        axis=1,
+    )
+    relative_acceleration_bound = (
+        uav_acceleration_bound + obstacle_acceleration_bound
+    )
+    velocity_change = relative_acceleration_bound * interval
+    position_change = (
+        np.linalg.norm(relative_velocity, axis=1) * interval
+        + 0.5 * relative_acceleration_bound * interval**2
+    )
+    relative_position_bound = (
+        np.linalg.norm(relative_position, axis=1) + position_change
+    )
+    relative_velocity_bound = (
+        np.linalg.norm(relative_velocity, axis=1) + velocity_change
+    )
+    gain_sum = config.k1 + config.k2
+    gain_product = config.k1 * config.k2
+    position_lipschitz = (
+        2.0 * obstacle_acceleration_bound
+        + 2.0 * gain_sum * relative_velocity_bound
+        + 2.0 * gain_product * relative_position_bound
+        + 2.0 * uav_acceleration_bound
+    )
+    velocity_lipschitz = (
+        4.0 * relative_velocity_bound
+        + 2.0 * gain_sum * relative_position_bound
+    )
+    return (
+        position_lipschitz * position_change
+        + velocity_lipschitz * velocity_change
+    )
+
+
+def _top_k_batch_indices(
+    batch: _BarrierConstraintBatch,
+    nominal_acceleration: np.ndarray,
+    top_k: int,
+    *,
+    priority: str,
+    braking_acceleration: float,
+) -> np.ndarray:
+    if top_k <= 0:
+        raise ValueError("top_k must be positive")
+    nominal = np.asarray(nominal_acceleration, dtype=np.float64)
+    if nominal.shape != (3,) or not np.all(np.isfinite(nominal)):
+        raise ValueError("nominal_acceleration must be a finite (3,) vector")
+    center_distance = np.sqrt(
+        np.maximum(batch.h + batch.safe_distances * batch.safe_distances, 0.0)
+    )
+    surface_distance = center_distance - batch.safe_distances
+    closing_speed = np.full_like(center_distance, np.inf)
+    nonzero = center_distance > 1e-12
+    closing_speed[nonzero] = np.maximum(
+        0.0,
+        -batch.h_dot[nonzero] / (2.0 * center_distance[nonzero]),
+    )
+    if priority == "distance":
+        scores = surface_distance
+    elif priority == "closing_speed":
+        scores = -closing_speed
+    elif priority == "ttc":
+        scores = np.full_like(center_distance, np.inf)
+        closing = closing_speed > 1e-12
+        scores[closing] = surface_distance[closing] / closing_speed[closing]
+    elif priority == "barrier_value":
+        scores = batch.h
+    elif priority == "braking_margin":
+        if not np.isfinite(braking_acceleration) or braking_acceleration <= 0.0:
+            raise ValueError("braking_acceleration must be finite and positive")
+        scores = (
+            surface_distance
+            - closing_speed * closing_speed / (2.0 * braking_acceleration)
+        )
+    elif priority == "hocbf_slack":
+        scores = batch.rows @ nominal - batch.lower_bounds
+    else:
+        raise ValueError(f"unsupported top-K priority: {priority}")
+    return np.argsort(scores, kind="stable")[: min(top_k, scores.size)]
+
+
 class UAVSafetyActionFilter:
     def __init__(
         self,
@@ -172,23 +380,65 @@ class UAVSafetyActionFilter:
         *,
         energy_gradient: np.ndarray | None = None,
         progress_direction: np.ndarray | None = None,
+        _constraint_batch: _BarrierConstraintBatch | None = None,
     ) -> SafetyFilterOutput:
         total_started = perf_counter()
         nominal = np.asarray(nominal_acceleration, dtype=np.float64)
         if nominal.shape != (3,) or not np.all(np.isfinite(nominal)):
             raise ValueError("nominal_acceleration must be a finite (3,) vector")
         build_started = perf_counter()
-        constraints = self._build_constraints(
-            position,
-            velocity,
-            nominal,
-            list(obstacles),
-        )
-        candidate_count = len(constraints)
-        selected = constraints
-        if self.config.top_k is not None:
-            selected = select_top_k_constraints(
-                constraints,
+        obstacle_list = list(obstacles)
+        if _constraint_batch is not None:
+            if obstacle_list:
+                raise ValueError("prebuilt constraints require an empty obstacle list")
+            batch = _constraint_batch
+        elif (
+            self.config.method is SafetyFilterMethod.HOCBF
+            and not self.config.sampled_data_robust
+        ):
+            batch = _vectorized_hocbf_batch(
+                position,
+                velocity,
+                obstacle_list,
+                self.hocbf_config,
+            )
+        else:
+            constraints = self._build_constraints(
+                position,
+                velocity,
+                nominal,
+                obstacle_list,
+            )
+            batch = _BarrierConstraintBatch(
+                rows=(
+                    np.stack([constraint.row for constraint in constraints])
+                    if constraints
+                    else np.empty((0, 3), dtype=np.float64)
+                ),
+                lower_bounds=np.asarray(
+                    [constraint.lower_bound for constraint in constraints],
+                    dtype=np.float64,
+                ),
+                h=np.asarray([constraint.h for constraint in constraints], dtype=np.float64),
+                h_dot=np.asarray(
+                    [constraint.h_dot for constraint in constraints],
+                    dtype=np.float64,
+                ),
+                psi1=np.asarray(
+                    [constraint.psi1 for constraint in constraints],
+                    dtype=np.float64,
+                ),
+                safe_distances=np.asarray(
+                    [constraint.safe_distance for constraint in constraints],
+                    dtype=np.float64,
+                ),
+            )
+        candidate_count = int(batch.rows.shape[0])
+        if self.config.top_k is None:
+            selected_indices = np.arange(candidate_count)
+        else:
+            selected_indices = _top_k_batch_indices(
+                batch,
                 nominal,
                 self.config.top_k,
                 priority=self.config.top_k_priority,
@@ -199,18 +449,11 @@ class UAVSafetyActionFilter:
                     )
                 ),
             )
-        dropped = candidate_count - len(selected)
+        dropped = candidate_count - int(selected_indices.size)
         build_seconds = perf_counter() - build_started
 
-        barrier_rows = (
-            np.stack([constraint.row for constraint in selected])
-            if selected
-            else np.empty((0, 3), dtype=np.float64)
-        )
-        barrier_bounds = np.asarray(
-            [constraint.lower_bound for constraint in selected],
-            dtype=np.float64,
-        )
+        barrier_rows = batch.rows[selected_indices]
+        barrier_bounds = batch.lower_bounds[selected_indices]
         physical_rows = [self._actuator_rows]
         physical_bounds = [self._actuator_bounds]
         if self.config.horizontal_velocity_limit is not None:
@@ -362,12 +605,12 @@ class UAVSafetyActionFilter:
                 ),
             )
         else:
-            projection = project_polyhedral_qp(
-                center,
-                hessian,
-                rows,
-                bounds,
+            projection_solver = (
+                project_polyhedral_qp_constraint_generation
+                if rows.shape[0] >= 128
+                else project_polyhedral_qp
             )
+            projection = projection_solver(center, hessian, rows, bounds)
         executed = projection.acceleration
         if self.config.method is SafetyFilterMethod.SAMPLED_DATA_LEXICOGRAPHIC_ENERGY_HOCBF:
             if lexicographic_reason == "stage_one_safe_set_infeasible":
@@ -401,8 +644,8 @@ class UAVSafetyActionFilter:
             )
             fallback_satisfies = bool(np.all(rows @ executed >= bounds - 1e-8))
 
-        nominal_slacks = [constraint.slack(nominal) for constraint in constraints]
-        executed_slacks = [constraint.slack(executed) for constraint in constraints]
+        nominal_slacks = batch.rows @ nominal - batch.lower_bounds
+        executed_slacks = batch.rows @ executed - batch.lower_bounds
         total_seconds = perf_counter() - total_started
         diagnostics = SafetyFilterDiagnostics(
             method=self.config.method.value,
@@ -412,13 +655,14 @@ class UAVSafetyActionFilter:
             candidate_constraints=candidate_count,
             active_constraints=projection.active_constraints,
             dropped_constraints=dropped,
-            minimum_h=min((constraint.h for constraint in constraints), default=None),
-            minimum_psi1=min(
-                (constraint.psi1 for constraint in constraints),
-                default=None,
+            minimum_h=(float(np.min(batch.h)) if candidate_count else None),
+            minimum_psi1=(float(np.min(batch.psi1)) if candidate_count else None),
+            minimum_nominal_slack=(
+                float(np.min(nominal_slacks)) if candidate_count else None
             ),
-            minimum_nominal_slack=min(nominal_slacks, default=None),
-            minimum_executed_slack=min(executed_slacks, default=None),
+            minimum_executed_slack=(
+                float(np.min(executed_slacks)) if candidate_count else None
+            ),
             intervention_norm=float(np.linalg.norm(executed - nominal)),
             constraint_build_seconds=build_seconds,
             solver_seconds=projection.solver_time_seconds,
@@ -450,6 +694,78 @@ class UAVSafetyActionFilter:
             executed.copy(),
             diagnostics,
             projection_problem,
+        )
+
+    def filter_lidar_points(
+        self,
+        position: np.ndarray,
+        velocity: np.ndarray,
+        nominal_acceleration: np.ndarray,
+        points: np.ndarray,
+        *,
+        point_radius: float = 0.0,
+    ) -> SafetyFilterOutput:
+        """Array-native path for static point obstacles emitted by LiDAR.
+
+        Both ordinary and sampled-data robust HOCBF use the same equations as
+        the object-based path.  The robust branch adds the vectorized form of
+        ``hocbf_sampled_data_residual_bound`` to each lower bound.
+        """
+
+        if self.config.method is not SafetyFilterMethod.HOCBF:
+            raise ValueError("LiDAR point fast path requires HOCBF")
+        centers = np.asarray(points, dtype=np.float64)
+        if centers.ndim != 2 or centers.shape[1:] != (3,) or not np.all(
+            np.isfinite(centers)
+        ):
+            raise ValueError("points must be a finite (n, 3) array")
+        radius = max(float(point_radius), 1e-9)
+        if not np.isfinite(radius):
+            raise ValueError("point_radius must be finite")
+        count = centers.shape[0]
+        position_array = np.asarray(position, dtype=np.float64)
+        velocity_array = np.asarray(velocity, dtype=np.float64)
+        obstacle_velocities = np.zeros((count, 3), dtype=np.float64)
+        obstacle_accelerations = np.zeros((count, 3), dtype=np.float64)
+        batch = _vectorized_hocbf_arrays(
+            position_array,
+            velocity_array,
+            centers=centers,
+            radii=np.full(count, radius, dtype=np.float64),
+            obstacle_velocities=obstacle_velocities,
+            obstacle_accelerations=obstacle_accelerations,
+            config=self.hocbf_config,
+        )
+        if self.config.sampled_data_robust:
+            residual_bounds = _sampled_data_residual_bounds_arrays(
+                position_array,
+                velocity_array,
+                centers=centers,
+                obstacle_velocities=obstacle_velocities,
+                obstacle_accelerations=obstacle_accelerations,
+                config=self.hocbf_config,
+                hold_dt=self.config.safety_dt,
+                horizontal_acceleration_limit=(
+                    self.config.horizontal_acceleration_limit
+                ),
+                vertical_acceleration_limit=(
+                    self.config.vertical_acceleration_limit
+                ),
+            )
+            batch = _BarrierConstraintBatch(
+                rows=batch.rows,
+                lower_bounds=batch.lower_bounds + residual_bounds,
+                h=batch.h,
+                h_dot=batch.h_dot,
+                psi1=batch.psi1,
+                safe_distances=batch.safe_distances,
+            )
+        return self.filter(
+            position,
+            velocity,
+            nominal_acceleration,
+            (),
+            _constraint_batch=batch,
         )
 
     def _build_constraints(

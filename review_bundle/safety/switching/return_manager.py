@@ -19,6 +19,8 @@ class ReturnDecisionContext:
     task_to_charger_distance: float
     return_now_requirement: float | None = None
     task_then_return_requirement: float | None = None
+    return_now_deadline_feasible: bool | None = None
+    task_then_return_deadline_feasible: bool | None = None
 
 
 @dataclass(frozen=True)
@@ -64,6 +66,65 @@ class QuantileEnergyReturnManager:
         )
         immediate_margin = remaining - return_now - reserve
         mission_margin = remaining - task_then_return - reserve
+        return_now_feasible = context.return_now_deadline_feasible is not False
+        task_then_return_feasible = (
+            context.task_then_return_deadline_feasible is not False
+        )
+        return_now_certified = bool(
+            return_now_feasible and immediate_margin > 0.0
+        )
+        task_then_return_certified = bool(
+            task_then_return_feasible and mission_margin > 0.0
+        )
+
+        # The two macro-action feasible sets need not be nested.  Switching the
+        # goal from TASK to CHARGER changes the goal-conditioned policy, and a
+        # completed task applies the real service reset (including zero
+        # velocity).  Consequently, direct return can be deadline-infeasible
+        # even though completing the task and returning is certified.  In that
+        # viability-restoration region, committing would replace the only safe
+        # option by an uncertified one.
+        if task_then_return_certified:
+            if not return_now_feasible:
+                reason = "task_completion_restores_return_viability"
+            elif immediate_margin <= 0.0:
+                reason = "task_completion_restores_return_energy_viability"
+            else:
+                reason = "task_continuation_has_energy_margin"
+            return ReturnManagerDecision(
+                False,
+                reason,
+                immediate_margin if return_now_feasible else float("-inf"),
+                mission_margin,
+                task_then_return,
+            )
+
+        if return_now_certified:
+            reason = (
+                "task_then_return_deadline_infeasible"
+                if not task_then_return_feasible
+                else "task_then_return_energy_boundary"
+            )
+            return ReturnManagerDecision(
+                True,
+                reason,
+                immediate_margin,
+                mission_margin if task_then_return_feasible else float("-inf"),
+                task_then_return,
+            )
+
+        # Neither macro action has a finite-deadline resource certificate.  The
+        # operational fallback remains an absorbing emergency return, but its
+        # reason explicitly withholds any claim that this action is safe or
+        # globally optimal.
+        if not return_now_feasible:
+            return ReturnManagerDecision(
+                True,
+                "return_now_deadline_infeasible",
+                float("-inf"),
+                mission_margin if task_then_return_feasible else float("-inf"),
+                return_now,
+            )
         if immediate_margin <= 0.0:
             return ReturnManagerDecision(
                 True,
@@ -72,21 +133,7 @@ class QuantileEnergyReturnManager:
                 mission_margin,
                 return_now,
             )
-        if mission_margin <= 0.0:
-            return ReturnManagerDecision(
-                True,
-                "task_then_return_energy_boundary",
-                immediate_margin,
-                mission_margin,
-                task_then_return,
-            )
-        return ReturnManagerDecision(
-            False,
-            "task_continuation_has_energy_margin",
-            immediate_margin,
-            mission_margin,
-            task_then_return,
-        )
+        raise RuntimeError("unreachable return-decision feasibility state")
 
 
 class FixedSOCThresholdReturnManager:

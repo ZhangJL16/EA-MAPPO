@@ -1,0 +1,22 @@
+\section{Experimental Protocol}
+\label{sec:experiments}
+
+The evaluation is organized by falsifiable research questions rather than implementation stages. The primary domain is continuous UAV delivery with a separately trained navigation policy and HOCBF collision filter; a second domain/filter family is required for a generality claim. Current simulator outcomes are deterministic conditional on the information state.
+
+\paragraph{RQ1: Is perfect Resource-to-Go useful?}
+Before learning a predictor, an oracle manager uses simulator-exact charger cost under the same navigation and return code. It must improve completed tasks per battery cycle by at least 5\% at a matched stranding ceiling relative to tuned state-of-charge and distance--energy rules. This is a predeclared practical-relevance gate, not a significance threshold; the full effect and its interval are reported, and sensitivity to the gate is retained. Failure closes the downstream return-decision claim.
+
+\paragraph{RQ2: Pair identity or executed-interface extrapolation?}
+We use leave-one-pair-out compositions over policies and safety operators. Test sets cross seen/unseen pairs with low/high executed-interface extrapolation, while matching charger hitting-horizon distributions. Direct, TD, PCM-Nominal, PCM-Executed, executed-WM, executed-WM Ensemble, and Oracle receive fair component access. The mechanism claim requires error to track interface risk after controlling for pair identity and horizon.
+
+\paragraph{RQ3: Can reliability detect future failures?}
+On held-out compositions, we measure accepted-set MAE, severe underestimation, risk--coverage, and area under the risk--coverage curve (AURC). Ensemble disagreement and simple $k$NN interface distance are mandatory baselines. SIRP is evaluated only if its gate in Section~\ref{sec:method} opens. No threshold is tuned on test compositions.
+
+\paragraph{RQ4: Does reliability improve decisions?}
+All estimators feed the same one-way ReturnManager. Comparisons include state-of-charge thresholds, distance--energy, a receding-horizon planner using the same declared plant/resource primitive, a Predictive-Safety-Network-style resource-safety head, a direct high-level continue/return switcher, direct Resource-to-Go, PCM, executed-WM, ensemble-conservative return, the gated candidate (if retained), and Oracle. The matched end-to-end track includes CPO/CVPO/SDAC and DCRL when its density-constraint semantics can be made task-equivalent; otherwise the incompatibility is reported rather than hidden. The main outcome is the paired stranding--throughput frontier; secondary outcomes are charger return success, unused charger-arrival resource, premature return, and tasks per simulated hour.
+
+\paragraph{RQ5: Does the phenomenon generalize?}
+The full pair/support/horizon regime is repeated in a second domain or with a materially different safety-operator family. Without this replication, claims remain scoped to the primary simulator.
+
+\paragraph{Statistics and stopping rules.}
+Every frontier point starts with at least 100 independent battery cycles, but the final count is preregistered from the precision needed at the declared stranding ceiling; 100 cycles alone cannot substantiate a one-percent-level rare-event claim. Rare-event stranding receives Wilson intervals; method differences use paired cycle-level bootstrap intervals under common task and disturbance seeds. Navigation requires three passing seeds before it can support downstream claims. Fail-closed gates stop the pipeline after navigation, held-out battery calibration, Oracle headroom, prediction pilot, or generality failure. Appendix~\ref{app:experimental} records splits, fairness controls, and the complete baseline matrix.

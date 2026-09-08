@@ -1,9 +1,53 @@
 from __future__ import annotations
 
+import ctypes
 from dataclasses import dataclass
+from pathlib import Path
 from time import perf_counter
 
 import numpy as np
+
+
+def _load_native_qp_function():
+    library_path = Path(__file__).with_name("_qp_native.so")
+    if not library_path.is_file():
+        return None
+    source_path = Path(__file__).with_name("_qp_native.c")
+    if (
+        source_path.is_file()
+        and source_path.stat().st_mtime > library_path.stat().st_mtime
+    ):
+        return None
+    try:
+        library = ctypes.CDLL(str(library_path))
+        function = library.hocbf_project_qp3
+        double_pointer = ctypes.POINTER(ctypes.c_double)
+        function.argtypes = [
+            double_pointer,
+            double_pointer,
+            double_pointer,
+            double_pointer,
+            double_pointer,
+            ctypes.c_int64,
+            ctypes.c_int,
+            ctypes.c_double,
+            ctypes.c_int,
+            double_pointer,
+            double_pointer,
+            ctypes.POINTER(ctypes.c_int),
+            ctypes.POINTER(ctypes.c_int),
+            ctypes.POINTER(ctypes.c_int),
+            double_pointer,
+            ctypes.POINTER(ctypes.c_int),
+        ]
+        function.restype = ctypes.c_int
+        function._hocbf_library = library
+        return function
+    except (AttributeError, OSError):
+        return None
+
+
+_NATIVE_QP_FUNCTION = _load_native_qp_function()
 
 
 def _vec3(value: np.ndarray, name: str) -> np.ndarray:
@@ -450,6 +494,63 @@ def energy_to_go_action_gradient(
     return 0.5 * interval**2 * grad_p + interval * grad_v
 
 
+def _native_project_polyhedral_loop(
+    reference: np.ndarray,
+    inverse: np.ndarray,
+    matrix: np.ndarray,
+    bounds: np.ndarray,
+    denominators: np.ndarray,
+    *,
+    max_iterations: int,
+    tolerance: float,
+    stagnation_sweeps: int,
+) -> tuple[np.ndarray, np.ndarray, int, bool, bool, float, int] | None:
+    if _NATIVE_QP_FUNCTION is None or matrix.shape[0] < 128:
+        return None
+    reference_c = np.ascontiguousarray(reference, dtype=np.float64)
+    inverse_c = np.ascontiguousarray(inverse, dtype=np.float64)
+    matrix_c = np.ascontiguousarray(matrix, dtype=np.float64)
+    bounds_c = np.ascontiguousarray(bounds, dtype=np.float64)
+    denominators_c = np.ascontiguousarray(denominators, dtype=np.float64)
+    acceleration = np.empty(3, dtype=np.float64)
+    multipliers = np.empty(matrix_c.shape[0], dtype=np.float64)
+    iterations = ctypes.c_int()
+    converged = ctypes.c_int()
+    stagnated = ctypes.c_int()
+    maximum_violation = ctypes.c_double()
+    active_constraints = ctypes.c_int()
+    double_pointer = ctypes.POINTER(ctypes.c_double)
+    status = _NATIVE_QP_FUNCTION(
+        reference_c.ctypes.data_as(double_pointer),
+        inverse_c.ctypes.data_as(double_pointer),
+        matrix_c.ctypes.data_as(double_pointer),
+        bounds_c.ctypes.data_as(double_pointer),
+        denominators_c.ctypes.data_as(double_pointer),
+        matrix_c.shape[0],
+        max_iterations,
+        tolerance,
+        stagnation_sweeps,
+        acceleration.ctypes.data_as(double_pointer),
+        multipliers.ctypes.data_as(double_pointer),
+        ctypes.byref(iterations),
+        ctypes.byref(converged),
+        ctypes.byref(stagnated),
+        ctypes.byref(maximum_violation),
+        ctypes.byref(active_constraints),
+    )
+    if status != 0:
+        return None
+    return (
+        acceleration,
+        multipliers,
+        int(iterations.value),
+        bool(converged.value),
+        bool(stagnated.value),
+        float(maximum_violation.value),
+        int(active_constraints.value),
+    )
+
+
 def project_polyhedral_qp(
     center: np.ndarray,
     hessian: np.ndarray,
@@ -474,6 +575,21 @@ def project_polyhedral_qp(
     if max_iterations <= 0 or tolerance <= 0.0 or stagnation_sweeps <= 0:
         raise ValueError("solver iteration and tolerance must be positive")
 
+    center_violations = bounds - matrix @ reference
+    if float(np.max(center_violations, initial=-np.inf)) <= tolerance:
+        elapsed = perf_counter() - started
+        return ProjectionResult(
+            acceleration=reference,
+            feasible=True,
+            converged=True,
+            iterations=0,
+            max_violation=float(max(0.0, np.max(center_violations, initial=0.0))),
+            intervention_norm=0.0,
+            solver_time_seconds=elapsed,
+            active_constraints=0,
+            reason="optimal",
+        )
+
     inverse = np.linalg.inv(metric)
     acceleration = reference.copy()
     multipliers = np.zeros(matrix.shape[0], dtype=np.float64)
@@ -493,41 +609,63 @@ def project_polyhedral_qp(
             reason="degenerate_infeasible_constraint",
         )
 
-    converged = False
-    iterations = 0
-    violation_history: list[float] = []
-    stagnated = False
-    for sweep in range(1, max_iterations + 1):
-        largest_delta = 0.0
-        for index in range(matrix.shape[0]):
-            if not nondegenerate[index]:
-                continue
-            violation = float(bounds[index] - matrix[index] @ acceleration)
-            candidate = max(
-                0.0,
-                multipliers[index] + violation / denominators[index],
-            )
-            delta = candidate - multipliers[index]
-            if delta != 0.0:
-                acceleration += delta * (inverse @ matrix[index])
-                multipliers[index] = candidate
-                largest_delta = max(largest_delta, abs(delta))
-        iterations = sweep
+    native = _native_project_polyhedral_loop(
+        reference,
+        inverse,
+        matrix,
+        bounds,
+        denominators,
+        max_iterations=max_iterations,
+        tolerance=tolerance,
+        stagnation_sweeps=stagnation_sweeps,
+    )
+    if native is not None:
+        (
+            acceleration,
+            multipliers,
+            iterations,
+            converged,
+            stagnated,
+            max_violation,
+            active_constraints,
+        ) = native
+    else:
+        converged = False
+        iterations = 0
+        violation_history: list[float] = []
+        stagnated = False
+        for sweep in range(1, max_iterations + 1):
+            largest_delta = 0.0
+            for index in range(matrix.shape[0]):
+                if not nondegenerate[index]:
+                    continue
+                violation = float(bounds[index] - matrix[index] @ acceleration)
+                candidate = max(
+                    0.0,
+                    multipliers[index] + violation / denominators[index],
+                )
+                delta = candidate - multipliers[index]
+                if delta != 0.0:
+                    acceleration += delta * (inverse @ matrix[index])
+                    multipliers[index] = candidate
+                    largest_delta = max(largest_delta, abs(delta))
+            iterations = sweep
+            max_violation = float(max(0.0, np.max(bounds - matrix @ acceleration)))
+            violation_history.append(max_violation)
+            if max_violation <= tolerance and largest_delta <= tolerance:
+                converged = True
+                break
+            if (
+                len(violation_history) > stagnation_sweeps
+                and max_violation > max(tolerance * 10.0, 1e-3)
+                and max_violation
+                >= violation_history[-stagnation_sweeps - 1] * (1.0 - 1e-6)
+                - tolerance
+            ):
+                stagnated = True
+                break
         max_violation = float(max(0.0, np.max(bounds - matrix @ acceleration)))
-        violation_history.append(max_violation)
-        if max_violation <= tolerance and largest_delta <= tolerance:
-            converged = True
-            break
-        if (
-            len(violation_history) > stagnation_sweeps
-            and max_violation > max(tolerance * 10.0, 1e-3)
-            and max_violation
-            >= violation_history[-stagnation_sweeps - 1] * (1.0 - 1e-6)
-            - tolerance
-        ):
-            stagnated = True
-            break
-    max_violation = float(max(0.0, np.max(bounds - matrix @ acceleration)))
+        active_constraints = int(np.sum(multipliers > tolerance))
     feasible = bool(max_violation <= tolerance * 10.0)
     elapsed = perf_counter() - started
     return ProjectionResult(
@@ -538,7 +676,7 @@ def project_polyhedral_qp(
         max_violation=max_violation,
         intervention_norm=float(np.linalg.norm(acceleration - reference)),
         solver_time_seconds=elapsed,
-        active_constraints=int(np.sum(multipliers > tolerance)),
+        active_constraints=active_constraints,
         reason=(
             "optimal"
             if feasible and converged
@@ -548,6 +686,121 @@ def project_polyhedral_qp(
                 else "iteration_limit_or_infeasible"
             )
         ),
+    )
+
+
+def project_polyhedral_qp_constraint_generation(
+    center: np.ndarray,
+    hessian: np.ndarray,
+    rows: np.ndarray,
+    lower_bounds: np.ndarray,
+    *,
+    max_iterations: int = 250,
+    tolerance: float = 1e-7,
+    stagnation_sweeps: int = 50,
+) -> ProjectionResult:
+    """Solve a large-row, three-variable QP by exact constraint generation.
+
+    Each restricted problem is a relaxation of the full problem.  A restricted
+    optimum is returned only after a vectorized check proves that it satisfies
+    every omitted inequality.  It is then also optimal for the full problem:
+    every full-feasible point was feasible for the restricted problem.  If a
+    restricted solve is numerically inconclusive, the original full solver is
+    used, preserving its fallback semantics.
+    """
+
+    started = perf_counter()
+    reference = _vec3(center, "center")
+    metric = np.asarray(hessian, dtype=np.float64)
+    matrix = np.asarray(rows, dtype=np.float64)
+    bounds = np.asarray(lower_bounds, dtype=np.float64)
+    if metric.shape != (3, 3) or np.min(np.linalg.eigvalsh(metric)) <= 0.0:
+        raise ValueError("hessian must be positive definite")
+    if matrix.ndim != 2 or matrix.shape[1] != 3 or bounds.shape != (matrix.shape[0],):
+        raise ValueError("linear constraints must have shapes (m, 3) and (m,)")
+    if not np.all(np.isfinite(matrix)) or not np.all(np.isfinite(bounds)):
+        raise ValueError("linear constraints must be finite")
+    if max_iterations <= 0 or tolerance <= 0.0 or stagnation_sweeps <= 0:
+        raise ValueError("solver iteration and tolerance must be positive")
+
+    center_violations = bounds - matrix @ reference
+    if float(np.max(center_violations, initial=-np.inf)) <= tolerance:
+        return ProjectionResult(
+            acceleration=reference,
+            feasible=True,
+            converged=True,
+            iterations=0,
+            max_violation=float(
+                max(0.0, np.max(center_violations, initial=0.0))
+            ),
+            intervention_norm=0.0,
+            solver_time_seconds=perf_counter() - started,
+            active_constraints=0,
+            reason="optimal",
+        )
+
+    constraint_count = matrix.shape[0]
+    selected = np.zeros(constraint_count, dtype=bool)
+    selected[int(np.argmax(center_violations))] = True
+    total_sweeps = 0
+    for _ in range(constraint_count):
+        restricted = project_polyhedral_qp(
+            reference,
+            metric,
+            matrix[selected],
+            bounds[selected],
+            max_iterations=max_iterations,
+            tolerance=tolerance,
+            stagnation_sweeps=stagnation_sweeps,
+        )
+        total_sweeps += restricted.iterations
+        if not (restricted.feasible and restricted.converged):
+            break
+        full_violations = bounds - matrix @ restricted.acceleration
+        maximum_violation = float(
+            max(0.0, np.max(full_violations, initial=0.0))
+        )
+        if maximum_violation <= tolerance * 10.0:
+            return ProjectionResult(
+                acceleration=restricted.acceleration,
+                feasible=True,
+                converged=True,
+                iterations=total_sweeps,
+                max_violation=maximum_violation,
+                intervention_norm=float(
+                    np.linalg.norm(restricted.acceleration - reference)
+                ),
+                solver_time_seconds=perf_counter() - started,
+                active_constraints=restricted.active_constraints,
+                reason="optimal",
+            )
+        omitted_violations = np.where(selected, -np.inf, full_violations)
+        next_index = int(np.argmax(omitted_violations))
+        if not np.isfinite(omitted_violations[next_index]):
+            break
+        selected[next_index] = True
+
+    # Preserve the established numerical/fallback behavior when a restricted
+    # solve cannot certify the full optimum (typically an infeasible system).
+    fallback = project_polyhedral_qp(
+        reference,
+        metric,
+        matrix,
+        bounds,
+        max_iterations=max_iterations,
+        tolerance=tolerance,
+        stagnation_sweeps=stagnation_sweeps,
+    )
+    return ProjectionResult(
+        acceleration=fallback.acceleration,
+        feasible=fallback.feasible,
+        converged=fallback.converged,
+        iterations=fallback.iterations,
+        max_violation=fallback.max_violation,
+        intervention_norm=fallback.intervention_norm,
+        solver_time_seconds=perf_counter() - started,
+        active_constraints=fallback.active_constraints,
+        reason=fallback.reason,
     )
 
 

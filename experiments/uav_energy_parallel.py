@@ -13,9 +13,13 @@ from envs.UAVEnergyDeliverySAC import (
     GoalConditionedQuantileTDEnergyEstimator,
     UAVEnergyDeliverySACEnv,
 )
+from experiments.forked_action_safety.core import (
+    sanitize_snapshot_position,
+)
 
 
 _LIGHT_INFO_KEYS = (
+    "progress",
     "realized_energy_cost",
     "transition_dt",
     "physics_substeps",
@@ -26,10 +30,17 @@ _LIGHT_INFO_KEYS = (
     "hocbf_intervened",
     "hocbf_emergency_brake",
     "hocbf_intervention_norm",
+    "nominal_action",
+    "executed_action",
+    "distance_to_goal_before",
     "projection_geometry",
     "active_set_changed",
     "completed_goal_evaluation",
     "energy_exhausted",
+    "continuous_battery_validation",
+    "battery_validation_task_rollover",
+    "battery_validation_task_rollover_count",
+    "battery_validation_episode_guard_exceeded",
 )
 
 
@@ -38,6 +49,44 @@ class WorkerReset:
     worker_id: int
     seed: int
     options: dict[str, object] | None = None
+
+
+@dataclass(frozen=True)
+class WorkerRetarget:
+    """Reset one worker at a new goal while preserving its obstacle layout."""
+
+    worker_id: int
+    seed: int
+    start_position: np.ndarray
+    start_velocity: np.ndarray
+    goal_position: np.ndarray
+
+
+@dataclass(frozen=True)
+class WorkerInPlaceRetarget:
+    """Change the goal/horizon without reconstructing the physical state."""
+
+    worker_id: int
+    goal_position: np.ndarray
+
+
+@dataclass(frozen=True)
+class WorkerForkReset:
+    """Restore a pre-action anchor in a locked static scene.
+
+    ``validation_start_position`` is a known legal reset position used only to
+    validate/reconstruct the obstacle layout.  The worker then moves the agent
+    to the already observed anchor without resampling the scene.
+    """
+
+    worker_id: int
+    seed: int
+    validation_start_position: np.ndarray
+    anchor_position: np.ndarray
+    anchor_velocity: np.ndarray
+    goal_position: np.ndarray
+    static_obstacles: list[dict[str, object]]
+    elapsed_policy_steps: int
 
 
 @dataclass(frozen=True)
@@ -88,6 +137,8 @@ def _worker_main(
 ) -> None:
     os.environ["OMP_NUM_THREADS"] = "1"
     os.environ["MKL_NUM_THREADS"] = "1"
+    os.environ["OPENBLAS_NUM_THREADS"] = "1"
+    os.environ["NUMEXPR_NUM_THREADS"] = "1"
     try:
         environment = UAVEnergyDeliverySACEnv(**environment_kwargs)
         if energy_estimator_checkpoint is not None:
@@ -124,10 +175,119 @@ def _worker_main(
                         _payload(environment, observation, 0.0, False, False, info),
                     )
                 )
-            elif command == "step":
-                observation, reward, terminated, truncated, info = environment.step(
-                    np.asarray(request["action"], dtype=np.float32)
+            elif command == "retarget":
+                obstacle_layout = environment.static_obstacle_layout()
+                observation, info = environment.reset(
+                    seed=int(request["seed"]),
+                    options={
+                        "start_position": request["start_position"],
+                        "start_velocity": request["start_velocity"],
+                        "task_point": request["goal_position"],
+                        "static_obstacles": obstacle_layout,
+                    },
                 )
+                connection.send(
+                    (
+                        "ok",
+                        _payload(environment, observation, 0.0, False, False, info),
+                    )
+                )
+            elif command == "retarget_in_place":
+                goal = environment._validate_task_point(
+                    np.asarray(request["goal_position"], dtype=np.float32),
+                    environment.agent.pos,
+                )
+                # This is a new control leg, not a new physical episode.  Keep
+                # position and velocity bitwise unchanged while resetting only
+                # the goal-relative horizon and trajectory bookkeeping.
+                environment.current_task_point = goal.copy()
+                environment.current_step = 0
+                environment.steps_in_current_task = 0
+                environment.simulation_time = 0.0
+                environment.agent.goal = goal.copy()
+                environment.agent.reached = False
+                environment.agent_paths = [[environment.agent.pos.copy()]]
+                environment._start_goal_trajectory(goal)
+                environment._update_lidar()
+                observation = environment._active_goal_sac_observation()
+                connection.send(
+                    (
+                        "ok",
+                        _payload(
+                            environment,
+                            observation,
+                            0.0,
+                            False,
+                            False,
+                            environment._info(),
+                        ),
+                    )
+                )
+            elif command == "fork_reset":
+                observation, info = environment.reset(
+                    seed=int(request["seed"]),
+                    options={
+                        "start_position": request["validation_start_position"],
+                        "start_velocity": np.zeros(3, dtype=np.float32),
+                        "task_point": request["goal_position"],
+                        "static_obstacles": request["static_obstacles"],
+                    },
+                )
+                del observation
+                anchor_position = environment._validate_position(
+                    sanitize_snapshot_position(
+                        request["anchor_position"],
+                        world_extent=np.asarray(
+                            [environment.length, environment.width, environment.height],
+                            dtype=np.float32,
+                        ),
+                        safe_radius=environment.safe_radius,
+                    ),
+                    "fork_anchor_position",
+                    check_obstacles=False,
+                )
+                # Anchor preparation (or the unstarted-anchor migration path)
+                # is the sole canonicalization point.  A fork must restore the
+                # registered, hash-bound float32 snapshot without transforming
+                # it again; validation still rejects a genuinely invalid state.
+                anchor_velocity = environment._validate_velocity(
+                    np.asarray(request["anchor_velocity"], dtype=np.float32)
+                )
+                environment.agent.pos = anchor_position.copy()
+                environment.agent.prev_pos = anchor_position.copy()
+                environment.agent.last_pos = anchor_position.copy()
+                environment.agent.spawn_pos = anchor_position.copy()
+                environment.agent.vel = anchor_velocity.copy()
+                environment.agent.goal = environment.current_task_point.copy()
+                environment.agent_paths = [[anchor_position.copy()]]
+                elapsed = int(request["elapsed_policy_steps"])
+                if not 0 <= elapsed < environment.max_steps_per_task:
+                    raise ValueError("fork elapsed steps lie outside the episode")
+                environment.current_step = elapsed
+                environment.steps_in_current_task = elapsed
+                environment.simulation_time = elapsed * environment.policy_dt
+                environment._current_goal_initial_distance = float(
+                    np.linalg.norm(environment.active_goal - anchor_position)
+                )
+                environment._current_goal_path_length = 0.0
+                environment._update_lidar()
+                observation = environment._active_goal_sac_observation()
+                connection.send(
+                    (
+                        "ok",
+                        _payload(environment, observation, 0.0, False, False, info),
+                    )
+                )
+            elif command == "step":
+                previous_cbf_enabled = bool(environment.cbf_enabled)
+                if bool(request.get("disable_cbf", False)):
+                    environment.cbf_enabled = False
+                try:
+                    observation, reward, terminated, truncated, info = environment.step(
+                        np.asarray(request["action"], dtype=np.float32)
+                    )
+                finally:
+                    environment.cbf_enabled = previous_cbf_enabled
                 connection.send(
                     (
                         "ok",
@@ -235,20 +395,140 @@ class ParallelUAVEnvPool:
         self,
         worker_ids: list[int],
         actions: np.ndarray,
+        *,
+        disable_cbf: bool | np.ndarray = False,
     ) -> dict[int, WorkerStep]:
         action_batch = np.asarray(actions, dtype=np.float32)
         if action_batch.shape != (len(worker_ids), 3):
             raise ValueError(
                 f"actions must have shape ({len(worker_ids)}, 3), got {action_batch.shape}"
             )
-        for worker_id, action in zip(worker_ids, action_batch, strict=True):
-            self._connections[worker_id].send(("step", {"action": action}))
+        raw_flags = np.asarray(disable_cbf, dtype=np.bool_)
+        if raw_flags.ndim == 0:
+            raw_flags = np.full(len(worker_ids), bool(raw_flags), dtype=np.bool_)
+        if raw_flags.shape != (len(worker_ids),):
+            raise ValueError("disable_cbf must be scalar or one flag per worker")
+        for worker_id, action, raw in zip(
+            worker_ids, action_batch, raw_flags, strict=True
+        ):
+            self._connections[worker_id].send(
+                ("step", {"action": action, "disable_cbf": bool(raw)})
+            )
         return {
             worker_id: self._step_from_payload(
                 worker_id,
                 self._decode(worker_id, self._connections[worker_id].recv()),
             )
             for worker_id in worker_ids
+        }
+
+    def fork_reset_many(
+        self,
+        requests: Iterable[WorkerForkReset],
+    ) -> dict[int, WorkerStep]:
+        selected = list(requests)
+        for request in selected:
+            self._connections[request.worker_id].send(
+                (
+                    "fork_reset",
+                    {
+                        "seed": int(request.seed),
+                        "validation_start_position": np.asarray(
+                            request.validation_start_position, dtype=np.float32
+                        ),
+                        "anchor_position": np.asarray(
+                            request.anchor_position, dtype=np.float32
+                        ),
+                        "anchor_velocity": np.asarray(
+                            request.anchor_velocity, dtype=np.float32
+                        ),
+                        "goal_position": np.asarray(
+                            request.goal_position, dtype=np.float32
+                        ),
+                        "static_obstacles": list(request.static_obstacles),
+                        "elapsed_policy_steps": int(request.elapsed_policy_steps),
+                    },
+                )
+            )
+        return {
+            request.worker_id: self._step_from_payload(
+                request.worker_id,
+                self._decode(
+                    request.worker_id,
+                    self._connections[request.worker_id].recv(),
+                ),
+            )
+            for request in selected
+        }
+
+    def retarget_many(
+        self,
+        requests: Iterable[WorkerRetarget],
+    ) -> dict[int, WorkerStep]:
+        """Start a second leg in the identical physical scene.
+
+        This is intentionally distinct from ``reset_many``: the worker captures
+        the already sampled obstacle layout before resetting, so task and return
+        legs form one physically matched counterfactual mission.
+        """
+
+        selected = list(requests)
+        for request in selected:
+            self._connections[request.worker_id].send(
+                (
+                    "retarget",
+                    {
+                        "seed": int(request.seed),
+                        "start_position": np.asarray(
+                            request.start_position, dtype=np.float32
+                        ),
+                        "start_velocity": np.asarray(
+                            request.start_velocity, dtype=np.float32
+                        ),
+                        "goal_position": np.asarray(
+                            request.goal_position, dtype=np.float32
+                        ),
+                    },
+                )
+            )
+        return {
+            request.worker_id: self._step_from_payload(
+                request.worker_id,
+                self._decode(
+                    request.worker_id,
+                    self._connections[request.worker_id].recv(),
+                ),
+            )
+            for request in selected
+        }
+
+    def retarget_in_place_many(
+        self,
+        requests: Iterable[WorkerInPlaceRetarget],
+    ) -> dict[int, WorkerStep]:
+        """Retarget workers while preserving their current physical states."""
+
+        selected = list(requests)
+        for request in selected:
+            self._connections[request.worker_id].send(
+                (
+                    "retarget_in_place",
+                    {
+                        "goal_position": np.asarray(
+                            request.goal_position, dtype=np.float32
+                        ),
+                    },
+                )
+            )
+        return {
+            request.worker_id: self._step_from_payload(
+                request.worker_id,
+                self._decode(
+                    request.worker_id,
+                    self._connections[request.worker_id].recv(),
+                ),
+            )
+            for request in selected
         }
 
     @staticmethod

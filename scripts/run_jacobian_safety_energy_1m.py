@@ -65,6 +65,7 @@ from scripts.train_uav_energy_delivery_sac import (
 )
 
 
+ROOT = Path(__file__).resolve().parents[1]
 FORMAL_PHASE1_TRANSITIONS = 500_000
 FORMAL_PHASE2_ENERGY_TRANSITIONS = 500_000
 FORMAL_TOTAL_TRANSITIONS = 1_000_000
@@ -144,6 +145,115 @@ def file_sha256(path: str | Path) -> str:
     return digest.hexdigest()
 
 
+def accelerated_r3_reproduction_contract(
+    args: argparse.Namespace,
+    *,
+    source_evaluation_path: Path,
+    selection_tasks_path: Path,
+) -> dict[str, object]:
+    baseline_path = Path(args.reproduction_baseline_config).expanduser().resolve()
+    if not baseline_path.is_file():
+        raise FileNotFoundError(baseline_path)
+    baseline = json.loads(baseline_path.read_text(encoding="utf-8"))
+    checks = {
+        "baseline_variant_r3": baseline.get("variant") == "R3",
+        "seed_0": int(args.seed) == int(baseline.get("seed", -1)) == 0,
+        "transition_budget_500k": (
+            int(args.phase1_transitions)
+            == int(baseline["fixed_training_budget"]["requested"])
+            == 500_000
+        ),
+        "eight_training_environments": (
+            int(args.num_envs)
+            == int(baseline["fixed_training_budget"]["num_envs"])
+            == 8
+        ),
+        "subproc_forkserver_training": (
+            args.training_vec_env == "subproc"
+            and args.training_vec_start_method == "forkserver"
+            and baseline["controlled_factors"]["training_vec_env"] == "subproc"
+            and baseline["controlled_factors"]["training_vec_start_method"]
+            == "forkserver"
+        ),
+        "gradient_steps_minus_one": (
+            int(args.gradient_steps)
+            == int(baseline["controlled_factors"]["gradient_steps"])
+            == -1
+        ),
+        "phase_end_only_evaluation": (
+            bool(args.phase_end_eval_only)
+            and bool(baseline["controlled_factors"]["phase_end_evaluation_only"])
+        ),
+        "lidar_128_by_8": (
+            [args.lidar_vertical_sectors, args.lidar_horizontal_sectors]
+            == baseline["controlled_factors"]["lidar_shape"]
+            == [8, 128]
+        ),
+        "ordinary_top16_hocbf": (
+            bool(args.hocbf_enabled)
+            and int(args.hocbf_top_k) == 16
+            and not bool(getattr(args, "hocbf_sampled_data_robust", False))
+        ),
+        "r3_bridge_contract": (
+            int(args.bridge_recency_window) == 512
+            and float(args.bridge_trust_region) == 0.35
+            and float(args.shield_loss_weight) == 0.10
+            and int(baseline["changed_factors"]["bridge_recency_window"]) == 512
+            and float(baseline["changed_factors"]["bridge_trust_region"]) == 0.35
+            and float(baseline["changed_factors"]["shield_loss_weight"]) == 0.10
+            and not bool(baseline["changed_factors"]["bridge_noise_coupling"])
+        ),
+        "source_evaluation_hash": (
+            file_sha256(source_evaluation_path)
+            == baseline["source_failed_gate"]["sha256"]
+        ),
+        "selection_task_hash": (
+            file_sha256(selection_tasks_path)
+            == baseline["immutable_selection_tasks"]["sha256"]
+        ),
+        "formal_500_tasks": (
+            int(args.eval_navigation_tasks) == 500
+            and int(args.eval_task_seed) == 170_001
+            and int(args.evaluation_num_envs) == 6
+        ),
+    }
+    if not all(bool(value) for value in checks.values()):
+        failed = sorted(key for key, value in checks.items() if not bool(value))
+        raise RuntimeError(f"accelerated R3 reproduction contract failed: {failed}")
+    source_paths = [
+        Path(__file__).resolve(),
+        ROOT / "scripts/train_uav_energy_delivery_sac.py",
+        ROOT / "envs/UAVEnergyDeliverySAC.py",
+        ROOT / "experiments/uav_energy_parallel.py",
+        ROOT / "experiments/jacobian_energy_bridge/features.py",
+        ROOT / "experiments/jacobian_energy_bridge/sac.py",
+        ROOT / "experiments/jacobian_energy_bridge/safety_buffer.py",
+        ROOT / "experiments/jacobian_energy_bridge/callbacks.py",
+        ROOT / "review_bundle/safety/collision/filter.py",
+        ROOT / "review_bundle/safety/collision/hocbf.py",
+        ROOT / "review_bundle/safety/collision/_qp_native.c",
+        ROOT / "review_bundle/safety/collision/_qp_native.so",
+    ]
+    missing = [str(path) for path in source_paths if not path.is_file()]
+    if missing:
+        raise FileNotFoundError(f"reproduction source files missing: {missing}")
+    return {
+        "enabled": True,
+        "evidence_label": "ACCELERATED_IMPLEMENTATION_REPRODUCTION",
+        "baseline_config": str(baseline_path),
+        "baseline_config_sha256": file_sha256(baseline_path),
+        "baseline_git_sha": baseline["git_sha"],
+        "checks": checks,
+        "intended_change": (
+            "array/native implementation of the same ordinary top-16 HOCBF "
+            "constraint and projection equations"
+        ),
+        "source_sha256": {
+            str(path.relative_to(ROOT)): file_sha256(path) for path in source_paths
+        },
+    }
+
+
 def policy_hash(model: JacobianBridgeSAC) -> str:
     digest = hashlib.sha256()
     for parameter in model.policy.parameters():
@@ -165,6 +275,17 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--device", default="cuda")
     parser.add_argument("--num-envs", type=int, default=8)
+    parser.add_argument(
+        "--training-vec-env",
+        choices=("subproc", "dummy"),
+        default="subproc",
+        help="subproc runs each HOCBF training environment in a separate CPU process",
+    )
+    parser.add_argument(
+        "--training-vec-start-method",
+        choices=("forkserver", "spawn", "fork"),
+        default="forkserver",
+    )
     parser.add_argument(
         "--evaluation-num-envs",
         type=int,
@@ -284,6 +405,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--smoke", action="store_true")
     parser.add_argument("--pilot", action="store_true")
     parser.add_argument("--allow-dirty", action="store_true")
+    parser.add_argument(
+        "--accelerated-runtime-reproduction",
+        action="store_true",
+        help="label an R3 reproduction that uses the accelerated HOCBF runtime",
+    )
+    parser.add_argument("--reproduction-baseline-config")
     parser.add_argument("--allow-failed-battery-calibration", action="store_true")
     args = parser.parse_args(argv)
     args.lidar_sectors = args.lidar_horizontal_sectors * args.lidar_vertical_sectors
@@ -390,6 +517,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     if not args.lidar_enabled or not args.hocbf_enabled or args.num_obstacles != 24:
         parser.error("JSEB requires static obstacles, LiDAR, and HOCBF")
     if not (args.smoke or args.pilot) and args.navigation_repair_variant is not None:
+        if args.training_vec_env != "subproc":
+            parser.error("formal navigation repair requires --training-vec-env subproc")
         if not args.phase_end_eval_only:
             parser.error("formal navigation repair requires phase-end-only evaluation")
         if args.phase1_transitions != FORMAL_PHASE1_TRANSITIONS:
@@ -429,6 +558,15 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
             parser.error("formal JSEB requires 128 x 8 LiDAR")
         if (args.obstacle_radius_min, args.obstacle_radius_max) != (50.0, 120.0):
             parser.error("formal JSEB requires obstacle radii 50-120 m")
+    if args.accelerated_runtime_reproduction:
+        if args.navigation_repair_variant != "R3":
+            parser.error("accelerated runtime reproduction is defined only for R3")
+        if not args.reproduction_baseline_config:
+            parser.error("accelerated runtime reproduction requires a baseline config")
+        if not args.allow_dirty:
+            parser.error("accelerated runtime reproduction requires explicit --allow-dirty")
+    elif args.reproduction_baseline_config:
+        parser.error("reproduction baseline config requires accelerated runtime reproduction")
     return args
 
 
@@ -1692,7 +1830,8 @@ def structured_navigation_policy_kwargs(args: argparse.Namespace) -> dict[str, o
 
 def run_navigation_repair(args: argparse.Namespace) -> dict[str, object]:
     long_run = not (args.smoke or args.pilot)
-    if long_run and (args.allow_dirty or not git_clean()):
+    accelerated_reproduction = bool(args.accelerated_runtime_reproduction)
+    if long_run and not accelerated_reproduction and (args.allow_dirty or not git_clean()):
         raise RuntimeError(
             "long navigation repair runs require a clean worktree and forbid --allow-dirty"
         )
@@ -1703,6 +1842,7 @@ def run_navigation_repair(args: argparse.Namespace) -> dict[str, object]:
     source_failures: list[str] = []
     source_path = None
     task_path = None
+    reproduction_contract = None
     if long_run:
         source_path = Path(args.repair_source_navigation_evaluation).resolve()
         task_path = Path(args.repair_evaluation_tasks).resolve()
@@ -1716,6 +1856,12 @@ def run_navigation_repair(args: argparse.Namespace) -> dict[str, object]:
         eval_tasks = load_navigation_tasks(task_path)
         if len(eval_tasks) != 500:
             raise ValueError("formal navigation repair requires the immutable 500-task set")
+        if accelerated_reproduction:
+            reproduction_contract = accelerated_r3_reproduction_contract(
+                args,
+                source_evaluation_path=source_path,
+                selection_tasks_path=task_path,
+            )
     else:
         eval_tasks = generate_stratified_navigation_tasks(
             num_tasks=args.eval_navigation_tasks,
@@ -1773,6 +1919,12 @@ def run_navigation_repair(args: argparse.Namespace) -> dict[str, object]:
     config = {
         "status": "RUNNING",
         "protocol": "JSEB_NAVIGATION_GATE_REPAIR_R1_R3",
+        "evidence_label": (
+            "ACCELERATED_IMPLEMENTATION_REPRODUCTION"
+            if accelerated_reproduction
+            else "ORIGINAL_PROTOCOL"
+        ),
+        "accelerated_runtime_reproduction": reproduction_contract,
         "variant": args.navigation_repair_variant,
         "seed": args.seed,
         "git_sha": git_output("rev-parse", "HEAD"),
@@ -1796,6 +1948,9 @@ def run_navigation_repair(args: argparse.Namespace) -> dict[str, object]:
             "hocbf_final_hard_layer": True,
             "actor_action_dim": 3,
             "gradient_steps": args.gradient_steps,
+            "training_vec_env": args.training_vec_env,
+            "training_vec_start_method": args.training_vec_start_method,
+            "worker_threads_per_environment": 1,
             "phase_end_evaluation_only": args.phase_end_eval_only,
         },
         "changed_factors": {

@@ -198,6 +198,79 @@ def test_model_rollout_oracle_returns_zero_inside_goal_radius() -> None:
     environment.close()
 
 
+def test_model_rollout_oracle_deadline_infeasibility_records_progress_context() -> None:
+    environment = UAVEnergyDeliverySACEnv(phase=SACTrainingPhase.TD_PRETRAINING)
+    environment.reset(
+        seed=141,
+        options={
+            "start_position": np.asarray([500.0, 500.0, 200.0], dtype=np.float32),
+            "start_velocity": np.zeros(3, dtype=np.float32),
+            "task_point": np.asarray([900.0, 500.0, 200.0], dtype=np.float32),
+        },
+    )
+    oracle = ModelBasedEnergyRolloutEstimator(
+        HeuristicGoalPolicy(),
+        max_policy_steps=1,
+    )
+    prediction = oracle.estimate_context(
+        environment,
+        environment.current_task_point,
+        goal_type="TASK_DIAGNOSTIC",
+    )
+    assert prediction.deadline_feasible is False
+    assert prediction.completion_status == "deadline_infeasible"
+    assert prediction.extended_prediction == float("inf")
+    assert prediction.extended_upper95 == float("inf")
+    assert prediction.rollout_steps == 1
+    assert prediction.prediction > 0.0
+    diagnostics = prediction.rollout_diagnostics
+    assert diagnostics is not None
+    assert diagnostics["failure_kind"] == "max_policy_steps_exceeded"
+    assert diagnostics["rollout_label"] == "TASK_DIAGNOSTIC"
+    assert diagnostics["executed_policy_steps"] == 1
+    assert diagnostics["max_policy_steps"] == 1
+    assert diagnostics["simulated_seconds"] == pytest.approx(environment.policy_dt)
+    assert len(diagnostics["start_position"]) == 3
+    assert len(diagnostics["final_position"]) == 3
+    assert diagnostics["start_distance_to_goal"] > diagnostics["goal_tolerance"]
+    assert diagnostics["minimum_distance_step"] in (0, 1)
+    assert diagnostics["path_length"] >= diagnostics["net_displacement"]
+    environment.close()
+
+
+def test_model_rollout_oracle_propagates_task_deadline_infeasibility_to_mission() -> None:
+    environment = UAVEnergyDeliverySACEnv(
+        phase=SACTrainingPhase.TD_PRETRAINING,
+        charger_position=np.asarray([500.0, 500.0, 200.0], dtype=np.float32),
+    )
+    environment.reset(
+        seed=142,
+        options={
+            "start_position": np.asarray([500.0, 500.0, 200.0], dtype=np.float32),
+            "start_velocity": np.zeros(3, dtype=np.float32),
+            "task_point": np.asarray([900.0, 500.0, 200.0], dtype=np.float32),
+        },
+    )
+    oracle = ModelBasedEnergyRolloutEstimator(
+        HeuristicGoalPolicy(),
+        max_policy_steps=1,
+    )
+    task, return_after, return_now, mission = oracle.estimate_mission_bundle(
+        environment,
+        environment.current_task_point,
+    )
+    assert task.deadline_feasible is False
+    assert return_after.deadline_feasible is False
+    assert return_after.completion_status == (
+        "not_evaluated_task_deadline_infeasible"
+    )
+    assert return_now.deadline_feasible is True
+    assert return_now.prediction == pytest.approx(0.0)
+    assert mission.deadline_feasible is False
+    assert mission.extended_upper95 == float("inf")
+    environment.close()
+
+
 def test_model_rollout_oracle_accepts_saturated_live_velocity() -> None:
     environment = UAVEnergyDeliverySACEnv(phase=SACTrainingPhase.TD_PRETRAINING)
     environment.reset(
@@ -256,6 +329,38 @@ def test_model_rollout_oracle_clone_preserves_obstacles_lidar_and_hocbf() -> Non
     environment.close()
 
 
+def test_model_rollout_oracle_clone_uses_oracle_budget_not_task_limit() -> None:
+    environment = UAVEnergyDeliverySACEnv(
+        phase=SACTrainingPhase.TD_PRETRAINING,
+        max_steps_per_task=5,
+        phase1_episode_max_policy_steps=6,
+        phase2_episode_limit=6,
+    )
+    environment.reset(
+        seed=18,
+        options={
+            "start_position": np.asarray([500.0, 500.0, 200.0], dtype=np.float32),
+            "start_velocity": np.zeros(3, dtype=np.float32),
+            "task_point": np.asarray([650.0, 500.0, 200.0], dtype=np.float32),
+        },
+    )
+    oracle = ModelBasedEnergyRolloutEstimator(HeuristicGoalPolicy(), max_policy_steps=500)
+    clone = oracle._make_rollout_environment(
+        environment,
+        start_position=environment.agent.pos.copy(),
+        start_velocity=environment.agent.vel.copy(),
+        goal=environment.current_task_point.copy(),
+    )
+    assert clone.max_steps_per_task == 502
+    assert clone.phase1_episode_max_policy_steps == 502
+    assert clone.phase2_episode_limit == 502
+    assert clone.episode_policy_step_limit == 502
+    clone.close()
+    prediction = oracle.estimate_context(environment, environment.current_task_point)
+    assert prediction.rollout_steps > 5
+    environment.close()
+
+
 def test_model_rollout_oracle_supplies_direct_joint_mission_cost() -> None:
     environment = UAVEnergyDeliverySACEnv(
         phase=SACTrainingPhase.TD_PRETRAINING,
@@ -281,6 +386,10 @@ def test_model_rollout_oracle_supplies_direct_joint_mission_cost() -> None:
     assert estimate.mission_upper_bound_semantics == (
         "deterministic_oracle_joint_mission_cost"
     )
+    assert estimate.task_deadline_feasible is True
+    assert estimate.return_after_task_deadline_feasible is True
+    assert estimate.return_now_deadline_feasible is True
+    assert estimate.mission_deadline_feasible is True
     assert estimate.mission_nominal_coverage_lower_bound == pytest.approx(1.0)
     assert oracle.update_count == 0
     assert len(oracle.replay) == 0
@@ -352,6 +461,51 @@ def test_model_rollout_oracle_disables_suffix_cache_for_per_step_decisions() -> 
     assert diagnostics["mission_cache_misses"] == 2
     assert diagnostics["rollout_request_count"] == 6
     environment.close()
+
+
+def test_model_rollout_oracle_shares_exact_bundle_across_identical_environments() -> None:
+    options = {
+        "start_position": np.asarray([500.0, 500.0, 200.0], dtype=np.float32),
+        "start_velocity": np.zeros(3, dtype=np.float32),
+        "task_point": np.asarray([650.0, 500.0, 200.0], dtype=np.float32),
+    }
+    first_environment = UAVEnergyDeliverySACEnv(
+        phase=SACTrainingPhase.TD_PRETRAINING,
+        mission_decision_interval_policy_steps=10,
+        charger_position=np.asarray([400.0, 500.0, 200.0], dtype=np.float32),
+    )
+    second_environment = UAVEnergyDeliverySACEnv(
+        phase=SACTrainingPhase.TD_PRETRAINING,
+        mission_decision_interval_policy_steps=10,
+        charger_position=np.asarray([400.0, 500.0, 200.0], dtype=np.float32),
+    )
+    first_environment.reset(seed=37, options=options)
+    second_environment.reset(seed=37, options=options)
+    shared: dict = {}
+    first = ModelBasedEnergyRolloutEstimator(
+        HeuristicGoalPolicy(),
+        max_policy_steps=500,
+        shared_bundle_cache=shared,
+    )
+    second = ModelBasedEnergyRolloutEstimator(
+        HeuristicGoalPolicy(),
+        max_policy_steps=500,
+        shared_bundle_cache=shared,
+    )
+    expected = first.estimate_mission_bundle(
+        first_environment,
+        first_environment.current_task_point,
+    )
+    actual = second.estimate_mission_bundle(
+        second_environment,
+        second_environment.current_task_point,
+    )
+    assert actual == expected
+    assert first.cache_diagnostics()["shared_bundle_cache_misses"] == 1
+    assert second.cache_diagnostics()["shared_bundle_cache_hits"] == 1
+    assert second.cache_diagnostics()["rollout_request_count"] == 0
+    first_environment.close()
+    second_environment.close()
 
 
 class UpperOnlyEstimator:

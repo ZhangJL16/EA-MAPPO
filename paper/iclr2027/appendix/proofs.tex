@@ -1,0 +1,67 @@
+\section{Proofs and Technical Scope}
+\label{app:proofs}
+
+\subsection{Common assumptions}
+
+State, nominal-action, executed-action, and resource spaces are standard Borel; the charger set is measurable. The target policy and safety operator are known/queryable Markov kernels. The plant/resource primitive receives the executed action and is shared across the compositions being compared. The charger is absorbing at zero subsequent cost. For every initial state considered, the charger hitting time is almost surely finite and integrable, and \(0\leq c_t\leq c_{\max}\).
+
+\subsection{Proof of Theorem~\ref{thm:identification}}
+
+Equation~\eqref{eq:closedloop} defines a Markov kernel by measurability of the component kernels. Fix any primitive \(\widetilde K\) observationally compatible with source data. By target-interface identification, \(\widetilde K\) and \(K_0\) agree almost everywhere under every true target executed occupancy before charger arrival. Integrating the same queryable \(\pi^\star\) and \(K_{\Pi^\star}\) therefore yields equal closed-loop kernels at target-reached states, up to path-law null sets.
+
+Starting from \(\delta_x\), Ionescu--Tulcea gives a unique measure on finite path cylinders. Induction on cylinder length shows that \(K_0\) and \(\widetilde K\) induce the same finite path law: their current marginals agree, and the next conditional kernels agree almost everywhere under this common marginal. For each \(H\), the truncated sum \(E_{C,H}\) is a measurable function of a finite path prefix and its pushforward law is therefore identified. Finally,
+\[
+0\leq E_C-E_{C,H}\leq c_{\max}(T_C-H)_+,
+\]
+whose expectation converges to zero by integrability of \(T_C\). Thus \(E_{C,H}\to E_C\) in \(L^1\), hence in distribution, and the unique truncated laws identify \(\mathcal Z_C\). No source trajectory from the complete target pair is used. \(\square\)
+
+\subsection{Proof of Proposition~\ref{prop:nonident}}
+
+Choose \(r_1\neq r_2\) in \([0,c_{\max}]\). Let \(K_1\) and \(K_2\) agree outside \(B\). On \(B\), both transition to a fixed charger state but incur \(r_1\) and \(r_2\), respectively. Since all source occupancies assign zero probability to \(B\), the complete source-data laws under \(K_1\) and \(K_2\) coincide. Any estimator based only on source observations has the same output distribution in both worlds. Before the first target visit \(\tau_B\), the target path laws also coincide; on the positive-probability event \(\tau_B<T_C\), they then incur different terminal resource. The target Resource-to-Go laws differ, so no common estimator can uniformly identify both. \(\square\)
+
+\subsection{Proof of Theorem~\ref{thm:transport}}
+
+Let \(e_t(x)=W_1(\mathcal Z_{t:H}(x),\widehat{\mathcal Z}_{t:H}(x))\) and \(e_H=0\). At a common state \(x\), draw the same \(a\sim\pi(\cdot\mid x)\) and \(u\sim K_\Pi(\cdot\mid x,a)\), then couple primitive outcomes. By the triangle inequality and continuation-law Lipschitzness,
+\[
+W_1\!\left(\mathcal Z_{t+1:H}(x'),\widehat{\mathcal Z}_{t+1:H}(\widehat x')\right)
+\leq e_{t+1}(x')+L_{t+1}d(x',\widehat x').
+\]
+Adding the coupled immediate resources yields
+\[
+e_t(x)\leq \mathbb E_{a,u}[\epsilon_t(x,u)]
++\mathbb E_{x'\sim Q_K^{\pi,\Pi}(\cdot\mid x)}[e_{t+1}(x')].
+\]
+Unrolling under the true target kernel gives Equation~\eqref{eq:transport}. For truncation, couple \(E_C\) and \(E_{C,H}\) on the same trajectory. The tail is bounded by \(c_{\max}(T_C-H)_+\), and dominated convergence proves Equation~\eqref{eq:truncation}. \(\square\)
+
+\subsection{Proof of Theorem~\ref{thm:boundary}}
+
+Let \(\theta=U+m\) and \(\widehat\theta=\widehat U+m\). If the two indicators differ, \(b\) lies between their thresholds, including the appropriate endpoint. Hence
+\[
+|b-\theta|\leq|\widehat\theta-\theta|=|\widehat U-U|\leq\varepsilon,
+\]
+which is Equation~\eqref{eq:boundary}. \(\square\)
+
+\subsection{Decision-interval overshoot}
+
+Suppose accepted predictions satisfy
+\(\Pr(E_{C,t}\leq U_t\mid\text{accepted at }t)\geq1-\delta\).
+Let \(D_s=b_s-U_s\), and assume that between checks
+\[
+(b_{t-1}-b_t)+(U_t-U_{t-1})\leq\Delta_{\rm check}.
+\]
+If the one-way manager first commits at \(t\), then \(D_{t-1}>m\). For \(m\geq\Delta_{\rm check}\),
+\(D_t>D_{t-1}-\Delta_{\rm check}>0\), so \(b_t>U_t\). Conditional on acceptance and excluding non-energy failure modes, exhaustion before charger arrival then has probability at most \(\delta\). This statement depends on calibration for the deployed composition and does not transfer collision-safety authority from HOCBF.
+
+\subsection{Task-plus-return allocation}
+
+For task resource \(E_T\) and return resource \(E_R\) on the same mission probability space, if
+\(\Pr(E_T\leq U_T)\geq1-\delta_T\) and
+\(\Pr(E_R\leq U_R)\geq1-\delta_R\), the union bound gives
+\[
+\Pr(E_T+E_R\leq U_T+U_R)\geq1-\delta_T-\delta_R,
+\]
+without independence. Thus adding two marginal q95 bounds supports only a 90\% lower bound by this argument; it does not support a 95\% joint claim.
+
+\subsection{Explicit non-claims}
+
+The theory does not show that ensemble variance or $k$NN distance equals the local transport error; that small \(W_1\) controls q95/q99; that component identity coverage implies target-interface identification; or that calibration survives arbitrary composition shift. Each is either an empirical question or requires additional assumptions.

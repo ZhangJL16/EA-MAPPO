@@ -1,0 +1,28 @@
+\section{Problem Setup}
+\label{sec:problem}
+
+Let \(\mathsf X,\mathsf A,\mathsf U\) be standard Borel state, nominal-action, and executed-action spaces. A task policy \(\pi(da\mid x)\) proposes \(a\), and a queryable safety operator \(K_\Pi(du\mid x,a)\) produces \(u\). The shared plant/resource primitive is
+\[
+K(dx',dc\mid x,u),\qquad c\in[0,c_{\max}],
+\]
+so the executed closed-loop kernel is
+\begin{equation}
+Q^{\pi,\Pi}_K(dx',dc\mid x)
+=\int\pi(da\mid x)\int K_\Pi(du\mid x,a)K(dx',dc\mid x,u).
+\label{eq:closedloop}
+\end{equation}
+For a measurable charger set \(G_C\), define the hitting time \(T_C=\inf\{t\geq0:x_t\in G_C\}\) and Resource-to-Go
+\begin{equation}
+E_C=\sum_{t=0}^{T_C-1}c_t, \qquad \mathcal Z_C(x)=\mathcal L(E_C\mid x_0=x).
+\label{eq:rtg}
+\end{equation}
+The charger is absorbing with zero subsequent cost. We assume a proper stochastic shortest path (SSP): \(T_C<\infty\) almost surely and \(\mathbb E[T_C]<\infty\) for states under study.
+
+At a return check, \(b_t\) is remaining resource and \(m\geq0\) is a reserve. The decision is \(d_t\in\{\continueaction,\returnaction\}\), with \(\returnaction\) absorbing for the remainder of the battery cycle. Given a requirement \(U_t\), the oracle decision is \(d_t^\star=\mathbf{1}\{b_t\leq U_t+m\}\); the deployed manager replaces \(U_t\) by \(\widehat U_t\), or fails closed when the prediction is rejected.
+
+\paragraph{Probability and safety semantics.}
+The present simulator has deterministic dynamics conditional on its information state. Accordingly, the learned target is point Resource-to-Go and the uncertainty object is epistemic error from finite data or extrapolation. We do not interpret ensemble percentiles as physical aleatoric q95/q99. Collision avoidance is certified, when its assumptions hold, by the HOCBF layer; the learned Resource-to-Go module provides no collision or energy-safety certificate.
+
+\begin{remark}[Stochastic extension]
+With a declared stochastic primitive and repeated fixed-condition rollouts, \(\mathcal Z_C(x)\) may be a non-degenerate conditional law. All tail or conformal claims would then require a new calibration audit under the deployed composition; this extension is outside the current empirical claim set.
+\end{remark}

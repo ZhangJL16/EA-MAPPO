@@ -1,0 +1,31 @@
+\section{Introduction}
+\label{sec:intro}
+
+An autonomous agent with finite onboard resources repeatedly faces a consequential stopping problem: when should it abandon productive work and commit to replenishment? A conservative decision wastes usable capacity and lowers task throughput; a late decision can strand the agent before it reaches a charger. This tension appears in delivery robots, mobile manipulators, field vehicles, and aerial systems. It is not resolved by optimizing nominal task reward alone because the return decision is one-way within a resource cycle and its cost is asymmetric.
+
+\begin{center}
+  \centering
+  \resizebox{0.98\linewidth}{!}{\input{figures/overview.tikz}}
+  \captionof{figure}{\textbf{Return decisions depend on the executed closed loop.} The task policy proposes \(a^{\rm nom}\), the hard safety operator produces \(u^{\rm exec}\), and the shared plant/resource primitive determines charger Resource-to-Go. The learned module estimates this requirement and may abstain when epistemic reliability is poor; it does not certify collision safety. Committing too early reduces throughput, while committing after the available-resource boundary risks stranding.}
+  \label{fig:overview}
+\end{center}
+
+State of charge and charger distance are tempting decision variables, but neither specifies the resource required by the trajectory that will actually be executed. A learned policy proposes a nominal action, a safety operator may replace that action, and the plant then realizes motion and resource use. Thus the relevant chain is
+\(
+\pi\!\to\! a^{\mathrm{nom}}\!\to\!\Pi\!\to\!u^{\mathrm{exec}}\!\to\!K\!\to\!\RtoGo
+\),
+where \(\RtoGo\) is charger Resource-to-Go. An obstacle that activates the filter can make two equally distant states require different maneuvers and resources. Figure~\ref{fig:overview} states the resulting decision problem and the scope of each component.
+
+Existing work addresses parts of this chain. Trajectory-energy models estimate consumption and risk \citep{choudhry2021cvar}, and predictive resource-safety networks place a learned override above task policies \citep{guo2020predictive}; constrained and distributional RL optimize policies under resource, expected-cost, or risk-sensitive constraints \citep{qin2021density,achiam2017cpo,liu2022cvpo,kim2023sdac}; and policy-conditioned or compositional world models adapt predictions across policies or structured environments \citep{chen2024pcm,zhao2022howm,wang2025wm3c}. Ensembles and selective prediction estimate when a predictor may fail \citep{lakshminarayanan2017ensembles,geifman2019selectivenet}. Yet none of these pieces by itself identifies what must be covered when a separately queryable safety operator rewrites actions, or when a prediction error changes an irreversible return decision.
+
+Our first insight is that \emph{pair novelty is not equivalent to executed-interface extrapolation}. An unseen pair \((\pi,\Pi)\) need not be statistically novel at the primitive interface if its induced \((x,u^{\rm exec})\) occupancy is identified. Conversely, observing each policy and each safety operator somewhere does not identify a target pair that reaches an uncovered executed interface. Our second insight is decision-theoretic: global Resource-to-Go error and mission-critical error are different. Under a threshold ReturnManager, bounded estimation error changes a decision only near the return boundary, and underestimation in this band is the direct route to late commitment.
+
+We therefore study executed-interface Resource-to-Go, not a nominal-action energy label. We establish a paired identification/non-identification result, give an assumption-explicit finite-horizon transport bound with a proper stochastic-shortest-path truncation term, and prove return-boundary stability. The practical framework compares direct temporal-difference prediction, policy-conditioned and executed-action world models, and epistemic ensembles under a common irreversible ReturnManager. A more structured reliability mechanism is retained only if these simpler models fail a predeclared gate.
+
+Our contributions are:
+\begin{itemize}[leftmargin=*,topsep=2pt,itemsep=1pt]
+  \item a formal executed-interface object that separates unseen pair identity from the support actually needed to identify charger Resource-to-Go;
+  \item identification, impossibility, long-horizon error, and return-boundary results whose assumptions explicitly separate coverage from smoothness;
+  \item a falsifiable protocol linking prediction error to return decisions through matched-support, matched-horizon, risk--coverage, and paired battery-cycle evaluations; and
+  \item \resultpending{EMPIRICAL CLAIMS} an evidence slot for testing whether interface extrapolation and hitting horizon predict Resource-to-Go failure, and whether reliable estimates improve the stranding--throughput frontier.
+\end{itemize}

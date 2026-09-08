@@ -1,0 +1,50 @@
+\section{Result Sheets}
+\label{app:result-sheets}
+
+\subsection{Prediction mechanism sheet}
+
+\begin{center}
+\centering
+\small
+\captionof{table}{Prediction results template. Every dash remains empty until the corresponding artifact passes audit.}
+\begin{tabular}{lcccccc}
+\toprule
+Method & MAE$\downarrow$ & Bias$\to0$ & Under.$\downarrow$ & BW-under.$\downarrow$ & AURC$\downarrow$ & Provenance \\
+\midrule
+Distance $\times$ rate & -- & -- & -- & -- & -- & -- \\
+Direct MC & -- & -- & -- & -- & -- & -- \\
+TD Resource-to-Go & -- & -- & -- & -- & -- & -- \\
+PCM-Nominal & -- & -- & -- & -- & -- & -- \\
+PCM-Executed & -- & -- & -- & -- & -- & -- \\
+Executed-WM & -- & -- & -- & -- & -- & -- \\
+Executed-WM + Ensemble & -- & -- & -- & -- & -- & -- \\
+SIRP (only if gate opens) & -- & -- & -- & -- & -- & -- \\
+Oracle & -- & -- & -- & -- & -- & -- \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\newpage
+\subsection{Decision sheet}
+
+\begin{center}
+\centering
+\small
+\captionof{table}{Return-decision results template at matched stranding ceilings or matched throughput.}
+\begin{tabular}{p{0.23\linewidth}ccccc}
+\toprule
+Manager & Strand.$\downarrow$ & Tasks/cycle$\uparrow$ & Return$\uparrow$ & Unused$\downarrow$ & Source \\
+\midrule
+SOC thresholds & -- & -- & -- & -- & -- \\
+Distance--energy & -- & -- & -- & -- & -- \\
+Receding-horizon planner & -- & -- & -- & -- & -- \\
+Predictive-safety head & -- & -- & -- & -- & -- \\
+Direct switcher & -- & -- & -- & -- & -- \\
+Direct Resource-to-Go & -- & -- & -- & -- & -- \\
+Executed-WM ensemble & -- & -- & -- & -- & -- \\
+Gated candidate & -- & -- & -- & -- & -- \\
+Oracle & -- & -- & -- & -- & -- \\
+CMDP track & -- & -- & -- & -- & -- \\
+\bottomrule
+\end{tabular}
+\end{center}

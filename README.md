@@ -1,5 +1,34 @@
 # Swap Certified UAV Research Bundle
 
+## Latest research snapshot — 2026-09-08
+
+The current navigation baseline is correction-supervised SAC with structured
+LiDAR and sensor-based HOCBF execution. The final adaptation adds131072
+transitions to a524288-step SAC checkpoint. On the fixed500 navigation tasks,
+raw execution reached484 goals,450 without contact; HOCBF execution reached492
+goals, all492 without contact, with8 timeouts and1 contact in a timeout trajectory.
+These are single-training-seed results, not a proof of collision-free deployment
+or an isolated causal effect of the correction loss.
+
+The next launched experiment collects500000 return-energy environment steps
+with the new navigator frozen. Its first8192-step resumable checkpoint was
+verified. Energy-head fitting and closed-loop sustainable mission validation
+remain subsequent work; data collection alone is not an energy-learning result.
+
+- [Frozen collision and recovery contract](docs/LOCKED_COLLISION_RECOVERY_PROTOCOL.md)
+- [HOCBF correction supervision](docs/HOCBF_CORRECTION_SUPERVISION_V1.md)
+- [Paired fixed500 evaluation and energy handoff](docs/HOCBF_FIXED500_AND_ENERGY_HANDOFF_20260908.md)
+- [New-navigation return-energy500k protocol](docs/NEW_NAVIGATION_RETURN_ENERGY_500K_PROTOCOL.md)
+- [Durable research plan](task_plan.md) and [research notes](notes.md)
+
+The native QP kernel is supplied as C source; build it locally with
+`.venv/bin/python scripts/build_hocbf_native.py`. Checkpoints, simulation data,
+downloaded papers, skill installers and machine-specific compiled libraries
+are not included in this source snapshot. Existing experiment resume commands
+require their original local artifacts and matching recorded source hashes.
+
+The sections below describe earlier research stages and are retained as history.
+
 ## Current Research Index
 
 The consolidated status of the energy-estimation, sampled-data safety-filter,

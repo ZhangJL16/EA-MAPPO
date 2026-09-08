@@ -3182,3 +3182,561 @@ physical bounds **blocked-by-calibration**; hard timing and atomic actuator I/O
 **blocked-by-deployment-evidence**. The main theorem therefore remains a corridor-conditional
 robust guarantee under independently valid bounds. Zero synthetic collisions or finite training
 losses do not upgrade T1, T6, or T7 to real-flight claims.
+
+## 2026-09-05 Post-Pilot Correction: Return Viability and Option Preservation
+
+### Target and status
+
+The failed bounded RCPS pilot requires a narrower probabilistic counterpart of
+the strict predecessor invariant. The target is to distinguish:
+
+1. task-completion-then-return feasibility;
+2. immediate return feasibility under a frozen recovery policy; and
+3. whether one proposed executed action preserves the latter option.
+
+**Status: mathematical distinction established; statistical certificate and
+fresh empirical validation unresolved.** This section does not replace the
+robust corridor theorem above. It defines the correct empirical object when a
+verified corridor is unavailable.
+
+### Definitions
+
+Let the battery-augmented state be (x=(s,b,h)), with unsafe set
+(U=U_{collision}\cup U_{boundary}\cup\{b<0\}\cup\{h<0\}), charger set
+(C), and frozen recovery policy \(\kappa\). Write \(\tau_U\) and
+\(\tau_C\) for first hitting times. Define the finite-horizon return value
+
+\[
+V_{R,h}^{\kappa}(x)
+:=\Pr_x^{\kappa}(\tau_C<\tau_U,\ \tau_C\le h).
+\tag{DV1}
+\]
+
+For a candidate command (a), let (a_{exec}=\Phi(x,a)) be the command after
+the fixed HOCBF execution interface and let (X_1\sim
+P(\cdot\mid x,a_{exec})). The one-action option-preservation value is
+
+\[
+Q_{OP,h}^{\kappa}(x,a)
+:=\mathbb E\!\left[
+\mathbf1_{\{X_1\notin U\}}
+V_{R,h-1}^{\kappa}(X_1)
+\mid x,a_{exec}\right].
+\tag{DV2}
+\]
+
+This is an identity, not a new theorem: it is exactly the probability of a safe
+charger hit after one executed candidate and immediate takeover by \(\kappa\).
+The prior pilot instead estimated
+
+\[
+Q_{CTR}(x,a)
+:=\Pr(a;\pi_{task};\kappa\text{ completes the task and then returns safely}),
+\tag{DV3}
+\]
+
+which has no general implication in either direction with (V_R^\kappa).
+
+For (\delta_R\in[0,1]), define the recovery-viable level set
+
+\[
+K_{h,\delta_R}^{\kappa}
+:=\{x:V_{R,h}^{\kappa}(x)\ge1-\delta_R\}.
+\tag{DV4}
+\]
+
+The stronger option-preserving action set is
+
+\[
+\mathcal A_{OP,t}(x)
+:=\left\{a:
+\Pr(X_1\in K_{h-1,\delta_R}^{\kappa}\mid x,\Phi(x,a))
+\ge1-\varepsilon_t\right\}.
+\tag{DV5}
+\]
+
+Thresholding (DV2) alone certifies a one-action-then-recover policy. Recursive
+task execution requires the successor-level-set statement (DV5) or a robust
+set-containment analogue; the two must not be conflated.
+
+### Proposition DV1: completion feasibility cannot authorize fallback
+
+There is no universal function (f) such that
+(V_R^\kappa(x)\ge f(Q_{CTR}(x,a))) for all controlled Markov systems.
+
+**Proof.** For one counterexample, let immediate recovery fail from (x), but
+let the task action move deterministically to a state from which task completion
+and return both succeed. Then (V_R^\kappa(x)=0) and (Q_{CTR}(x,a)=1).
+For the reverse ordering, let immediate recovery succeed from (x), while the
+task action enters an absorbing non-return state. Then
+(V_R^\kappa(x)=1) and (Q_{CTR}(x,a)=0). Thus neither event orders the
+other. \(\square\)
+
+The pilot's rule “reject low (Q_{CTR}), therefore return now” used precisely
+the invalid second implication.
+
+### Theorem DV2: finite-horizon recursive-risk composition
+
+Suppose (X_0\in K_{H,\delta_R}^{\kappa}). Before takeover, at each
+adaptively selected task step (t<T\le H), the executed candidate satisfies
+the conditional guarantee
+
+\[
+\Pr(X_{t+1}\notin K_{H-t-1,\delta_R}^{\kappa}\mid\mathcal F_t)
+\le\varepsilon_t
+\quad\text{a.s.}
+\tag{DV6}
+\]
+
+If takeover then executes \(\kappa\), the probability of either leaving the
+recovery-viable set before takeover or failing to reach (C) safely after
+takeover is at most
+
+\[
+\boxed{\delta_R+\sum_{t=0}^{T-1}\varepsilon_t.}
+\tag{DV7}
+\]
+
+**Proof.** Let (E_t) be the first exit from the relevant recovery-viable
+level set at task step (t). By conditioning on survival through (t) and
+using (DV6), (\Pr(E_t)\le\varepsilon_t). The union bound gives
+(\Pr(\cup_{t<T}E_t)\le\sum_{t<T}\varepsilon_t\). On its complement, the
+takeover state belongs to (K^\kappa), so (DV4) bounds recovery failure by
+\(\delta_R\). A final union bound proves (DV7). \(\square\)
+
+This theorem requires conditional, adaptively valid transition guarantees.
+Scene-level RCPS on independent frozen branches supplies neither (DV6) nor a
+time-uniform substitute. With deterministic verified successor containment,
+all \(\varepsilon_t=0\) and DV2 reduces to the strict predecessor logic already
+used by T1--T2. With only learned scores, the honest alternative is to freeze
+the whole controller and calibrate/evaluate complete trajectories as the
+independent unit.
+
+### Energy-CDF realization
+
+Let the extended-real recovery resource be
+
+\[
+Y_R^\kappa(s)=
+\begin{cases}
+\sum_{j=0}^{\tau_C-1}e_j,&\tau_C<\tau_U,\ \tau_C\le h,\\
++\infty,&\text{otherwise}.
+\end{cases}
+\]
+
+Then (V_R^\kappa(s,b,h)=\Pr(Y_R^\kappa(s)\le b)), so a monotone-budget CDF
+head is an appropriate architecture. The option value obeys the positive
+Bellman identity
+
+\[
+Q_{OP,h}^\kappa(s,b,a)
+=\mathbb E\left[
+\mathbf1_{\{S_1\notin U,\ e_0\le b\}}
+V_{R,h-1}^\kappa(S_1,b-e_0)
+\right].
+\tag{DV8}
+\]
+
+Training data must therefore implement exactly “one executed action, then
+\(\kappa\)” and preserve the resulting velocity and remaining horizon. An
+eight-step raw action prefix, continued task policy, or zero-velocity retarget
+changes the random variable and cannot validate (DV8).
+
+### Immediate empirical obligation
+
+Before fitting a new model, collect paired return-now and one-executed-action-
+then-return rollouts at the exact inspected anchors and compare them to the
+historical completion-then-return outcomes. This is a mechanism diagnostic,
+not new confirmation evidence. Fresh scene-grouped train/calibration/test data
+are justified only if return feasibility and within-anchor option-preservation
+are both nondegenerate.
+
+## 2026-09-05 Minimal R3 Collision Learning: Constraint-Terminated Reach-Avoid Value
+
+### Status and invariant object (implementation correction)
+
+**COHERENT AFTER REFRAMING.** The invariant is discounted first-contact-free
+goal reach, optionally attenuated by a nonnegative, measured physical-action
+correction hazard. This is not a new safety certificate. The implementation
+audit corrected action coordinates, terminal indexing, emergency semantics,
+and long-trajectory hazard scaling in the preliminary design.
+
+Assumptions: a fixed policy on the full Markov state (or history/belief state),
+a fixed transition/hazard kernel, bounded measurable values and potentials,
+and nonterminal initial states. A single LiDAR frame has not been proved to be
+a sufficient Markov state. The strategy is first-step decomposition, a sup-norm
+contraction, then potential cancellation; neural approximation enters only
+after these identities and is not covered by the contraction theorem.
+
+### Target
+
+Let \(G\) be the goal set and \(F\) the union of obstacle and boundary contacts.
+The existing R3 twin critics are reassigned, rather than augmented, to estimate
+
+\[
+V_\gamma^\pi(s)
+=\mathbb E_s^\pi[
+\gamma^{\tau_G-1}\mathbf1\{\tau_G<\tau_F,\ \tau_G<\infty\}],
+\qquad 0<\gamma<1.
+\tag{CR1}
+\]
+
+This nonnegative object matches first-contact-free goal reach. It is an
+infinite-horizon discounted surrogate; because R3's actor does not observe
+remaining time, it is not described as the exact 4,000-step finite-horizon
+probability. Here \(\tau_G\ge1\) is the index of the first goal state; a
+one-transition safe success pays one, explaining the exponent minus one.
+Paths never reaching the goal contribute zero by definition. Physical-contact
+events are recorded before state repair; a repaired state outside an obstacle
+must not erase the contact event.
+
+### Sampled-data admissibility distance
+
+Let the existing sampled-data robust HOCBF, actuator, and next-velocity
+inequalities define a nonempty closed convex action set
+
+\[
+\mathcal C_\Delta(s)=\{u:A_\Delta(s)u\ge b_\Delta(s)\}.
+\tag{CR2}
+\]
+
+The environment radially clips horizontal normalized actions and scales them
+to physical acceleration limits \(A_h=5,A_v=3\). Therefore normalized-action
+displacement is not the physical QP's Euclidean projection distance. For each
+executed physics substep \(j\), define the measured correction
+
+\[
+d_{t,j}=\frac{\|u^{nom}_{t,j}-u^{exec}_{t,j}\|_2}
+{2\sqrt{A_h^2+A_v^2}}.
+\tag{CR3}
+\]
+
+Both measured accelerations lie in the horizontal-disk/vertical-interval
+actuator set, so \(d_{t,j}\in[0,1]\). Only if the final execution output is
+the exact feasible convex projection does zero distance imply nominal
+admissibility. Emergency/fallback and post-QP clipping do not automatically
+qualify. The measured signal is never called a collision probability.
+
+Let \(c_t\) denote first physical contact and set
+
+\[
+I_t=\sum_{j=1}^{m_t}d_{t,j}^2\Delta_{physics},\qquad
+q_t=(1-c_t)\exp[-\kappa I_t].
+\tag{CR4}
+\]
+
+Only physical obstacle/boundary contact forces zero. Emergency/fallback use
+finite measured correction and are logged separately: they can be followed
+by a safe goal and must not be silently equated with physical failure.
+The integral is subdivision-consistent for the same physical trajectory;
+changing simulator/control step size need not preserve the trajectory.
+Before short training, revise calibration to \(\kappa=\log2/H_{90}\), with
+\(H_{90}\) the 90th percentile whole-trajectory integral across all safe
+robust-interface development successes. The previous positive-median scale
+gave weights below 0.01 for 7/49 safe paths; the revised scale's minimum on
+those same paths is 0.2773. This is development calibration, not a theorem or
+a preregistered scale that survived unchanged. It halves weight at a high
+correction-integral quantile, not every second, and leaves CR4/CR5 unchanged.
+No positive integral means the proposed dense signal has failed its feasibility
+check, not permission to invent a scale.
+
+### Killed-kernel Bellman operator
+
+Let \(g_t\) indicate a safe goal hit. For fixed policy \(\pi\) and fixed
+survival kernel \(q\), define
+
+\[
+(\mathcal T_q^\pi Q)(s,a)
+=\mathbb E\left[
+q_t\left(
+g_t+\gamma(1-g_t)
+\mathbb E_{a'\sim\pi(\cdot|S_{t+1})}Q(S_{t+1},a')
+\right)\right].
+\tag{CR5}
+\]
+
+The entropy regularizer is deliberately absent from CR5. Multiplying R3's
+mixed-sign reward or an unconstrained differential-entropy soft value by
+\(q_t\) has no unconditional monotonic-safety interpretation: a negative
+continuation value can make artificial termination attractive.
+
+### Killed-kernel potential shaping
+
+For dense progress feedback without changing CR5's action ordering, set
+
+\[
+\beta_t=\gamma q_t(1-g_t),
+\tag{CR6}
+\]
+
+choose any bounded state potential \(\Phi\) that is zero at absorbing states,
+and use
+
+\[
+\widetilde r_t
+=q_tg_t+\beta_t\Phi(S_{t+1})-\Phi(S_t),
+\tag{CR7}
+\]
+
+\[
+\widetilde Q(s,a)
+=\mathbb E[
+\widetilde r_t+\beta_t\widetilde Q(S_{t+1},A_{t+1})].
+\tag{CR8}
+\]
+
+Substitution gives exactly
+
+\[
+\widetilde Q_q^\pi(s,a)=Q_q^\pi(s,a)-\Phi(s).
+\tag{CR9}
+\]
+
+Thus shaped and unshaped values order actions identically at every state. A
+negative normalized goal-distance potential supplies dense progress feedback
+without an independent progress reward or a per-step survival bonus.
+
+### Theorem CR1: contraction and random absorption
+
+For fixed \(\pi\) and measurable \(q\in[0,1]\), \(\mathcal T_q^\pi\) is a
+\(\gamma\)-contraction in sup norm and has a unique fixed point. If
+\(\tau_B\) is the absorption time generated by the conditional survival
+weights \(q_t\), then
+
+\[
+Q_q^\pi(s,a)
+=\mathbb E[
+\gamma^{\tau_G-1}
+\mathbf1\{\tau_G<\tau_F\wedge\tau_B,\ \tau_G<\infty\}
+\mid S_0=s,A_0=a].
+\tag{CR10}
+\]
+
+The artificial kill on transition \(t\to t+1\) is assigned state index
+\(t+1\), so a kill on the goal transition ties and invalidates that goal.
+Equivalently, before physical contact the path weight for a goal at index
+\(T\) is \(\gamma^{T-1}\prod_{t=0}^{T-1}q_t\).
+
+**Proof.** All non-continuation terms cancel between two Bellman images and
+the remaining multiplier is bounded by \(\gamma q_t(1-g_t)\le\gamma\).
+Banach's theorem yields the unique fixed point. First-step decomposition of the
+event that neither physical nor artificial absorption occurs gives CR5;
+iteration and bounded convergence give CR10. The shaped operator has the same
+continuation multiplier. Inserting \(\widetilde Q=Q-\Phi\) in CR8 cancels the
+successor-potential terms and proves CR9. \(\square\)
+
+### Corollary CR1: conservative ordering
+
+Artificial absorption only removes physically safe goal-reaching paths:
+
+\[
+0\le Q_q^\pi(s,a)
+\le
+\mathbb E[
+\gamma^{\tau_G-1}\mathbf1\{\tau_G<\tau_F,\ \tau_G<\infty\}
+\mid s,a].
+\tag{CR11}
+\]
+
+This is value conservatism, not calibration. A value of \(0.9\) is not a
+certified 90% physical success probability.
+
+### Proposition CR2: fixed-policy monotonicity in hazard strength
+
+For a fixed policy, transition law, and nonnegative no-entropy base return, if
+\(\kappa_2\ge\kappa_1\), then trajectory-wise
+\(q_t^{(\kappa_2)}\le q_t^{(\kappa_1)}\), hence
+
+\[
+Q_{\kappa_2}^\pi(s,a)\le Q_{\kappa_1}^\pi(s,a).
+\tag{CR12}
+\]
+
+This does not imply that neural training produces collision rate monotonic in
+\(\kappa\), and it does not extend to a survival target containing an
+unbounded-sign entropy term.
+
+### Conditional shield link and non-claims
+
+If \(d_{t,j}=0\) at every visited nonterminal physical substep, execution is
+always an exact feasible projection, and CR3 uses physical actions, every visited action
+belongs to \(\mathcal C_\Delta(s)\). If the sampled-data HOCBF premises are
+independently valid—safe nested initialization, correct dynamics and obstacle
+geometry, a valid intersample bound, and recursive QP feasibility—these nominal
+actions meet the corresponding conditional invariance premise and the
+minimum-deviation filter is the identity.
+
+Neural Bellman fitting and finite rollouts do not prove the universal
+zero-distance premise. Projection distance is not physical collision
+probability. Emergency output is not a projection certificate. Top-K omission,
+LiDAR miss, model error, QP infeasibility, and time limits remain explicit
+failure modes. In particular, the actual world uses cylinders while the filter
+uses top-K LiDAR point-ball proxies. Full cylinder-surface and boundary coverage
+is unproved, so the current implementation does not establish the premises of
+this conditional safety link.
+
+Entropy-free critic targets with temporary actor entropy regularization define
+a SAC-derived off-policy actor-critic, not unchanged SAC. Twin-Q minimization,
+nonlinear approximation and partial observations do not inherit a convergence
+or safety guarantee from exact CR5 policy evaluation. Pure time truncation of
+the infinite-horizon surrogate must bootstrap from its terminal observation,
+never the auto-reset observation; contact and safe goal stop continuation.
+
+### Discriminating experiment
+
+Use a common sampled-data-HOCBF, critic-reset, bridge-disabled R3 fine-tuning
+base. Compare only \(\kappa=0\) (hard first-contact reach-avoid) against one
+preregistered \(\kappa>0\). Before either training run, evaluate frozen R3 under
+ordinary and sampled-data filters to isolate interface effects. Promotion
+requires paired improvement in safe goal reach and nominal admissibility
+without success/path collapse. High shield-on success with unchanged
+intervention is insufficient.
+
+The implemented common warm start freezes the R3 stochastic actor for 10k
+transitions and regresses the new Qs on complete-trajectory returns using
+the recurrence \(z_t=\widetilde r_t+\beta_t z_{t+1}\), with terminal
+\(z_T=0\). Timeout continuations are unknown and excluded from MC labeling.
+This initialization has completion-selection bias, and is not described as
+an unbiased estimator for every state. After warmup only CR8 TD fitting is
+used; no MC auxiliary loss is retained during actor updates. Both arms share
+this initialization protocol, optimizer settings and 50k-transition budget.
+
+## FH-CMDP: finite-task first-contact safety (2026-09-05 redesign)
+
+### Target
+
+Derive an exact collision-event cost contract for a future from-scratch
+constrained navigation baseline. This is a modeling identity and finite-horizon
+policy-evaluation recurrence, **not a new safe-RL convergence theorem**.
+It does not retroactively change CR1 or the completed reach-avoid experiment.
+
+### Status
+
+**COHERENT AS STATED** for the event identity and exact finite-horizon recurrence.
+Neural FOCOPS adaptation remains an empirical implementation proposal.
+
+### Invariant Object
+
+Probability of at least one physical contact during a specified navigation
+task, evaluated under a specified initial-task distribution and policy.
+Not action-correction effort, repeated collision-step count, discounted cost,
+or deployment-wide zero-risk certification.
+
+### Assumptions
+
+- Finite task horizon H, a positive integer, is defined before evaluation.
+- Physical obstacle/boundary contact is correctly detected on every physics
+  substep and aggregated without losing a contact after positional repair.
+- First contact stops the logical task; contact takes precedence over a goal
+  recorded on the same transition. Safe goal or the H-th transition also stops.
+- For the Bellman recurrence only, X_t is a sufficient Markov state (including
+  task/time information where needed), with a fixed policy and transition law.
+  The event identity itself also holds for history-dependent policies/POMDPs.
+- The task distribution is fixed for each comparison. Expected cost refers to
+  this distribution, not every possible starting state.
+
+### Notation
+
+Transitions have indices t=0,...,H-1. T<=H is the number of transitions actually
+executed before logical termination. F is the event that a physical contact
+occurs on one of those transitions. Let c_t=1 on the first contact transition
+and zero otherwise; use zero-cost absorbing padding after T. Let r_t be the
+bounded navigation reward (not a contact-probability surrogate). Define
+J_C(pi)=E_pi[sum_{t=0}^{H-1} c_t] and J_R(pi)=E_pi[sum_{t=0}^{H-1} r_t], with
+zero reward after termination. Let d_t denote logical termination after
+transition t, and delta in [0,1] denote an externally chosen risk budget.
+
+### Derivation Strategy
+
+First-contact stopping -> pathwise indicator identity -> expectation ->
+finite-horizon dynamic programming -> explicit separation from approximate
+policy optimization.
+
+### Derivation Map
+
+1. Stopping and contact precedence imply at most one unit of trajectory cost.
+2. This unit is present exactly on F; expectation gives physical event risk.
+3. Conditional expectation gives a finite-time cost Bellman recurrence.
+4. Parameterized state values and GAE replace exact conditional expectations
+   during training; this is where approximation enters.
+
+### Main Derivation
+
+**Step 1 — identity.** If F occurs, exactly one c_t equals one. Otherwise all
+costs are zero. Therefore, on every trajectory,
+
+\[
+\sum_{t=0}^{H-1}c_t=\mathbf1_F,
+\qquad J_C(\pi)=\Pr_\pi(F). \tag{FH1}
+\]
+
+Thus the constrained objective can be written without a proxy substitution:
+
+\[
+\max_\pi J_R(\pi)\quad\text{subject to}\quad J_C(\pi)\le\delta.
+\tag{FH2}
+\]
+
+**Step 2 — exact conditional-expectation recurrence.** For an active state x at
+time t, define V_{C,t}^pi(x) as expected remaining undiscounted cost and
+Q_{C,t}^pi(x,a) as that expectation conditional also on the current action.
+With V_{C,H}=0 and zero continuation after any logical terminal,
+
+\[
+Q_{C,t}^\pi(x,a)=
+\mathbb E[c_t+(1-d_t)V_{C,t+1}^\pi(X_{t+1})\mid X_t=x,A_t=a],
+\quad
+V_{C,t}^\pi(x)=\mathbb E_{a\sim\pi_t(\cdot|x)}Q_{C,t}^\pi(x,a).
+\tag{FH3}
+\]
+
+Backward induction uniquely determines the finite-horizon values. FH1 yields
+0<=V_{C,t}<=1 and 0<=Q_{C,t}<=1 on active states. There is no need to invoke an
+infinite-horizon gamma<1 contraction for this recurrence.
+
+**Step 3 — discounted-cost mismatch (identity).** If instead gamma_c<1 and
+tau denotes the index of the first contact transition, then
+
+\[
+J_{C,\gamma_c}(\pi)=
+\mathbb E[\gamma_c^\tau\mathbf1_F]\le\Pr_\pi(F).
+\tag{FH4}
+\]
+
+Consequently, a discounted-cost upper constraint with budget delta is not the
+same probability constraint. Delayed failures can receive much smaller weight.
+Keeping a conventional discounted CMDP is legitimate only if labeled as that
+different object; one may not set gamma_c=.99 and silently claim FH2.
+
+**Step 4 — empirical optimization, not theorem.** A cost value estimator and
+cost advantage can be paired with a reward value estimator and reward advantage
+in a FOCOPS-style KL-controlled policy update. Finite samples, function
+approximation, GAE, empirical KL masks and multiplier estimates replace exact
+objects. This package does not prove that those updates enforce FH2. The
+original discounted FOCOPS bounds cannot be carried over by substituting
+gamma=1 into expressions containing 1/(1-gamma).
+
+### Remarks and Interpretation
+
+The derivation survives without a complete-map observation for FH1; the
+feedforward partial-LiDAR value network nevertheless need not realize FH3.
+Adding remaining time avoids one source of aliasing but does not remove all
+partial observability. Keeping first-contact logical termination while
+preserving physical repair is a task-wrapper choice, not a change to mechanics.
+
+### Boundaries and Non-Claims
+
+No novelty claim for FH1/FH3; no guarantee of deep policy convergence, finite-
+sample safety, universal safe initialization or safe physical exploration.
+Low contact probability alone does not ensure goal completion: a stationary
+policy can time out. Delta is a task requirement, not a theorem-derived constant.
+An in-range neural estimate is necessary for probability semantics, not proof
+of calibration. Clipping an invalid estimate would not resolve that gap.
+
+### Open Risks
+
+Cost estimation with censored incomplete episodes; finite-horizon occupancy
+weighting; advantage/dual scaling; sparse first-contact supervision; partial
+observability; initially unsafe stochastic policies; and the distinction
+between neural-only evaluation and shield-assisted execution. Resolve these
+in the implementation contract and diagnostics, not by claiming new guarantees.

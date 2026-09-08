@@ -26,6 +26,7 @@ from envs.UAVEnergyDeliverySAC import (
 )
 from review_bundle.envs.navigation.state import NavigationState
 from review_bundle.envs.navigation.telemetry_cost import TelemetryCostConfig, TelemetryCostModel
+from review_bundle.safety.energy.mc_regression import GoalEnergyPrediction
 from review_bundle.safety.switching import (
     DistanceEnergyReturnManager,
     FixedSOCThresholdReturnManager,
@@ -106,6 +107,27 @@ class ConstantActionPolicy:
     def predict(self, observation: np.ndarray, deterministic: bool = True):
         del observation, deterministic
         return self.action.copy(), None
+
+
+class FixedOracleShadow:
+    class Prediction:
+        def __init__(self, value: float) -> None:
+            self.prediction = float(value)
+            self.upper95 = float(value)
+
+    def __init__(self, *, return_now: float, task_then_return: float) -> None:
+        self.return_now = float(return_now)
+        self.task_then_return = float(task_then_return)
+        self.calls = 0
+
+    def estimate_mission_bundle(self, environment, task_goal):
+        del environment, task_goal
+        self.calls += 1
+        task = self.Prediction(0.5 * self.task_then_return)
+        return_after = self.Prediction(0.5 * self.task_then_return)
+        return_now = self.Prediction(self.return_now)
+        mission = self.Prediction(self.task_then_return)
+        return task, return_after, return_now, mission
 
 
 def zero_policy(observation: np.ndarray) -> np.ndarray:
@@ -423,6 +445,138 @@ def test_phase1_task_limit_is_truncation_not_terminal() -> None:
     assert info["end_reason"] == "task_step_limit"
 
 
+def test_battery_validation_rolls_over_failed_tasks_until_true_depletion() -> None:
+    environment = UAVEnergyDeliverySACEnv(
+        max_steps_per_task=1,
+        phase2_episode_limit=2,
+    )
+    environment.configure_calibrated_battery(0.20, reserve_fraction=0.0)
+    environment.enable_battery_validation()
+    observation, _ = environment.reset(seed=2026)
+    initial_energy = float(environment.agent.energy)
+    rollover_events = 0
+    guard_exceeded = False
+    for _ in range(100):
+        previous_energy = float(environment.agent.energy)
+        observation, _, terminated, truncated, info = environment.step(
+            np.zeros(3, dtype=np.float32)
+        )
+        assert observation.shape == environment.observation_space.shape
+        assert float(environment.agent.energy) <= previous_energy
+        if terminated:
+            assert truncated is False
+            assert info["end_reason"] == "energy_exhausted"
+            assert info["battery_validation_task_rollover_count"] == rollover_events
+            assert info["battery_validation_episode_guard_exceeded"] is True
+            break
+        assert truncated is False
+        assert info["end_reason"] is None
+        assert info["continuous_battery_validation"] is True
+        if info["battery_validation_task_rollover"]:
+            rollover_events += 1
+            assert info["task_stuck"] is True
+            assert environment.steps_in_current_task == 0
+            assert float(environment.agent.energy) < initial_energy
+        guard_exceeded = bool(
+            guard_exceeded
+            or info["battery_validation_episode_guard_exceeded"]
+        )
+    else:
+        pytest.fail("continuous endurance validation did not reach depletion")
+    assert rollover_events > 0
+    assert guard_exceeded is True
+
+
+def test_stage_b_continuous_task_timeout_preserves_physical_sortie() -> None:
+    environment = UAVEnergyDeliverySACEnv(
+        max_steps_per_task=1,
+        phase2_episode_limit=100,
+        operational_energy_capacity=10.0,
+    )
+    environment.bind_navigation_policy(zero_policy)
+    environment.bind_return_manager(FixedSOCThresholdReturnManager(0.0))
+    environment.enable_phase_two()
+    environment.enable_continuous_task_workload()
+    start = np.array([1000.0, 1000.0, 100.0], dtype=np.float32)
+    old_task = start + np.array([500.0, 0.0, 0.0], dtype=np.float32)
+    environment.reset(
+        seed=2030,
+        options={"start_position": start, "task_point": old_task},
+    )
+    initial_energy = float(environment.agent.energy)
+    initial_cycle_id = int(environment.battery_cycle_id)
+
+    _, _, terminated, truncated, info = environment.step(
+        np.zeros(3, dtype=np.float32)
+    )
+
+    assert not terminated and not truncated
+    assert info["end_reason"] is None
+    assert info["continuous_task_workload"] is True
+    assert info["continuous_task_workload_rollover"] is True
+    assert info["continuous_task_workload_rollover_count"] == 1
+    assert info["episode_policy_steps"] == 1
+    assert environment.steps_in_current_task == 0
+    assert environment.battery_cycle_id == initial_cycle_id
+    assert float(environment.agent.energy) < initial_energy
+    np.testing.assert_allclose(environment.agent.pos, start)
+    np.testing.assert_allclose(environment.agent.vel, 0.0)
+    assert not np.allclose(environment.current_task_point, old_task)
+
+
+def test_battery_validation_rollover_accepts_safe_reference_inside_goal_clearance() -> None:
+    environment = UAVEnergyDeliverySACEnv(
+        length=400.0,
+        width=400.0,
+        height=100.0,
+        minimum_task_distance=30.0,
+        xy_sampling_margin=20.0,
+        task_z_min=10.0,
+        task_z_max=90.0,
+        max_steps_per_task=1,
+        phase2_episode_limit=2,
+        num_obstacles=0,
+    )
+    environment.configure_calibrated_battery(10.0, reserve_fraction=0.0)
+    environment.enable_battery_validation()
+    start = np.array([200.0, 200.0, 50.0], dtype=np.float32)
+    environment.reset(
+        seed=2027,
+        options={
+            "start_position": start,
+            "task_point": np.array([300.0, 300.0, 50.0], dtype=np.float32),
+        },
+    )
+    obstacle = StaticCylinderObstacle(
+        pos=np.array([220.0, 200.0], dtype=np.float32),
+        radius=15.0,
+    )
+    environment.obstacles = [obstacle]
+    assert np.linalg.norm(start[:2] - obstacle.pos) > (
+        obstacle.radius + environment.safe_radius
+    )
+    assert environment._position_clear_of_obstacles(
+        start,
+        environment.goal_tolerance,
+    ) is False
+
+    _, _, terminated, truncated, info = environment.step(
+        np.zeros(3, dtype=np.float32)
+    )
+
+    assert not terminated and not truncated
+    assert info["battery_validation_task_rollover"] is True
+    np.testing.assert_allclose(environment.agent.pos, start)
+    assert environment._position_clear_of_obstacles(
+        environment.current_task_point,
+        environment.goal_tolerance,
+    ) is True
+    assert np.linalg.norm(environment.current_task_point - start) >= (
+        environment.minimum_task_distance
+    )
+    environment.close()
+
+
 def test_boundary_contact_is_nonterminal() -> None:
     environment = UAVEnergyDeliverySACEnv()
     start = np.array([0.5, 1000.0, 100.0], dtype=np.float32)
@@ -667,11 +821,26 @@ def test_phase2_emergency_limit_is_only_truncation() -> None:
         operational_energy_capacity=100.0,
         phase2_episode_limit=1,
     )
-    environment.enable_battery_validation()
+    environment.bind_navigation_policy(zero_policy)
+    environment.bind_return_manager(FixedSOCThresholdReturnManager(0.0))
+    environment.enable_phase_two()
     environment.reset(seed=11)
     _, _, terminated, truncated, info = environment.step(np.zeros(3, dtype=np.float32))
     assert not terminated and truncated
     assert info["end_reason"] == "episode_emergency_step_guard"
+
+
+def test_battery_validation_records_but_ignores_phase2_emergency_limit() -> None:
+    environment = UAVEnergyDeliverySACEnv(
+        operational_energy_capacity=100.0,
+        phase2_episode_limit=1,
+    )
+    environment.enable_battery_validation()
+    environment.reset(seed=11)
+    _, _, terminated, truncated, info = environment.step(np.zeros(3, dtype=np.float32))
+    assert not terminated and not truncated
+    assert info["battery_validation_episode_guard_exceeded"] is True
+    assert info["end_reason"] is None
 
 
 def test_quantile_td_contract_order_gamma_and_terminal_target() -> None:
@@ -794,6 +963,197 @@ def test_quantile_return_manager_reproduces_legacy_two_boundary_rule() -> None:
     )
     assert immediate_decision.commit is True
     assert immediate_decision.reason == "immediate_return_energy_boundary"
+
+
+def test_quantile_return_manager_commits_on_deadline_infeasibility() -> None:
+    manager = QuantileEnergyReturnManager()
+    common = dict(
+        mode=SortieMode.TASK,
+        remaining_energy=10.0,
+        battery_capacity=10.0,
+        reserve=1.0,
+        distance_to_charger=100.0,
+        distance_to_task=100.0,
+        task_to_charger_distance=100.0,
+        return_now_requirement=2.0,
+        task_then_return_requirement=4.0,
+    )
+    mission_infeasible = manager.decide(
+        ReturnDecisionContext(
+            **common,
+            return_now_deadline_feasible=True,
+            task_then_return_deadline_feasible=False,
+        )
+    )
+    assert mission_infeasible.commit is True
+    assert mission_infeasible.reason == "task_then_return_deadline_infeasible"
+    assert mission_infeasible.immediate_margin == pytest.approx(7.0)
+    assert mission_infeasible.mission_margin == float("-inf")
+
+    return_infeasible = manager.decide(
+        ReturnDecisionContext(
+            **common,
+            return_now_deadline_feasible=False,
+            task_then_return_deadline_feasible=False,
+        )
+    )
+    assert return_infeasible.commit is True
+    assert return_infeasible.reason == "return_now_deadline_infeasible"
+    assert return_infeasible.immediate_margin == float("-inf")
+    assert return_infeasible.mission_margin == float("-inf")
+
+
+def test_quantile_return_manager_preserves_viability_restoring_task_route() -> None:
+    manager = QuantileEnergyReturnManager()
+    common = dict(
+        mode=SortieMode.TASK,
+        remaining_energy=100.0,
+        battery_capacity=100.0,
+        reserve=5.0,
+        distance_to_charger=100.0,
+        distance_to_task=100.0,
+        task_to_charger_distance=100.0,
+        return_now_requirement=70.0,
+        task_then_return_requirement=40.0,
+        task_then_return_deadline_feasible=True,
+    )
+    deadline_inversion = manager.decide(
+        ReturnDecisionContext(
+            **common,
+            return_now_deadline_feasible=False,
+        )
+    )
+    assert deadline_inversion.commit is False
+    assert deadline_inversion.reason == (
+        "task_completion_restores_return_viability"
+    )
+    assert deadline_inversion.immediate_margin == float("-inf")
+    assert deadline_inversion.mission_margin == pytest.approx(55.0)
+
+    energy_inversion = manager.decide(
+        ReturnDecisionContext(
+            **{
+                **common,
+                "remaining_energy": 60.0,
+                "return_now_requirement": 70.0,
+                "task_then_return_requirement": 40.0,
+            },
+            return_now_deadline_feasible=True,
+        )
+    )
+    assert energy_inversion.commit is False
+    assert energy_inversion.reason == (
+        "task_completion_restores_return_energy_viability"
+    )
+    assert energy_inversion.immediate_margin == pytest.approx(-15.0)
+    assert energy_inversion.mission_margin == pytest.approx(15.0)
+
+
+def test_environment_does_not_commit_when_task_route_restores_viability() -> None:
+    class ViabilityInversionEstimator:
+        estimator_type = "viability_inversion_test"
+        returns_deterministic_exact = True
+
+        def estimate_mission_bundle(self, environment, task_goal):
+            del environment, task_goal
+            task = GoalEnergyPrediction(10.0, 10.0)
+            return_after = GoalEnergyPrediction(10.0, 10.0)
+            return_now = GoalEnergyPrediction(
+                30.0,
+                30.0,
+                deadline_feasible=False,
+                completion_status="deadline_infeasible",
+            )
+            mission = GoalEnergyPrediction(20.0, 20.0)
+            return task, return_after, return_now, mission
+
+    environment = UAVEnergyDeliverySACEnv(
+        operational_energy_capacity=100.0,
+        energy_reserve_fraction=0.05,
+    )
+    environment.bind_energy_learning(
+        energy_estimator=ViabilityInversionEstimator(),
+        goal_action_provider=zero_policy,
+        training_enabled=False,
+        return_manager=QuantileEnergyReturnManager(),
+    )
+    environment.reset(seed=1403)
+    assert environment._refresh_mission_decision() is False
+    assert environment.mode is SortieMode.TASK
+    record = environment.return_decision_records[-1]
+    assert record["estimated_return_now_deadline_feasible"] is False
+    assert record["estimated_task_then_return_deadline_feasible"] is True
+    assert record["estimated_effective_requirement"] == pytest.approx(20.0)
+    assert record["estimated_effective_requirement_is_infinite"] is False
+    assert record["estimated_effective_requirement_semantics"] == (
+        "task_then_return_stopping_boundary"
+    )
+    assert record["method_commit"] is False
+    assert record["method_decision_reason"] == (
+        "task_completion_restores_return_viability"
+    )
+    environment.close()
+
+
+def test_environment_propagates_oracle_deadline_infeasibility_without_nonfinite_json_fields() -> None:
+    class DeadlineBundleEstimator:
+        estimator_type = "deadline_bundle_test"
+        returns_deterministic_exact = True
+
+        def estimate_mission_bundle(self, environment, task_goal):
+            del environment, task_goal
+            task = GoalEnergyPrediction(
+                3.0,
+                3.0,
+                deadline_feasible=False,
+                completion_status="deadline_infeasible",
+            )
+            return_after = GoalEnergyPrediction(
+                0.0,
+                0.0,
+                deadline_feasible=False,
+                completion_status="not_evaluated_task_deadline_infeasible",
+            )
+            return_now = GoalEnergyPrediction(2.0, 2.0)
+            mission = GoalEnergyPrediction(
+                3.0,
+                3.0,
+                deadline_feasible=False,
+                completion_status="mission_deadline_infeasible",
+            )
+            return task, return_after, return_now, mission
+
+    environment = UAVEnergyDeliverySACEnv(
+        operational_energy_capacity=10.0,
+        energy_reserve_fraction=0.1,
+    )
+    environment.bind_energy_learning(
+        energy_estimator=DeadlineBundleEstimator(),
+        goal_action_provider=zero_policy,
+        training_enabled=False,
+        return_manager=QuantileEnergyReturnManager(),
+    )
+    environment.reset(seed=1402)
+    estimate = environment.mission_energy_estimate()
+    assert estimate.return_now_deadline_feasible is True
+    assert estimate.mission_deadline_feasible is False
+    assert estimate.mission_upper_bound_semantics == (
+        "deterministic_oracle_deadline_completion_requirement"
+    )
+    assert environment._refresh_mission_decision() is True
+    record = environment.return_decision_records[-1]
+    assert record["method_decision_reason"] == (
+        "task_then_return_deadline_infeasible"
+    )
+    assert record["estimated_effective_requirement"] is None
+    assert record["estimated_effective_requirement_is_infinite"] is True
+    assert record["method_score_margin"] is None
+    event = environment.switching_events[-1]
+    assert event["mission_deadline_feasible"] is False
+    assert event["mission_completion_status"] == "mission_deadline_infeasible"
+    assert event["mission_margin"] is None
+    assert event["threshold_crossing_overshoot"] is None
+    environment.close()
 
 
 def test_quantile_return_manager_preserves_seeded_legacy_switch_step() -> None:
@@ -938,6 +1298,102 @@ def test_soc_return_manager_runs_phase2_without_energy_estimator() -> None:
     assert event["observed_decision_interval_energy_requirement_drift"] is None
     assert event["mission_energy_upper_bound"] is None
     assert event["reason"] == "soc_threshold_reached"
+    environment.close()
+
+
+def test_keyed_task_schedule_is_method_invariant() -> None:
+    environments = [
+        UAVEnergyDeliverySACEnv(
+            length=400.0,
+            width=400.0,
+            height=80.0,
+            minimum_task_distance=30.0,
+            xy_sampling_margin=20.0,
+            task_z_min=10.0,
+            task_z_max=70.0,
+            operational_energy_capacity=10.0,
+        )
+        for _ in range(2)
+    ]
+    for environment in environments:
+        environment.bind_keyed_task_schedule(12345)
+        environment.bind_navigation_policy(zero_policy)
+        environment.bind_return_manager(FixedSOCThresholdReturnManager(0.2))
+        environment.enable_phase_two()
+    environments[0].reset(seed=1)
+    environments[1].reset(seed=999)
+    first_tasks = [environment.current_task_point.copy() for environment in environments]
+    assert np.array_equal(first_tasks[0], first_tasks[1])
+
+    second_tasks = []
+    for environment, first_task in zip(environments, first_tasks):
+        environment.tasks_in_current_battery_cycle = 1
+        second_tasks.append(environment._sample_task_point(first_task))
+    assert np.array_equal(second_tasks[0], second_tasks[1])
+    assert not np.array_equal(first_tasks[0], second_tasks[0])
+    for environment in environments:
+        environment.close()
+
+
+def test_oracle_shadow_records_only_the_first_decision_disagreement() -> None:
+    environment = UAVEnergyDeliverySACEnv(
+        operational_energy_capacity=10.0,
+        energy_reserve_fraction=0.0,
+    )
+    environment.bind_navigation_policy(zero_policy)
+    environment.bind_return_manager(FixedSOCThresholdReturnManager(0.4))
+    environment.bind_oracle_shadow(
+        FixedOracleShadow(return_now=1.0, task_then_return=6.0)
+    )
+    environment.bind_keyed_task_schedule(77)
+    environment.enable_phase_two()
+    environment.reset(seed=25)
+    environment.agent.energy = 5.0
+
+    assert environment._refresh_mission_decision() is False
+    assert environment._refresh_mission_decision() is False
+    first, second = environment.return_decision_records
+    assert first["method_commit"] is False
+    assert first["oracle_commit"] is True
+    assert first["first_disagreement"] is True
+    assert first["first_disagreement_direction"] == (
+        "method_late_continue_oracle_commit"
+    )
+    assert first["exact_effective_requirement"] == pytest.approx(6.0)
+    assert first["task_schedule_seed"] == 77
+    assert second["decisions_disagree"] is True
+    assert second["first_disagreement"] is False
+    environment.close()
+
+
+def test_oracle_shadow_can_stop_after_the_audited_first_disagreement() -> None:
+    environment = UAVEnergyDeliverySACEnv(
+        operational_energy_capacity=10.0,
+        energy_reserve_fraction=0.0,
+    )
+    environment.bind_navigation_policy(zero_policy)
+    environment.bind_return_manager(FixedSOCThresholdReturnManager(0.4))
+    shadow = FixedOracleShadow(return_now=1.0, task_then_return=6.0)
+    environment.bind_oracle_shadow(
+        shadow,
+        stop_after_first_disagreement=True,
+    )
+    environment.bind_keyed_task_schedule(77)
+    environment.enable_phase_two()
+    environment.reset(seed=25)
+    environment.agent.energy = 5.0
+
+    assert environment._refresh_mission_decision() is False
+    assert environment._refresh_mission_decision() is False
+    first, second = environment.return_decision_records
+    assert first["first_disagreement"] is True
+    assert first["oracle_shadow_active"] is True
+    assert second["oracle_shadow_active"] is False
+    assert second["exact_effective_requirement"] is None
+    assert second["exact_effective_requirement_is_infinite"] is None
+    assert second["exact_return_now_deadline_feasible"] is None
+    assert second["exact_task_then_return_deadline_feasible"] is None
+    assert shadow.calls == 1
     environment.close()
 
 
@@ -1785,6 +2241,8 @@ def test_battery_validation_runs_to_depletion_and_writes_report(tmp_path: Path) 
     )
     assert summary["battery_validation_runs"] == 2
     assert summary["all_runs_depleted"] is True
+    assert summary["continuous_workload_until_depletion"] is True
+    assert summary["censored_run_count"] == 0
     assert summary["battery_validation_env_transitions"] > 0
     assert (output / "battery_validation.json").exists()
     assert (output / "battery_validation_depletion_time.png").exists()
@@ -1796,18 +2254,24 @@ def test_parallel_battery_validation_uses_batched_workers_and_progress(tmp_path:
     args.target_nominal_endurance_minutes = 0.01
     args.evaluation_num_envs = 2
     args.evaluation_progress_interval_tasks = 1
+    args.phase1_episode_max_steps = 1
+    args.phase2_episode_max_steps = 2
     output = tmp_path / "validation_parallel"
     output.mkdir()
     summary = run_battery_validation(
         HeuristicGoalPolicy(),
         args,
-        battery_capacity=0.06,
+        battery_capacity=0.20,
         output=output,
     )
     assert summary["execution"]["parallel"] is True
     assert summary["execution"]["num_workers"] == 2
     assert summary["battery_validation_runs"] == 2
     assert summary["all_runs_depleted"] is True
+    assert summary["continuous_workload_until_depletion"] is True
+    assert summary["censored_run_count"] == 0
+    assert summary["task_step_limit_rollovers"] > 0
+    assert summary["runs_exceeding_episode_guard"] == 2
     assert (output / "battery_validation_progress.jsonl").exists()
 
 

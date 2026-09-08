@@ -24,7 +24,7 @@ from PIL import Image
 from stable_baselines3 import SAC
 from stable_baselines3.common.callbacks import BaseCallback
 from stable_baselines3.common.env_checker import check_env
-from stable_baselines3.common.vec_env import DummyVecEnv
+from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv, VecEnv
 
 from envs.UAVEnergyDeliverySAC import (
     ENERGY_GAMMA,
@@ -237,6 +237,9 @@ def environment_kwargs_from_args(
             getattr(args, "hocbf_uncertainty_margin", 1.0)
         ),
         "hocbf_top_k": getattr(args, "hocbf_top_k", None),
+        "hocbf_sampled_data_robust": bool(
+            getattr(args, "hocbf_sampled_data_robust", False)
+        ),
         "projection_geometry_enabled": bool(
             getattr(args, "projection_geometry_enabled", False)
         ),
@@ -990,19 +993,66 @@ def navigation_safety_gate_passed(summary: dict[str, object]) -> bool:
     )
 
 
-def make_navigation_vec_env(args: argparse.Namespace) -> DummyVecEnv:
+def _configure_navigation_worker_threads() -> None:
+    for variable in (
+        "OMP_NUM_THREADS",
+        "MKL_NUM_THREADS",
+        "OPENBLAS_NUM_THREADS",
+        "NUMEXPR_NUM_THREADS",
+        "BLIS_NUM_THREADS",
+        "VECLIB_MAXIMUM_THREADS",
+    ):
+        os.environ[variable] = "1"
+    torch.set_num_threads(1)
+    try:
+        torch.set_num_interop_threads(1)
+    except RuntimeError:
+        pass
+
+
+def make_navigation_vec_env(args: argparse.Namespace) -> VecEnv:
     factories = []
     for env_index in range(args.num_envs):
         environment_seed = args.seed + env_index
 
         def factory(seed: int = environment_seed):
+            _configure_navigation_worker_threads()
             environment = environment_from_args(args, phase=SACTrainingPhase.NAVIGATION)
             environment.reset(seed=seed)
             environment.action_space.seed(seed)
             return environment
 
         factories.append(factory)
-    vector_environment = DummyVecEnv(factories)
+    implementation = str(getattr(args, "training_vec_env", "subproc"))
+    if implementation == "dummy":
+        vector_environment: VecEnv = DummyVecEnv(factories)
+    elif implementation == "subproc":
+        thread_variables = (
+            "OMP_NUM_THREADS",
+            "MKL_NUM_THREADS",
+            "OPENBLAS_NUM_THREADS",
+            "NUMEXPR_NUM_THREADS",
+            "BLIS_NUM_THREADS",
+            "VECLIB_MAXIMUM_THREADS",
+        )
+        previous = {name: os.environ.get(name) for name in thread_variables}
+        try:
+            for name in thread_variables:
+                os.environ[name] = "1"
+            vector_environment = SubprocVecEnv(
+                factories,
+                start_method=str(
+                    getattr(args, "training_vec_start_method", "forkserver")
+                ),
+            )
+        finally:
+            for name, value in previous.items():
+                if value is None:
+                    os.environ.pop(name, None)
+                else:
+                    os.environ[name] = value
+    else:
+        raise ValueError(f"unsupported training vector environment: {implementation}")
     vector_environment.seed(args.seed)
     return vector_environment
 
@@ -1239,6 +1289,13 @@ class NavigationBudgetCallback(BaseCallback):
             "final_evaluation": self.final_evaluation,
             "phase_end_eval_only": self.phase_end_eval_only,
             "periodic_navigation_evaluation_enabled": not self.phase_end_eval_only,
+            "training_vec_env": str(
+                getattr(self.args, "training_vec_env", "subproc")
+            ),
+            "training_vec_start_method": str(
+                getattr(self.args, "training_vec_start_method", "forkserver")
+            ),
+            "worker_threads_per_environment": 1,
         }
 
 
@@ -1910,6 +1967,18 @@ def run_battery_validation(
                         "actual_policy_steps_to_depletion": int(environment.current_step),
                         "tasks_before_depletion": int(environment.tasks_completed),
                         "distance_before_depletion": distance_flown,
+                        "task_step_limit_rollovers_before_depletion": int(
+                            info.get("battery_validation_task_rollover_count", 0)
+                        ),
+                        "episode_guard_exceeded_before_depletion": bool(
+                            info.get(
+                                "battery_validation_episode_guard_exceeded",
+                                False,
+                            )
+                        ),
+                        "continuous_workload_until_depletion": bool(
+                            info.get("continuous_battery_validation", False)
+                        ),
                         "energy_exhausted": bool(terminated and info["end_reason"] == "energy_exhausted"),
                         "truncated": bool(truncated),
                         "end_reason": info["end_reason"],
@@ -1923,8 +1992,16 @@ def run_battery_validation(
     relative_error = (observed_mean - expected_seconds) / expected_seconds
     all_depleted = all(row["energy_exhausted"] for row in records)
     calibration_valid = bool(all_depleted and abs(relative_error) <= 0.20)
+    total_task_step_limit_rollovers = int(
+        sum(
+            int(row["task_step_limit_rollovers_before_depletion"])
+            for row in records
+        )
+    )
     summary = {
+        "schema": "continuous_workload_battery_validation_v2",
         "stage": "battery_endurance_validation",
+        "endurance_estimand": "time_to_true_energy_exhaustion_under_continuous_task_workload",
         "engineering_calibration_tolerance_fraction": 0.20,
         "target_nominal_endurance_minutes": args.target_nominal_endurance_minutes,
         "target_nominal_endurance_seconds": expected_seconds,
@@ -1947,6 +2024,20 @@ def run_battery_validation(
             np.mean([row["distance_before_depletion"] for row in records])
         ),
         "relative_endurance_error": relative_error,
+        "censored_run_count": int(sum(not row["energy_exhausted"] for row in records)),
+        "task_step_limit_rollovers": total_task_step_limit_rollovers,
+        "runs_with_task_step_limit_rollover": int(
+            sum(
+                int(row["task_step_limit_rollovers_before_depletion"]) > 0
+                for row in records
+            )
+        ),
+        "runs_exceeding_episode_guard": int(
+            sum(row["episode_guard_exceeded_before_depletion"] for row in records)
+        ),
+        "continuous_workload_until_depletion": all(
+            row["continuous_workload_until_depletion"] for row in records
+        ),
         "all_runs_depleted": all_depleted,
         "battery_calibration_valid": calibration_valid,
         "execution": {
@@ -2065,6 +2156,21 @@ def run_parallel_battery_validation(
                             "actual_policy_steps_to_depletion": int(result.current_step),
                             "tasks_before_depletion": int(result.tasks_completed),
                             "distance_before_depletion": float(state["distance_flown"]),
+                            "task_step_limit_rollovers_before_depletion": int(
+                                info.get(
+                                    "battery_validation_task_rollover_count",
+                                    0,
+                                )
+                            ),
+                            "episode_guard_exceeded_before_depletion": bool(
+                                info.get(
+                                    "battery_validation_episode_guard_exceeded",
+                                    False,
+                                )
+                            ),
+                            "continuous_workload_until_depletion": bool(
+                                info.get("continuous_battery_validation", False)
+                            ),
                             "energy_exhausted": bool(
                                 result.terminated
                                 and info["end_reason"] == "energy_exhausted"
@@ -2104,8 +2210,16 @@ def run_parallel_battery_validation(
     relative_error = (observed_mean - expected_seconds) / expected_seconds
     all_depleted = all(row["energy_exhausted"] for row in records)
     calibration_valid = bool(all_depleted and abs(relative_error) <= 0.20)
+    total_task_step_limit_rollovers = int(
+        sum(
+            int(row["task_step_limit_rollovers_before_depletion"])
+            for row in records
+        )
+    )
     summary = {
+        "schema": "continuous_workload_battery_validation_v2",
         "stage": "battery_endurance_validation",
+        "endurance_estimand": "time_to_true_energy_exhaustion_under_continuous_task_workload",
         "engineering_calibration_tolerance_fraction": 0.20,
         "target_nominal_endurance_minutes": args.target_nominal_endurance_minutes,
         "target_nominal_endurance_seconds": expected_seconds,
@@ -2130,6 +2244,20 @@ def run_parallel_battery_validation(
             np.mean([row["distance_before_depletion"] for row in records])
         ),
         "relative_endurance_error": relative_error,
+        "censored_run_count": int(sum(not row["energy_exhausted"] for row in records)),
+        "task_step_limit_rollovers": total_task_step_limit_rollovers,
+        "runs_with_task_step_limit_rollover": int(
+            sum(
+                int(row["task_step_limit_rollovers_before_depletion"]) > 0
+                for row in records
+            )
+        ),
+        "runs_exceeding_episode_guard": int(
+            sum(row["episode_guard_exceeded_before_depletion"] for row in records)
+        ),
+        "continuous_workload_until_depletion": all(
+            row["continuous_workload_until_depletion"] for row in records
+        ),
         "all_runs_depleted": all_depleted,
         "battery_calibration_valid": calibration_valid,
         "execution": {
@@ -3203,6 +3331,17 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--device", default="cuda")
     parser.add_argument("--num-envs", type=int, default=8)
+    parser.add_argument(
+        "--training-vec-env",
+        choices=("subproc", "dummy"),
+        default="subproc",
+        help="subproc runs each training environment in a separate CPU process",
+    )
+    parser.add_argument(
+        "--training-vec-start-method",
+        choices=("forkserver", "spawn", "fork"),
+        default="forkserver",
+    )
     parser.add_argument(
         "--evaluation-num-envs",
         type=int,

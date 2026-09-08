@@ -5,6 +5,8 @@ import unittest
 import numpy as np
 import torch
 
+import review_bundle.safety.collision.hocbf as hocbf_module
+
 from envs.UAVEnergyDeliverySAC import UAVEnergyDeliverySACEnv
 from experiments.uav_safety_filter.benchmark import (
     make_scenarios,
@@ -25,6 +27,8 @@ from review_bundle.safety.collision.filter import (
     SafetyFilterConfig,
     SafetyFilterMethod,
     UAVSafetyActionFilter,
+    _top_k_batch_indices,
+    _vectorized_hocbf_batch,
 )
 from review_bundle.safety.collision.feasibility import (
     cylindrical_input_support,
@@ -45,6 +49,7 @@ from review_bundle.safety.collision.hocbf import (
     hocbf_sampled_data_residual_bound,
     one_step_supporting_constraint,
     project_polyhedral_qp,
+    project_polyhedral_qp_constraint_generation,
     project_single_halfspace,
     select_top_k_constraints,
     sphere_hocbf_constraint,
@@ -260,6 +265,193 @@ class HOCBFDerivationTests(unittest.TestCase):
 
 
 class ProjectionTests(unittest.TestCase):
+    def test_vectorized_hocbf_batch_matches_scalar_constraints_and_top_k(self) -> None:
+        rng = np.random.default_rng(20260831)
+        position = rng.normal(size=3)
+        velocity = rng.normal(size=3)
+        nominal = rng.normal(size=3)
+        config = HOCBFConfig(k1=1.3, k2=0.8, uav_radius=0.5, uncertainty_margin=0.2)
+        obstacles = [
+            SphericalObstacle(
+                center=rng.normal(size=3),
+                radius=float(rng.uniform(0.1, 2.0)),
+                velocity=rng.normal(size=3),
+                acceleration=rng.normal(size=3),
+                identifier=f"obstacle_{index}",
+            )
+            for index in range(257)
+        ]
+        scalar = [
+            sphere_hocbf_constraint(position, velocity, obstacle, config)
+            for obstacle in obstacles
+        ]
+        batch = _vectorized_hocbf_batch(position, velocity, obstacles, config)
+        np.testing.assert_allclose(batch.rows, np.stack([item.row for item in scalar]))
+        np.testing.assert_allclose(
+            batch.lower_bounds,
+            [item.lower_bound for item in scalar],
+        )
+        np.testing.assert_allclose(batch.h, [item.h for item in scalar])
+        np.testing.assert_allclose(batch.h_dot, [item.h_dot for item in scalar])
+        np.testing.assert_allclose(batch.psi1, [item.psi1 for item in scalar])
+        np.testing.assert_allclose(
+            batch.safe_distances,
+            [item.safe_distance for item in scalar],
+        )
+        for priority in (
+            "distance",
+            "closing_speed",
+            "ttc",
+            "barrier_value",
+            "hocbf_slack",
+            "braking_margin",
+        ):
+            selected = select_top_k_constraints(
+                scalar,
+                nominal,
+                top_k=16,
+                priority=priority,
+                braking_acceleration=5.0,
+            )
+            expected = [int(item.identifier.rsplit("_", 1)[1]) for item in selected]
+            actual = _top_k_batch_indices(
+                batch,
+                nominal,
+                16,
+                priority=priority,
+                braking_acceleration=5.0,
+            )
+            self.assertEqual(actual.tolist(), expected)
+
+    def test_vectorized_filter_matches_scalar_reference_path(self) -> None:
+        rng = np.random.default_rng(91)
+        position = np.array([1.0, -2.0, 0.5])
+        velocity = np.array([3.0, -1.0, 0.2])
+        nominal = np.array([2.0, 1.0, -0.5])
+        obstacles = [
+            SphericalObstacle(
+                center=rng.uniform(-20.0, 20.0, size=3),
+                radius=float(rng.uniform(0.1, 1.5)),
+                identifier=f"point_{index}",
+            )
+            for index in range(256)
+        ]
+        config = SafetyFilterConfig(
+            method=SafetyFilterMethod.HOCBF,
+            top_k=16,
+            top_k_priority="hocbf_slack",
+        )
+        vectorized = UAVSafetyActionFilter(config).filter(
+            position,
+            velocity,
+            nominal,
+            obstacles,
+        )
+        reference_filter = UAVSafetyActionFilter(config)
+        reference_filter.config = SafetyFilterConfig(
+            method=SafetyFilterMethod.ENERGY_AWARE_HOCBF,
+            top_k=16,
+            top_k_priority="hocbf_slack",
+            energy_weight=0.0,
+        )
+        scalar = reference_filter.filter(position, velocity, nominal, obstacles)
+        np.testing.assert_allclose(vectorized.acceleration, scalar.acceleration, atol=1e-10)
+        self.assertEqual(
+            vectorized.diagnostics.candidate_constraints,
+            scalar.diagnostics.candidate_constraints,
+        )
+        self.assertAlmostEqual(
+            vectorized.diagnostics.minimum_nominal_slack,
+            scalar.diagnostics.minimum_nominal_slack,
+        )
+        self.assertAlmostEqual(
+            vectorized.diagnostics.minimum_executed_slack,
+            scalar.diagnostics.minimum_executed_slack,
+        )
+
+    def test_lidar_point_fast_path_matches_point_obstacle_objects(self) -> None:
+        rng = np.random.default_rng(117)
+        points = rng.uniform(-15.0, 15.0, size=(211, 3))
+        position = np.array([2.0, -3.0, 1.0])
+        velocity = np.array([1.0, 0.5, -0.2])
+        nominal = np.array([-0.5, 1.2, 0.3])
+        safety_filter = UAVSafetyActionFilter(
+            SafetyFilterConfig(
+                method=SafetyFilterMethod.HOCBF,
+                top_k=16,
+                top_k_priority="hocbf_slack",
+            ),
+            HOCBFConfig(uncertainty_margin=1.0),
+        )
+        objects = [SphericalObstacle(point, 1e-9) for point in points]
+        expected = safety_filter.filter(position, velocity, nominal, objects)
+        actual = safety_filter.filter_lidar_points(
+            position,
+            velocity,
+            nominal,
+            points,
+        )
+        np.testing.assert_allclose(actual.acceleration, expected.acceleration, atol=1e-10)
+        ignored = {
+            "constraint_build_seconds",
+            "solver_seconds",
+            "total_seconds",
+            "deadline_missed",
+        }
+        actual_diagnostics = {
+            key: value
+            for key, value in actual.diagnostics.__dict__.items()
+            if key not in ignored
+        }
+        expected_diagnostics = {
+            key: value
+            for key, value in expected.diagnostics.__dict__.items()
+            if key not in ignored
+        }
+        self.assertEqual(actual_diagnostics, expected_diagnostics)
+
+    def test_sampled_data_lidar_fast_path_matches_point_obstacle_objects(self) -> None:
+        rng = np.random.default_rng(118)
+        points = rng.uniform(-20.0, 20.0, size=(257, 3))
+        position = np.array([1.5, -2.0, 0.75])
+        velocity = np.array([3.0, -1.0, 0.4])
+        nominal = np.array([1.0, -0.7, 0.2])
+        safety_filter = UAVSafetyActionFilter(
+            SafetyFilterConfig(
+                method=SafetyFilterMethod.HOCBF,
+                sampled_data_robust=True,
+                top_k=None,
+                safety_dt=0.05,
+            ),
+            HOCBFConfig(k1=1.2, k2=0.8, uncertainty_margin=1.0),
+        )
+        objects = [SphericalObstacle(point, 1e-9) for point in points]
+        expected = safety_filter.filter(position, velocity, nominal, objects)
+        actual = safety_filter.filter_lidar_points(
+            position,
+            velocity,
+            nominal,
+            points,
+        )
+        np.testing.assert_allclose(actual.acceleration, expected.acceleration, atol=1e-10)
+        ignored = {
+            "constraint_build_seconds",
+            "solver_seconds",
+            "total_seconds",
+            "deadline_missed",
+        }
+        actual_diagnostics = {
+            key: value
+            for key, value in actual.diagnostics.__dict__.items()
+            if key not in ignored
+        }
+        expected_diagnostics = {
+            key: value
+            for key, value in expected.diagnostics.__dict__.items()
+            if key not in ignored
+        }
+        self.assertEqual(actual_diagnostics, expected_diagnostics)
+
     def test_closed_form_projection_is_feasible_and_optimal(self) -> None:
         nominal = np.array([-1.0, 0.4, -0.2])
         row = np.array([2.0, 0.0, 0.0])
@@ -284,6 +476,16 @@ class ProjectionTests(unittest.TestCase):
         self.assertTrue(result.feasible)
         self.assertLessEqual(np.linalg.norm(result.acceleration[:2]), 5.0 + 1e-7)
         self.assertLessEqual(abs(result.acceleration[2]), 3.0 + 1e-7)
+
+    def test_polyhedral_projection_short_circuits_at_feasible_center(self) -> None:
+        rows, bounds = actuator_polygon_constraints(5.0, 3.0, facets=32)
+        center = np.array([0.2, -0.1, 0.3])
+        result = project_polyhedral_qp(center, np.eye(3), rows, bounds)
+        np.testing.assert_array_equal(result.acceleration, center)
+        self.assertTrue(result.feasible)
+        self.assertTrue(result.converged)
+        self.assertEqual(result.iterations, 0)
+        self.assertEqual(result.active_constraints, 0)
 
     def test_velocity_constraints_prevent_post_step_speed_saturation(self) -> None:
         rows, bounds = velocity_polygon_constraints(
@@ -342,6 +544,78 @@ class ProjectionTests(unittest.TestCase):
         )
         self.assertFalse(result.feasible)
         self.assertGreater(result.max_violation, 0.1)
+
+    def test_constraint_generation_matches_full_large_feasible_projection(self) -> None:
+        rng = np.random.default_rng(119)
+        redundant_rows = rng.normal(size=(256, 3))
+        redundant_rows /= np.linalg.norm(redundant_rows, axis=1, keepdims=True)
+        rows = np.vstack(
+            (
+                np.eye(3),
+                redundant_rows,
+            )
+        )
+        bounds = np.concatenate((np.array([0.5, -0.2, 0.1]), np.full(256, -100.0)))
+        center = np.array([-1.0, -1.0, -1.0])
+        reference = project_polyhedral_qp(center, np.eye(3), rows, bounds)
+        generated = project_polyhedral_qp_constraint_generation(
+            center,
+            np.eye(3),
+            rows,
+            bounds,
+        )
+        self.assertTrue(reference.feasible)
+        self.assertTrue(generated.feasible)
+        np.testing.assert_allclose(generated.acceleration, reference.acceleration, atol=1e-9)
+        self.assertLessEqual(np.max(bounds - rows @ generated.acceleration), 1e-7)
+
+    def test_constraint_generation_preserves_full_solver_infeasible_fallback(self) -> None:
+        rng = np.random.default_rng(120)
+        redundant_rows = rng.normal(size=(256, 3))
+        redundant_rows /= np.linalg.norm(redundant_rows, axis=1, keepdims=True)
+        rows = np.vstack(
+            (
+                np.array([[1.0, 0.0, 0.0], [-1.0, 0.0, 0.0]]),
+                redundant_rows,
+            )
+        )
+        bounds = np.concatenate((np.array([2.0, 0.0]), np.full(256, -100.0)))
+        center = np.zeros(3)
+        reference = project_polyhedral_qp(center, np.eye(3), rows, bounds)
+        generated = project_polyhedral_qp_constraint_generation(
+            center,
+            np.eye(3),
+            rows,
+            bounds,
+        )
+        self.assertFalse(reference.feasible)
+        self.assertEqual(generated.feasible, reference.feasible)
+        self.assertEqual(generated.converged, reference.converged)
+        self.assertEqual(generated.reason, reference.reason)
+        np.testing.assert_array_equal(generated.acceleration, reference.acceleration)
+
+    def test_native_large_qp_loop_matches_python_reference(self) -> None:
+        if hocbf_module._NATIVE_QP_FUNCTION is None:
+            self.skipTest("optional native QP library is not built")
+        rng = np.random.default_rng(121)
+        rows = rng.normal(size=(320, 3))
+        rows /= np.linalg.norm(rows, axis=1, keepdims=True)
+        bounds = rng.uniform(-1.0, 0.5, size=320)
+        center = np.array([0.4, -0.6, 0.2])
+        native = project_polyhedral_qp(center, np.eye(3), rows, bounds)
+        saved = hocbf_module._NATIVE_QP_FUNCTION
+        try:
+            hocbf_module._NATIVE_QP_FUNCTION = None
+            reference = project_polyhedral_qp(center, np.eye(3), rows, bounds)
+        finally:
+            hocbf_module._NATIVE_QP_FUNCTION = saved
+        self.assertEqual(native.feasible, reference.feasible)
+        self.assertEqual(native.converged, reference.converged)
+        self.assertEqual(native.iterations, reference.iterations)
+        self.assertEqual(native.active_constraints, reference.active_constraints)
+        self.assertEqual(native.reason, reference.reason)
+        self.assertAlmostEqual(native.max_violation, reference.max_violation, places=10)
+        np.testing.assert_allclose(native.acceleration, reference.acceleration, atol=1e-11)
 
     def test_top_k_uses_hocbf_nominal_slack(self) -> None:
         config = HOCBFConfig(k1=1.0, k2=1.0, uav_radius=0.5)

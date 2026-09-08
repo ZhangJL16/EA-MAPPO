@@ -102,3 +102,12 @@ review_bundle/artifacts/smoke_sb3_ppo/
 review_bundle/artifacts/smoke_sb3_ddpg/
 review_bundle/artifacts/smoke_sb3_energy/
 review_bundle/artifacts/final_smoke_*/
+
+# Local research downloads/installers and reproducible build outputs
+/.litsearch-*/
+/nature-skills-*.zip
+/paper/*/build/
+/literature-search-*/fulltext/
+/independent-review-*/search-data/papers/
+/ccfa-review-reports/*.pdf
+/review_bundle/safety/collision/_qp_native.so

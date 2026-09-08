@@ -10,6 +10,7 @@ from pathlib import Path
 
 import torch
 
+from experiments.energy_mc.gate_b_prerequisites import navigation_artifact_view
 from experiments.jacobian_energy_bridge.sac import JacobianBridgeSAC
 from scripts.evaluate_jseb_checkpoints import reconstruct_environment_args
 from scripts.train_uav_energy_delivery_sac import (
@@ -74,16 +75,43 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     return args
 
 
-def navigation_readiness_failures(evaluation: dict[str, object]) -> list[str]:
+def navigation_readiness_failures(
+    evaluation: dict[str, object],
+    *,
+    require_wrapped_artifact: bool = False,
+) -> list[str]:
     failures: list[str] = []
-    if int(evaluation.get("num_tasks", -1)) != 500:
+    view = navigation_artifact_view(evaluation)
+    metrics = view.metrics
+    if require_wrapped_artifact and not view.wrapped:
+        failures.append(
+            "formal calibration requires a navigation completion wrapper"
+        )
+    if view.wrapped and view.authorization_passed is not True:
+        failures.append("navigation completion wrapper does not authorize calibration")
+    if int(metrics.get("num_tasks", -1)) != 500:
         failures.append("navigation readiness evaluation must contain 500 tasks")
-    if int(evaluation.get("global_env_transitions", -1)) != FORMAL_NAVIGATION_TRANSITIONS:
+    if int(metrics.get("global_env_transitions", -1)) != FORMAL_NAVIGATION_TRANSITIONS:
         failures.append("navigation readiness evaluation must use the 500k checkpoint")
-    if not navigation_energy_gate_passed(evaluation):
-        failures.append("navigation energy/readiness gate failed")
-    if not navigation_safety_gate_passed(evaluation):
-        failures.append("navigation collision/boundary gate failed")
+    if view.fixed_baseline_contract:
+        required_telemetry = {
+            "overall_success_rate",
+            "distance_bucket_success",
+            "mean_path_ratio",
+            "boundary_contact_step_rate",
+            "obstacle_collision_steps",
+            "episodes_with_obstacle_collision",
+        }
+        missing = sorted(required_telemetry.difference(metrics))
+        if missing:
+            failures.append(
+                f"fixed-baseline navigation telemetry is incomplete: {missing}"
+            )
+    else:
+        if not navigation_energy_gate_passed(metrics):
+            failures.append("navigation energy/readiness gate failed")
+        if not navigation_safety_gate_passed(metrics):
+            failures.append("navigation collision/boundary gate failed")
     return failures
 
 
@@ -99,13 +127,28 @@ def main(argv: list[str] | None = None) -> int:
         if not path.exists():
             raise FileNotFoundError(path)
     navigation = json.loads(navigation_path.read_text(encoding="utf-8"))
-    failures = navigation_readiness_failures(navigation)
+    navigation_view = navigation_artifact_view(navigation)
+    checkpoint_digest = file_sha256(checkpoint)
+    navigation_digest = file_sha256(navigation_path)
+    artifact_config_path = artifact / "config.json"
+    if not artifact_config_path.is_file():
+        raise FileNotFoundError(artifact_config_path)
+    artifact_config_digest = file_sha256(artifact_config_path)
+    failures = navigation_readiness_failures(
+        navigation,
+        require_wrapped_artifact=True,
+    )
+    if navigation_view.checkpoint_sha256 != checkpoint_digest:
+        failures.append(
+            "navigation completion wrapper checkpoint SHA does not match "
+            "the calibration checkpoint"
+        )
     if cli.dry_run:
         print(
             json.dumps(
                 {
                     "checkpoint": str(checkpoint),
-                    "checkpoint_sha256": file_sha256(checkpoint),
+                    "checkpoint_sha256": checkpoint_digest,
                     "navigation_failures": failures,
                     "would_run": not failures,
                 },
@@ -122,7 +165,7 @@ def main(argv: list[str] | None = None) -> int:
         "pid": os.getpid(),
         "source_artifact": str(artifact),
         "checkpoint": str(checkpoint),
-        "checkpoint_sha256": file_sha256(checkpoint),
+        "checkpoint_sha256": checkpoint_digest,
         "navigation_evaluation": str(navigation_path),
         "navigation_readiness_failures": failures,
         "git_sha": subprocess.check_output(
@@ -180,7 +223,48 @@ def main(argv: list[str] | None = None) -> int:
             role="battery_calibration_not_navigation_training",
         )
         calibration = run_battery_calibration(policy, args, tasks, output)
-        if not bool(calibration["battery_calibration_navigation_valid"]):
+        task_rows = calibration.get("tasks")
+        taxonomy_fields = {
+            "task_index",
+            "distance_bucket",
+            "success",
+            "end_reason",
+            "total_realized_energy",
+            "simulation_flight_time",
+        }
+        taxonomy_complete = bool(
+            isinstance(task_rows, list)
+            and len(task_rows) == FORMAL_CALIBRATION_TASKS
+            and all(
+                isinstance(row, dict) and taxonomy_fields.issubset(row)
+                for row in task_rows
+            )
+        )
+        calibration.update(
+            {
+                "legacy_battery_calibration_navigation_valid": calibration.get(
+                    "battery_calibration_navigation_valid"
+                ),
+                "fixed_baseline_calibration_evaluable": bool(
+                    navigation_view.fixed_baseline_contract
+                    and taxonomy_complete
+                    and int(calibration.get("num_successful_tasks", 0)) > 0
+                ),
+                "calibration_failure_taxonomy_complete": taxonomy_complete,
+            }
+        )
+        calibration.update(
+            {
+                "navigation_checkpoint_sha256": checkpoint_digest,
+                "navigation_evaluation_sha256": navigation_digest,
+                "navigation_artifact_config_sha256": artifact_config_digest,
+            }
+        )
+        write_json(output / "battery_calibration.json", calibration)
+        if (
+            not navigation_view.fixed_baseline_contract
+            and not bool(calibration["battery_calibration_navigation_valid"])
+        ):
             stopped = {
                 "status": "STOPPED_CALIBRATION_NAVIGATION_INVALID",
                 "calibration_success_rate": calibration["calibration_success_rate"],
@@ -201,6 +285,16 @@ def main(argv: list[str] | None = None) -> int:
             battery_capacity=capacity,
             output=output,
         )
+        calibration_digest = file_sha256(output / "battery_calibration.json")
+        validation.update(
+            {
+                "navigation_checkpoint_sha256": checkpoint_digest,
+                "navigation_evaluation_sha256": navigation_digest,
+                "navigation_artifact_config_sha256": artifact_config_digest,
+                "battery_calibration_sha256": calibration_digest,
+            }
+        )
+        write_json(output / "battery_validation.json", validation)
         if not bool(validation["battery_calibration_valid"]):
             stopped = {
                 "status": "STOPPED_BATTERY_ENDURANCE_INVALID",
@@ -214,13 +308,21 @@ def main(argv: list[str] | None = None) -> int:
         completed = {
             "status": "COMPLETED",
             "checkpoint": str(checkpoint),
-            "checkpoint_sha256": file_sha256(checkpoint),
+            "checkpoint_sha256": checkpoint_digest,
+            "navigation_evaluation": str(navigation_path),
+            "navigation_evaluation_sha256": navigation_digest,
+            "navigation_artifact": str(artifact),
+            "navigation_artifact_config_sha256": artifact_config_digest,
             "calibrated_battery_capacity": capacity,
             "calibration_success_rate": calibration["calibration_success_rate"],
             "mean_depletion_time": validation["mean_depletion_time"],
             "relative_endurance_error": validation["relative_endurance_error"],
             "battery_calibration_json": str(output / "battery_calibration.json"),
             "battery_validation_json": str(output / "battery_validation.json"),
+            "battery_calibration_sha256": calibration_digest,
+            "battery_validation_sha256": file_sha256(
+                output / "battery_validation.json"
+            ),
         }
         write_json(output / "COMPLETED.json", completed)
         (output / "RUNNING.json").unlink(missing_ok=True)

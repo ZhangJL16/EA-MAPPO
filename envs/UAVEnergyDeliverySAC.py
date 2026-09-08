@@ -107,6 +107,14 @@ class MissionEnergyEstimate:
     component_upper95_sum: float
     mission_upper_bound_semantics: str
     mission_nominal_coverage_lower_bound: float | None
+    task_deadline_feasible: bool = True
+    return_after_task_deadline_feasible: bool = True
+    return_now_deadline_feasible: bool = True
+    mission_deadline_feasible: bool = True
+    task_completion_status: str = "goal_reached"
+    return_after_task_completion_status: str = "goal_reached"
+    return_now_completion_status: str = "goal_reached"
+    mission_completion_status: str = "goal_reached"
 
     @property
     def mission_upper95(self) -> float:
@@ -506,6 +514,7 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         hocbf_k2: float = 1.0,
         hocbf_uncertainty_margin: float = 1.0,
         hocbf_top_k: int | None = None,
+        hocbf_sampled_data_robust: bool = False,
         projection_geometry_enabled: bool = False,
         render_mode: str | None = None,
         render_vertical_exaggeration: float = 4.0,
@@ -623,6 +632,18 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         self.phase = SACTrainingPhase(int(phase))
         self.mission_switching_enabled = self.phase is SACTrainingPhase.ENERGY_MANAGED
         self.reset_at_charger = self.phase is SACTrainingPhase.ENERGY_MANAGED
+        # Endurance calibration is a continuous-workload experiment.  A failed
+        # navigation task is an observed workload outcome, not the end of the
+        # battery lifetime.  This flag is enabled only by
+        # ``enable_battery_validation`` so the ordinary Gym episode contract is
+        # unchanged for navigation training and evaluation.
+        self.continuous_battery_validation = False
+        # A task may time out without ending the physical battery sortie.  This
+        # flag is separate from battery validation because Stage-B still needs
+        # mission switching and charger resets while preserving a continuous
+        # workload across failed TASK goals.
+        self.continuous_task_workload = False
+        self.battery_validation_episode_guard_was_exceeded = False
         self.lidar_enabled = bool(lidar_enabled)
         self.lidar_max_range = float(lidar_max_range)
         self.lidar_min_range = float(lidar_min_range)
@@ -641,6 +662,7 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         self.hocbf_k2 = float(hocbf_k2)
         self.hocbf_uncertainty_margin = float(hocbf_uncertainty_margin)
         self.hocbf_top_k = None if hocbf_top_k is None else int(hocbf_top_k)
+        self.hocbf_sampled_data_robust = bool(hocbf_sampled_data_robust)
         self.projection_geometry_enabled = bool(projection_geometry_enabled)
         self._lidar_model = Lidar3DModel(
             Lidar3DConfig(
@@ -661,6 +683,7 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
                     top_k=self.hocbf_top_k,
                     safety_dt=self.physics_dt,
                     deadline_seconds=self.physics_dt,
+                    sampled_data_robust=self.hocbf_sampled_data_robust,
                 ),
                 HOCBFConfig(
                     k1=self.hocbf_k1,
@@ -678,6 +701,9 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         self.energy_estimator: object | None = None
         self.goal_action_provider: GoalActionProvider | None = None
         self.return_manager: ReturnManager = QuantileEnergyReturnManager()
+        self.oracle_shadow_estimator: object | None = None
+        self.oracle_shadow_stop_after_first_disagreement = False
+        self.keyed_task_schedule_seed: int | None = None
         self.energy_learning_enabled = False
         self.action_space = spaces.Box(-1.0, 1.0, shape=(3,), dtype=np.float32)
         observation_low = [-1.0] * 6 + [0.0]
@@ -696,6 +722,7 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         self.obstacles = []
         self.trajectory_log: list[dict[str, object]] = []
         self.switching_events: list[dict[str, object]] = []
+        self.return_decision_records: list[dict[str, object]] = []
         self.battery_cycle_records: list[dict[str, object]] = []
         self.completed_goal_records: list[dict[str, object]] = []
         self.render_overlay: dict[str, object] = {}
@@ -779,6 +806,26 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
             raise TypeError("return_manager must implement decide(context)")
         self.return_manager = return_manager
 
+    def bind_oracle_shadow(
+        self,
+        energy_estimator: object,
+        *,
+        stop_after_first_disagreement: bool = False,
+    ) -> None:
+        if not hasattr(energy_estimator, "estimate_mission_bundle"):
+            raise TypeError(
+                "oracle shadow must implement estimate_mission_bundle(environment, task_goal)"
+            )
+        self.oracle_shadow_estimator = energy_estimator
+        self.oracle_shadow_stop_after_first_disagreement = bool(
+            stop_after_first_disagreement
+        )
+
+    def bind_keyed_task_schedule(self, seed: int) -> None:
+        """Use method-invariant tasks keyed by seed, battery cycle, and task index."""
+
+        self.keyed_task_schedule_seed = int(seed)
+
     def set_phase(self, phase: int | SACTrainingPhase) -> None:
         self.phase = SACTrainingPhase(int(phase))
         self.max_cycles = self.episode_policy_step_limit
@@ -825,6 +872,23 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         self.set_phase(SACTrainingPhase.ENERGY_MANAGED)
         self.mission_switching_enabled = True
         self.reset_at_charger = True
+        self.continuous_battery_validation = False
+        self.continuous_task_workload = False
+
+    def enable_continuous_task_workload(self) -> None:
+        """Roll failed TASK goals forward without resetting physical state.
+
+        This mode is intended for mission-level return-decision evaluation.  It
+        leaves return switching and charger behavior unchanged.  Only a TASK
+        segment that reaches ``max_steps_per_task`` is rolled over; a committed
+        charger return cannot use this escape hatch.
+        """
+
+        if not self.finite_energy_enabled or not self.mission_switching_enabled:
+            raise RuntimeError(
+                "continuous task workload requires active Phase-2 mission switching"
+            )
+        self.continuous_task_workload = True
 
     def enable_battery_validation(self) -> None:
         if self.operational_energy_capacity is None:
@@ -833,6 +897,8 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         self.mission_switching_enabled = False
         self.reset_at_charger = False
         self.energy_learning_enabled = False
+        self.continuous_battery_validation = True
+        self.continuous_task_workload = True
 
     def reset(
         self,
@@ -909,20 +975,24 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         self.agent.prev_pos = start.copy()
         self.agent.last_pos = start.copy()
         self.agent.spawn_pos = start.copy()
+        self.tasks_in_current_battery_cycle = 0
+        self.battery_cycle_id = 0
         self.current_task_point = (
+            # These indices must be reset before keyed task generation.  Without
+            # this ordering, an episode reset after stranding could inherit the
+            # previous method-dependent cycle index.
             self._sample_task_point(start)
             if requested_task_position is None
             else self._validate_task_point(requested_task_position, start)
         )
         self.tasks_completed = 0
-        self.tasks_in_current_battery_cycle = 0
         self.battery_cycles_completed = 0
-        self.battery_cycle_id = 0
         self.current_step = 0
         self.steps_in_current_task = 0
         self.mode = SortieMode.TASK
         self.task_to_charger_count = 0
         self.task_stuck_count = 0
+        self.battery_validation_episode_guard_was_exceeded = False
         self.boundary_collision_count = 0
         self.consecutive_boundary_contacts = 0
         self.maximum_consecutive_boundary_contacts = 0
@@ -941,6 +1011,7 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         self.agent_paths = [[start.copy()]]
         self.trajectory_log = []
         self.switching_events = []
+        self.return_decision_records = []
         self.battery_cycle_records = []
         self.completed_goal_records = []
         self._pending_goal_transitions = []
@@ -949,6 +1020,8 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         self.last_td_loss = None
         self.last_realized_energy = 0.0
         self.last_battery_cycle_record = None
+        self._return_decision_index = 0
+        self._first_return_disagreement: dict[str, object] | None = None
         self.safety_filter_calls = 0
         self.safety_interventions = 0
         self.safety_fallbacks = 0
@@ -988,7 +1061,9 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
             and self.mode is SortieMode.TASK
             and decision_due_at_step_start
         ):
-            switched_at_step_start = self._refresh_mission_decision()
+            switched_at_step_start = self._refresh_mission_decision(
+                information_time="step_start_pre_action",
+            )
             if switched_at_step_start:
                 self._finalize_goal_trajectory(success=False, censored_reason="task_interrupted_by_charger_commitment")
                 self.steps_in_current_task = 0
@@ -1145,21 +1220,55 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
             self.last_battery_cycle_record = self._complete_battery_cycle()
             battery_cycle_end = True
             instantaneous_service_reset = True
-        task_stuck = bool(
+        task_step_limit_reached = bool(
             not task_completed_now
             and self.mode is SortieMode.TASK
             and not energy_exhausted
             and self.steps_in_current_task >= self.max_steps_per_task
         )
-        episode_guard = bool(
+        task_workload_rollover = bool(
+            task_step_limit_reached and self.continuous_task_workload
+        )
+        battery_validation_task_rollover = bool(
+            task_workload_rollover and self.continuous_battery_validation
+        )
+        task_stuck = bool(
+            task_step_limit_reached and not task_workload_rollover
+        )
+        episode_guard_reached = bool(
             not task_completed_now
             and not energy_exhausted
             and self.current_step >= self.episode_policy_step_limit
         )
+        episode_guard = bool(
+            episode_guard_reached and not self.continuous_battery_validation
+        )
+        if self.continuous_battery_validation and episode_guard_reached:
+            self.battery_validation_episode_guard_was_exceeded = True
         if energy_exhausted:
             self._finalize_goal_trajectory(success=False, censored_reason="energy_exhausted")
             self.last_battery_cycle_record = self._failed_battery_cycle_record("energy_exhausted")
             battery_cycle_end = True
+        elif task_workload_rollover:
+            self._finalize_goal_trajectory(
+                success=False,
+                censored_reason=(
+                    "battery_validation_task_step_limit"
+                    if battery_validation_task_rollover
+                    else "continuous_task_workload_task_step_limit"
+                ),
+            )
+            self.task_stuck_count += 1
+            # Match the existing instantaneous task-service transition: do not
+            # teleport or recharge, but begin a new workload from the current
+            # physical position with zero residual velocity.
+            self.agent.vel[:] = 0.0
+            instantaneous_service_reset = True
+            self.current_task_point = self._sample_task_point(self.agent.pos)
+            self.steps_in_current_task = 0
+            self.mode = SortieMode.TASK
+            self.agent.goal = self.current_task_point.copy()
+            self._start_goal_trajectory(self.current_task_point)
         elif task_stuck:
             self._finalize_goal_trajectory(success=False, censored_reason="task_stuck")
             self.task_stuck_count += 1
@@ -1177,10 +1286,19 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
             self.finite_energy_enabled
             and self.mission_switching_enabled
             and self.mission_decision_interval_policy_steps == 1
-            and not any((energy_exhausted, task_stuck, episode_guard, charger_reached_now))
+            and not any(
+                (
+                    energy_exhausted,
+                    task_step_limit_reached,
+                    episode_guard,
+                    charger_reached_now,
+                )
+            )
         ):
             if self.mode is SortieMode.TASK and not task_completed_now:
-                switched_after_motion = self._refresh_mission_decision()
+                switched_after_motion = self._refresh_mission_decision(
+                    information_time="post_motion_pre_next_action",
+                )
                 if switched_after_motion:
                     switched_now = True
                     self._finalize_goal_trajectory(
@@ -1227,7 +1345,7 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
             transition_dt=transition_dt,
             physics_substeps=physics_substeps,
             instantaneous_service_reset=instantaneous_service_reset,
-            task_stuck=task_stuck,
+            task_stuck=task_step_limit_reached,
             end_reason=end_reason,
             reward_components=reward_components,
             completed_goal_evaluation=completed_goal_evaluation,
@@ -1276,9 +1394,28 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
                 "mode_before": mode_before_decision.value,
                 "active_goal_before": segment_goal.copy(),
                 "energy_exhausted": energy_exhausted,
+                "continuous_battery_validation": bool(
+                    self.continuous_battery_validation
+                ),
+                "continuous_task_workload": bool(self.continuous_task_workload),
+                "continuous_task_workload_rollover": bool(
+                    task_workload_rollover
+                ),
+                "continuous_task_workload_rollover_count": int(
+                    self.task_stuck_count
+                ),
+                "battery_validation_task_rollover": bool(
+                    battery_validation_task_rollover
+                ),
+                "battery_validation_task_rollover_count": int(
+                    self.task_stuck_count
+                ),
+                "battery_validation_episode_guard_exceeded": bool(
+                    self.battery_validation_episode_guard_was_exceeded
+                ),
                 "censored_return": bool(energy_exhausted and goal_type == "CHARGER"),
                 "is_success": bool(task_completed_now and single_task_phase),
-                "navigation_failure": bool(task_stuck or episode_guard),
+                "navigation_failure": bool(task_step_limit_reached or episode_guard),
             }
         )
         self.trajectory_log.append(
@@ -1566,7 +1703,11 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
             if bool(
                 getattr(self.energy_estimator, "returns_deterministic_exact", False)
             ):
-                mission_upper_bound_semantics = "deterministic_oracle_joint_mission_cost"
+                mission_upper_bound_semantics = (
+                    "deterministic_oracle_joint_mission_cost"
+                    if mission.deadline_feasible
+                    else "deterministic_oracle_deadline_completion_requirement"
+                )
                 mission_nominal_coverage = 1.0
             else:
                 mission_upper_bound_semantics = "direct_joint_mission_upper_bound"
@@ -1623,9 +1764,36 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
             None
             if mission_nominal_coverage is None
             else float(mission_nominal_coverage),
+            task_deadline_feasible=bool(task.deadline_feasible),
+            return_after_task_deadline_feasible=bool(
+                return_after.deadline_feasible
+            ),
+            return_now_deadline_feasible=bool(return_now.deadline_feasible),
+            mission_deadline_feasible=bool(
+                task.deadline_feasible and return_after.deadline_feasible
+            ),
+            task_completion_status=str(task.completion_status),
+            return_after_task_completion_status=str(
+                return_after.completion_status
+            ),
+            return_now_completion_status=str(return_now.completion_status),
+            mission_completion_status=str(
+                mission.completion_status
+                if bundled_mission is not None
+                or hasattr(self.energy_estimator, "estimate_mission_context")
+                else (
+                    "goal_reached"
+                    if task.deadline_feasible and return_after.deadline_feasible
+                    else "mission_deadline_infeasible"
+                )
+            ),
         )
 
-    def _refresh_mission_decision(self) -> bool:
+    def _refresh_mission_decision(
+        self,
+        *,
+        information_time: str = "manual_pre_action",
+    ) -> bool:
         if self.mode is SortieMode.CHARGER_COMMITTED:
             self.agent.goal = self.charger_position
             return False
@@ -1638,42 +1806,106 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         remaining = float(self.agent.energy)
         if self.operational_energy_capacity is None or self.energy_reserve is None:
             raise RuntimeError("return decisions require configured battery capacity and reserve")
-        decision = self.return_manager.decide(
-            ReturnDecisionContext(
-                mode=self.mode,
-                remaining_energy=remaining,
-                battery_capacity=float(self.operational_energy_capacity),
-                reserve=float(self.energy_reserve),
-                distance_to_charger=float(
-                    np.linalg.norm(self.charger_position - self.agent.pos)
-                ),
-                distance_to_task=float(
-                    np.linalg.norm(self.current_task_point - self.agent.pos)
-                ),
-                task_to_charger_distance=float(
-                    np.linalg.norm(self.charger_position - self.current_task_point)
-                ),
-                return_now_requirement=(
-                    None if estimate is None else estimate.return_now_upper95
-                ),
-                task_then_return_requirement=(
-                    None if estimate is None else estimate.mission_upper95
-                ),
+        context = ReturnDecisionContext(
+            mode=self.mode,
+            remaining_energy=remaining,
+            battery_capacity=float(self.operational_energy_capacity),
+            reserve=float(self.energy_reserve),
+            distance_to_charger=float(
+                np.linalg.norm(self.charger_position - self.agent.pos)
+            ),
+            distance_to_task=float(
+                np.linalg.norm(self.current_task_point - self.agent.pos)
+            ),
+            task_to_charger_distance=float(
+                np.linalg.norm(self.charger_position - self.current_task_point)
+            ),
+            return_now_requirement=(
+                None if estimate is None else estimate.return_now_upper95
+            ),
+            task_then_return_requirement=(
+                None if estimate is None else estimate.mission_upper95
+            ),
+            return_now_deadline_feasible=(
+                None if estimate is None else estimate.return_now_deadline_feasible
+            ),
+            task_then_return_deadline_feasible=(
+                None if estimate is None else estimate.mission_deadline_feasible
+            ),
+        )
+        decision = self.return_manager.decide(context)
+
+        exact_return_now_requirement = None
+        exact_task_then_return_requirement = None
+        exact_return_now_deadline_feasible = None
+        exact_task_then_return_deadline_feasible = None
+        oracle_decision = None
+        oracle_shadow_active = bool(
+            self.oracle_shadow_estimator is not None
+            and (
+                not self.oracle_shadow_stop_after_first_disagreement
+                or self._first_return_disagreement is None
             )
         )
+        if oracle_shadow_active:
+            if self.oracle_shadow_estimator is self.energy_estimator and estimate is not None:
+                exact_return_now_requirement = float(estimate.return_now_upper95)
+                exact_task_then_return_requirement = float(estimate.mission_upper95)
+                exact_return_now_deadline_feasible = bool(
+                    estimate.return_now_deadline_feasible
+                )
+                exact_task_then_return_deadline_feasible = bool(
+                    estimate.mission_deadline_feasible
+                )
+            else:
+                shadow_bundle = self.oracle_shadow_estimator.estimate_mission_bundle(
+                    self,
+                    self.current_task_point,
+                )
+                exact_return_now_requirement = float(shadow_bundle[2].upper95)
+                exact_task_then_return_requirement = float(shadow_bundle[3].upper95)
+                # Legacy deterministic shadow estimators predate the explicit
+                # deadline-feasibility contract.  Their finite predictions
+                # retain the historical completed-rollout meaning, so absence
+                # of the new tag is backward-compatibly interpreted as True.
+                exact_return_now_deadline_feasible = bool(
+                    getattr(shadow_bundle[2], "deadline_feasible", True)
+                )
+                exact_task_then_return_deadline_feasible = bool(
+                    getattr(shadow_bundle[3], "deadline_feasible", True)
+                )
+            oracle_decision = QuantileEnergyReturnManager().decide(
+                ReturnDecisionContext(
+                    **{
+                        **context.__dict__,
+                        "return_now_requirement": exact_return_now_requirement,
+                        "task_then_return_requirement": (
+                            exact_task_then_return_requirement
+                        ),
+                        "return_now_deadline_feasible": (
+                            exact_return_now_deadline_feasible
+                        ),
+                        "task_then_return_deadline_feasible": (
+                            exact_task_then_return_deadline_feasible
+                        ),
+                    }
+                )
+            )
         manager_type = getattr(
             self.return_manager,
             "manager_type",
             type(self.return_manager).__name__,
         )
         margin_unit = getattr(self.return_manager, "margin_unit", "unknown")
-        continuation_margin = min(
-            decision.immediate_margin,
-            decision.mission_margin,
-        )
+        # The binary CONTINUE/RETURN boundary is the certified
+        # task-then-return route.  Direct-return feasibility is a certificate
+        # for the committed fallback, not an additional stopping boundary:
+        # goal switching and the task-service reset make the two macro-action
+        # feasible sets non-nested.
+        continuation_margin = float(decision.mission_margin)
         governing_requirement = (
             remaining - float(self.energy_reserve) - continuation_margin
-            if margin_unit == ENERGY_UNIT
+            if margin_unit == ENERGY_UNIT and np.isfinite(continuation_margin)
             else None
         )
         current_decision_audit = {
@@ -1683,9 +1915,6 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
             "governing_requirement": governing_requirement,
             "margin_unit": margin_unit,
         }
-        if not decision.commit:
-            self._last_return_decision_audit = current_decision_audit
-            return False
         previous_decision = self._last_return_decision_audit
         previous_step = (
             None if previous_decision is None else int(previous_decision["global_step"])
@@ -1728,6 +1957,171 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
                 float(self.energy_reserve)
                 >= max(0.0, observed_energy_requirement_drift)
             )
+        exact_deadline_semantics_available = bool(
+            exact_return_now_deadline_feasible is not None
+            and exact_task_then_return_deadline_feasible is not None
+        )
+        exact_effective_requirement_is_infinite = (
+            None
+            if not exact_deadline_semantics_available
+            else bool(exact_task_then_return_deadline_feasible is False)
+        )
+        exact_effective_requirement = (
+            None
+            if exact_task_then_return_requirement is None
+            or exact_effective_requirement_is_infinite is not False
+            else exact_task_then_return_requirement
+        )
+        estimated_deadline_semantics_available = bool(
+            context.return_now_deadline_feasible is not None
+            and context.task_then_return_deadline_feasible is not None
+        )
+        estimated_effective_requirement_is_infinite = (
+            None
+            if not estimated_deadline_semantics_available
+            else bool(context.task_then_return_deadline_feasible is False)
+        )
+        estimated_effective_requirement = (
+            None
+            if context.task_then_return_requirement is None
+            or estimated_effective_requirement_is_infinite is not False
+            else float(context.task_then_return_requirement)
+        )
+        decisions_disagree = bool(
+            oracle_decision is not None
+            and bool(decision.commit) != bool(oracle_decision.commit)
+        )
+        first_disagreement = bool(
+            decisions_disagree and self._first_return_disagreement is None
+        )
+        disagreement_direction = None
+        if decisions_disagree:
+            disagreement_direction = (
+                "method_early_commit_oracle_continue"
+                if decision.commit
+                else "method_late_continue_oracle_commit"
+            )
+        decision_index = int(self._return_decision_index)
+        self._return_decision_index += 1
+        decision_record = {
+            "decision_index": decision_index,
+            "global_step": int(self.current_step),
+            "battery_cycle_id": int(self.battery_cycle_id),
+            "task_index_in_cycle": int(self.tasks_in_current_battery_cycle),
+            "task_schedule_seed": self.keyed_task_schedule_seed,
+            "information_time": str(information_time),
+            "position": self.agent.pos.copy(),
+            "velocity": self.agent.vel.copy(),
+            "task_goal": self.current_task_point.copy(),
+            "remaining_energy": remaining,
+            "reserve_energy": float(self.energy_reserve),
+            "exact_return_now_requirement": exact_return_now_requirement,
+            "exact_task_then_return_requirement": exact_task_then_return_requirement,
+            "exact_effective_requirement": exact_effective_requirement,
+            "exact_effective_requirement_semantics": (
+                "task_then_return_stopping_boundary"
+            ),
+            "exact_effective_requirement_is_infinite": (
+                exact_effective_requirement_is_infinite
+            ),
+            "exact_return_now_deadline_feasible": (
+                exact_return_now_deadline_feasible
+            ),
+            "exact_task_then_return_deadline_feasible": (
+                exact_task_then_return_deadline_feasible
+            ),
+            "estimated_return_now_requirement": context.return_now_requirement,
+            "estimated_task_then_return_requirement": (
+                context.task_then_return_requirement
+            ),
+            "estimated_effective_requirement": estimated_effective_requirement,
+            "estimated_effective_requirement_semantics": (
+                "task_then_return_stopping_boundary"
+            ),
+            "estimated_effective_requirement_is_infinite": (
+                estimated_effective_requirement_is_infinite
+            ),
+            "estimated_return_now_deadline_feasible": (
+                context.return_now_deadline_feasible
+            ),
+            "estimated_task_then_return_deadline_feasible": (
+                context.task_then_return_deadline_feasible
+            ),
+            "oracle_commit": (
+                None if oracle_decision is None else bool(oracle_decision.commit)
+            ),
+            "oracle_decision_reason": (
+                None if oracle_decision is None else oracle_decision.reason
+            ),
+            "method_commit": bool(decision.commit),
+            "method_decision_reason": decision.reason,
+            "commitment_state_before": SortieMode.TASK.value,
+            "commitment_state_after": (
+                SortieMode.CHARGER_COMMITTED.value
+                if decision.commit
+                else SortieMode.TASK.value
+            ),
+            "oracle_score_margin": (
+                None
+                if oracle_decision is None
+                or not np.isfinite(oracle_decision.mission_margin)
+                else float(oracle_decision.mission_margin)
+            ),
+            "method_score_margin": (
+                None
+                if not np.isfinite(continuation_margin)
+                else float(continuation_margin)
+            ),
+            "method_margin_unit": margin_unit,
+            "decisions_disagree": decisions_disagree,
+            "first_disagreement": first_disagreement,
+            "first_disagreement_direction": disagreement_direction,
+            "decision_check_interval_steps": interval_steps,
+            "threshold_crossing_overshoot": (
+                None
+                if not np.isfinite(continuation_margin)
+                else max(0.0, -float(continuation_margin))
+            ),
+            "observed_interval_requirement_drift": (
+                observed_energy_requirement_drift
+            ),
+            "feature_provenance": {
+                "available_before_decision": [
+                    "position",
+                    "velocity",
+                    "task_goal",
+                    "charger_position",
+                    "remaining_energy",
+                    "reserve_energy",
+                    "policy",
+                    "safety_filter",
+                    "obstacle_realization",
+                ],
+                "excluded_post_decision": [
+                    "realized_return_energy",
+                    "terminal_duration",
+                    "final_path_length",
+                    "future_safety_interventions",
+                    "cycle_outcome",
+                ],
+            },
+            "oracle_shadow_active": oracle_shadow_active,
+            "oracle_shadow_stopping_rule": (
+                "stop_after_first_disagreement"
+                if self.oracle_shadow_stop_after_first_disagreement
+                else "full_cycle"
+            ),
+        }
+        if first_disagreement:
+            self._first_return_disagreement = {
+                "decision_index": decision_index,
+                "global_step": int(self.current_step),
+                "direction": disagreement_direction,
+            }
+        self.return_decision_records.append(decision_record)
+        if not decision.commit:
+            self._last_return_decision_audit = current_decision_audit
+            return False
         self.mode = SortieMode.CHARGER_COMMITTED
         self.task_to_charger_count += 1
         self.agent.goal = self.charger_position
@@ -1784,17 +2178,70 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
             "mission_component_upper95_sum": None
             if estimate is None
             else estimate.component_upper95_sum,
+            "task_deadline_feasible": (
+                None if estimate is None else estimate.task_deadline_feasible
+            ),
+            "return_after_task_deadline_feasible": (
+                None
+                if estimate is None
+                else estimate.return_after_task_deadline_feasible
+            ),
+            "return_now_deadline_feasible": (
+                None if estimate is None else estimate.return_now_deadline_feasible
+            ),
+            "mission_deadline_feasible": (
+                None if estimate is None else estimate.mission_deadline_feasible
+            ),
+            "task_completion_status": (
+                None if estimate is None else estimate.task_completion_status
+            ),
+            "return_after_task_completion_status": (
+                None
+                if estimate is None
+                else estimate.return_after_task_completion_status
+            ),
+            "return_now_completion_status": (
+                None
+                if estimate is None
+                else estimate.return_now_completion_status
+            ),
+            "mission_completion_status": (
+                None if estimate is None else estimate.mission_completion_status
+            ),
             "reserve": self.energy_reserve,
-            "immediate_margin": decision.immediate_margin,
-            "mission_margin": decision.mission_margin,
-            "continuation_margin": continuation_margin,
+            "immediate_margin": (
+                None
+                if not np.isfinite(decision.immediate_margin)
+                else decision.immediate_margin
+            ),
+            "mission_margin": (
+                None
+                if not np.isfinite(decision.mission_margin)
+                else decision.mission_margin
+            ),
+            "continuation_margin": (
+                None
+                if not np.isfinite(continuation_margin)
+                else continuation_margin
+            ),
             "decision_margin_unit": margin_unit,
             "governing_required_energy": governing_requirement,
-            "threshold_crossing_overshoot": max(0.0, -float(continuation_margin)),
+            "threshold_crossing_overshoot": (
+                None
+                if not np.isfinite(continuation_margin)
+                else max(0.0, -float(continuation_margin))
+            ),
             "previous_decision_step": previous_step,
             "previous_continuation_margin": previous_margin,
             "decision_check_interval_steps": interval_steps,
             "decision_margin_drop_since_previous_check": margin_drop,
+            "decision_record_index": decision_index,
+            "oracle_commit": (
+                None if oracle_decision is None else bool(oracle_decision.commit)
+            ),
+            "oracle_score_margin": decision_record["oracle_score_margin"],
+            "first_disagreement": first_disagreement,
+            "first_disagreement_direction": disagreement_direction,
             "energy_consumed_since_previous_decision_check": (
                 energy_consumed_since_check
             ),
@@ -1823,6 +2270,17 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         record = {
             "segment_type": "completed_recharge_cycle",
             "battery_cycle_id": int(self.battery_cycle_id),
+            "task_schedule_seed": self.keyed_task_schedule_seed,
+            "first_disagreement_step": (
+                None
+                if self._first_return_disagreement is None
+                else self._first_return_disagreement["global_step"]
+            ),
+            "first_disagreement_direction": (
+                None
+                if self._first_return_disagreement is None
+                else self._first_return_disagreement["direction"]
+            ),
             "cycle_start_global_step": int(self.cycle_start_global_step),
             "cycle_end_global_step": int(self.current_step),
             "cycle_start_transition": int(self.cycle_start_global_step),
@@ -1886,6 +2344,7 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         self.cycle_distance_flown = 0.0
         self.return_commit_record = None
         self._last_return_decision_audit = None
+        self._first_return_disagreement = None
         self.task_to_charger_count = 0
         self.agent.vel[:] = 0.0
         self.agent.energy = self.operational_energy_capacity
@@ -1907,6 +2366,17 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
                 else "failed_battery_segment"
             ),
             "battery_cycle_id": int(self.battery_cycle_id),
+            "task_schedule_seed": self.keyed_task_schedule_seed,
+            "first_disagreement_step": (
+                None
+                if self._first_return_disagreement is None
+                else self._first_return_disagreement["global_step"]
+            ),
+            "first_disagreement_direction": (
+                None
+                if self._first_return_disagreement is None
+                else self._first_return_disagreement["direction"]
+            ),
             "cycle_start_global_step": int(self.cycle_start_global_step),
             "cycle_end_global_step": int(self.current_step),
             "cycle_start_transition": int(self.cycle_start_global_step),
@@ -2254,25 +2724,29 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         distances = np.full(sector_count, self.lidar_max_range, dtype=np.float64)
         indices = np.full(sector_count, -1, dtype=np.int64)
 
-        bounds = (
-            (0, 0.0),
-            (0, self.length),
-            (1, 0.0),
-            (1, self.width),
-            (2, 0.0),
-            (2, self.height),
+        boundary_axes = np.array([0, 0, 1, 1, 2, 2], dtype=np.intp)
+        boundary_coordinates = np.array(
+            [0.0, self.length, 0.0, self.width, 0.0, self.height],
+            dtype=np.float64,
         )
-        for boundary_index, (axis, coordinate) in enumerate(bounds):
-            component = directions[:, axis]
-            candidate = np.divide(
-                coordinate - origin[axis],
-                component,
-                out=np.full(sector_count, np.inf, dtype=np.float64),
-                where=np.abs(component) > eps,
-            )
-            update = (candidate >= 0.0) & (candidate < distances)
-            distances[update] = candidate[update]
-            indices[update] = self.num_obstacles + boundary_index
+        boundary_components = directions[:, boundary_axes].T
+        boundary_candidates = np.divide(
+            (boundary_coordinates - origin[boundary_axes])[:, None],
+            boundary_components,
+            out=np.full((6, sector_count), np.inf, dtype=np.float64),
+            where=np.abs(boundary_components) > eps,
+        )
+        boundary_candidates[boundary_candidates < 0.0] = np.inf
+        boundary_indices = np.argmin(boundary_candidates, axis=0)
+        boundary_distances = boundary_candidates[
+            boundary_indices,
+            np.arange(sector_count),
+        ]
+        boundary_update = boundary_distances < distances
+        distances[boundary_update] = boundary_distances[boundary_update]
+        indices[boundary_update] = (
+            self.num_obstacles + boundary_indices[boundary_update]
+        )
 
         if self.obstacles:
             centers = np.stack([obstacle.pos for obstacle in self.obstacles]).astype(np.float64)
@@ -2396,9 +2870,9 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         if self.safety_filter is None or self._lidar_packet is None:
             raise RuntimeError("HOCBF requires an initialized safety filter and LiDAR packet")
         nominal_acceleration = self._normalized_action_to_acceleration(nominal)
-        perceived_obstacles = raw_lidar_point_obstacles(self._lidar_packet)
+        lidar_hit_indices = np.flatnonzero(self._lidar_packet.hit)
         self.safety_filter_calls += 1
-        if not perceived_obstacles:
+        if lidar_hit_indices.size == 0:
             geometry = (
                 identity_projection_geometry(
                     nominal,
@@ -2433,12 +2907,20 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
                 "projection_geometry": geometry.as_dict(),
                 "active_set_changed": active_set_changed,
             }
-        output = self.safety_filter.filter(
-            self.agent.pos,
-            self.agent.vel,
-            nominal_acceleration,
-            perceived_obstacles,
-        )
+        if self.safety_filter.config.method is SafetyFilterMethod.HOCBF:
+            output = self.safety_filter.filter_lidar_points(
+                self.agent.pos,
+                self.agent.vel,
+                nominal_acceleration,
+                self._lidar_packet.points[lidar_hit_indices],
+            )
+        else:
+            output = self.safety_filter.filter(
+                self.agent.pos,
+                self.agent.vel,
+                nominal_acceleration,
+                raw_lidar_point_obstacles(self._lidar_packet),
+            )
         diagnostics = output.diagnostics
         emergency_brake = bool(
             diagnostics.fallback_used
@@ -2525,7 +3007,52 @@ class UAVEnergyDeliverySACEnv(gym.Env, LegacyUAVEnv):
         return changed
 
     def _sample_task_point(self, reference_position: np.ndarray) -> np.ndarray:
-        reference = self._validate_position(reference_position, "reference_position")
+        # The reference is the UAV's preserved physical position and is used
+        # only to enforce minimum task distance.  A legal trajectory may enter
+        # the goal-clearance halo (obstacle radius + safe radius + goal
+        # tolerance) without entering the physical collision region.  New task
+        # candidates must remain goal-clear, but rejecting such a reference
+        # would make continuous workloads fail exactly at task rollover.
+        reference = self._validate_position(
+            reference_position,
+            "reference_position",
+            check_obstacles=False,
+        )
+        if self.keyed_task_schedule_seed is not None:
+            cycle_index = int(getattr(self, "battery_cycle_id", 0))
+            task_index = int(getattr(self, "tasks_in_current_battery_cycle", 0))
+            sequence = np.random.SeedSequence(
+                [self.keyed_task_schedule_seed, cycle_index, task_index]
+            )
+            schedule_rng = np.random.default_rng(sequence)
+            for _ in range(max(1000, self.sample_retry_limit)):
+                candidate = np.array(
+                    [
+                        schedule_rng.uniform(
+                            self.xy_sampling_margin,
+                            self.length - self.xy_sampling_margin,
+                        ),
+                        schedule_rng.uniform(
+                            self.xy_sampling_margin,
+                            self.width - self.xy_sampling_margin,
+                        ),
+                        schedule_rng.uniform(self.task_z_min, self.task_z_max),
+                    ],
+                    dtype=np.float32,
+                )
+                if (
+                    self._position_clear_of_obstacles(
+                        candidate,
+                        self.goal_tolerance,
+                    )
+                    and np.linalg.norm(candidate - reference)
+                    >= self.minimum_task_distance
+                ):
+                    return candidate
+            raise RuntimeError(
+                "failed to generate the keyed task for "
+                f"cycle={cycle_index}, task={task_index}"
+            )
         for _ in range(self.sample_retry_limit):
             candidate = self._sample_legal_position()
             if np.linalg.norm(candidate - reference) >= self.minimum_task_distance:

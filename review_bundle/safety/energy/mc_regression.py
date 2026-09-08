@@ -5,7 +5,7 @@ import math
 import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Protocol
+from typing import MutableMapping, Protocol
 
 import numpy as np
 import torch
@@ -246,6 +246,31 @@ class GoalEnergyPrediction:
     upper95: float
     rollout_steps: int = 0
     wall_clock_seconds: float = 0.0
+    deadline_feasible: bool = True
+    completion_status: str = "goal_reached"
+    rollout_diagnostics: dict[str, object] | None = None
+
+    @property
+    def extended_prediction(self) -> float:
+        return float(self.prediction) if self.deadline_feasible else float("inf")
+
+    @property
+    def extended_upper95(self) -> float:
+        return float(self.upper95) if self.deadline_feasible else float("inf")
+
+
+class ModelBasedRolloutError(RuntimeError):
+    """Oracle rollout failure with compact, JSON-serializable provenance."""
+
+    def __init__(
+        self,
+        message: str,
+        rollout_diagnostics: dict[str, object] | None = None,
+    ) -> None:
+        super().__init__(message)
+        self.rollout_diagnostics = (
+            {} if rollout_diagnostics is None else rollout_diagnostics
+        )
 
 
 @dataclass(frozen=True)
@@ -698,12 +723,23 @@ class ModelBasedEnergyRolloutEstimator:
         *,
         max_policy_steps: int = 4000,
         cache_mission_suffixes: bool = True,
+        shared_bundle_cache: MutableMapping[
+            tuple[bytes, bytes, bytes, bytes],
+            tuple[
+                GoalEnergyPrediction,
+                GoalEnergyPrediction,
+                GoalEnergyPrediction,
+                GoalEnergyPrediction,
+            ],
+        ]
+        | None = None,
     ) -> None:
         if max_policy_steps <= 0:
             raise ValueError("max_policy_steps must be positive")
         self.policy = policy
         self.max_policy_steps = int(max_policy_steps)
         self.cache_mission_suffixes = bool(cache_mission_suffixes)
+        self.shared_bundle_cache = shared_bundle_cache
         self.update_count = 0
         self.replay: tuple[()] = ()
         self.last_loss = None
@@ -711,6 +747,8 @@ class ModelBasedEnergyRolloutEstimator:
         self.full_rollout_count = 0
         self.mission_cache_hits = 0
         self.mission_cache_misses = 0
+        self.shared_bundle_cache_hits = 0
+        self.shared_bundle_cache_misses = 0
         self._mission_cache: _MissionRolloutCache | None = None
 
     def estimate_context(
@@ -722,12 +760,12 @@ class ModelBasedEnergyRolloutEstimator:
         velocity: np.ndarray | None = None,
         goal_type: str | None = None,
     ) -> GoalEnergyPrediction:
-        del goal_type
         result = self._rollout_context(
             environment,
             goal,
             position=position,
             velocity=velocity,
+            rollout_label="goal_context" if goal_type is None else str(goal_type),
         )
         return result[0]
 
@@ -748,6 +786,13 @@ class ModelBasedEnergyRolloutEstimator:
         GoalEnergyPrediction,
         GoalEnergyPrediction,
     ]:
+        shared_key = self._shared_bundle_key(environment, task_goal)
+        if self.shared_bundle_cache is not None:
+            shared = self.shared_bundle_cache.get(shared_key)
+            if shared is not None:
+                self.shared_bundle_cache_hits += 1
+                return shared
+            self.shared_bundle_cache_misses += 1
         cached = self._cached_task_and_return(environment, task_goal)
         if cached is None:
             self.mission_cache_misses += 1
@@ -756,16 +801,26 @@ class ModelBasedEnergyRolloutEstimator:
                 task_goal,
                 position=environment.agent.pos,
                 velocity=environment.agent.vel,
+                rollout_label="task",
             )
             task = task_trace.prediction
-            endpoint_position = task_trace.positions[-1]
-            return_after, _, _ = self._rollout_context(
-                environment,
-                environment.charger_position,
-                position=endpoint_position,
-                velocity=np.zeros(3, dtype=np.float32),
-            )
-            if self._mission_cache_allowed(environment):
+            if task.deadline_feasible:
+                endpoint_position = task_trace.positions[-1]
+                return_after, _, _ = self._rollout_context(
+                    environment,
+                    environment.charger_position,
+                    position=endpoint_position,
+                    velocity=np.zeros(3, dtype=np.float32),
+                    rollout_label="return_after_task",
+                )
+            else:
+                return_after = GoalEnergyPrediction(
+                    0.0,
+                    0.0,
+                    deadline_feasible=False,
+                    completion_status="not_evaluated_task_deadline_infeasible",
+                )
+            if task.deadline_feasible and self._mission_cache_allowed(environment):
                 self._mission_cache = _MissionRolloutCache(
                     self._mission_signature(environment, task_goal),
                     int(environment.steps_in_current_task),
@@ -780,15 +835,28 @@ class ModelBasedEnergyRolloutEstimator:
             environment.charger_position,
             position=environment.agent.pos,
             velocity=environment.agent.vel,
+            rollout_label="return_now",
         )
         total = float(task.prediction + return_after.prediction)
+        mission_deadline_feasible = bool(
+            task.deadline_feasible and return_after.deadline_feasible
+        )
         mission = GoalEnergyPrediction(
             total,
             total,
             int(task.rollout_steps + return_after.rollout_steps),
             float(task.wall_clock_seconds + return_after.wall_clock_seconds),
+            deadline_feasible=mission_deadline_feasible,
+            completion_status=(
+                "goal_reached"
+                if mission_deadline_feasible
+                else "mission_deadline_infeasible"
+            ),
         )
-        return task, return_after, return_now, mission
+        result = (task, return_after, return_now, mission)
+        if self.shared_bundle_cache is not None:
+            self.shared_bundle_cache[shared_key] = result
+        return result
 
     def cache_diagnostics(self) -> dict[str, int | bool]:
         return {
@@ -797,7 +865,24 @@ class ModelBasedEnergyRolloutEstimator:
             "full_rollout_count": self.full_rollout_count,
             "mission_cache_hits": self.mission_cache_hits,
             "mission_cache_misses": self.mission_cache_misses,
+            "shared_bundle_cache_hits": self.shared_bundle_cache_hits,
+            "shared_bundle_cache_misses": self.shared_bundle_cache_misses,
         }
+
+    @staticmethod
+    def _shared_bundle_key(
+        environment,
+        task_goal: np.ndarray,
+    ) -> tuple[bytes, bytes, bytes, bytes]:
+        def packed(value: np.ndarray) -> bytes:
+            return np.asarray(value, dtype=np.float32).tobytes()
+
+        return (
+            packed(environment.agent.pos),
+            packed(environment.agent.vel),
+            packed(task_goal),
+            packed(environment.charger_position),
+        )
 
     def _cached_task_and_return(
         self,
@@ -866,12 +951,14 @@ class ModelBasedEnergyRolloutEstimator:
         *,
         position: np.ndarray | None = None,
         velocity: np.ndarray | None = None,
+        rollout_label: str = "goal_context",
     ) -> tuple[GoalEnergyPrediction, np.ndarray, np.ndarray]:
         trace = self._rollout_trace(
             environment,
             goal,
             position=position,
             velocity=velocity,
+            rollout_label=rollout_label,
         )
         return trace.prediction, trace.positions[-1].copy(), trace.velocities[-1].copy()
 
@@ -882,6 +969,7 @@ class ModelBasedEnergyRolloutEstimator:
         *,
         position: np.ndarray | None = None,
         velocity: np.ndarray | None = None,
+        rollout_label: str = "goal_context",
     ) -> _DeterministicRolloutTrace:
         self.rollout_request_count += 1
         start_position = environment.agent.pos.copy() if position is None else np.asarray(position, dtype=np.float32)
@@ -917,9 +1005,11 @@ class ModelBasedEnergyRolloutEstimator:
         positions = [clone.agent.pos.copy()]
         velocities = [clone.agent.vel.copy()]
         step_energies: list[float] = []
+        last_info: dict[str, object] = {}
         while steps < self.max_policy_steps:
             action, _ = self.policy.predict(observation, deterministic=True)
             observation, _, terminated, truncated, info = clone.step(action)
+            last_info = dict(info)
             step_energy = float(info["realized_energy_cost"])
             total_energy += step_energy
             step_energies.append(step_energy)
@@ -928,8 +1018,24 @@ class ModelBasedEnergyRolloutEstimator:
             steps += 1
             if terminated or truncated:
                 if not bool(info["is_success"]):
+                    diagnostics = self._rollout_failure_diagnostics(
+                        clone=clone,
+                        rollout_label=rollout_label,
+                        goal=np.asarray(goal, dtype=np.float32),
+                        start_position=start_position,
+                        start_velocity=start_velocity,
+                        positions=positions,
+                        velocities=velocities,
+                        total_energy=total_energy,
+                        steps=steps,
+                        last_info=last_info,
+                        failure_kind="unsuccessful_terminal",
+                    )
                     clone.close()
-                    raise RuntimeError(f"model-based energy rollout failed: {info['end_reason']}")
+                    raise ModelBasedRolloutError(
+                        f"model-based energy rollout failed: {info['end_reason']}",
+                        diagnostics,
+                    )
                 elapsed = time.perf_counter() - started
                 clone.close()
                 suffix_energies = np.zeros(steps + 1, dtype=np.float64)
@@ -942,11 +1048,106 @@ class ModelBasedEnergyRolloutEstimator:
                     np.asarray(velocities, dtype=np.float32),
                     suffix_energies,
                 )
+        diagnostics = self._rollout_failure_diagnostics(
+            clone=clone,
+            rollout_label=rollout_label,
+            goal=np.asarray(goal, dtype=np.float32),
+            start_position=start_position,
+            start_velocity=start_velocity,
+            positions=positions,
+            velocities=velocities,
+            total_energy=total_energy,
+            steps=steps,
+            last_info=last_info,
+            failure_kind="max_policy_steps_exceeded",
+        )
+        elapsed = time.perf_counter() - started
         clone.close()
-        raise RuntimeError("model-based energy rollout exceeded max_policy_steps")
+        suffix_energies = np.zeros(steps + 1, dtype=np.float64)
+        suffix_energies[:-1] = np.cumsum(
+            np.asarray(step_energies, dtype=np.float64)[::-1]
+        )[::-1]
+        return _DeterministicRolloutTrace(
+            GoalEnergyPrediction(
+                total_energy,
+                total_energy,
+                steps,
+                elapsed,
+                deadline_feasible=False,
+                completion_status="deadline_infeasible",
+                rollout_diagnostics=diagnostics,
+            ),
+            np.asarray(positions, dtype=np.float32),
+            np.asarray(velocities, dtype=np.float32),
+            suffix_energies,
+        )
 
-    @staticmethod
+    def _rollout_failure_diagnostics(
+        self,
+        *,
+        clone,
+        rollout_label: str,
+        goal: np.ndarray,
+        start_position: np.ndarray,
+        start_velocity: np.ndarray,
+        positions: list[np.ndarray],
+        velocities: list[np.ndarray],
+        total_energy: float,
+        steps: int,
+        last_info: dict[str, object],
+        failure_kind: str,
+    ) -> dict[str, object]:
+        position_array = np.asarray(positions, dtype=np.float64)
+        velocity_array = np.asarray(velocities, dtype=np.float64)
+        goal_array = np.asarray(goal, dtype=np.float64)
+        distances = np.linalg.norm(position_array - goal_array[None, :], axis=1)
+        increments = np.diff(position_array, axis=0)
+        recent_index = max(0, int(distances.size) - 101)
+        minimum_index = int(np.argmin(distances))
+        return {
+            "failure_kind": str(failure_kind),
+            "rollout_label": str(rollout_label),
+            "max_policy_steps": int(self.max_policy_steps),
+            "executed_policy_steps": int(steps),
+            "policy_dt": float(clone.policy_dt),
+            "simulated_seconds": float(steps * clone.policy_dt),
+            "start_position": np.asarray(start_position, dtype=np.float64).tolist(),
+            "start_velocity": np.asarray(start_velocity, dtype=np.float64).tolist(),
+            "goal": goal_array.tolist(),
+            "final_position": position_array[-1].tolist(),
+            "final_velocity": velocity_array[-1].tolist(),
+            "goal_tolerance": float(clone.goal_tolerance),
+            "start_distance_to_goal": float(distances[0]),
+            "final_distance_to_goal": float(distances[-1]),
+            "minimum_distance_to_goal": float(distances[minimum_index]),
+            "minimum_distance_step": minimum_index,
+            "net_progress_to_goal": float(distances[0] - distances[-1]),
+            "best_progress_to_goal": float(distances[0] - distances[minimum_index]),
+            "recent_100_step_progress": float(
+                distances[recent_index] - distances[-1]
+            ),
+            "path_length": float(
+                np.linalg.norm(increments, axis=1).sum()
+                if increments.size
+                else 0.0
+            ),
+            "net_displacement": float(
+                np.linalg.norm(position_array[-1] - position_array[0])
+            ),
+            "total_realized_energy": float(total_energy),
+            "safety_interventions": int(getattr(clone, "safety_interventions", 0)),
+            "obstacle_collision_count": int(
+                getattr(clone, "obstacle_collision_count", 0)
+            ),
+            "boundary_contact_count": int(
+                getattr(clone, "boundary_contact_count", 0)
+            ),
+            "last_end_reason": last_info.get("end_reason"),
+            "last_is_success": bool(last_info.get("is_success", False)),
+        }
+
     def _make_rollout_environment(
+        self,
         environment,
         *,
         start_position: np.ndarray,
@@ -969,9 +1170,18 @@ class ModelBasedEnergyRolloutEstimator:
             xy_sampling_margin=environment.xy_sampling_margin,
             task_z_min=environment.task_z_min,
             task_z_max=environment.task_z_max,
-            max_steps_per_task=environment.max_steps_per_task,
-            phase1_episode_max_policy_steps=environment.phase1_episode_max_policy_steps,
-            phase2_episode_limit=environment.phase2_episode_limit,
+            max_steps_per_task=max(
+                int(environment.max_steps_per_task),
+                self.max_policy_steps + 2,
+            ),
+            phase1_episode_max_policy_steps=max(
+                int(environment.phase1_episode_max_policy_steps),
+                self.max_policy_steps + 2,
+            ),
+            phase2_episode_limit=max(
+                int(environment.phase2_episode_limit),
+                self.max_policy_steps + 2,
+            ),
             mission_decision_interval_policy_steps=(
                 environment.mission_decision_interval_policy_steps
             ),
