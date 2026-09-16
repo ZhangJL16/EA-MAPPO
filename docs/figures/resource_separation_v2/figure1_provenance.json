@@ -1,0 +1,15 @@
+{
+  "figure_version": 2,
+  "archetype": "schematic-led composite",
+  "backend": "python_matplotlib",
+  "width_mm": 183,
+  "height_mm": 88,
+  "sampled_trajectories": 0,
+  "new_horizons": [],
+  "source_rows": 5,
+  "certificate_sha256": "d05eac70ec41d7247aef4fd18f65ad494352ea5705e13b4ead12275e950324af",
+  "source_sha256": "4ed53df3c4d98f3d636a69c6879dbd8a8cc4eba5356882197e007faa84c64da2",
+  "bounds_not_exact_values": true,
+  "clipping_preflight": "pass",
+  "original_figure_preserved": true
+}

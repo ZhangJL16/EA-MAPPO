@@ -1,0 +1,80 @@
+{
+  "schema_version": "paired-advantage-identification-contract-template-v1",
+  "status": "PRE_FREEZE_TEMPLATE",
+  "method_train_authorized": false,
+  "splits": {
+    "SMOKE_DEBUG": 2,
+    "PAI_DEV": 96,
+    "PAI_CONFIRM": 128
+  },
+  "sampling": {
+    "anchor_steps": [256, 768],
+    "actions": ["R", "C"],
+    "paired_crn_resamples_per_anchor_action": 64,
+    "discovery_replicates": "even_indices_0_to_62",
+    "evaluation_replicates": "odd_indices_1_to_63",
+    "swap_halves": true,
+    "outcome_dependent_extension": false
+  },
+  "advantage": {
+    "definition": "U(C)-U(R)",
+    "exact_zero_action": "R"
+  },
+  "inference": {
+    "unit": "physical_world",
+    "outer_folds": 6,
+    "inner_folds": 4,
+    "bootstrap": "whole_world_multiplier_max_t",
+    "bootstrap_draws": 20000,
+    "confidence_level": 0.95,
+    "strict_lcb_comparator": ">"
+  },
+  "gate_h": {
+    "minimum_contributing_worlds": 90,
+    "minimum_anchors_per_step": 85,
+    "paired_mc_se_median_max": 0.10,
+    "paired_mc_se_p95_max": 0.15,
+    "heldout_selector_gain_lcb_min_exclusive": 0.0,
+    "heldout_selector_gain_point_min_inclusive": 0.05,
+    "minimum_action_anchor_fraction_each_half": 0.05,
+    "minimum_action_worlds_each_half": 5,
+    "noise_corrected_variance_lcb_min_exclusive": 0.0,
+    "all_conjunctive": true
+  },
+  "gate_i": {
+    "simultaneous_contrasts": [
+      "full_minus_latest_advantage_mse_improvement",
+      "full_minus_constant_advantage_mse_improvement",
+      "full_minus_latest_selected_utility",
+      "full_minus_best_constant_action_utility"
+    ],
+    "all_contrast_lcbs_min_exclusive": 0.0,
+    "full_vs_latest_relative_mse_improvement_min_inclusive": 0.05,
+    "full_vs_constant_relative_mse_improvement_min_inclusive": 0.05,
+    "full_vs_constant_selected_utility_point_min_inclusive": 0.05,
+    "full_latest_action_disagreement_min_inclusive": 0.05,
+    "every_family_full_minus_latest_mse_improvement_min_exclusive": 0.0,
+    "family_improvement_signs_must_agree": true,
+    "all_conjunctive": true
+  },
+  "confirm_support": {
+    "channels": ["latest", "full"],
+    "distance_comparator": "<=",
+    "radius": "1.15_times_DEV_99th_percentile_LOO_distance",
+    "minimum_overall_inside_fraction_inclusive": 0.95,
+    "minimum_inside_fraction_per_anchor_step_inclusive": 0.90,
+    "anchor_step_strata": [256, 768],
+    "out_of_support_anchor_policy": "RETAIN_IN_ALL_STATISTICS_NO_PER_ANCHOR_ABSTENTION",
+    "any_failure_status": "INCONCLUSIVE_SUPPORT",
+    "post_access_rule_change_allowed": false
+  },
+  "stopping": {
+    "gate_h_failure": "TERMINATE_NO_CONFIRM_NO_METHOD_TRAIN",
+    "gate_h_pass_gate_i_failure": "TERMINATE_REDIRECT_OBSERVATION_INTERFACE_BENCHMARK_NO_METHOD_TRAIN",
+    "both_dev_pass": "MAY_FREEZE_EXTERNALLY_ANCHORED_CONFIRM_CHILD",
+    "both_confirm_pass": "MAY_PROPOSE_METHOD_DESIGN_ONLY",
+    "automatic_analysis": false,
+    "automatic_confirmation": false,
+    "automatic_training": false
+  }
+}

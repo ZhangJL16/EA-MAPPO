@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="518.740157pt" height="249.448819pt" viewBox="0 0 518.740157 249.448819" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-09-16T23:09:18.592957</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.5.3, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 249.448819 
+L 518.740157 249.448819 
+L 518.740157 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 20.541307 110.954835 
+L 254.310618 110.954835 
+Q 256.696019 110.954835 256.696019 109.682646 
+L 256.696019 52.434142 
+Q 256.696019 51.161953 254.310618 51.161953 
+L 20.541307 51.161953 
+Q 18.155906 51.161953 18.155906 52.434142 
+L 18.155906 109.682646 
+Q 18.155906 110.954835 20.541307 110.954835 
+z
+" clip-path="url(#p8cce0045cc)" style="fill: #f1f5f9; stroke: #d1d5db; stroke-width: 0.6; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 20.541307 172.656 
+L 125.498956 172.656 
+Q 127.884358 172.656 127.884358 171.383811 
+L 127.884358 126.857197 
+Q 127.884358 125.585008 125.498956 125.585008 
+L 20.541307 125.585008 
+Q 18.155906 125.585008 18.155906 126.857197 
+L 18.155906 171.383811 
+Q 18.155906 172.656 20.541307 172.656 
+z
+" clip-path="url(#p8cce0045cc)" style="fill: #ffffff; stroke: #596579; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 149.352968 172.656 
+L 254.310618 172.656 
+Q 256.696019 172.656 256.696019 171.383811 
+L 256.696019 126.857197 
+Q 256.696019 125.585008 254.310618 125.585008 
+L 149.352968 125.585008 
+Q 146.967567 125.585008 146.967567 126.857197 
+L 146.967567 171.383811 
+Q 146.967567 172.656 149.352968 172.656 
+z
+" clip-path="url(#p8cce0045cc)" style="fill: #ffffff; stroke: #16718a; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_1">
+    <text style="font: 700 8px 'sans-serif'; text-anchor: start" x="28.890211" y="63.247748" transform="rotate(-0, 28.890211, 63.247748)">Known-model gains agree</text>
+   </g>
+   <g id="text_2">
+    <text style="font: 7.2px 'sans-serif'; text-anchor: start" x="28.890211" y="75.333543" transform="rotate(-0, 28.890211, 75.333543)">(q, A, B): (.05, .10, 19/60) at both capacities</text>
+   </g>
+   <g id="text_3">
+    <text style="font: 700 8px 'sans-serif'; text-anchor: start" x="28.890211" y="89.963717" transform="rotate(-0, 28.890211, 89.963717)">Maximal fixed-instance coefficient agrees</text>
+   </g>
+   <g id="text_4">
+    <text style="font: 7.2px 'sans-serif'; text-anchor: start" x="28.890211" y="102.049512" transform="rotate(-0, 28.890211, 102.049512)">0.498692 at both capacities</text>
+   </g>
+   <g id="text_5">
+    <text style="fill: #596579; font: 700 8px 'sans-serif'; text-anchor: start" x="26.504809" y="137.670803" transform="rotate(-0, 26.504809, 137.670803)">Capacity 3</text>
+   </g>
+   <g id="text_6">
+    <text style="font: 7.2px 'sans-serif'; text-anchor: start" x="26.504809" y="149.756598" transform="rotate(-0, 26.504809, 149.756598)">dock, A, B</text>
+   </g>
+   <g id="text_7">
+    <text style="fill: #16718a; font: 700 8px 'sans-serif'; text-anchor: start" x="155.316471" y="137.670803" transform="rotate(-0, 155.316471, 137.670803)">Capacity 4</text>
+   </g>
+   <g id="text_8">
+    <text style="font: 7.2px 'sans-serif'; text-anchor: start" x="155.316471" y="149.756598" transform="rotate(-0, 155.316471, 149.756598)">dock, A, B</text>
+   </g>
+   <g id="text_9">
+    <text style="fill: #596579; font: 7.2px 'sans-serif'; text-anchor: start" x="26.504809" y="162.478488" transform="rotate(-0, 26.504809, 162.478488)">Joint route unavailable</text>
+   </g>
+   <g id="text_10">
+    <text style="fill: #16718a; font: 7.2px 'sans-serif'; text-anchor: start" x="155.316471" y="162.478488" transform="rotate(-0, 155.316471, 162.478488)">+ joint AB / BA sortie</text>
+   </g>
+   <g id="text_11">
+    <text style="font: 700 8px 'sans-serif'; text-anchor: start" x="18.155906" y="35.889764" transform="rotate(-0, 18.155906, 35.889764)">a   Equal summaries; richer safe feedback</text>
+   </g>
+  </g>
+  <g id="axes_2">
+   <g id="patch_5">
+    <path d="M 306.988226 177.108661 
+L 505.771654 177.108661 
+L 505.771654 49.889764 
+L 306.988226 49.889764 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="matplotlib.axis_1">
+    <g id="xtick_1">
+     <g id="line2d_1">
+      <defs>
+       <path id="m9150c297be" d="M 0 0 
+L 0 3.5 
+" style="stroke: #000000; stroke-width: 0.8"/>
+      </defs>
+      <g>
+       <use xlink:href="#m9150c297be" x="306.988226" y="177.108661" style="stroke: #000000; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_12">
+      <text style="font: 7.2px 'sans-serif'; text-anchor: middle" x="306.988226" y="189.579536" transform="rotate(-0, 306.988226, 189.579536)">0.0</text>
+     </g>
+    </g>
+    <g id="xtick_2">
+     <g id="line2d_2">
+      <g>
+       <use xlink:href="#m9150c297be" x="365.45394" y="177.108661" style="stroke: #000000; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_13">
+      <text style="font: 7.2px 'sans-serif'; text-anchor: middle" x="365.45394" y="189.579536" transform="rotate(-0, 365.45394, 189.579536)">0.1</text>
+     </g>
+    </g>
+    <g id="xtick_3">
+     <g id="line2d_3">
+      <g>
+       <use xlink:href="#m9150c297be" x="423.919654" y="177.108661" style="stroke: #000000; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_14">
+      <text style="font: 7.2px 'sans-serif'; text-anchor: middle" x="423.919654" y="189.579536" transform="rotate(-0, 423.919654, 189.579536)">0.2</text>
+     </g>
+    </g>
+    <g id="xtick_4">
+     <g id="line2d_4">
+      <g>
+       <use xlink:href="#m9150c297be" x="482.385368" y="177.108661" style="stroke: #000000; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_15">
+      <text style="font: 7.2px 'sans-serif'; text-anchor: middle" x="482.385368" y="189.579536" transform="rotate(-0, 482.385368, 189.579536)">0.3</text>
+     </g>
+    </g>
+    <g id="text_16">
+     <text style="font: 7.2px 'sans-serif'; text-anchor: middle" x="406.37994" y="200.547786" transform="rotate(-0, 406.37994, 200.547786)">Finite-budget minimax regret (bounds)</text>
+    </g>
+   </g>
+   <g id="matplotlib.axis_2"/>
+   <g id="patch_6">
+    <path d="M 306.988226 177.108661 
+L 505.771654 177.108661 
+" style="fill: none; stroke: #000000; stroke-width: 0.7; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 467.795623 82.371184 
+Q 481.398669 82.371184 493.436468 82.371184 
+" style="fill: none; stroke: #596579; stroke-width: 1.4; stroke-linecap: round"/>
+    <path d="M 490.556468 80.931184 
+L 493.436468 82.371184 
+L 490.556468 83.811184 
+" style="fill: none; stroke: #596579; stroke-width: 1.4; stroke-linecap: round"/>
+   </g>
+   <g id="text_17">
+    <text style="fill: #596579; font: 7.2px 'sans-serif'; text-anchor: start" x="315.758083" y="66.130474" transform="rotate(-0, 315.758083, 66.130474)">Capacity 3: lower bound</text>
+   </g>
+   <g id="text_18">
+    <text style="fill: #596579; font: 7.2px 'sans-serif'; text-anchor: middle" x="465.795722" y="94.551717" transform="rotate(-0, 465.795722, 94.551717)">≥ 0.271625</text>
+   </g>
+   <g id="patch_8">
+    <path d="M 430.754414 150.040811 
+Q 385.94886 150.040811 342.708554 150.040811 
+" style="fill: none; stroke: #16718a; stroke-width: 1.4; stroke-linecap: round"/>
+    <path d="M 345.588554 151.480811 
+L 342.708554 150.040811 
+L 345.588554 148.600811 
+" style="fill: none; stroke: #16718a; stroke-width: 1.4; stroke-linecap: round"/>
+   </g>
+   <g id="text_19">
+    <text style="fill: #16718a; font: 7.2px 'sans-serif'; text-anchor: start" x="315.758083" y="133.800101" transform="rotate(-0, 315.758083, 133.800101)">Capacity 4: upper bound</text>
+   </g>
+   <g id="text_20">
+    <text style="fill: #16718a; font: 7.2px 'sans-serif'; text-anchor: middle" x="432.757054" y="162.221344" transform="rotate(-0, 432.757054, 162.221344)">≤ 0.215116</text>
+   </g>
+   <g id="patch_9">
+    <path d="M 434.753409 115.529301 
+Q 449.276073 115.529301 463.798737 115.529301 
+" style="fill: none; stroke: #111827; stroke-linecap: round"/>
+    <path d="M 434.753409 108.329301 
+L 434.753409 108.329301 
+L 434.753409 122.729301 
+L 434.753409 122.729301 
+" style="fill: none; stroke: #111827; stroke-linecap: round"/>
+    <path d="M 463.798737 122.729301 
+L 463.798737 122.729301 
+L 463.798737 108.329301 
+L 463.798737 108.329301 
+" style="fill: none; stroke: #111827; stroke-linecap: round"/>
+   </g>
+   <g id="text_21">
+    <text style="font: 7.2px 'sans-serif'; text-anchor: middle" x="449.276388" y="109.439035" transform="rotate(-0, 449.276388, 109.439035)">Gap ≥ 0.056509</text>
+   </g>
+   <g id="text_22">
+    <text style="font: 700 8px 'sans-serif'; text-anchor: start" x="306.988226" y="35.889764" transform="rotate(-0, 306.988226, 35.889764)">b   Certified risk bounds at T = 12</text>
+   </g>
+   <g id="PathCollection_1">
+    <defs>
+     <path id="m6f1704c589" d="M 0 3.082207 
+C 0.817411 3.082207 1.601453 2.757446 2.179449 2.179449 
+C 2.757446 1.601453 3.082207 0.817411 3.082207 0 
+C 3.082207 -0.817411 2.757446 -1.601453 2.179449 -2.179449 
+C 1.601453 -2.757446 0.817411 -3.082207 0 -3.082207 
+C -0.817411 -3.082207 -1.601453 -2.757446 -2.179449 -2.179449 
+C -2.757446 -1.601453 -3.082207 -0.817411 -3.082207 0 
+C -3.082207 0.817411 -2.757446 1.601453 -2.179449 2.179449 
+C -1.601453 2.757446 -0.817411 3.082207 0 3.082207 
+z
+" style="stroke: #596579; stroke-width: 1.5"/>
+    </defs>
+    <g clip-path="url(#p2d8d641b3a)">
+     <use xlink:href="#m6f1704c589" x="465.795722" y="82.371184" style="fill: #ffffff; stroke: #596579; stroke-width: 1.5"/>
+    </g>
+   </g>
+   <g id="PathCollection_2">
+    <defs>
+     <path id="m600042274c" d="M 0 3.082207 
+C 0.817411 3.082207 1.601453 2.757446 2.179449 2.179449 
+C 2.757446 1.601453 3.082207 0.817411 3.082207 0 
+C 3.082207 -0.817411 2.757446 -1.601453 2.179449 -2.179449 
+C 1.601453 -2.757446 0.817411 -3.082207 0 -3.082207 
+C -0.817411 -3.082207 -1.601453 -2.757446 -2.179449 -2.179449 
+C -2.757446 -1.601453 -3.082207 -0.817411 -3.082207 0 
+C -3.082207 0.817411 -2.757446 1.601453 -2.179449 2.179449 
+C -1.601453 2.757446 -0.817411 3.082207 0 3.082207 
+z
+" style="stroke: #16718a; stroke-width: 1.5"/>
+    </defs>
+    <g clip-path="url(#p2d8d641b3a)">
+     <use xlink:href="#m600042274c" x="432.757054" y="150.040811" style="fill: #ffffff; stroke: #16718a; stroke-width: 1.5"/>
+    </g>
+   </g>
+  </g>
+  <g id="text_23">
+   <text style="font: 700 10px 'sans-serif'; text-anchor: middle" x="259.370079" y="17.57639" transform="rotate(-0, 259.370079, 17.57639)">Same summaries. Different finite-budget learning risk.</text>
+  </g>
+  <g id="text_24">
+   <text style="fill: #475569; font: 7.2px 'sans-serif'; text-anchor: start" x="18.155906" y="223.256693" transform="rotate(-0, 18.155906, 223.256693)">Equality concerns the maximum coefficient, not every instance or full asymptotic geometry.</text>
+  </g>
+  <g id="text_25">
+   <!-- Exact certificates, not learning curves. Known-model charger-terminal value: $12\rho_\theta$ at both capacities. -->
+   <g style="fill: #475569" transform="translate(18.155906 235.729134)">
+    <text>
+     <tspan style="font: 7.2px 'DejaVu Sans'" x="0 4.580811 8.871338 13.314087 17.300171 20.142822 22.447388 26.433472 30.893921 33.874634 36.717285 38.731567 41.283936 43.298218 47.284302 51.727051 54.569702 59.030151 62.807373 65.111938 67.416504 72.011475 76.447144 79.289795 81.59436 83.608643 88.069092 92.511841 95.492554 100.087524 102.101807 106.696777 111.298828 113.603394 117.589478 122.184448 125.165161 129.455688 133.916138 137.693359 139.997925 142.30249 147.056763 151.651733 156.087402 162.016968 166.611938 169.103027 176.165405 180.601074 185.203125 189.663574 191.677856 193.982422 197.968506 202.563477 207.006226 209.986938 214.588989 219.049438 222.030151 224.64624 227.488892 231.949341 234.930054 241.992432 244.006714 248.601685 253.044434 255.058716 257.363281 261.653809 266.096558 268.11084 272.705811 277.16626 279.608887 281.913452 286.526123 299.037219 301.341785 305.784534 308.627185 310.93175 315.533801 319.96947 322.812122 327.407092 329.711658 333.697742 338.140491 342.742542 347.185291 351.171375 353.185657 356.028308 358.04259 362.50304 366.280261" y="-0.6875">Exact certificates, not learning curves. Known-model charger-terminal value: 12 at both capacities.</tspan>
+     <tspan style="font: oblique 7.2px 'DejaVu Sans'" x="291.138794" y="-0.6875">ρ</tspan>
+     <tspan style="font: oblique 5.04px 'DejaVu Sans'" x="295.740845" y="0.4609375">θ</tspan>
+    </text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p8cce0045cc">
+   <rect x="18.155906" y="49.889764" width="238.540113" height="127.218898"/>
+  </clipPath>
+  <clipPath id="p2d8d641b3a">
+   <rect x="306.988226" y="49.889764" width="198.783428" height="127.218898"/>
+  </clipPath>
+ </defs>
+</svg>

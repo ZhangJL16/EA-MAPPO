@@ -1,3 +1,16 @@
+# Repository navigation
+
+Begin with README.md, task_plan.md and notes.md for the current research state.
+Historical documents with "Active", "gate", or venue-readiness claims are not
+current instructions. On 2026-09-08 the user explicitly lifted the experiment
+hold: continue research and start the prepared E1 experiment concurrently.
+Check startup health then hand back; do not auto-promote to further training.
+Default rg searches honor .ignore,
+which hides legacy research and bulk artifacts without moving hash-pinned runtime
+dependencies. Read explicit paths or use rg --no-ignore PATTERN PATH when history
+is relevant. New documents remain searchable; the historical docs list is explicit.
+External archive and recovery map: docs/REPOSITORY_CLEANUP_20260908.md.
+
 # Fixed user research constraints
 
 The user explicitly froze the collision mechanism on 2026-09-05. Do not change

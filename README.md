@@ -1,86 +1,73 @@
-# Swap Certified UAV Research Bundle
+# Paired-Advantage Identification
 
-## Latest research snapshot — 2026-09-08
+This repository is currently scoped to one research question: whether the
+paired C/R advantage has stable decision heterogeneity (Gate H), and only then
+whether full legal history adds predictive value beyond the latest legal frame
+(Gate I).
 
-The current navigation baseline is correction-supervised SAC with structured
-LiDAR and sensor-based HOCBF execution. The final adaptation adds131072
-transitions to a524288-step SAC checkpoint. On the fixed500 navigation tasks,
-raw execution reached484 goals,450 without contact; HOCBF execution reached492
-goals, all492 without contact, with8 timeouts and1 contact in a timeout trajectory.
-These are single-training-seed results, not a proof of collision-free deployment
-or an isolated causal effect of the correction loss.
+## Completed experiment
 
-The next launched experiment collects500000 return-energy environment steps
-with the new navigator frozen. Its first8192-step resumable checkpoint was
-verified. Energy-head fitting and closed-loop sustainable mission validation
-remain subsequent work; data collection alone is not an energy-learning result.
+The active formal lineage is
+`artifacts/paired_advantage_identification_20260914_v3`. It uses 96 fresh DEV
+worlds, 64 paired-CRN resamples per action and anchor, four world processes, and
+eight branch workers per world. The initial service stopped after a child Python
+SIGSEGV at 84/96; the unchanged resume completed all 96 worlds.
 
-- [Frozen collision and recovery contract](docs/LOCKED_COLLISION_RECOVERY_PROTOCOL.md)
-- [HOCBF correction supervision](docs/HOCBF_CORRECTION_SUPERVISION_V1.md)
-- [Paired fixed500 evaluation and energy handoff](docs/HOCBF_FIXED500_AND_ENERGY_HANDOFF_20260908.md)
-- [New-navigation return-energy500k protocol](docs/NEW_NAVIGATION_RETURN_ENERGY_500K_PROTOCOL.md)
-- [Durable research plan](task_plan.md) and [research notes](notes.md)
+The complete raw audit passed. Gate H passed, establishing stable paired C/R
+advantage heterogeneity on DEV. Gate I failed: the tested full legal history did
+not improve out-of-world prediction or selected utility over latest/constant
+baselines. The frozen stopping rule keeps CONFIRM unopened and METHOD-TRAIN
+unauthorized. See `docs/PAIRED_ADVANTAGE_DEV_RESULT_20260915.md`.
 
-The native QP kernel is supplied as C source; build it locally with
-`.venv/bin/python scripts/build_hocbf_native.py`. Checkpoints, simulation data,
-downloaded papers, skill installers and machine-specific compiled libraries
-are not included in this source snapshot. Existing experiment resume commands
-require their original local artifacts and matching recorded source hashes.
+Protocol and machine contract:
 
-The sections below describe earlier research stages and are retained as history.
+- `docs/PAIRED_ADVANTAGE_IDENTIFICATION_PROTOCOL_20260914.md`
+- `docs/PAIRED_ADVANTAGE_IDENTIFICATION_CONTRACT_TEMPLATE.json`
+- `docs/LOCKED_COLLISION_RECOVERY_PROTOCOL.md`
 
-## Current Research Index
+## Current research direction
 
-The consolidated status of the energy-estimation, sampled-data safety-filter,
-history-conditioned trajectory, recurrent-memory, and control-grounded memory
-studies is maintained in [`docs/RESEARCH_OVERVIEW.md`](docs/RESEARCH_OVERVIEW.md).
-That document also links the complete primary-paper matrices, proof audits,
-controlled experiment reports, hostile reviews, and final keep/reject decisions.
+Larger history-model training is stopped. An existing-DEV-only factor audit
+finds that C/R sign changes are dominated by controller-conditioned task
+reachability/stuckness rather than energy exhaustion or contact. Compact legal
+progress/stall history is suggestive but not yet proven decision-sufficient;
+simple privileged straight-path geometry adds no held-out value. See
+`docs/LATENT_FACTOR_OBSERVABILITY_DEV_RESULT_20260915.md`. No new training or
+CONFIRM access has been started.
 
-The current high-level conclusion is deliberately mixed: calibrated Monte Carlo
-energy estimation remains a useful component under its stated exchangeability
-and predefined-group assumptions, while the attempted generic theory claims for
-energy-aware filtering, history-conditioned safe sampling, and structured memory
-were not supported. Those rejected routes are preserved as research provenance.
+The user subsequently authorized the independent PSPS-v1 prospective test.
+Its 20-D compact legal progress/stall state, Gate O then Gate D rules, 96 fresh
+DEV worlds and 128 unopened CONFIRM worlds are externally frozen under
+`artifacts/psps_v1_20260915`. The formal resumable DEV service passed its first
+checkpoint health check and is running with automatic analysis, confirmation,
+and training disabled. See `docs/PSPS_V1_PROSPECTIVE_PROTOCOL_20260915.md` and
+`artifacts/psps_v1_20260915/startup_health_psps_v1.md`.
 
-The active research package is in `review_bundle/`.
+Startup audit:
+`artifacts/paired_advantage_identification_20260914_v3/startup_health_pai_v3.md`.
+
+## Repository layout
+
+- `scripts/`: only the active collector/validator/analyzer/freezer closure and
+  generic confirmation helpers.
+- `tests/`: focused current runtime/model/coordinator tests.
+- `artifacts/`: active v3 evidence, minimal provenance contracts, and the exact
+  frozen model files required at runtime.
+- `envs/`, `experiments/`, `agent/`, `common/`, `network/`, `policy/`,
+  `calibration/`, `cert_runtime/`: environment and method implementations,
+  intentionally untouched by repository cleanup.
+- `runtime_support/review_bundle`: byte-identical runtime safety/environment
+  support moved out of the old review bundle. The root `review_bundle` symlink
+  preserves unchanged imports for the active frozen run.
+
+## Health commands
 
 ```bash
-cd review_bundle
-uv venv .venv
-uv pip install --python .venv/bin/python -r requirements.txt
-.venv/bin/python -m unittest discover -v -s tests -p 'test_*.py'
+.venv/bin/python scripts/validate_paired_advantage_contract.py \
+  artifacts/paired_advantage_identification_20260914_v3/contract.json \
+  --receipt artifacts/paired_advantage_identification_20260914_v3/freeze_receipt.json
 ```
 
-See `review_bundle/README.md` for multi-step Generator-SAC and comparison commands.
-The current phase adds Center-Only/Random-in-Generator ablations, deterministic scenario-family
-generation, held-out manifest checks, and paper-oriented synthetic result tables.
-The checked-in mission gate, repaired 2k matrix, and five-seed 10k matrix are synthetic software
-and empirical evidence only, not calibrated real-flight safety evidence.
-The current RL-contribution and held-out gates both pass their synthetic evidence criteria. The
-central result is negative but important: Center-Only matches Generator-SAC on the current open and
-obstacle missions, so demonstrated task competence is primarily attributable to the verified
-task-oriented center rather than learned residual optimization.
-
-The current development phase adds a separate single-UAV persistent goal/charging path. The
-environment assigns certified goals while one continuous three-dimensional Generator-SAC policy
-controls normal task and voluntary charging behavior. Certified recoverability constrains every
-accepted action, and kappa is backup only. Code and deterministic unit tests are included;
-persistent certificate validation, baseline comparisons, and learning are left for manual execution. See
-`review_bundle/docs/PERSISTENT_TASK_CHARGING.md`.
-
-## UAV Energy Delivery V3
-
-The current V3 energy experiment is explicitly `obstacle_free_pre_safety`.
-Navigation energy readiness is separated from boundary-safety readiness, so a
-frozen policy that passes goal success and path-quality gates may proceed to
-battery calibration and Energy TD while boundary-contact limitations remain
-recorded. The active Energy TD context is
-`frozen_navigation_policy_without_cbf`, and its artifacts declare
-`requires_retraining_after_safety_layer = true`: a future LiDAR/CBF layer will
-change executed trajectories and therefore requires Energy TD retraining or
-fine-tuning. See `docs/UAV_ENERGY_DELIVERY_V3.md`.
-
-The persistent Bellman/runtime closure records one shared execution authority for each next state.
-Closed charging departure is handled by a certified stay-inside Generator support; kappa and charger
-hold remain explicit fallback atoms rather than silently aliased accepted policy actions.
+Do not run the DEV analyzer until collection reaches 96/96 with a complete raw
+audit. Repository minimization details are in
+`docs/REPOSITORY_MINIMIZATION_20260914.md`.
