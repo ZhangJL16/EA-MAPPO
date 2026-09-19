@@ -1,5 +1,23 @@
 # Current task plan
 
+## Public-task mechanism prototype (completed first DEV round, 2026-09-19)
+
+- [x] Replace theorem-first escalation with a bounded empirical hypothesis.
+- [x] Verify DAD author task/architecture; isolated Torch adapter, no old runtime edits.
+- [x] Implement pool+budget, fixed attention, budget-query attention, wider pool,
+  and original-architecture fixed-H DAD reference.
+- [x] Run 3 seeds × 5 models × 600 updates; paired H=4/6/8/12 evaluation.
+- [x] Query-only constant/zero controls; report both EIG bounds and computation.
+- [x] Fix and disclose missing evaluation weight load; retain invalid old eval.
+- [x] Nine tests including original-source parity and end-to-end checkpoint eval.
+- [x] Report a non-supportive first result; do not claim a new mechanism/paradigm.
+- [ ] NOT done: full-budget original DAD, Step-DAD, per-H specialists, second task,
+  final confirmation. No automatic promotion or new theorem/teacher gate.
+
+See `docs/BUDGET_READING_PILOT_20260919.md`. Full-vector separation is not the
+mandatory next step; V2.1/V3 and stopped AFPP remain unlaunched. A short pilot
+does not establish convergence or rule out all budget-aware design methods.
+
 ## T5.1e Bellman residual decomposition (completed, 2026-09-19)
 
 - [x] Freeze four planner settings; probe 1,171 states (4,684 exact rows).

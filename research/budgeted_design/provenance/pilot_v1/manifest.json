@@ -1,0 +1,56 @@
+{
+  "binding": {
+    "config": {
+      "scope": "public-source-location-development-only",
+      "source_commit": "4b1008174e1531d1f14601d83cef481c0f586f36",
+      "methods": [
+        "pool",
+        "fixed_attention",
+        "budget_attention",
+        "pool_wide",
+        "dad_native"
+      ],
+      "seeds": [
+        4101,
+        4102,
+        4103
+      ],
+      "train_horizons": [
+        4,
+        8
+      ],
+      "native_horizon": 8,
+      "eval_horizons": [
+        4,
+        6,
+        8,
+        12
+      ],
+      "steps": 600,
+      "batch": 64,
+      "contrasts": 128,
+      "hidden": 64,
+      "encoding": 16,
+      "lr": 0.0003,
+      "gradient_clip": 10.0,
+      "checkpoint_every": 100,
+      "eval_rollouts": 512,
+      "eval_batch": 32,
+      "eval_contrasts": 4096,
+      "eval_seed": 910000,
+      "threads": 1,
+      "hard_timeout_seconds": 2400
+    },
+    "runtime": {
+      "__init__.py": "765cb47936e3f200d6a6f4134272b6603f2ab83e9bdf0eb4b4ab157bfd7e7d27",
+      "core.py": "1e7cbcdfe9ab568659535b0e8256c34c3b36362eca6914533225634cf2a65b10",
+      "run.py": "f41503be8014cb1ed0de4b4e5854083f371f257ad3e2f60b689f9a1baf164fcd"
+    },
+    "torch": "2.7.1+cu128",
+    "python": "3.12.3"
+  },
+  "device": "cuda",
+  "gpu": "NVIDIA GeForce RTX 5060 Laptop GPU",
+  "created_utc": "2026-09-19T09:42:43Z",
+  "scope": "DEV prototype; no final confirmation; no teacher"
+}

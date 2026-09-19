@@ -1,0 +1,21 @@
+{
+  "author_commit": "4b1008174e1531d1f14601d83cef481c0f586f36",
+  "author_files": {
+    "README.md": "cd3c0802cd928765b1dce5c4a29b7c6444969b147536245aedb58fa3f675ad81",
+    "LICENSE": "46223997f730dcd689969cf7daf52ed37457f32033c06e855be947c949a30a00",
+    "location_finding.py": "799baab9896da8901b1ffdc4050e5b2e82b0af1f2bbe13961d8f9308ef787472",
+    "location_finding_eval.py": "3877fccd3d97a75dccfe2b932d4254e7ec7d8824da12abb2ba25612adb549b03",
+    "neural/modules.py": "74f8abfe7286640ec0f7684f28737e15fddf545b78810c1abd2f6737c76e1eba",
+    "contrastive/mi.py": "2b2f3c6324cf0327cf561ca3acb0e7a702f6554a06036dba3bc4b13d315884f3"
+  },
+  "python": "3.12.3",
+  "torch": "2.7.1+cu128",
+  "numpy": "1.26.4",
+  "cuda": "12.8",
+  "gpu": "NVIDIA GeForce RTX 5060 Laptop GPU",
+  "CPU": "x86_64",
+  "reference_test": "selected original Torch AST forward functions matched; original Pyro runner not run",
+  "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+  "teacher_cost": 0,
+  "remaining_work": "Step-DAD; native T=30 full-budget reproduction; second task; broader repeats; final confirmation"
+}

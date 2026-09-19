@@ -1,5 +1,29 @@
 # Current research notes
 
+## 2026-09-19 public-task prototype: mechanism hypothesis not supported yet
+
+The user withdrew theorem-only escalation and authorized an actual low-cost
+method experiment. New isolated `research/budgeted_design` uses the DAD 2D,
+two-source continuous task, not FPL roots/teachers or resource constraints.
+Fifteen 600-update training runs completed. Paired 512-rollout evaluations at
+four horizons, L=4096, include three seeds and query-only interventions.
+
+Budget-query minus pool mean sPCE differences at H=4/6/8/12:
+-0.0308 / -0.0940 / -0.0869 / -0.1450 nats. Against fixed attention:
+-0.0084 / -0.0400 / -0.0698 / -0.0458. Query interventions do not show a robust
+positive effect. Do not claim superiority, convergence or a universal negative
+result; this was a short DEV comparison. No automatic larger run started.
+
+An initial evaluator forgot `load_state_dict` and evaluated initialized
+networks. All initial evaluation rows are INVALID and preserved with a notice.
+The trained checkpoints themselves were valid; corrected evaluation uses identical
+checkpoint bytes in a new directory and passes loading/end-to-end regression.
+Training-tail timing overlapped that initial invalid eval; training times are
+accounting, not isolated speed evidence. Corrected inference latency is separate.
+No original Pyro-stack/full-budget DAD reproduction or Step-DAD experiment is
+claimed. Details, raw estimates and portable checkpoints are linked in
+`docs/BUDGET_READING_PILOT_20260919.md`.
+
 ## 2026-09-19 residual decomposition: Route C
 
 All 4,684 census decision probes and 128 exact episode decompositions completed.

@@ -1,0 +1,23 @@
+{
+  "scope": "public-source-location-development-only",
+  "source_commit": "4b1008174e1531d1f14601d83cef481c0f586f36",
+  "methods": ["pool", "fixed_attention", "budget_attention", "pool_wide", "dad_native"],
+  "seeds": [4101, 4102, 4103],
+  "train_horizons": [4, 8],
+  "native_horizon": 8,
+  "eval_horizons": [4, 6, 8, 12],
+  "steps": 600,
+  "batch": 64,
+  "contrasts": 128,
+  "hidden": 64,
+  "encoding": 16,
+  "lr": 0.0003,
+  "gradient_clip": 10.0,
+  "checkpoint_every": 100,
+  "eval_rollouts": 512,
+  "eval_batch": 32,
+  "eval_contrasts": 4096,
+  "eval_seed": 910000,
+  "threads": 1,
+  "hard_timeout_seconds": 2400
+}
