@@ -1,0 +1,14 @@
+{
+  "status": "passed",
+  "states": 273,
+  "prefixes": 5383,
+  "all_state_policy_weights_one": true,
+  "all_advantages_nonpositive": true,
+  "archive_sha256": "c78bb29b97088c60a483ae54705eff2928301c565ce5a16e7e5d876067c04add",
+  "archive_bytes": 509193,
+  "design_commitment": {
+    "file": "teacher_v2_design_v1.json",
+    "sha256": "d07ea15a226b5e6a072695dda6abbf003e26a3f6d4e6f0e7bb3d6c6b17df4a8e",
+    "scope": "Design bytes only; no V2 implementation, problem generation or solver run"
+  }
+}

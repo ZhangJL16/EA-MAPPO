@@ -1,0 +1,63 @@
+{
+  "environment_calls": 0,
+  "excluded_states": 0,
+  "export_config": {
+    "advantage": "q_next minus maximum q_next; every optimal action has zero advantage",
+    "class_balancing": "none in this export",
+    "folds": "metadata-only salted hash order; floor(groups/4) validation groups, at least one if groups >=2",
+    "group_split_salt": "teacher-prefix-v1-structural-holdout-20260919",
+    "input_archive_sha256": "f489508a0bcc30ee9a27b882bff0894a595ed96dd033428248fb30baffa64377",
+    "no_feature_fields": [
+      "state_id",
+      "problem_id",
+      "root",
+      "condition",
+      "structural_group",
+      "fold",
+      "sources",
+      "solver_status",
+      "work",
+      "targets"
+    ],
+    "normalization": "divide by max(original decision H,1), including prefix value",
+    "policy_loss": "negative log total probability assigned to optimal_next set",
+    "prefix_value_semantics": "Total original-state complete-protocol Q, not residual value after prefix execution",
+    "sampling": "uniform state within its fold, then uniform nonterminal prefix within state; action loss averaged within prefix",
+    "schema": "teacher-prefix-export-v1",
+    "scope": "Pure derived TRAIN targets, no exact solves or network training",
+    "terminal_decoding": "END only, policy loss masked; STOP at empty prefix only"
+  },
+  "exporter_sha256": "a614394a89dc37438f50694d86aebb9f329aaf958970c9e931a421ce803b87d6",
+  "files": {
+    "excluded.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "group_folds.json": "039c38dc7a89b72d174234a6b347e4e3a757db41c6e0704d5b5e79463fdbe347",
+    "prefixes.jsonl": "10b149900fccf7e75d141f3deff7d91ab39605bd12ac02e632b0f572782ec8ed",
+    "problems.json": "022b8446e98a021e721c38432a6f501dd883794663f88f3d10cb25f24805da7b",
+    "states.jsonl": "7af9791aa645f9fb51434d915fa8b49e9181f9c65d9191dbed85439923307d8a"
+  },
+  "fold_summary": {
+    "student_train": {
+      "nonprior_required": 0,
+      "states": 145,
+      "structural_groups": 6
+    },
+    "student_validation": {
+      "nonprior_required": 2,
+      "states": 128,
+      "structural_groups": 2
+    }
+  },
+  "input_archive_sha256": "f489508a0bcc30ee9a27b882bff0894a595ed96dd033428248fb30baffa64377",
+  "input_audit_sha256": "ba1cf250e6a544b01d1ef340624cc1eeeb02266e455cc2d439caec727e953c37",
+  "limits": "No new information or structures; inherited V1 coverage. Fold assignment not balanced by outcomes.",
+  "schema": "teacher-target-export-v1",
+  "solver_calls": 0,
+  "status": "complete",
+  "summary": {
+    "decision_prefixes": 2394,
+    "prefixes": 5383,
+    "states": 273,
+    "tied_decision_prefixes": 82
+  },
+  "verification": "all prefix Q/advantage/set targets checked by direct saved-candidate scan"
+}

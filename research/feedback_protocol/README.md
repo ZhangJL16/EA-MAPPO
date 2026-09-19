@@ -1,5 +1,10 @@
 # Feedback Protocol Lab — finite Bernoulli testbed
 
+Latest: [T5.1b prefix/Q/advantage export + frozen V2 design](../../docs/FPL_T51B_EXPORT_V2_DESIGN_20260919.md).
+273 states -> 5,383 prefix rows (not independent samples), equal total state
+weight, set-valued targets and structural holdout. V2 has not been implemented
+or run. No neural training; V1's training fold lacks continued-sensing-required states.
+
 Current: [T5.1 teacher contract](CONTRACT_V05_TEACHER.md) and
 [implementation/startup report](../../docs/FPL_T5_1_STARTUP_20260919.md).
 TRAIN-only exact V/Q dataset builder and mixed-history sampling are implemented.

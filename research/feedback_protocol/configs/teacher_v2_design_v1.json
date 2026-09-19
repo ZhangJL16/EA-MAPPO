@@ -1,0 +1,92 @@
+{
+  "schema": "teacher-v2-design-v1",
+  "status": "design_frozen_implementation_pending",
+  "purpose": "TRAIN structure diversity and post-feedback sensing supervision; not a new B2-necessity gate",
+  "not_authorized_by_this_file": ["GPU training", "DEV evaluation", "test/OOD evaluation", "confirmation preimage access", "automatic root replacement by label outcome"],
+  "scope": {"split": "train", "K": 4, "depth": 2, "channels": [3, 4, 5], "horizons": [9, 12], "capacities": [3, 5], "quality": ["4/5", "9/10"], "task_duration": 1, "task_energy": 1},
+  "admission": {
+    "candidate_root_start": 300001,
+    "candidate_limit_per_family": 128,
+    "target_unique_structures_per_family": 8,
+    "target_unique_structures_total": 32,
+    "sizing_pilot_structures_per_family": 2,
+    "sizing_pilot_structures_total": 8,
+    "selection_order": "family order below then ascending candidate seed; globally deduplicate conservative structural hashes before solving",
+    "exclude": ["teacher_v1 exclusion hashes/seeds", "all V1 structural hashes and roots", "already reserved public DEV/test/OOD registry hashes"],
+    "no_private_confirmation_access": true,
+    "structural_checks": ["all probes reachable and returnable at capacity 5", "debit-before-reload feasible", "positive operation durations", "max channel multiplicity one per protocol", "at least two sequential singleton measurement batches plus one task feasible at H=12 and capacity 5 for some channel order; no optimality check"],
+    "on_exhaustion": "retain missing stratum and rejection log; no silent redesign",
+    "on_unresolved": "retain root and selected state; no retry or replacement"
+  },
+  "randomness": {
+    "namespace": "fpl-teacher-v2-design-v1",
+    "independent_streams": ["topology", "return_structure", "hypothesis_permutation", "channel_polarity", "prior", "quality", "cost", "state_exploration", "retention"],
+    "derivation": "SHA256 canonical JSON [namespace,root_seed,stream_name]; random.Random seeded by resulting integer",
+    "paired_variants": "public likelihood/prior/topology fixed within root; cross horizons 9/12 with capacities 3/5; never count variants as independent roots",
+    "categorical_defaults": "uniform choice from each explicitly listed set; independent Bernoulli graph edges; prior integer weights independently uniform in 2..5, normalized exactly; uniform hypothesis permutation and channel polarity bits"
+  },
+  "families": [
+    {"id": "adaptive_hierarchy", "sensors": "coarse c0 plus complementary specialized cL/cR; outside subtree probability 1/2", "graph": "three measurement nodes; directed transit Bernoulli p=1/2; independent direct/shared-cleanup return choices; singleton sensing durations total 3", "costs": {"prepare": 1, "probe": 1, "cleanup": 1, "transit": 1}},
+    {"id": "random_resource_graph", "sensors": "same coarse/specialized semantics plus zero or one weak duplicate", "graph": "directed connectivity p in {1/4,1/2,3/4}; single shared-preparation hub and random shared-cleanup incidences", "costs": {"prepare": 1, "probe": 1, "cleanup": 1, "transit": [1,2]}},
+    {"id": "cost_horizon", "sensors": "coarse/specialized hierarchy", "graph": "independent directed transit and return choices; not a reskin of an admitted graph", "costs": {"prepare": [1,2], "probe": 1, "cleanup": [1,2], "transit": [1,2]}},
+    {"id": "decoy_redundancy", "sensors": "coarse/specialized plus one or two sensors: duplicate specialization, weak broad-group or strong high-cost broad-group", "graph": "directed transit p=1/2 with return-structure randomization", "costs": {"prepare": 1, "probe": [1,2], "cleanup": 1, "transit": [1,2]}, "weak_quality": "3/5", "strong_quality": "9/10"}
+  ],
+  "return_structure": {
+    "choices": ["direct", "shared_cleanup"],
+    "direct": "measurement node -> reset; duration=cleanup, energy=1",
+    "shared_cleanup": "measurement node -> cleanup_node -> reset; first duration=1, second duration=cleanup, each energy=1; genuine extra recovery time/energy",
+    "random_choice": "each measurement independently direct or shared_cleanup with probability 1/2; create one shared cleanup node only if used",
+    "nontriviality": "do not add unreachable padding nodes or zero-cost subdivisions solely to inflate structure count"
+  },
+  "base_operation_graph": {
+    "prepare": "reset -> ready: configured prepare duration, energy 1, no observation",
+    "probe": "ready -> channel node: per-channel configured probe duration, energy 1, that channel observed",
+    "transit_probe": "channel i -> channel j: configured transit + probe_j duration, energy 2, observe j; one edge per independently admitted ordered pair",
+    "task": "one reset self-loop per hypothesis, unit utility only at matching hypothesis, duration=energy=1; task payoff is not feedback",
+    "empty_return": "ready -> reset: cleanup duration, energy 1, zero utility",
+    "sensing_utility": "zero",
+    "extra_sensors": "random_resource: uniform 0/1 duplicate specialized sensor with quality 3/5; decoy: uniform 1/2 extra sensors, each uniformly duplicate-specialized, weak-coarse or strong-coarse; strong-coarse probe duration 2",
+    "cost_draws": "listed prepare/cleanup/transit choices drawn once per root; probe choices independently per channel, then fixed across all H/B variants"
+  },
+  "state_collection": {
+    "sources": ["exact", "random", "one_step_voi", "beam", "posterior_sampling", "public_information_explorer"],
+    "rollout_batches_per_source": 6,
+    "max_positive_outcomes": 32,
+    "retain_root": true,
+    "max_selected_states_per_problem": 48,
+    "explorer": "among bounded legal measuring candidates, maximize sum_y P_b(y|p)*sum_h (b_y[h]-b[h])^2 / duration(p); zero utility in ranking; lexical tie break",
+    "explorer_role": "training-state coverage only, not a performance baseline or novelty claim",
+    "candidate_builder": "bounded prefix beam width 16; no full catalogue required by explorer",
+    "retention": "union source pools, deduplicate sufficient states retaining provenance; deterministic round-robin over occupied public-feature strata, hash priority within each stratum",
+    "strata": {
+      "normalized_gini": {"formula": "(1-sum_h b[h]^2)/(1-1/K)", "edges": ["0", "1/4", "1/2", "3/4", "1"]},
+      "relative_H": {"formula": "H/problem.budget", "edges": ["0", "1/3", "2/3", "1"]},
+      "distance_from_prior": {"formula": "sum_h abs(b[h]-prior[h])/2", "edges": ["0", "1/4", "1/2", "1"]},
+      "released_measurements": ["0", "1", "2_or_more"],
+      "boundary_rule": "left closed/right open, last bin includes 1; all arithmetic rational",
+      "duplicate_history_rule": "if one sufficient state appears in several strata via different histories, assign its lexicographically smallest stratum once; preserve all provenance"
+    },
+    "forbidden_retention_features": ["teacher Q", "teacher V", "optimal action", "measurement-required label", "solve success", "learner performance"]
+  },
+  "work_limits": {
+    "exact_label": {"max_states": 3000, "max_protocol_nodes": 10000, "max_outcomes": 32, "max_expansions": 1000000, "max_model_calls": 3000000, "watchdog_seconds": 5},
+    "collection_per_source_episode": {"max_expansions": 10000, "max_model_calls": 100000, "watchdog_seconds": 15},
+    "accounting": "separate candidate/admission, collection, label solve, export/audit CPU, wall and counters; complete state/root checkpoints; interrupted work logged separately"
+  },
+  "student_split": {
+    "unit": "connected component of shared root or structural-clone identities; all paired cost/horizon/capacity variants stay together",
+    "rule": "salted hash order on all admitted groups before labels; first floor(N/4) validation; remainder train",
+    "salt": "teacher-v2-internal-structural-holdout-v1",
+    "no_adaptive_reassignment": true,
+    "scope": "internal TRAIN corpus holdout, not public DEV or confirmation"
+  },
+  "reporting_targets_not_admission_filters": {
+    "distinct_structures_range": [24,40],
+    "nonprior_measurement_required_groups_min": 6,
+    "train_adaptive_groups_min": 4,
+    "validation_adaptive_groups_min": 2,
+    "if_not_met": "report shortfall; do not label-filter roots, alter holdout or launch formal AFPP training",
+    "sizing_pilot": "solve only first two admitted structures per family with all four H/capacity variants; report cost/yield including unresolved; no automatic full-corpus launch"
+  },
+  "training_future": {"default_sampling": "uniform state then prefix with unit total state weight", "rare_class_balancing": "possible later versioned TRAIN-only choice; not used in this design pilot", "targets": ["set_policy", "advantage", "normalized_value"], "no_RL": true}
+}

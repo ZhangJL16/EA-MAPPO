@@ -1,5 +1,16 @@
 # Current research notes
 
+## 2026-09-19 prefix supervision and V2 design freeze
+
+Pure audited-Q export yields 5,383 prefixes from 273 states, with 2,394 decision
+prefixes and 82 tied next-action sets. END rows carry no policy weight; each
+state totals weight one. Root STOP differs from decoder END. No new solves.
+Metadata-only structural holdout gives 145 train/128 val states over 6/2 groups,
+but non-prior measurement-required states are 0/2. This split is not retuned;
+prefix expansion does not cure continued-sensing coverage. V2's 32-group design
+and 8-group sizing pilot are prospective, not implemented or executed. 49 tests
+pass. No network/test/CONFIRM/push. See `docs/FPL_T51B_EXPORT_V2_DESIGN_20260919.md`.
+
 ## 2026-09-19 Teacher V1 complete census
 
 The authorized unchanged 23-root continuation completed. Full audit passed:

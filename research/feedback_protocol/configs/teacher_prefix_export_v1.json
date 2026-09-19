@@ -1,0 +1,15 @@
+{
+  "schema": "teacher-prefix-export-v1",
+  "input_archive_sha256": "f489508a0bcc30ee9a27b882bff0894a595ed96dd033428248fb30baffa64377",
+  "group_split_salt": "teacher-prefix-v1-structural-holdout-20260919",
+  "scope": "Pure derived TRAIN targets, no exact solves or network training",
+  "prefix_value_semantics": "Total original-state complete-protocol Q, not residual value after prefix execution",
+  "normalization": "divide by max(original decision H,1), including prefix value",
+  "policy_loss": "negative log total probability assigned to optimal_next set",
+  "advantage": "q_next minus maximum q_next; every optimal action has zero advantage",
+  "sampling": "uniform state within its fold, then uniform nonterminal prefix within state; action loss averaged within prefix",
+  "terminal_decoding": "END only, policy loss masked; STOP at empty prefix only",
+  "class_balancing": "none in this export",
+  "folds": "metadata-only salted hash order; floor(groups/4) validation groups, at least one if groups >=2",
+  "no_feature_fields": ["state_id", "problem_id", "root", "condition", "structural_group", "fold", "sources", "solver_status", "work", "targets"]
+}

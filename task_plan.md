@@ -1,5 +1,18 @@
 # Current task plan
 
+## T5.1b export / T5.1c design (2026-09-19)
+
+- [x] Derive exact prefix Q, advantages, optimal sets, normalized values without solves.
+- [x] Preserve terminal/feedback semantics, state-balanced weights, structural holdout.
+- [x] Export all 273 states; 5,383 prefix rows; full 49-test suite and arithmetic checks pass.
+- [x] Freeze V2 four-family design and engineering targets before generation.
+- [ ] Implement/run V2 structural admission and stratified collection sizing pilot.
+- [ ] T5.2 model/training (not started).
+
+See `docs/FPL_T51B_EXPORT_V2_DESIGN_20260919.md`. V1 holdout has 6 train/2 val
+structures, with non-prior measurement-required counts 0/2. Keep the split;
+do not promote training or inflate sample size by counting prefixes.
+
 ## Teacher V1 full continuation (completed, 2026-09-19)
 
 - [x] Resume remaining 23 sealed roots unchanged, without retry/limit changes.
