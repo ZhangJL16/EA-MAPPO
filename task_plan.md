@@ -1,5 +1,16 @@
 # Current task plan
 
+## Feedback protocol first batch (completed, 2026-09-19)
+
+- [x] Read expert_advice; local HEAD matches fff2b02; inventory confirms all 26 allowlisted evidence paths exist.
+- [x] Establish isolated public/private contract, configurable graph simulator, posterior and finite-budget oracle.
+- [x] Implement independent channel coverage and exact Bayes references with bounded computation.
+- [x] Pass 13 focused tests and two budget-6 debug smoke episodes; frozen source hashes unchanged.
+
+See `docs/FPL_FIRST_BATCH_20260919.md`. New code is in
+`research/feedback_protocol/`; only master retained. No training, CONFIRM access,
+scientific sweep or performance claim. Remaining A/B/C stages are listed explicitly.
+
 ## AI relevance and evaluation implications (completed, 2026-09-16)
 
 - [x] Write standalone one-page-equivalent relevance layer with concrete protocol-reporting implications.

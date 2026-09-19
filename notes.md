@@ -1,5 +1,14 @@
 # Current research notes
 
+## 2026-09-19 isolated feedback-protocol implementation
+
+First batch from expert_advice is executable: committed reset-to-reset protocols,
+separate duration/energy, exact public belief, channel-coverage heuristic and
+rational finite-budget Bayes reference. The new comparator is matching known-model
+finite-budget value, not silently T*rho. Metadata-only inventory found every
+allowlisted old evidence path. 13 tests and two debug smoke episodes pass;
+no algorithm superiority inferred. See docs/FPL_FIRST_BATCH_20260919.md.
+
 ## 2026-09-16 completed AI relevance layer
 
 Feasible acquisition protocol belongs to the comparison object, not just an

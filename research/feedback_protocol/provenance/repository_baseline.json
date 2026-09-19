@@ -1,0 +1,182 @@
+{
+  "schema": "ea-mappo-local-handoff-v1",
+  "created_at_utc": "2026-09-19T00:01:57.684134+00:00",
+  "remote_audited_commit": "fff2b026ca3e4ea6b68cacc3964971b0749bfeb3",
+  "local_head": {
+    "returncode": 0,
+    "stdout": "fff2b026ca3e4ea6b68cacc3964971b0749bfeb3",
+    "stderr": ""
+  },
+  "branch": {
+    "returncode": 0,
+    "stdout": "master",
+    "stderr": ""
+  },
+  "matches_audited_commit": true,
+  "tracked_working_tree_status": {
+    "returncode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "committed_file_changes_since_audit": {
+    "returncode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "environment": {
+    "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+    "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "logical_cpu_count": 24,
+    "package_metadata": {
+      "numpy": "1.26.4",
+      "scipy": "1.15.3",
+      "pytest": "8.4.2",
+      "torch": "2.7.1+cu128",
+      "gymnasium": "1.2.3",
+      "pyro-ppl": null,
+      "networkx": "3.4.2"
+    }
+  },
+  "gpu_metadata": {
+    "returncode": 0,
+    "stdout": "NVIDIA GeForce RTX 5060 Laptop GPU, 8151 MiB, 592.01",
+    "stderr": ""
+  },
+  "source_allowlist": [
+    {
+      "path": "AGENTS.md",
+      "contents_read": true,
+      "exists": true,
+      "is_file": true,
+      "is_dir": false,
+      "size_bytes": 4328,
+      "sha256": "aae87ccf568281419df1515e8ba10c4e74d22346af8a6cdf7e4f4b194cfb2618"
+    },
+    {
+      "path": "README.md",
+      "contents_read": true,
+      "exists": true,
+      "is_file": true,
+      "is_dir": false,
+      "size_bytes": 3506,
+      "sha256": "11400144ed5c0163346a6e329bc7de50fb2a3e84b1f158b26951db3b834513c4"
+    },
+    {
+      "path": "task_plan.md",
+      "contents_read": true,
+      "exists": true,
+      "is_file": true,
+      "is_dir": false,
+      "size_bytes": 29267,
+      "sha256": "cd63442412cdd3dcbe4b799e3cbd8a5105e9053d575aaf0a441b24664a6c6a9e"
+    },
+    {
+      "path": "notes.md",
+      "contents_read": true,
+      "exists": true,
+      "is_file": true,
+      "is_dir": false,
+      "size_bytes": 39512,
+      "sha256": "e0c2c8789914427d2ed6f2ccd5dfc6d59fe0296bfaa879b7c566186ce3aeb805"
+    },
+    {
+      "path": ".gitignore",
+      "contents_read": true,
+      "exists": true,
+      "is_file": true,
+      "is_dir": false,
+      "size_bytes": 2907,
+      "sha256": "fc5709beaa628adabc7d2d0c5a3d2f57f4b8e5fae6907157b9ebe2bd10d9e626"
+    },
+    {
+      "path": "requirements.uv.txt",
+      "contents_read": true,
+      "exists": true,
+      "is_file": true,
+      "is_dir": false,
+      "size_bytes": 1313,
+      "sha256": "54a27c75abfd9bc09d0942feaeb4d0176d49417c923f8ccdae44bb678db07fef"
+    },
+    {
+      "path": "pytest.ini",
+      "contents_read": true,
+      "exists": true,
+      "is_file": true,
+      "is_dir": false,
+      "size_bytes": 42,
+      "sha256": "b160d82f7811555051f8966d8e02750a985227c1d022208c784e606946f2eada"
+    },
+    {
+      "path": "experiments/bundling_calibration_core.py",
+      "contents_read": true,
+      "exists": true,
+      "is_file": true,
+      "is_dir": false,
+      "size_bytes": 10561,
+      "sha256": "6590733c3e1df21f97f653fa5c0d17eeba90342a063db63287f57dde55646d2d"
+    },
+    {
+      "path": "scripts/run_bundling_calibration.py",
+      "contents_read": true,
+      "exists": true,
+      "is_file": true,
+      "is_dir": false,
+      "size_bytes": 8077,
+      "sha256": "974aafc8c3aeec9f611b2cc7b2ba7a07e197f732fb89f3151fbf0ef24dfdce03"
+    },
+    {
+      "path": "scripts/analyze_bundling_calibration.py",
+      "contents_read": true,
+      "exists": true,
+      "is_file": true,
+      "is_dir": false,
+      "size_bytes": 10583,
+      "sha256": "63a543f8d3509a678bb7b371ba71b5c05ed8faaea4cc7f282debda97306fe1fa"
+    },
+    {
+      "path": "scripts/diagnose_bundling_allocation.py",
+      "contents_read": true,
+      "exists": true,
+      "is_file": true,
+      "is_dir": false,
+      "size_bytes": 6602,
+      "sha256": "934bccc42af03c3348db6fef0a1e1a28ac7d16e8299ed8fdcd01607d7aed95eb"
+    },
+    {
+      "path": "scripts/verify_bundling_finite_budget_theory.py",
+      "contents_read": true,
+      "exists": true,
+      "is_file": true,
+      "is_dir": false,
+      "size_bytes": 20412,
+      "sha256": "498c7be9b674492b7d551b28ce07ec3e391abbf89e9ffd5d753bd1529c44be2e"
+    },
+    {
+      "path": "scripts/audit_resource_separation_bridge.py",
+      "contents_read": true,
+      "exists": true,
+      "is_file": true,
+      "is_dir": false,
+      "size_bytes": 7855,
+      "sha256": "c768061af84f34ff15e98258ebe251c5aadb4971a935e057c0877f184f0ab18b"
+    },
+    {
+      "path": "tests/test_bundling_calibration.py",
+      "contents_read": true,
+      "exists": true,
+      "is_file": true,
+      "is_dir": false,
+      "size_bytes": 4311,
+      "sha256": "0f33ba3898b2cd93287f3e090c549bcbe5418de3b9d4d5e58a7ea8b792b5d0e5"
+    },
+    {
+      "path": "docs/ICML_RESOURCE_SEPARATION_PAPER_CORE_20260916.md",
+      "contents_read": true,
+      "exists": true,
+      "is_file": true,
+      "is_dir": false,
+      "size_bytes": 24615,
+      "sha256": "6357a8cbe3340914cd4a3467215de08e538890852df95794f57b1796eb4a286c"
+    }
+  ]
+}

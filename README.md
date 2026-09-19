@@ -1,4 +1,15 @@
-# Paired-Advantage Identification
+# EA-MAPPO research workspace
+
+Current entry (2026-09-19): [Feedback Protocol Lab](research/feedback_protocol/README.md)
+implements the first isolated batch of the [A/B/C plan](expert_advice/EA_MAPPO_ABC_RESEARCH_PLAN.md).
+Its public problem contract and two independent comparison baselines are separate
+from the frozen [resource-separation paper](docs/ICML_RESOURCE_SEPARATION_PAPER_CORE_20260916.md).
+See [first-batch status](docs/FPL_FIRST_BATCH_20260919.md) for implementation limits.
+
+## Historical PAI / PSPS entry (retained)
+
+The following records the earlier research line and its then-current runtime
+status; it is not an instruction to resume those experiments.
 
 This repository is currently scoped to one research question: whether the
 paired C/R advantage has stable decision heterogeneity (Gate H), and only then
