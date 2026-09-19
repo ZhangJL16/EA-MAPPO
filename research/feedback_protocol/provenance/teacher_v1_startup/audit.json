@@ -1,0 +1,57 @@
+{
+  "archive_sha256": "ecc358e7a6bd1646685a67d33000043bbf1158b891c3ae11e25c97f78970dd02",
+  "limitation": "not an independent proof of ExactBayes or a sufficient-training-coverage guarantee",
+  "scope": "all completed shards; arithmetic, reachability, completeness and seal replay",
+  "status": "passed",
+  "summary": {
+    "by_condition": {
+      "binary-short": {
+        "exact": 7,
+        "exact_nonprior": 2,
+        "roots": 1
+      }
+    },
+    "channels": [
+      1
+    ],
+    "completed_roots": 1,
+    "exact_nonprior_states": 2,
+    "exact_remaining_horizons": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "exact_source_membership": {
+      "beam": 5,
+      "exact": 5,
+      "posterior_sampling": 5,
+      "random": 4,
+      "voi": 5
+    },
+    "exact_states_with_optimal_measurement": 0,
+    "exact_states_with_ties": 0,
+    "exact_unique_beliefs": 3,
+    "exhausted_strata": 0,
+    "hypothesis_counts": [
+      2
+    ],
+    "labels": {
+      "exact": 7
+    },
+    "recorded_work": {
+      "label_expansions": 77,
+      "label_model_calls": 232,
+      "sampling_expansions": 434,
+      "sampling_model_calls": 812
+    },
+    "rejected_candidates": 1,
+    "scheduled_roots": 24,
+    "status": "partial",
+    "structural_groups": 1,
+    "total_cpu_seconds": 0.005905197000000001,
+    "total_wall_seconds": 0.006140966999737429,
+    "warning": "Descriptive TRAIN coverage, not generalization, population evidence, or neural advantage."
+  }
+}

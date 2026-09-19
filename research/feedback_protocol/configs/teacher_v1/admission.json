@@ -1,0 +1,343 @@
+{
+  "jobs": [
+    {
+      "clone_hash": "e1d3e86a7cb23a1f00040b560fbb4701ee82e55c2872d0857ebb16363e56829b",
+      "condition": "binary-short",
+      "instance_hash": "3afed972c40cb258ad1ba0b4f80474adc4289111b640130ff04b1be13840f9f5",
+      "parameters": {
+        "budget": 4,
+        "capacity": 3,
+        "depth": 1,
+        "quality": "3/5"
+      },
+      "root_seed": 100001,
+      "split": "train"
+    },
+    {
+      "clone_hash": "e1d3e86a7cb23a1f00040b560fbb4701ee82e55c2872d0857ebb16363e56829b",
+      "condition": "binary-short",
+      "instance_hash": "34acd458701e540dbe57fff8a66a2ad32fb4f4a6c90d72c4d0fb8939e6f4ea71",
+      "parameters": {
+        "budget": 4,
+        "capacity": 3,
+        "depth": 1,
+        "quality": "3/5"
+      },
+      "root_seed": 100101,
+      "split": "train"
+    },
+    {
+      "clone_hash": "e1d3e86a7cb23a1f00040b560fbb4701ee82e55c2872d0857ebb16363e56829b",
+      "condition": "binary-short",
+      "instance_hash": "29b33808fd080fbb7e452386d0126cbedcbd301d00eb83296d442db72665f737",
+      "parameters": {
+        "budget": 4,
+        "capacity": 3,
+        "depth": 1,
+        "quality": "3/5"
+      },
+      "root_seed": 100201,
+      "split": "train"
+    },
+    {
+      "clone_hash": "e1d3e86a7cb23a1f00040b560fbb4701ee82e55c2872d0857ebb16363e56829b",
+      "condition": "binary-long",
+      "instance_hash": "14be1acd37db654180621d0c77e4d8be0ef901466a2c20fac434e8ffd165c335",
+      "parameters": {
+        "budget": 12,
+        "capacity": 4,
+        "depth": 1,
+        "quality": "9/10"
+      },
+      "root_seed": 100301,
+      "split": "train"
+    },
+    {
+      "clone_hash": "e1d3e86a7cb23a1f00040b560fbb4701ee82e55c2872d0857ebb16363e56829b",
+      "condition": "binary-long",
+      "instance_hash": "fffbab413a2cc7f631724159daa971618056df60ff89a474c75792492c8acf01",
+      "parameters": {
+        "budget": 12,
+        "capacity": 4,
+        "depth": 1,
+        "quality": "9/10"
+      },
+      "root_seed": 100401,
+      "split": "train"
+    },
+    {
+      "clone_hash": "e1d3e86a7cb23a1f00040b560fbb4701ee82e55c2872d0857ebb16363e56829b",
+      "condition": "binary-long",
+      "instance_hash": "370e959a736c355c83fd16d86d6434a7ea53c9fedbc45b7e5159130b01f86560",
+      "parameters": {
+        "budget": 12,
+        "capacity": 4,
+        "depth": 1,
+        "quality": "9/10"
+      },
+      "root_seed": 100501,
+      "split": "train"
+    },
+    {
+      "clone_hash": "53cb25df1d320e5137839e5c065657711e23975da9f81c521262d41946209272",
+      "condition": "binary-redundant",
+      "instance_hash": "af1cf26632d0bc6a0a8de298d295541754513913c4fc371b7a53d52ff214bbd9",
+      "parameters": {
+        "budget": 8,
+        "capacity": 5,
+        "depth": 1,
+        "quality": "7/10",
+        "redundancy": 1
+      },
+      "root_seed": 100601,
+      "split": "train"
+    },
+    {
+      "clone_hash": "53cb25df1d320e5137839e5c065657711e23975da9f81c521262d41946209272",
+      "condition": "binary-redundant",
+      "instance_hash": "745ef3e0aa45a4dbd932ff0701f4570669aea105f00c5707ae26c3ef0e15950e",
+      "parameters": {
+        "budget": 8,
+        "capacity": 5,
+        "depth": 1,
+        "quality": "7/10",
+        "redundancy": 1
+      },
+      "root_seed": 100701,
+      "split": "train"
+    },
+    {
+      "clone_hash": "53cb25df1d320e5137839e5c065657711e23975da9f81c521262d41946209272",
+      "condition": "binary-redundant",
+      "instance_hash": "0630c2074cbfb062ef34bff7e61becd1f82a0654d4a3d9ef5f954f1b82288f08",
+      "parameters": {
+        "budget": 8,
+        "capacity": 5,
+        "depth": 1,
+        "quality": "7/10",
+        "redundancy": 1
+      },
+      "root_seed": 100801,
+      "split": "train"
+    },
+    {
+      "clone_hash": "93a0d4fc9397f59b33f742767b30463a29c5e7e6acccea35f69e4fc5792c400d",
+      "condition": "hierarchy-sparse",
+      "instance_hash": "bbbdf76346e3120929acfe1f13d1942ab0a77a9bbbeff656661b6a4075097136",
+      "parameters": {
+        "budget": 8,
+        "capacity": 3,
+        "depth": 2,
+        "quality": "4/5",
+        "topology": "sparse"
+      },
+      "root_seed": 100902,
+      "split": "train"
+    },
+    {
+      "clone_hash": "6a7220f3a9e788e1c259a48c050a7be49e934b420aa79e49f43e4b702c4160ca",
+      "condition": "hierarchy-sparse",
+      "instance_hash": "ed3cd8355ecea5977183c52d0b9f06477005c21b4277b5c20ffd20125376cee9",
+      "parameters": {
+        "budget": 8,
+        "capacity": 3,
+        "depth": 2,
+        "quality": "4/5",
+        "topology": "sparse"
+      },
+      "root_seed": 101001,
+      "split": "train"
+    },
+    {
+      "clone_hash": "fb00c2084174a724be55376fcb978e1c1be558298ac7cb544f9943ec82db37a7",
+      "condition": "hierarchy-sparse",
+      "instance_hash": "80dfe4097537b4d34169fbd3f80b1d0680138231068875f5ec2c6aa82ec7810a",
+      "parameters": {
+        "budget": 8,
+        "capacity": 3,
+        "depth": 2,
+        "quality": "4/5",
+        "topology": "sparse"
+      },
+      "root_seed": 101101,
+      "split": "train"
+    },
+    {
+      "clone_hash": "9f3842891947193a1d82a5063dd22d44f7ef6b5a6cfca9c9ebeae30118ad7a1f",
+      "condition": "hierarchy-dense",
+      "instance_hash": "8e0e94c79b3e13c485973c5aa938b4155d48f85e9b87ad7f2aeca4beed33a578",
+      "parameters": {
+        "budget": 12,
+        "capacity": 5,
+        "depth": 2,
+        "quality": "9/10"
+      },
+      "root_seed": 101201,
+      "split": "train"
+    },
+    {
+      "clone_hash": "9f3842891947193a1d82a5063dd22d44f7ef6b5a6cfca9c9ebeae30118ad7a1f",
+      "condition": "hierarchy-dense",
+      "instance_hash": "cdc2943982bb979d966a1fdfaad62721db8007eedfaa9abac0a6f34b046edb54",
+      "parameters": {
+        "budget": 12,
+        "capacity": 5,
+        "depth": 2,
+        "quality": "9/10"
+      },
+      "root_seed": 101301,
+      "split": "train"
+    },
+    {
+      "clone_hash": "9f3842891947193a1d82a5063dd22d44f7ef6b5a6cfca9c9ebeae30118ad7a1f",
+      "condition": "hierarchy-dense",
+      "instance_hash": "0ebfaf12ac5ae250af941f2457157ef8db7b1aa2ea1fe9695b3178cbb902c7de",
+      "parameters": {
+        "budget": 12,
+        "capacity": 5,
+        "depth": 2,
+        "quality": "9/10"
+      },
+      "root_seed": 101401,
+      "split": "train"
+    },
+    {
+      "clone_hash": "9f3842891947193a1d82a5063dd22d44f7ef6b5a6cfca9c9ebeae30118ad7a1f",
+      "condition": "hierarchy-cost",
+      "instance_hash": "1193232aa2e3b4d468f21d4f3db591df1e974abe90fce39b7902d5f376a2ac13",
+      "parameters": {
+        "budget": 10,
+        "capacity": 4,
+        "cleanup": 2,
+        "depth": 2,
+        "prepare": 2,
+        "quality": "7/10"
+      },
+      "root_seed": 101501,
+      "split": "train"
+    },
+    {
+      "clone_hash": "9f3842891947193a1d82a5063dd22d44f7ef6b5a6cfca9c9ebeae30118ad7a1f",
+      "condition": "hierarchy-cost",
+      "instance_hash": "ddce8b6f57d6184a96566612a312fc2fc23859b381f41f084ed842ad0c0c74c6",
+      "parameters": {
+        "budget": 10,
+        "capacity": 4,
+        "cleanup": 2,
+        "depth": 2,
+        "prepare": 2,
+        "quality": "7/10"
+      },
+      "root_seed": 101601,
+      "split": "train"
+    },
+    {
+      "clone_hash": "9f3842891947193a1d82a5063dd22d44f7ef6b5a6cfca9c9ebeae30118ad7a1f",
+      "condition": "hierarchy-cost",
+      "instance_hash": "7f1c6f92bae53b94bedad887c3fdd3b608d1e04f739136b8e07e9bcada84faf8",
+      "parameters": {
+        "budget": 10,
+        "capacity": 4,
+        "cleanup": 2,
+        "depth": 2,
+        "prepare": 2,
+        "quality": "7/10"
+      },
+      "root_seed": 101701,
+      "split": "train"
+    },
+    {
+      "clone_hash": "88e29abbd2ece7f3061dd76fa52fd7a8c727fc6347cbe028187f15ad4445f41a",
+      "condition": "hierarchy-four-channels",
+      "instance_hash": "18879a48b082e9856d502e733c40c1dd45218216f47f6e571ac7ff22459fa62f",
+      "parameters": {
+        "budget": 6,
+        "capacity": 4,
+        "depth": 2,
+        "quality": "3/5",
+        "redundancy": 1
+      },
+      "root_seed": 101801,
+      "split": "train"
+    },
+    {
+      "clone_hash": "88e29abbd2ece7f3061dd76fa52fd7a8c727fc6347cbe028187f15ad4445f41a",
+      "condition": "hierarchy-four-channels",
+      "instance_hash": "bb7081e8f78eb248ca1f360c2f92848c092db826eccea4ef35c0a6bae4443784",
+      "parameters": {
+        "budget": 6,
+        "capacity": 4,
+        "depth": 2,
+        "quality": "3/5",
+        "redundancy": 1
+      },
+      "root_seed": 101901,
+      "split": "train"
+    },
+    {
+      "clone_hash": "88e29abbd2ece7f3061dd76fa52fd7a8c727fc6347cbe028187f15ad4445f41a",
+      "condition": "hierarchy-four-channels",
+      "instance_hash": "4a336df6502fb7a39a8229554bc6c5a01af841bdfac2af2246e99c4b5ac3b234",
+      "parameters": {
+        "budget": 6,
+        "capacity": 4,
+        "depth": 2,
+        "quality": "3/5",
+        "redundancy": 1
+      },
+      "root_seed": 102001,
+      "split": "train"
+    },
+    {
+      "clone_hash": "8acda1c0465a7b23fdad659e8fafa5f78282b578ce8451d042af51375b91b965",
+      "condition": "hierarchy-five-channels",
+      "instance_hash": "5a1cb4951874f86620d6c235eeb67efb2f2751a4c27c47367e044c90e65b45ab",
+      "parameters": {
+        "budget": 12,
+        "capacity": 5,
+        "depth": 2,
+        "quality": "4/5",
+        "redundancy": 2
+      },
+      "root_seed": 102101,
+      "split": "train"
+    },
+    {
+      "clone_hash": "8acda1c0465a7b23fdad659e8fafa5f78282b578ce8451d042af51375b91b965",
+      "condition": "hierarchy-five-channels",
+      "instance_hash": "1768b8fad0df1e932686e48ed53d65e19ab682f86fc511cec38270d30a1f2c43",
+      "parameters": {
+        "budget": 12,
+        "capacity": 5,
+        "depth": 2,
+        "quality": "4/5",
+        "redundancy": 2
+      },
+      "root_seed": 102201,
+      "split": "train"
+    },
+    {
+      "clone_hash": "8acda1c0465a7b23fdad659e8fafa5f78282b578ce8451d042af51375b91b965",
+      "condition": "hierarchy-five-channels",
+      "instance_hash": "fea6fba68fd21eaa3c4ddd393d718e6df54c0cf603ac7caae6f59de880af9211",
+      "parameters": {
+        "budget": 12,
+        "capacity": 5,
+        "depth": 2,
+        "quality": "4/5",
+        "redundancy": 2
+      },
+      "root_seed": 102301,
+      "split": "train"
+    }
+  ],
+  "planned_slots": 24,
+  "rejections": [
+    {
+      "clone_hash": "d292aa22aa740de4e77926f1ec4b60e6e24084e2dbb429bd41bac73d14381893",
+      "reason": "reserved structural clone",
+      "root_seed": 100901,
+      "slot": 9
+    }
+  ]
+}

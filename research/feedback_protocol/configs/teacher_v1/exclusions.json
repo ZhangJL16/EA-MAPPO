@@ -1,0 +1,51 @@
+{
+  "clone_hashes": [
+    "0fca2dd4edab668127f073111ed79d0e09c9148405a73834ed49fb5a69ef64cf",
+    "37ee42c7b52b69e493544bfba29b0202f05ebd30df11e773708ba6ec2b9d9d3e",
+    "564432a411f1ae728749daca18d84b98fa432bbfb75b43d7a59e8c7b248c5ff8",
+    "5bac7e9dcb6e88990dd1e6a7b833328327f793fdaedaef09d6e83799e1b8e9a1",
+    "5ed6d8cc21397b0587be5f584ac94929b554146bb7c7a841ca333ce8a9d834e6",
+    "5ff8f9ede4981718bbdb5485605997f807e4184c3858a309e6645bca8137dfce",
+    "6a0c63f4c532e311850a542f19375fc6453ef38e08fcbb047fcf3e650fe63978",
+    "93fe14426ed9ea96593a566187c58704b940898ba6b0ca34b5fdf58c2fc87e48",
+    "a45d741690fc2d859b0cdf272acfaa8ac6c3178be3161b34c1f1b5b224f0b826",
+    "a47ef67d10a29ac87477baffff57b44423182de1ff71836b4b0f5d8a4bb44190",
+    "a746e2f08c1e6345b260b8e304ae773542c602e49739f85ec871f1aed7336c5d",
+    "a928f476cdf248620caba314fbf18b7ba3abcdfb2f6d8b4540c2911c16fb2fbf",
+    "d00f6db0abb698b5ce31942e0bcc447983f6d15c14da6832e04d115a8ff4faf1",
+    "d292aa22aa740de4e77926f1ec4b60e6e24084e2dbb429bd41bac73d14381893",
+    "dadeedcff994b57f8a5a04070c2245c34f7ca40fd3d22410d68b3d611c93accc",
+    "dba735475f5b16a2a203283e6675a9e919b7d3a29f2169e94e504d5e6251601b"
+  ],
+  "forbidden_seeds": [
+    110,
+    210,
+    310,
+    410,
+    510,
+    611,
+    710,
+    810,
+    910,
+    1110,
+    1111,
+    1210,
+    1211,
+    1310,
+    1311,
+    1410,
+    1510,
+    1610,
+    1710,
+    1810,
+    1910,
+    2201,
+    2202
+  ],
+  "private_confirm": "not read; no confirmation instances generated",
+  "schema": "fpl-teacher-exclusions-v1",
+  "source_hashes": {
+    "difficulty_dev_plan": "b0e654e79c6b132a8640f1af02d9b19ffb8145861dce120af8c34929b09679b3",
+    "scientific_manifest": "d40ac51ecfec6d5693de9da843946bb4ec061a52533bcf2ed95d28a45f8ce687"
+  }
+}

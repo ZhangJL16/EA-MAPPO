@@ -153,3 +153,7 @@ exists; no final instance was generated. The preimage is stored at
 This is local custody, not independent external blinding. The final method and
 full confirmation protocol are still unfrozen; seed commitment alone does not
 authorize final evaluation. Old CONFIRM was not accessed.
+
+Post-implementation repository note (2026-09-19): this fourth batch was
+subsequently committed as `dceb2675a9b4cbb3186b955840e5786743813d87`.
+The historical implementation-time status above is retained unchanged.

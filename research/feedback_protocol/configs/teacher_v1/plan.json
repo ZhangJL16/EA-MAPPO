@@ -1,0 +1,104 @@
+{
+  "conditions": [
+    {
+      "id": "binary-short",
+      "parameters": {
+        "budget": 4,
+        "capacity": 3,
+        "depth": 1,
+        "quality": "3/5"
+      }
+    },
+    {
+      "id": "binary-long",
+      "parameters": {
+        "budget": 12,
+        "capacity": 4,
+        "depth": 1,
+        "quality": "9/10"
+      }
+    },
+    {
+      "id": "binary-redundant",
+      "parameters": {
+        "budget": 8,
+        "capacity": 5,
+        "depth": 1,
+        "quality": "7/10",
+        "redundancy": 1
+      }
+    },
+    {
+      "id": "hierarchy-sparse",
+      "parameters": {
+        "budget": 8,
+        "capacity": 3,
+        "depth": 2,
+        "quality": "4/5",
+        "topology": "sparse"
+      }
+    },
+    {
+      "id": "hierarchy-dense",
+      "parameters": {
+        "budget": 12,
+        "capacity": 5,
+        "depth": 2,
+        "quality": "9/10"
+      }
+    },
+    {
+      "id": "hierarchy-cost",
+      "parameters": {
+        "budget": 10,
+        "capacity": 4,
+        "cleanup": 2,
+        "depth": 2,
+        "prepare": 2,
+        "quality": "7/10"
+      }
+    },
+    {
+      "id": "hierarchy-four-channels",
+      "parameters": {
+        "budget": 6,
+        "capacity": 4,
+        "depth": 2,
+        "quality": "3/5",
+        "redundancy": 1
+      }
+    },
+    {
+      "id": "hierarchy-five-channels",
+      "parameters": {
+        "budget": 12,
+        "capacity": 5,
+        "depth": 2,
+        "quality": "4/5",
+        "redundancy": 2
+      }
+    }
+  ],
+  "exclusions_hash": "91d2335949eb89c0d60c63d2e29a864f6789b999e912993038e88824aea887b3",
+  "max_rollout_batches": 4,
+  "max_structure_attempts": 100,
+  "root_start": 100001,
+  "roots_per_condition": 3,
+  "sampling_work": {
+    "max_expansions": 5000,
+    "max_model_calls": 50000,
+    "watchdog_seconds": 15
+  },
+  "schema": "fpl-teacher-plan-v1",
+  "solver": {
+    "max_expansions": 1000000,
+    "max_model_calls": 3000000,
+    "max_outcomes": 64,
+    "max_protocol_nodes": 10000,
+    "max_states": 3000,
+    "watchdog_seconds": 5
+  },
+  "split": "train",
+  "statement": "No outcome filtering; unresolved labels and empty structural strata remain visible. No network or final evaluation.",
+  "states_per_source": 6
+}

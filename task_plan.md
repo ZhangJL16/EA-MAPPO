@@ -1,5 +1,18 @@
 # Current task plan
 
+## Feedback protocol T5.1 (implemented, first-checkpoint handoff, 2026-09-19)
+
+- [x] Freeze 24 TRAIN root slots, exclude public held-out structural clones/seeds.
+- [x] Exact rational V/Q labels, tied actions, mixed public-history sources.
+- [x] Root-atomic source-sealed resume, reachability/arithmetic audit and CPU/work logs.
+- [x] 43 tests pass; first root has 7 exact labels, 2 non-prior states.
+- [ ] Resume remaining 23 roots; assess actual coverage and unresolved selection.
+- [ ] T5.2+ learned methods and DEV quality–compute comparison (not started).
+
+See `docs/FPL_T5_1_STARTUP_20260919.md`. Stopped at first checkpoint under
+AGENTS.md; no background run, test/CONFIRM use, neural training or push.
+B2 necessity is already GO and is not being re-tested.
+
 ## Feedback protocol fourth batch (completed final pre-B2 study, 2026-09-19)
 
 - [x] Full-state ExactPolicyEvaluator, deterministic work limits and episode pools.

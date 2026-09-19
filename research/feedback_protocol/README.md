@@ -1,5 +1,13 @@
 # Feedback Protocol Lab — finite Bernoulli testbed
 
+Current: [T5.1 teacher contract](CONTRACT_V05_TEACHER.md) and
+[implementation/startup report](../../docs/FPL_T5_1_STARTUP_20260919.md).
+TRAIN-only exact V/Q dataset builder and mixed-history sampling are implemented;
+one of 24 root checkpoints is generated and audited. The report contains the
+resume command. No neural architecture or training yet; full coverage is pending.
+
+## Completed fourth batch
+
 Fourth batch: [contract](CONTRACT_V04.md),
 [final pre-B2 report](../../docs/FPL_FOURTH_BATCH_20260919.md).
 Exact fixed-policy expectations replace MC where resolvable; deterministic
@@ -96,7 +104,8 @@ Output must not exist. Use `--policy channel_cover` for the independent heuristi
 
 At the first batch the next stages were bounded planning, generation/registry,
 checkpointing and teacher datasets. The first three now have bounded implementations.
-Teacher datasets, neural protocol decoding and DAD-style external adapters remain
-unimplemented. This is not a completed A/B/C method study.
+Teacher data infrastructure is now implemented, with full generation pending.
+Neural protocol decoding and DAD-style external adapters remain unimplemented.
+This is not a completed A/B/C method study.
 
 First-batch provenance and local evidence inventory: [implementation report](../../docs/FPL_FIRST_BATCH_20260919.md).

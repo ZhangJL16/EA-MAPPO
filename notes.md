@@ -1,5 +1,16 @@
 # Current research notes
 
+## 2026-09-19 T5.1: exact teacher data startup
+
+TRAIN inputs admitted 24 roots across eight predefined strata; one structural
+clone rejected before labels. First root: seven exact V/Q labels, two updated
+belief states, no optimal measurement at this short budget. Kept without tuning.
+Mixed histories use public predictive feedback, not hidden truth. Status/caps
+remain explicit; arithmetic replay is not an independent optimality proof.
+43 tests pass. Remaining 23 root shards and broad coverage are pending under
+the first-checkpoint handoff rule. No network/training/test/CONFIRM. See
+`docs/FPL_T5_1_STARTUP_20260919.md` for the sealed continuation command.
+
 ## 2026-09-19 fourth FPL batch: exact fixed-policy evaluation
 
 371 fixed-policy expectations are exact, conditional on owned internal RNG state;
