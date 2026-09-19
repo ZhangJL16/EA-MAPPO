@@ -1,5 +1,14 @@
 # EA-MAPPO research workspace
 
+Final user decision (2026-09-19): **the entire regenerative-control research branch
+is CLOSED to new research**, including a third statistical/finite-sample pivot.
+Standalone theory assessment: **Level 1/5, workshop/supporting theory**; no current
+ICML Spotlight/Oral central result. Preserve the environment, frozen SAC, P0–P2
+negative evidence, exact tree and certificate as research assets. Do not expand,
+retrain, change the task family, or repackage this branch to rescue a paper.
+The next research activity is independent PhD problem selection, not another
+method/theorem extension here. No new project or experiment has been started.
+
 Latest (2026-09-19): [theorem-reduction novelty audit: KILL](docs/VIABILITY_BOUNDARY_NOVELTY_AUDIT_20260919.md).
 **Both the regenerative-learning and current standalone theory-paper stories are CLOSED.**
 Prop. 1 reduces to Wald/renewal monotonicity; Prop. 3 to differential advantage

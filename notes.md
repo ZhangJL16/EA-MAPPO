@@ -1,5 +1,15 @@
 # Current research notes
 
+## 2026-09-19 final user decision: entire regenerative branch frozen
+
+User accepts the theorem reductions and confirms closure beyond the two paper stories:
+no further regenerative-control research and no immediate third statistical pivot.
+Standalone theory is now assessed by the user as Level 1/5 (workshop/supporting theory),
+superseding the prior Level 2 assessment. No ICML Spotlight/Oral central result exists
+in this formulation. Preserve negative evidence and derivations without repackaging.
+Next priority is independent PhD problem selection. No new direction was selected or
+started in this administrative closure; no assets, physics, actor or results changed.
+
 ## 2026-09-19 novelty kill test: theory-paper story CLOSED
 
 Explicit reduction, not lack of search hits, resolves the novelty gate.

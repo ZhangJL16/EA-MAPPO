@@ -1,5 +1,16 @@
 # Current task plan
 
+## Final user closure: freeze the entire regenerative-control branch (2026-09-19)
+
+- [x] User independently confirms novelty KILL for Prop. 1/3/4 and overhead result.
+- [x] Record standalone theory assessment: Level 1/5, supporting/thesis material.
+- [x] Stop all new research on this branch, including a third finite-sample pivot.
+- [x] Retain environment, frozen SAC, P0–P2 evidence, exact tree and certificate unchanged.
+
+Next activity: independent PhD problem selection, not rescuing the closed branch.
+No new project, literature campaign, theorem work or experiment started by this closure.
+Older pending tasks below are historical; they do not authorize renewed work here.
+
 ## Novelty audit complete: current theory-paper story KILLED (2026-09-19)
 
 - [x] Read the six specified papers' relevant primary text; verify Wald source.
