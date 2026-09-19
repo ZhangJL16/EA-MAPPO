@@ -1,0 +1,25 @@
+{
+  "checked_at_utc": "2026-09-19T12:13:58.962543+00:00",
+  "startup_pass": true,
+  "observed_progress": {
+    "status": "RUNNING",
+    "completed_nodes": 13,
+    "new_nodes_this_call": 12,
+    "frontier": 12,
+    "max_task_depth": 2,
+    "checkpoint_unchanged": true,
+    "task_rng_read": false,
+    "neural_updates": 0
+  },
+  "pid": 370798,
+  "resumed_node_checked": "59e55028ca09014434e7ce7caa5e93889a4a870a4d84b9ead6bdd966f617ca19",
+  "resumed_snapshot_hashes_pass": true,
+  "source_hashes_pass": true,
+  "checkpoint_sha256": "fb79482ae7d832b40137ff1a080ee84912eabb95867e118aca80c846f6ae62be",
+  "tiny_smoke_completed_nodes": 1,
+  "resume_reused_smoke_checkpoint": true,
+  "rho_star": null,
+  "kill_result": "PENDING",
+  "monitoring_stopped_after_startup": true,
+  "initial_launcher_issue": "First launcher resolved virtualenv interpreter symlink and failed on torch import before simulation; corrected interpreter path; log retained."
+}

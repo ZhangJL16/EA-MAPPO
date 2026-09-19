@@ -1,0 +1,56 @@
+.......                                                                  [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/matplotlib/fontconfig_pattern.py:66
+  /home/zjl/mappo/.venv/lib/python3.12/site-packages/matplotlib/fontconfig_pattern.py:66: PyparsingDeprecationWarning: 'setParseAction' deprecated - use 'set_parse_action'
+    ).setParseAction(self._family)
+
+.venv/lib/python3.12/site-packages/matplotlib/fontconfig_pattern.py:70
+  /home/zjl/mappo/.venv/lib/python3.12/site-packages/matplotlib/fontconfig_pattern.py:70: PyparsingDeprecationWarning: 'setParseAction' deprecated - use 'set_parse_action'
+    ).setParseAction(self._size)
+
+.venv/lib/python3.12/site-packages/matplotlib/fontconfig_pattern.py:74
+  /home/zjl/mappo/.venv/lib/python3.12/site-packages/matplotlib/fontconfig_pattern.py:74: PyparsingDeprecationWarning: 'setParseAction' deprecated - use 'set_parse_action'
+    ).setParseAction(self._name)
+
+.venv/lib/python3.12/site-packages/matplotlib/fontconfig_pattern.py:78
+  /home/zjl/mappo/.venv/lib/python3.12/site-packages/matplotlib/fontconfig_pattern.py:78: PyparsingDeprecationWarning: 'setParseAction' deprecated - use 'set_parse_action'
+    ).setParseAction(self._value)
+
+.venv/lib/python3.12/site-packages/matplotlib/fontconfig_pattern.py:85
+  /home/zjl/mappo/.venv/lib/python3.12/site-packages/matplotlib/fontconfig_pattern.py:85: PyparsingDeprecationWarning: 'setParseAction' deprecated - use 'set_parse_action'
+    ).setParseAction(self._families)
+
+.venv/lib/python3.12/site-packages/matplotlib/fontconfig_pattern.py:92
+  /home/zjl/mappo/.venv/lib/python3.12/site-packages/matplotlib/fontconfig_pattern.py:92: PyparsingDeprecationWarning: 'setParseAction' deprecated - use 'set_parse_action'
+    ).setParseAction(self._point_sizes)
+
+.venv/lib/python3.12/site-packages/matplotlib/fontconfig_pattern.py:102
+  /home/zjl/mappo/.venv/lib/python3.12/site-packages/matplotlib/fontconfig_pattern.py:102: PyparsingDeprecationWarning: 'setParseAction' deprecated - use 'set_parse_action'
+    ).setParseAction(self._property)
+
+.venv/lib/python3.12/site-packages/matplotlib/fontconfig_pattern.py:127
+.venv/lib/python3.12/site-packages/matplotlib/fontconfig_pattern.py:127
+.venv/lib/python3.12/site-packages/matplotlib/fontconfig_pattern.py:127
+.venv/lib/python3.12/site-packages/matplotlib/fontconfig_pattern.py:127
+.venv/lib/python3.12/site-packages/matplotlib/fontconfig_pattern.py:127
+  /home/zjl/mappo/.venv/lib/python3.12/site-packages/matplotlib/fontconfig_pattern.py:127: PyparsingDeprecationWarning: 'parseString' deprecated - use 'parse_string'
+    self._parser.parseString(pattern)
+
+.venv/lib/python3.12/site-packages/matplotlib/fontconfig_pattern.py:134
+.venv/lib/python3.12/site-packages/matplotlib/fontconfig_pattern.py:134
+.venv/lib/python3.12/site-packages/matplotlib/fontconfig_pattern.py:134
+.venv/lib/python3.12/site-packages/matplotlib/fontconfig_pattern.py:134
+.venv/lib/python3.12/site-packages/matplotlib/fontconfig_pattern.py:134
+  /home/zjl/mappo/.venv/lib/python3.12/site-packages/matplotlib/fontconfig_pattern.py:134: PyparsingDeprecationWarning: 'resetCache' deprecated - use 'reset_cache'
+    self._parser.resetCache()
+
+.venv/lib/python3.12/site-packages/google/protobuf/internal/well_known_types.py:92
+  /home/zjl/mappo/.venv/lib/python3.12/site-packages/google/protobuf/internal/well_known_types.py:92: DeprecationWarning: datetime.datetime.utcfromtimestamp() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.fromtimestamp(timestamp, datetime.UTC).
+    _EPOCH_DATETIME = datetime.utcfromtimestamp(0)
+
+.venv/lib/python3.12/site-packages/matplotlib/_mathtext.py:30
+  /home/zjl/mappo/.venv/lib/python3.12/site-packages/matplotlib/_mathtext.py:30: PyparsingDeprecationWarning: 'enablePackrat' deprecated - use 'enable_packrat'
+    ParserElement.enablePackrat()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+7 passed, 19 warnings in 1.61s

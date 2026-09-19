@@ -1,5 +1,13 @@
 # EA-MAPPO research workspace
 
+Latest (2026-09-19): [P2-A2 safe-set stopping kill-test startup](docs/REGENERATIVE_CONTROL_P2A2_20260919.md).
+P2-A1 passed diagnostic review. Exact task-prefix enumeration and renewal-ratio DP
+are implemented; VB is the sole baseline, with the fixed >=.98 kill criterion.
+Seven focused tests and actual-SAC startup/resume checks pass. At handoff, 13
+nodes were saved and 12 remained pending; **no ratio/kill conclusion yet**.
+The resumable authorized run continues; no monitoring to completion or neural
+training promotion. Historical P2 holds below are superseded only for P2-A2.
+
 Latest (2026-09-19): [P2-A1 reachable-state branching](docs/REGENERATIVE_CONTROL_P2A1_20260919.md).
 P1/P1.1 passed user review. Bounded census: 885 natural D observations, 65 distinct
 physical keys (target 200 not reached), 260 exact task-type/R branches. No RNG

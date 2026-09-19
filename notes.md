@@ -1,5 +1,20 @@
 # Current research notes
 
+## 2026-09-19 P2-A2: exact safe-tree runner started, no result claim
+
+User accepted P2-A1 and replaced random census with a safe-set optimal-stopping
+kill test. Implemented prefix-preserving full snapshots, explicit uniform task
+branching with forbidden RNG access, original-energy task+return admissibility,
+ratio DP and VB-only comparison. No environment/actor/training changes.
+Nominated negative-local-contrast state is a zero-weight auxiliary subtree.
+Read-only reporting separates candidate duplicates and decomposes VB excess loss
+by prefix. Seven tests plus actual one-node smoke and resume health pass.
+Formal launch PID370798, four CPU workers; startup observation13 saved nodes /
+12 pending. No rho-star or kill conclusion yet; no completion monitoring per
+AGENTS.md. Failed initial system-interpreter launch retained; correct venv used.
+Runtime: `artifacts/regenerative_p2a2_20260919`. Report:
+`docs/REGENERATIVE_CONTROL_P2A2_20260919.md`. Stop/resume instructions included.
+
 ## 2026-09-19 P2-A1: insufficient coverage, no sign-flip finding
 
 User authorized reachable D-state census and exact branching only. Frozen budget

@@ -1,0 +1,9 @@
+{
+  "focused_tests": 7,
+  "passed": 7,
+  "command": "PYTHONPATH=. .venv/bin/pytest -q tests/test_regenerative_p2a2.py",
+  "real_smoke_nodes": 1,
+  "formal_resume_health": "PASS; observed13 completed nodes/frontier12",
+  "neural_updates": 0,
+  "completed_kill_result": false
+}

@@ -1,5 +1,19 @@
 # Current task plan
 
+## P2-A2 — authorized exact safe-tree kill test, startup handoff (2026-09-19)
+
+- [x] P2-A1 PASS accepted; no further random census.
+- [x] Exact task-prefix branching; original-energy robust safe set; no bin closure.
+- [x] Ratio DP, sole VB baseline, frozen >=.98 kill criterion.
+- [x] Separate nominated-state subtree, zero root weight; no duplicate finding counts.
+- [x] Seven focused tests, tiny real smoke, actual checkpoint reuse and startup health.
+- [x] Start resumable CPU run; handoff observation13 nodes/frontier12.
+- [ ] Complete tree / rho-star / kill result: PENDING at handoff; not monitored.
+- [ ] Any further research or high-level training: NOT STARTED / no auto-promotion.
+
+Report and stop/resume commands: `docs/REGENERATIVE_CONTROL_P2A2_20260919.md`.
+The run itself performs only the authorized P2-A2 enumeration and ratio solve.
+
 ## P2-A1 only — bounded census complete, hypothesis unresolved (2026-09-19)
 
 - [x] User P1.1 PASS; frozen SAC and post-delivery semantics retained.

@@ -1,0 +1,5 @@
+{
+  "pid": 370569,
+  "command": "PYTHONPATH=. .venv/bin/python -m research.regenerative_control.stopping_p2a2 --output artifacts/regenerative_p2a2_20260919 --workers 4",
+  "resumed_after_smoke_nodes": 1
+}
