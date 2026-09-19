@@ -2,9 +2,10 @@
 
 Current: [T5.1 teacher contract](CONTRACT_V05_TEACHER.md) and
 [implementation/startup report](../../docs/FPL_T5_1_STARTUP_20260919.md).
-TRAIN-only exact V/Q dataset builder and mixed-history sampling are implemented;
-one of 24 root checkpoints is generated and audited. The report contains the
-resume command. No neural architecture or training yet; full coverage is pending.
+TRAIN-only exact V/Q dataset builder and mixed-history sampling are implemented.
+The subsequently authorized [full V1 audit](../../docs/FPL_TEACHER_V1_COMPLETE_20260919.md)
+completed all 24 roots: 273 exact labels, eight structural groups, only five
+non-prior measurement-optimal states. No neural architecture or training yet.
 
 ## Completed fourth batch
 
@@ -104,7 +105,7 @@ Output must not exist. Use `--policy channel_cover` for the independent heuristi
 
 At the first batch the next stages were bounded planning, generation/registry,
 checkpointing and teacher datasets. The first three now have bounded implementations.
-Teacher data infrastructure is now implemented, with full generation pending.
+Teacher V1 generation and audit are complete; broader training coverage is not established.
 Neural protocol decoding and DAD-style external adapters remain unimplemented.
 This is not a completed A/B/C method study.
 

@@ -1,5 +1,17 @@
 # Current task plan
 
+## Teacher V1 full continuation (completed, 2026-09-19)
+
+- [x] Resume remaining 23 sealed roots unchanged, without retry/limit changes.
+- [x] Full audit in a new directory; original startup bytes preserved.
+- [x] 273/273 exact labels; source/condition/work/action-change census delivered.
+- [x] Explicit limitation: eight structures, only five non-prior sensing-optimal states.
+- [ ] Derived prefix export and broader TRAIN structure/continuation coverage (not executed).
+- [ ] Neural method/training (not executed).
+
+See `docs/FPL_TEACHER_V1_COMPLETE_20260919.md`. Stop after the requested full
+audit. No runtime/config changes, test/CONFIRM access, commit or push.
+
 ## Feedback protocol T5.1 (implemented, first-checkpoint handoff, 2026-09-19)
 
 - [x] Freeze 24 TRAIN root slots, exclude public held-out structural clones/seeds.

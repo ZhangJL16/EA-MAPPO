@@ -1,5 +1,17 @@
 # Current research notes
 
+## 2026-09-19 Teacher V1 complete census
+
+The authorized unchanged 23-root continuation completed. Full audit passed:
+273 exact, zero unresolved; 147 non-prior states; 37 measurement-optimal states,
+but only five in their intersection, all hierarchy-dense. 24 roots remain only
+eight structures. 58 states have tied optima. Label CPU totals 4.273 seconds;
+whole-shard CPU 7.574 seconds. No selected-state solver failures observed, not
+proof against small/easy-task sampling bias. Exact first-operation changes with
+belief/horizon exist but do not establish broad adaptive-continuation coverage.
+Full evidence: `docs/FPL_TEACHER_V1_COMPLETE_20260919.md`. No prefix export,
+Teacher V2, neural training, test/OOD or confirmation run in this task.
+
 ## 2026-09-19 T5.1: exact teacher data startup
 
 TRAIN inputs admitted 24 roots across eight predefined strata; one structural

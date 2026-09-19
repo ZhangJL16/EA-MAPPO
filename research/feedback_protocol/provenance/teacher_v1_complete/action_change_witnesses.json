@@ -1,0 +1,4495 @@
+{
+  "belief": [
+    {
+      "H": [
+        3,
+        3
+      ],
+      "beliefs": [
+        [
+          "5/8",
+          "3/8"
+        ],
+        [
+          "15/64",
+          "49/64"
+        ]
+      ],
+      "condition": "binary-redundant",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task0"
+        ],
+        [
+          "task1"
+        ]
+      ],
+      "root": 100801,
+      "states": [
+        "0d7ae03e88874da475d24abd06e7eae1d8e5b2646c3aef13fefc7e34db419e28",
+        "340d6ec4cdd492cce69db46e984ed3b2651692c2a7c93e903eae9fa343207649"
+      ]
+    },
+    {
+      "H": [
+        3,
+        3
+      ],
+      "beliefs": [
+        [
+          "15/64",
+          "49/64"
+        ],
+        [
+          "245/272",
+          "27/272"
+        ]
+      ],
+      "condition": "binary-redundant",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task1"
+        ],
+        [
+          "task0"
+        ]
+      ],
+      "root": 100801,
+      "states": [
+        "340d6ec4cdd492cce69db46e984ed3b2651692c2a7c93e903eae9fa343207649",
+        "4ede61cfbeffc466fe93e4e4cec8a1fb4f5ca3b03fbcf6a5a30168d372526b44"
+      ]
+    },
+    {
+      "H": [
+        9,
+        9
+      ],
+      "beliefs": [
+        [
+          "1/34",
+          "45/68",
+          "3/68",
+          "9/34"
+        ],
+        [
+          "9/26",
+          "5/52",
+          "27/52",
+          "1/26"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": true,
+      "optimal_first": [
+        [
+          "task1"
+        ],
+        [
+          "prepare",
+          "task2"
+        ]
+      ],
+      "root": 101401,
+      "states": [
+        "0a900eca77ba7d4eebaf64f5c1a981b2a6704be8163bee47c98f871a7a732d20",
+        "a953a1d0b7bf88311ca1f86fd5e55ebe56f280b15c189339ffac4aafa2f1c9a5"
+      ]
+    },
+    {
+      "H": [
+        9,
+        9
+      ],
+      "beliefs": [
+        [
+          "1/6",
+          "5/12",
+          "1/4",
+          "1/6"
+        ],
+        [
+          "9/26",
+          "5/52",
+          "27/52",
+          "1/26"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": true,
+      "optimal_first": [
+        [
+          "task1"
+        ],
+        [
+          "prepare",
+          "task2"
+        ]
+      ],
+      "root": 101401,
+      "states": [
+        "253a6756a1cd6bcddc5994b2810609fdd4a75be78883dd8f67ca9f43732b4470",
+        "a953a1d0b7bf88311ca1f86fd5e55ebe56f280b15c189339ffac4aafa2f1c9a5"
+      ]
+    },
+    {
+      "H": [
+        8,
+        8
+      ],
+      "beliefs": [
+        [
+          "1/34",
+          "45/68",
+          "3/68",
+          "9/34"
+        ],
+        [
+          "9/26",
+          "5/52",
+          "27/52",
+          "1/26"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task1"
+        ],
+        [
+          "task2"
+        ]
+      ],
+      "root": 101401,
+      "states": [
+        "27ab831963950d4fb47b7fa91550afe4dc4a263e49867286b830b242a236382c",
+        "467142c0cc3e56036db47b11449cec9984283167fe2030ae4c607c0b83b0be20"
+      ]
+    },
+    {
+      "H": [
+        7,
+        7
+      ],
+      "beliefs": [
+        [
+          "1/34",
+          "45/68",
+          "3/68",
+          "9/34"
+        ],
+        [
+          "9/26",
+          "5/52",
+          "27/52",
+          "1/26"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task1"
+        ],
+        [
+          "task2"
+        ]
+      ],
+      "root": 101401,
+      "states": [
+        "329ed889c4089c3149e89691f87656d339e7060b2556b766130118152ebdae32",
+        "4deff626cdde2951ff0b543ee1926e64ee75b478d8dfcbcbd2f3d575ce1d9afe"
+      ]
+    },
+    {
+      "H": [
+        7,
+        7
+      ],
+      "beliefs": [
+        [
+          "1/34",
+          "45/68",
+          "3/68",
+          "9/34"
+        ],
+        [
+          "45/124",
+          "5/248",
+          "135/248",
+          "9/124"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task1"
+        ],
+        [
+          "task2"
+        ]
+      ],
+      "root": 101401,
+      "states": [
+        "329ed889c4089c3149e89691f87656d339e7060b2556b766130118152ebdae32",
+        "ba43186bfb6b00d0fce47d9b3724f0588a004ec822230d482d85456fa28fb102"
+      ]
+    },
+    {
+      "H": [
+        7,
+        7
+      ],
+      "beliefs": [
+        [
+          "1/34",
+          "45/68",
+          "3/68",
+          "9/34"
+        ],
+        [
+          "45/136",
+          "45/272",
+          "135/272",
+          "1/136"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task1"
+        ],
+        [
+          "task2"
+        ]
+      ],
+      "root": 101401,
+      "states": [
+        "329ed889c4089c3149e89691f87656d339e7060b2556b766130118152ebdae32",
+        "fc3ceaed5f763206fb8f34c6f6d9fee400783b04b62ba574f9b82d6d0340aff6"
+      ]
+    },
+    {
+      "H": [
+        6,
+        6
+      ],
+      "beliefs": [
+        [
+          "9/26",
+          "5/52",
+          "27/52",
+          "1/26"
+        ],
+        [
+          "1/34",
+          "45/68",
+          "3/68",
+          "9/34"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task2"
+        ],
+        [
+          "task1"
+        ]
+      ],
+      "root": 101401,
+      "states": [
+        "44e423230b2e212835f3ff8d650b1648f29dd1eb07bb8e9b734bada2eabe7621",
+        "a4872401b29448790b2319a05d7b90a5cbe72a74e2de25b9b48854e8d1d56679"
+      ]
+    },
+    {
+      "H": [
+        8,
+        8
+      ],
+      "beliefs": [
+        [
+          "9/26",
+          "5/52",
+          "27/52",
+          "1/26"
+        ],
+        [
+          "1/6",
+          "5/12",
+          "1/4",
+          "1/6"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task2"
+        ],
+        [
+          "task1"
+        ]
+      ],
+      "root": 101401,
+      "states": [
+        "467142c0cc3e56036db47b11449cec9984283167fe2030ae4c607c0b83b0be20",
+        "c0d9a15497e3048adb9e50e4cc382af8d0418212e1c3d46472ca39227c752858"
+      ]
+    },
+    {
+      "H": [
+        8,
+        8
+      ],
+      "beliefs": [
+        [
+          "1/19",
+          "18/19"
+        ],
+        [
+          "9/11",
+          "2/11"
+        ]
+      ],
+      "condition": "binary-long",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task1"
+        ],
+        [
+          "task0"
+        ]
+      ],
+      "root": 100301,
+      "states": [
+        "26ce2126c2e819feb3a40d717b4a9d16175647b3d3f0f842e94d0776f5bd2010",
+        "f22a7d6423c4617b6e69e93ed904d280cf305341879c1a7d222d02c25fde8ae2"
+      ]
+    },
+    {
+      "H": [
+        9,
+        9
+      ],
+      "beliefs": [
+        [
+          "1/19",
+          "18/19"
+        ],
+        [
+          "9/11",
+          "2/11"
+        ]
+      ],
+      "condition": "binary-long",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task1"
+        ],
+        [
+          "task0"
+        ]
+      ],
+      "root": 100301,
+      "states": [
+        "37c3e13320ca8efc78f161b0d70879955e3218402a09ae370ec4f4a0d38f4e29",
+        "af9feeb0a90538d65be997c548693963f14d724e3ce35076ccccc008e94b6c12"
+      ]
+    },
+    {
+      "H": [
+        8,
+        8
+      ],
+      "beliefs": [
+        [
+          "1/3",
+          "2/3"
+        ],
+        [
+          "9/11",
+          "2/11"
+        ]
+      ],
+      "condition": "binary-long",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task1"
+        ],
+        [
+          "task0"
+        ]
+      ],
+      "root": 100301,
+      "states": [
+        "55a8c66d2822ec7e244e7254f25eccc8b2a6df783887a9cb4704b6be0f44eea1",
+        "f22a7d6423c4617b6e69e93ed904d280cf305341879c1a7d222d02c25fde8ae2"
+      ]
+    },
+    {
+      "H": [
+        7,
+        7
+      ],
+      "beliefs": [
+        [
+          "9/11",
+          "2/11"
+        ],
+        [
+          "1/19",
+          "18/19"
+        ]
+      ],
+      "condition": "binary-long",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task0"
+        ],
+        [
+          "task1"
+        ]
+      ],
+      "root": 100301,
+      "states": [
+        "560f64a6c6007ad421def3e058d2eaf6e44c771c88e93728c15493c5b156412f",
+        "adcc6e8f30cb5611f01a559b2f11f33fc8a5c1c1d6e18df32babe9f8aaa4e564"
+      ]
+    },
+    {
+      "H": [
+        6,
+        6
+      ],
+      "beliefs": [
+        [
+          "9/11",
+          "2/11"
+        ],
+        [
+          "1/19",
+          "18/19"
+        ]
+      ],
+      "condition": "binary-long",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task0"
+        ],
+        [
+          "task1"
+        ]
+      ],
+      "root": 100301,
+      "states": [
+        "9f7794c191423eb752884fe98b74c5b393a797abcdb3bf4e6d805281ab59c9cf",
+        "bffcdd650cff2911ebf3e6cb9cb53f0955049474afcb10f98dc10659aaa44485"
+      ]
+    },
+    {
+      "H": [
+        9,
+        9
+      ],
+      "beliefs": [
+        [
+          "9/11",
+          "2/11"
+        ],
+        [
+          "1/3",
+          "2/3"
+        ]
+      ],
+      "condition": "binary-long",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task0"
+        ],
+        [
+          "task1"
+        ]
+      ],
+      "root": 100301,
+      "states": [
+        "af9feeb0a90538d65be997c548693963f14d724e3ce35076ccccc008e94b6c12",
+        "bda94aca2f8125960bdc4c564ad8c8fa48d246835cca5f73fcbf2820468e2589"
+      ]
+    },
+    {
+      "H": [
+        7,
+        7
+      ],
+      "beliefs": [
+        [
+          "4/21",
+          "8/21",
+          "1/21",
+          "8/21"
+        ],
+        [
+          "2/3",
+          "1/12",
+          "1/6",
+          "1/12"
+        ]
+      ],
+      "condition": "hierarchy-five-channels",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task1",
+          "task3"
+        ],
+        [
+          "task0"
+        ]
+      ],
+      "root": 102201,
+      "states": [
+        "36356ef87b0600ce8013816f9319c9383bb3a36310370abbcffa4a8940a44d70",
+        "4340be4c25314bc9a9d50e6988323394b5430a8e267b90a05758e9f8ffd96469"
+      ]
+    },
+    {
+      "H": [
+        7,
+        7
+      ],
+      "beliefs": [
+        [
+          "4/21",
+          "8/21",
+          "1/21",
+          "8/21"
+        ],
+        [
+          "1/9",
+          "16/45",
+          "4/9",
+          "4/45"
+        ]
+      ],
+      "condition": "hierarchy-five-channels",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task1",
+          "task3"
+        ],
+        [
+          "task2"
+        ]
+      ],
+      "root": 102201,
+      "states": [
+        "36356ef87b0600ce8013816f9319c9383bb3a36310370abbcffa4a8940a44d70",
+        "71b5b8a76af1d53db28d76ebaa17b5bb418cc93c6be6f5e107da3fe3d76d758c"
+      ]
+    },
+    {
+      "H": [
+        7,
+        7
+      ],
+      "beliefs": [
+        [
+          "4/21",
+          "8/21",
+          "1/21",
+          "8/21"
+        ],
+        [
+          "4/9",
+          "4/45",
+          "1/9",
+          "16/45"
+        ]
+      ],
+      "condition": "hierarchy-five-channels",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task1",
+          "task3"
+        ],
+        [
+          "task0"
+        ]
+      ],
+      "root": 102201,
+      "states": [
+        "36356ef87b0600ce8013816f9319c9383bb3a36310370abbcffa4a8940a44d70",
+        "772c087cc275c7c783c1180a4a672bf544803113ea74d7a26a64e2c030d854d0"
+      ]
+    },
+    {
+      "H": [
+        7,
+        7
+      ],
+      "beliefs": [
+        [
+          "4/21",
+          "8/21",
+          "1/21",
+          "8/21"
+        ],
+        [
+          "4/9",
+          "2/9",
+          "1/9",
+          "2/9"
+        ]
+      ],
+      "condition": "hierarchy-five-channels",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task1",
+          "task3"
+        ],
+        [
+          "task0"
+        ]
+      ],
+      "root": 102201,
+      "states": [
+        "36356ef87b0600ce8013816f9319c9383bb3a36310370abbcffa4a8940a44d70",
+        "e4a9709588d24c69161f23b759b5915f2414b3a6d4db282b0438308bd0df69d0"
+      ]
+    },
+    {
+      "H": [
+        7,
+        7
+      ],
+      "beliefs": [
+        [
+          "4/21",
+          "8/21",
+          "1/21",
+          "8/21"
+        ],
+        [
+          "1/6",
+          "1/12",
+          "2/3",
+          "1/12"
+        ]
+      ],
+      "condition": "hierarchy-five-channels",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task1",
+          "task3"
+        ],
+        [
+          "task2"
+        ]
+      ],
+      "root": 102201,
+      "states": [
+        "36356ef87b0600ce8013816f9319c9383bb3a36310370abbcffa4a8940a44d70",
+        "ebec2d5f239d4d8bba2ded4b15739f66b5e64edcf0ecd31171df3f2099f8d05e"
+      ]
+    },
+    {
+      "H": [
+        2,
+        2
+      ],
+      "beliefs": [
+        [
+          "5/117",
+          "16/117",
+          "80/117",
+          "16/117"
+        ],
+        [
+          "5/27",
+          "16/27",
+          "5/27",
+          "1/27"
+        ]
+      ],
+      "condition": "hierarchy-five-channels",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task2"
+        ],
+        [
+          "task1"
+        ]
+      ],
+      "root": 102201,
+      "states": [
+        "40f64641cafa8754b82f042edec8d3c839490f8a7f2b26b7c7e869c44741be3c",
+        "6982208d27c10a783f526426eae11e9da24ae8c4efdb58b06f3183a4220d0438"
+      ]
+    },
+    {
+      "H": [
+        7,
+        7
+      ],
+      "beliefs": [
+        [
+          "2/3",
+          "1/12",
+          "1/6",
+          "1/12"
+        ],
+        [
+          "1/21",
+          "8/21",
+          "4/21",
+          "8/21"
+        ]
+      ],
+      "condition": "hierarchy-five-channels",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task0"
+        ],
+        [
+          "task1",
+          "task3"
+        ]
+      ],
+      "root": 102201,
+      "states": [
+        "4340be4c25314bc9a9d50e6988323394b5430a8e267b90a05758e9f8ffd96469",
+        "4a4bd53b1055a1eaeae1284a57893cd29c36f21c399fc2eec030a0025e26ee68"
+      ]
+    },
+    {
+      "H": [
+        7,
+        7
+      ],
+      "beliefs": [
+        [
+          "2/3",
+          "1/12",
+          "1/6",
+          "1/12"
+        ],
+        [
+          "1/9",
+          "16/45",
+          "4/9",
+          "4/45"
+        ]
+      ],
+      "condition": "hierarchy-five-channels",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task0"
+        ],
+        [
+          "task2"
+        ]
+      ],
+      "root": 102201,
+      "states": [
+        "4340be4c25314bc9a9d50e6988323394b5430a8e267b90a05758e9f8ffd96469",
+        "71b5b8a76af1d53db28d76ebaa17b5bb418cc93c6be6f5e107da3fe3d76d758c"
+      ]
+    },
+    {
+      "H": [
+        7,
+        7
+      ],
+      "beliefs": [
+        [
+          "2/3",
+          "1/12",
+          "1/6",
+          "1/12"
+        ],
+        [
+          "1/6",
+          "1/12",
+          "2/3",
+          "1/12"
+        ]
+      ],
+      "condition": "hierarchy-five-channels",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task0"
+        ],
+        [
+          "task2"
+        ]
+      ],
+      "root": 102201,
+      "states": [
+        "4340be4c25314bc9a9d50e6988323394b5430a8e267b90a05758e9f8ffd96469",
+        "ebec2d5f239d4d8bba2ded4b15739f66b5e64edcf0ecd31171df3f2099f8d05e"
+      ]
+    },
+    {
+      "H": [
+        7,
+        7
+      ],
+      "beliefs": [
+        [
+          "1/21",
+          "8/21",
+          "4/21",
+          "8/21"
+        ],
+        [
+          "1/9",
+          "16/45",
+          "4/9",
+          "4/45"
+        ]
+      ],
+      "condition": "hierarchy-five-channels",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task1",
+          "task3"
+        ],
+        [
+          "task2"
+        ]
+      ],
+      "root": 102201,
+      "states": [
+        "4a4bd53b1055a1eaeae1284a57893cd29c36f21c399fc2eec030a0025e26ee68",
+        "71b5b8a76af1d53db28d76ebaa17b5bb418cc93c6be6f5e107da3fe3d76d758c"
+      ]
+    },
+    {
+      "H": [
+        7,
+        7
+      ],
+      "beliefs": [
+        [
+          "1/21",
+          "8/21",
+          "4/21",
+          "8/21"
+        ],
+        [
+          "4/9",
+          "4/45",
+          "1/9",
+          "16/45"
+        ]
+      ],
+      "condition": "hierarchy-five-channels",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task1",
+          "task3"
+        ],
+        [
+          "task0"
+        ]
+      ],
+      "root": 102201,
+      "states": [
+        "4a4bd53b1055a1eaeae1284a57893cd29c36f21c399fc2eec030a0025e26ee68",
+        "772c087cc275c7c783c1180a4a672bf544803113ea74d7a26a64e2c030d854d0"
+      ]
+    },
+    {
+      "H": [
+        7,
+        7
+      ],
+      "beliefs": [
+        [
+          "1/21",
+          "8/21",
+          "4/21",
+          "8/21"
+        ],
+        [
+          "4/9",
+          "2/9",
+          "1/9",
+          "2/9"
+        ]
+      ],
+      "condition": "hierarchy-five-channels",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task1",
+          "task3"
+        ],
+        [
+          "task0"
+        ]
+      ],
+      "root": 102201,
+      "states": [
+        "4a4bd53b1055a1eaeae1284a57893cd29c36f21c399fc2eec030a0025e26ee68",
+        "e4a9709588d24c69161f23b759b5915f2414b3a6d4db282b0438308bd0df69d0"
+      ]
+    },
+    {
+      "H": [
+        7,
+        7
+      ],
+      "beliefs": [
+        [
+          "1/21",
+          "8/21",
+          "4/21",
+          "8/21"
+        ],
+        [
+          "1/6",
+          "1/12",
+          "2/3",
+          "1/12"
+        ]
+      ],
+      "condition": "hierarchy-five-channels",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task1",
+          "task3"
+        ],
+        [
+          "task2"
+        ]
+      ],
+      "root": 102201,
+      "states": [
+        "4a4bd53b1055a1eaeae1284a57893cd29c36f21c399fc2eec030a0025e26ee68",
+        "ebec2d5f239d4d8bba2ded4b15739f66b5e64edcf0ecd31171df3f2099f8d05e"
+      ]
+    },
+    {
+      "H": [
+        2,
+        2
+      ],
+      "beliefs": [
+        [
+          "5/27",
+          "16/27",
+          "5/27",
+          "1/27"
+        ],
+        [
+          "5/153",
+          "64/153",
+          "80/153",
+          "4/153"
+        ]
+      ],
+      "condition": "hierarchy-five-channels",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task1"
+        ],
+        [
+          "task2"
+        ]
+      ],
+      "root": 102201,
+      "states": [
+        "6982208d27c10a783f526426eae11e9da24ae8c4efdb58b06f3183a4220d0438",
+        "7a4ab6ba66f910a7e32bd614ee53bfc9e792963b12b4e5fd4c59de6fded50ecd"
+      ]
+    },
+    {
+      "H": [
+        7,
+        7
+      ],
+      "beliefs": [
+        [
+          "1/9",
+          "16/45",
+          "4/9",
+          "4/45"
+        ],
+        [
+          "4/9",
+          "4/45",
+          "1/9",
+          "16/45"
+        ]
+      ],
+      "condition": "hierarchy-five-channels",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task2"
+        ],
+        [
+          "task0"
+        ]
+      ],
+      "root": 102201,
+      "states": [
+        "71b5b8a76af1d53db28d76ebaa17b5bb418cc93c6be6f5e107da3fe3d76d758c",
+        "772c087cc275c7c783c1180a4a672bf544803113ea74d7a26a64e2c030d854d0"
+      ]
+    },
+    {
+      "H": [
+        7,
+        7
+      ],
+      "beliefs": [
+        [
+          "1/9",
+          "16/45",
+          "4/9",
+          "4/45"
+        ],
+        [
+          "4/9",
+          "2/9",
+          "1/9",
+          "2/9"
+        ]
+      ],
+      "condition": "hierarchy-five-channels",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task2"
+        ],
+        [
+          "task0"
+        ]
+      ],
+      "root": 102201,
+      "states": [
+        "71b5b8a76af1d53db28d76ebaa17b5bb418cc93c6be6f5e107da3fe3d76d758c",
+        "e4a9709588d24c69161f23b759b5915f2414b3a6d4db282b0438308bd0df69d0"
+      ]
+    },
+    {
+      "H": [
+        7,
+        7
+      ],
+      "beliefs": [
+        [
+          "4/9",
+          "4/45",
+          "1/9",
+          "16/45"
+        ],
+        [
+          "1/6",
+          "1/12",
+          "2/3",
+          "1/12"
+        ]
+      ],
+      "condition": "hierarchy-five-channels",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task0"
+        ],
+        [
+          "task2"
+        ]
+      ],
+      "root": 102201,
+      "states": [
+        "772c087cc275c7c783c1180a4a672bf544803113ea74d7a26a64e2c030d854d0",
+        "ebec2d5f239d4d8bba2ded4b15739f66b5e64edcf0ecd31171df3f2099f8d05e"
+      ]
+    },
+    {
+      "H": [
+        9,
+        9
+      ],
+      "beliefs": [
+        [
+          "4/9",
+          "2/9",
+          "1/9",
+          "2/9"
+        ],
+        [
+          "1/9",
+          "2/9",
+          "4/9",
+          "2/9"
+        ]
+      ],
+      "condition": "hierarchy-five-channels",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task0"
+        ],
+        [
+          "task2"
+        ]
+      ],
+      "root": 102201,
+      "states": [
+        "8eace06cf9e6d239786de6d2324bc6abefaea96c7e1dedf3311c7133b27445db",
+        "d7215fd57ea9ee259accd6c46b69843717d7c7ef0de33a0762af62919e141f35"
+      ]
+    },
+    {
+      "H": [
+        9,
+        9
+      ],
+      "beliefs": [
+        [
+          "4/9",
+          "2/9",
+          "1/9",
+          "2/9"
+        ],
+        [
+          "5/18",
+          "2/9",
+          "5/18",
+          "2/9"
+        ]
+      ],
+      "condition": "hierarchy-five-channels",
+      "involves_measurement": true,
+      "optimal_first": [
+        [
+          "task0"
+        ],
+        [
+          "prepare"
+        ]
+      ],
+      "root": 102201,
+      "states": [
+        "8eace06cf9e6d239786de6d2324bc6abefaea96c7e1dedf3311c7133b27445db",
+        "df646f9a5b2d7ea2faeed1b5ca1cd971b3d88e138d88baa4496cc5f9842e77ae"
+      ]
+    },
+    {
+      "H": [
+        9,
+        9
+      ],
+      "beliefs": [
+        [
+          "1/9",
+          "2/9",
+          "4/9",
+          "2/9"
+        ],
+        [
+          "5/18",
+          "2/9",
+          "5/18",
+          "2/9"
+        ]
+      ],
+      "condition": "hierarchy-five-channels",
+      "involves_measurement": true,
+      "optimal_first": [
+        [
+          "task2"
+        ],
+        [
+          "prepare"
+        ]
+      ],
+      "root": 102201,
+      "states": [
+        "d7215fd57ea9ee259accd6c46b69843717d7c7ef0de33a0762af62919e141f35",
+        "df646f9a5b2d7ea2faeed1b5ca1cd971b3d88e138d88baa4496cc5f9842e77ae"
+      ]
+    },
+    {
+      "H": [
+        7,
+        7
+      ],
+      "beliefs": [
+        [
+          "4/9",
+          "2/9",
+          "1/9",
+          "2/9"
+        ],
+        [
+          "1/6",
+          "1/12",
+          "2/3",
+          "1/12"
+        ]
+      ],
+      "condition": "hierarchy-five-channels",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task0"
+        ],
+        [
+          "task2"
+        ]
+      ],
+      "root": 102201,
+      "states": [
+        "e4a9709588d24c69161f23b759b5915f2414b3a6d4db282b0438308bd0df69d0",
+        "ebec2d5f239d4d8bba2ded4b15739f66b5e64edcf0ecd31171df3f2099f8d05e"
+      ]
+    },
+    {
+      "H": [
+        3,
+        3
+      ],
+      "beliefs": [
+        [
+          "3/11",
+          "12/55",
+          "2/11",
+          "18/55"
+        ],
+        [
+          "3/11",
+          "18/55",
+          "2/11",
+          "12/55"
+        ]
+      ],
+      "condition": "hierarchy-four-channels",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task3"
+        ],
+        [
+          "task1"
+        ]
+      ],
+      "root": 101801,
+      "states": [
+        "52faca98da901129b16018fce0951796960075f889dbf1fea831c5c4aa41eece",
+        "f400d7617d4e6e57bb75f2e02c52f523baf972f86c4aaec2768e41448f3403a9"
+      ]
+    },
+    {
+      "H": [
+        7,
+        7
+      ],
+      "beliefs": [
+        [
+          "6/7",
+          "1/7"
+        ],
+        [
+          "2/29",
+          "27/29"
+        ]
+      ],
+      "condition": "binary-long",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task0"
+        ],
+        [
+          "task1"
+        ]
+      ],
+      "root": 100501,
+      "states": [
+        "04c6085c107cbd9b2fcdc238357a560f4fd17257a813b5f31fd35e680e36e93e",
+        "085c4eb6f056d3eecae70225f8263f07d3c74581576f7a4e337984e8a0a01c5c"
+      ]
+    },
+    {
+      "H": [
+        7,
+        7
+      ],
+      "beliefs": [
+        [
+          "6/7",
+          "1/7"
+        ],
+        [
+          "2/5",
+          "3/5"
+        ]
+      ],
+      "condition": "binary-long",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task0"
+        ],
+        [
+          "task1"
+        ]
+      ],
+      "root": 100501,
+      "states": [
+        "04c6085c107cbd9b2fcdc238357a560f4fd17257a813b5f31fd35e680e36e93e",
+        "714ebff0c300a07bb7fb3cea373849b1d6d66eaec5ba2bb106985c4f2b7348db"
+      ]
+    },
+    {
+      "H": [
+        8,
+        8
+      ],
+      "beliefs": [
+        [
+          "6/7",
+          "1/7"
+        ],
+        [
+          "2/5",
+          "3/5"
+        ]
+      ],
+      "condition": "binary-long",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task0"
+        ],
+        [
+          "task1"
+        ]
+      ],
+      "root": 100501,
+      "states": [
+        "237a6f049555e8711a84ed4acb92e13383d3b8ed3ca7505b1d0752090e62f417",
+        "7510ccd6c10b9e6f3d04f9ce836ff0d3918463f17f2e402606856bf32d8e566d"
+      ]
+    },
+    {
+      "H": [
+        8,
+        8
+      ],
+      "beliefs": [
+        [
+          "6/7",
+          "1/7"
+        ],
+        [
+          "2/29",
+          "27/29"
+        ]
+      ],
+      "condition": "binary-long",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task0"
+        ],
+        [
+          "task1"
+        ]
+      ],
+      "root": 100501,
+      "states": [
+        "237a6f049555e8711a84ed4acb92e13383d3b8ed3ca7505b1d0752090e62f417",
+        "c6df009d9ac72712589fc9b60acf9dc0d8c6f43299cd559e6c89e07b01a5a835"
+      ]
+    },
+    {
+      "H": [
+        9,
+        9
+      ],
+      "beliefs": [
+        [
+          "2/29",
+          "27/29"
+        ],
+        [
+          "6/7",
+          "1/7"
+        ]
+      ],
+      "condition": "binary-long",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task1"
+        ],
+        [
+          "task0"
+        ]
+      ],
+      "root": 100501,
+      "states": [
+        "241936ea612a849ea0ac1e484e87be92d627e1728c8d5863d6d726f6fd459675",
+        "f4fa12b8e5eebe14364c0ca36ecb532555ec40ab739a901aa6de2b60885ce206"
+      ]
+    },
+    {
+      "H": [
+        6,
+        6
+      ],
+      "beliefs": [
+        [
+          "2/29",
+          "27/29"
+        ],
+        [
+          "6/7",
+          "1/7"
+        ]
+      ],
+      "condition": "binary-long",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task1"
+        ],
+        [
+          "task0"
+        ]
+      ],
+      "root": 100501,
+      "states": [
+        "543c856c5164a3694d1239fcb33f96d7d7521fdf01ba6f7abc03ef37ef0b04db",
+        "aab37e1bedf9aa5c09a5af93d727a52b6e8e739f9580ec6a7813a42e8788d050"
+      ]
+    },
+    {
+      "H": [
+        9,
+        9
+      ],
+      "beliefs": [
+        [
+          "6/7",
+          "1/7"
+        ],
+        [
+          "2/5",
+          "3/5"
+        ]
+      ],
+      "condition": "binary-long",
+      "involves_measurement": true,
+      "optimal_first": [
+        [
+          "task0"
+        ],
+        [
+          "prepare",
+          "task1"
+        ]
+      ],
+      "root": 100501,
+      "states": [
+        "f4fa12b8e5eebe14364c0ca36ecb532555ec40ab739a901aa6de2b60885ce206",
+        "fffc10fd2ee50fcfaf77243419fd9714b4e30fe1f7e221a7b93ffa52068541ad"
+      ]
+    },
+    {
+      "H": [
+        8,
+        8
+      ],
+      "beliefs": [
+        [
+          "1/5",
+          "1/5",
+          "4/15",
+          "1/3"
+        ],
+        [
+          "5/24",
+          "5/24",
+          "4/9",
+          "5/36"
+        ]
+      ],
+      "condition": "hierarchy-five-channels",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task3"
+        ],
+        [
+          "task2"
+        ]
+      ],
+      "root": 102101,
+      "states": [
+        "05bb575d3ce497573f04249bd0cc0033c194ccebdac8c0ae74dac777d33d7d1d",
+        "cea7da0b7be2c14e3c9d6884128234dbffe4dcf079ad9c7582cecb4bc9cbc7ea"
+      ]
+    },
+    {
+      "H": [
+        9,
+        9
+      ],
+      "beliefs": [
+        [
+          "5/26",
+          "5/26",
+          "4/39",
+          "20/39"
+        ],
+        [
+          "5/24",
+          "5/24",
+          "4/9",
+          "5/36"
+        ]
+      ],
+      "condition": "hierarchy-five-channels",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task3"
+        ],
+        [
+          "task2"
+        ]
+      ],
+      "root": 102101,
+      "states": [
+        "496bae23dfdd233af7e2c2667cae4f4ebc30188aee9257584d1eac2e75fb10fd",
+        "ead9200b1d4de2a819be2d3f35566a9c2c34b8523f44b09708c0d230f13c67d2"
+      ]
+    },
+    {
+      "H": [
+        7,
+        7
+      ],
+      "beliefs": [
+        [
+          "16/107",
+          "16/107",
+          "100/321",
+          "125/321"
+        ],
+        [
+          "4/143",
+          "64/143",
+          "100/429",
+          "125/429"
+        ]
+      ],
+      "condition": "hierarchy-five-channels",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task3"
+        ],
+        [
+          "task1"
+        ]
+      ],
+      "root": 102101,
+      "states": [
+        "4d705782d90598e76b8b350a4f9e82f96e1bba27a5314efc4128d3b934b32548",
+        "9a752d5234ba5204cf01873267a947fa2adbdc3fd7df9a1e0350a85882f122ca"
+      ]
+    },
+    {
+      "H": [
+        7,
+        7
+      ],
+      "beliefs": [
+        [
+          "16/107",
+          "16/107",
+          "100/321",
+          "125/321"
+        ],
+        [
+          "64/143",
+          "4/143",
+          "100/429",
+          "125/429"
+        ]
+      ],
+      "condition": "hierarchy-five-channels",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task3"
+        ],
+        [
+          "task0"
+        ]
+      ],
+      "root": 102101,
+      "states": [
+        "4d705782d90598e76b8b350a4f9e82f96e1bba27a5314efc4128d3b934b32548",
+        "b566c96f03d1d299e5b576711c1cb27fc41f7944ced4b5a8fb28be64b6efb238"
+      ]
+    },
+    {
+      "H": [
+        7,
+        7
+      ],
+      "beliefs": [
+        [
+          "16/107",
+          "16/107",
+          "100/321",
+          "125/321"
+        ],
+        [
+          "5/24",
+          "5/24",
+          "4/9",
+          "5/36"
+        ]
+      ],
+      "condition": "hierarchy-five-channels",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task3"
+        ],
+        [
+          "task2"
+        ]
+      ],
+      "root": 102101,
+      "states": [
+        "4d705782d90598e76b8b350a4f9e82f96e1bba27a5314efc4128d3b934b32548",
+        "e3d588a1588a657b731638c2ec35d52e273847c625dbe3a07ff63a87358e4a8e"
+      ]
+    },
+    {
+      "H": [
+        7,
+        7
+      ],
+      "beliefs": [
+        [
+          "4/143",
+          "64/143",
+          "100/429",
+          "125/429"
+        ],
+        [
+          "64/143",
+          "4/143",
+          "100/429",
+          "125/429"
+        ]
+      ],
+      "condition": "hierarchy-five-channels",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task1"
+        ],
+        [
+          "task0"
+        ]
+      ],
+      "root": 102101,
+      "states": [
+        "9a752d5234ba5204cf01873267a947fa2adbdc3fd7df9a1e0350a85882f122ca",
+        "b566c96f03d1d299e5b576711c1cb27fc41f7944ced4b5a8fb28be64b6efb238"
+      ]
+    },
+    {
+      "H": [
+        7,
+        7
+      ],
+      "beliefs": [
+        [
+          "4/143",
+          "64/143",
+          "100/429",
+          "125/429"
+        ],
+        [
+          "5/24",
+          "5/24",
+          "4/9",
+          "5/36"
+        ]
+      ],
+      "condition": "hierarchy-five-channels",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task1"
+        ],
+        [
+          "task2"
+        ]
+      ],
+      "root": 102101,
+      "states": [
+        "9a752d5234ba5204cf01873267a947fa2adbdc3fd7df9a1e0350a85882f122ca",
+        "e3d588a1588a657b731638c2ec35d52e273847c625dbe3a07ff63a87358e4a8e"
+      ]
+    },
+    {
+      "H": [
+        7,
+        7
+      ],
+      "beliefs": [
+        [
+          "64/143",
+          "4/143",
+          "100/429",
+          "125/429"
+        ],
+        [
+          "5/24",
+          "5/24",
+          "4/9",
+          "5/36"
+        ]
+      ],
+      "condition": "hierarchy-five-channels",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task0"
+        ],
+        [
+          "task2"
+        ]
+      ],
+      "root": 102101,
+      "states": [
+        "b566c96f03d1d299e5b576711c1cb27fc41f7944ced4b5a8fb28be64b6efb238",
+        "e3d588a1588a657b731638c2ec35d52e273847c625dbe3a07ff63a87358e4a8e"
+      ]
+    },
+    {
+      "H": [
+        9,
+        9
+      ],
+      "beliefs": [
+        [
+          "5/24",
+          "5/24",
+          "4/9",
+          "5/36"
+        ],
+        [
+          "1/5",
+          "1/5",
+          "4/15",
+          "1/3"
+        ]
+      ],
+      "condition": "hierarchy-five-channels",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task2"
+        ],
+        [
+          "task3"
+        ]
+      ],
+      "root": 102101,
+      "states": [
+        "ead9200b1d4de2a819be2d3f35566a9c2c34b8523f44b09708c0d230f13c67d2",
+        "f43ef64d00fee49b76601e17dfce4321cdadd4a7ee0b4728e8bb995a453890da"
+      ]
+    },
+    {
+      "H": [
+        5,
+        5
+      ],
+      "beliefs": [
+        [
+          "2/9",
+          "7/9"
+        ],
+        [
+          "14/23",
+          "9/23"
+        ]
+      ],
+      "condition": "binary-redundant",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task1"
+        ],
+        [
+          "task0"
+        ]
+      ],
+      "root": 100701,
+      "states": [
+        "24339abc6960d3458a08ea0760d251d351b753b9602cb72f468bd42d47b55f58",
+        "52bfe1176e175aaeae3b22d708328ee7c441820b0fe6954f5f8eeed574627ccb"
+      ]
+    },
+    {
+      "H": [
+        5,
+        5
+      ],
+      "beliefs": [
+        [
+          "14/23",
+          "9/23"
+        ],
+        [
+          "2/5",
+          "3/5"
+        ]
+      ],
+      "condition": "binary-redundant",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task0"
+        ],
+        [
+          "task1"
+        ]
+      ],
+      "root": 100701,
+      "states": [
+        "52bfe1176e175aaeae3b22d708328ee7c441820b0fe6954f5f8eeed574627ccb",
+        "9536bf29bed84d2a6e6725fa0c1ace6aa71c80d5b8118e5978a4a67ebb93cdd0"
+      ]
+    },
+    {
+      "H": [
+        5,
+        5
+      ],
+      "beliefs": [
+        [
+          "3/32",
+          "7/16",
+          "15/64",
+          "15/64"
+        ],
+        [
+          "1/4",
+          "3/14",
+          "15/56",
+          "15/56"
+        ]
+      ],
+      "condition": "hierarchy-cost",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task1"
+        ],
+        [
+          "task2",
+          "task3"
+        ]
+      ],
+      "root": 101701,
+      "states": [
+        "05cb283e50a6cb2f872e0c13de87efd703c8a6d2f0691396e7d17ad182f43c60",
+        "090026be0a8eb0835bac64f9fd5d44be97ea3ce6fc5e036120e3a9563a623c00"
+      ]
+    },
+    {
+      "H": [
+        5,
+        5
+      ],
+      "beliefs": [
+        [
+          "3/29",
+          "12/29",
+          "2/29",
+          "12/29"
+        ],
+        [
+          "6/13",
+          "3/26",
+          "4/13",
+          "3/26"
+        ]
+      ],
+      "condition": "hierarchy-sparse",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task1",
+          "task3"
+        ],
+        [
+          "task0"
+        ]
+      ],
+      "root": 101101,
+      "states": [
+        "3fc7373d4379a0519682c8b28b203ed82d5a0cfcd2caaff46784a2285d5095f5",
+        "7f601896aaec367c6a88fddfeccb04d86eaf48cfa20cc01fef51866c51dfe2c6"
+      ]
+    },
+    {
+      "H": [
+        3,
+        3
+      ],
+      "beliefs": [
+        [
+          "3/11",
+          "6/55",
+          "2/11",
+          "24/55"
+        ],
+        [
+          "3/11",
+          "24/55",
+          "2/11",
+          "6/55"
+        ]
+      ],
+      "condition": "hierarchy-sparse",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task3"
+        ],
+        [
+          "task1"
+        ]
+      ],
+      "root": 101101,
+      "states": [
+        "5e770bb33dc6ebf06c07e5425530b779ae98d2e8efdd571064aaa65bb945d006",
+        "e161ec727090d2a598536f8c2440d200a3e4992549ea8b385536a89f099662cb"
+      ]
+    },
+    {
+      "H": [
+        7,
+        7
+      ],
+      "beliefs": [
+        [
+          "6/17",
+          "10/51",
+          "20/51",
+          "1/17"
+        ],
+        [
+          "2/59",
+          "10/59",
+          "20/59",
+          "27/59"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task2"
+        ],
+        [
+          "task3"
+        ]
+      ],
+      "root": 101201,
+      "states": [
+        "0046d0a5f501a524da0e59a90341f0f521a143eeeab8661b3b6d33f2c2ff8c3b",
+        "9882b5471234e67216e4b31a0a1478e10f6beab6bb6104cd2fe6487ebb5f358e"
+      ]
+    },
+    {
+      "H": [
+        7,
+        7
+      ],
+      "beliefs": [
+        [
+          "6/17",
+          "10/51",
+          "20/51",
+          "1/17"
+        ],
+        [
+          "6/17",
+          "2/51",
+          "4/51",
+          "9/17"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task2"
+        ],
+        [
+          "task3"
+        ]
+      ],
+      "root": 101201,
+      "states": [
+        "0046d0a5f501a524da0e59a90341f0f521a143eeeab8661b3b6d33f2c2ff8c3b",
+        "e4427bdbb63dc34625150821c079c6b006f4479bfadb6a2a8b3c34253da42e90"
+      ]
+    },
+    {
+      "H": [
+        8,
+        8
+      ],
+      "beliefs": [
+        [
+          "2/59",
+          "18/59",
+          "36/59",
+          "3/59"
+        ],
+        [
+          "6/17",
+          "2/51",
+          "4/51",
+          "9/17"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task2"
+        ],
+        [
+          "task3"
+        ]
+      ],
+      "root": 101201,
+      "states": [
+        "2c39807fd85e32dfdf4850806c4edda2426a586d36781a0f374bf0a8aee0014c",
+        "d34eb8377ae27c48eb1ae886f1037cfb7d91cedbedd1fcd3a05f6218fe1308a0"
+      ]
+    },
+    {
+      "H": [
+        9,
+        9
+      ],
+      "beliefs": [
+        [
+          "2/11",
+          "2/11",
+          "4/11",
+          "3/11"
+        ],
+        [
+          "2/59",
+          "18/59",
+          "36/59",
+          "3/59"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": true,
+      "optimal_first": [
+        [
+          "prepare"
+        ],
+        [
+          "task2"
+        ]
+      ],
+      "root": 101201,
+      "states": [
+        "4a836de11f991bf648d231a9af24f01d92ad731a948cf051d00ba19ceda42e5e",
+        "c54693b2dfd6c455330b4d5c5fdf8e2fedc4ea1c71db3f5daf52c49020259f86"
+      ]
+    },
+    {
+      "H": [
+        6,
+        6
+      ],
+      "beliefs": [
+        [
+          "2/59",
+          "18/59",
+          "36/59",
+          "3/59"
+        ],
+        [
+          "6/17",
+          "2/51",
+          "4/51",
+          "9/17"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task2"
+        ],
+        [
+          "task3"
+        ]
+      ],
+      "root": 101201,
+      "states": [
+        "5d6f3d53cbdc4f2f9f82b3c3eb461d61d1decda1b305660e3bf9722db36dd1de",
+        "a29c16851538ec18e960f9bc7a301f5a2dcb6e622a11817520c102ba76acec38"
+      ]
+    },
+    {
+      "H": [
+        7,
+        7
+      ],
+      "beliefs": [
+        [
+          "2/59",
+          "18/59",
+          "36/59",
+          "3/59"
+        ],
+        [
+          "2/59",
+          "10/59",
+          "20/59",
+          "27/59"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task2"
+        ],
+        [
+          "task3"
+        ]
+      ],
+      "root": 101201,
+      "states": [
+        "7db531e974fcde2dd87d8995b59e372e683f974ab0bbb60280f44162a420f9c1",
+        "9882b5471234e67216e4b31a0a1478e10f6beab6bb6104cd2fe6487ebb5f358e"
+      ]
+    },
+    {
+      "H": [
+        7,
+        7
+      ],
+      "beliefs": [
+        [
+          "2/59",
+          "18/59",
+          "36/59",
+          "3/59"
+        ],
+        [
+          "6/17",
+          "2/51",
+          "4/51",
+          "9/17"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task2"
+        ],
+        [
+          "task3"
+        ]
+      ],
+      "root": 101201,
+      "states": [
+        "7db531e974fcde2dd87d8995b59e372e683f974ab0bbb60280f44162a420f9c1",
+        "e4427bdbb63dc34625150821c079c6b006f4479bfadb6a2a8b3c34253da42e90"
+      ]
+    },
+    {
+      "H": [
+        8,
+        8
+      ],
+      "beliefs": [
+        [
+          "2/11",
+          "2/11",
+          "4/11",
+          "3/11"
+        ],
+        [
+          "6/17",
+          "2/51",
+          "4/51",
+          "9/17"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task2"
+        ],
+        [
+          "task3"
+        ]
+      ],
+      "root": 101201,
+      "states": [
+        "81260ed65d256a265c0a4dc1ada2ecc4bb3aa412da6d2afb2b4944f4f9b6fd82",
+        "d34eb8377ae27c48eb1ae886f1037cfb7d91cedbedd1fcd3a05f6218fe1308a0"
+      ]
+    },
+    {
+      "H": [
+        6,
+        6
+      ],
+      "beliefs": [
+        [
+          "6/17",
+          "10/51",
+          "20/51",
+          "1/17"
+        ],
+        [
+          "6/17",
+          "2/51",
+          "4/51",
+          "9/17"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task2"
+        ],
+        [
+          "task3"
+        ]
+      ],
+      "root": 101201,
+      "states": [
+        "96a16ba120f5140dbc70b76e8cc7ac6760ab5c00d44b959bea28a31c0dd680a0",
+        "a29c16851538ec18e960f9bc7a301f5a2dcb6e622a11817520c102ba76acec38"
+      ]
+    },
+    {
+      "H": [
+        9,
+        9
+      ],
+      "beliefs": [
+        [
+          "2/59",
+          "18/59",
+          "36/59",
+          "3/59"
+        ],
+        [
+          "6/17",
+          "2/51",
+          "4/51",
+          "9/17"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": true,
+      "optimal_first": [
+        [
+          "task2"
+        ],
+        [
+          "prepare",
+          "task3"
+        ]
+      ],
+      "root": 101201,
+      "states": [
+        "c54693b2dfd6c455330b4d5c5fdf8e2fedc4ea1c71db3f5daf52c49020259f86",
+        "fc6994d09986ba6ff35a610363cc06f8f5d7b63404d6cb4ffa9f726a6660785c"
+      ]
+    },
+    {
+      "H": [
+        4,
+        4
+      ],
+      "beliefs": [
+        [
+          "2/9",
+          "1/9",
+          "4/9",
+          "2/9"
+        ],
+        [
+          "2/9",
+          "4/9",
+          "1/9",
+          "2/9"
+        ]
+      ],
+      "condition": "hierarchy-sparse",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task2"
+        ],
+        [
+          "task1"
+        ]
+      ],
+      "root": 100902,
+      "states": [
+        "2326758c7aa32f5005f9716debfed536936ab5a64deab5685b0e0166635e861c",
+        "f2deb9a26375dc5b634ced4845daf610a55764093a5914708ceb29d3839a61d7"
+      ]
+    },
+    {
+      "H": [
+        5,
+        5
+      ],
+      "beliefs": [
+        [
+          "2/9",
+          "4/9",
+          "1/9",
+          "2/9"
+        ],
+        [
+          "2/9",
+          "1/9",
+          "4/9",
+          "2/9"
+        ]
+      ],
+      "condition": "hierarchy-sparse",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task1"
+        ],
+        [
+          "task2"
+        ]
+      ],
+      "root": 100902,
+      "states": [
+        "6d1683b95ae8ab67b6e5be4b106e8c8d575fd34af1cf15d11f06dadca6bfd9bf",
+        "74a49e60ceaf1659bc2bbf41d1f4ec361248ae139c76f435170e5b8812fe459d"
+      ]
+    },
+    {
+      "H": [
+        7,
+        7
+      ],
+      "beliefs": [
+        [
+          "30/67",
+          "1/67",
+          "6/67",
+          "30/67"
+        ],
+        [
+          "18/245",
+          "27/49",
+          "18/49",
+          "2/245"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": true,
+      "optimal_first": [
+        [
+          "prepare"
+        ],
+        [
+          "task1"
+        ]
+      ],
+      "root": 101301,
+      "states": [
+        "05d508f07080d55232aff2bb7379fde2d9c420dcaa9f8a022b6a3dd96e13b0f1",
+        "42079c1672cfecec29f4afc65200d7ebff3dc5f8095e46af6669efe1ded0f702"
+      ]
+    },
+    {
+      "H": [
+        7,
+        7
+      ],
+      "beliefs": [
+        [
+          "30/67",
+          "1/67",
+          "6/67",
+          "30/67"
+        ],
+        [
+          "162/205",
+          "3/41",
+          "2/41",
+          "18/205"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": true,
+      "optimal_first": [
+        [
+          "prepare"
+        ],
+        [
+          "task0"
+        ]
+      ],
+      "root": 101301,
+      "states": [
+        "05d508f07080d55232aff2bb7379fde2d9c420dcaa9f8a022b6a3dd96e13b0f1",
+        "b374c31655b75019bd53d103122ff0cd975e9365daee84d01e3f2ecc34123773"
+      ]
+    },
+    {
+      "H": [
+        7,
+        7
+      ],
+      "beliefs": [
+        [
+          "30/67",
+          "1/67",
+          "6/67",
+          "30/67"
+        ],
+        [
+          "10/209",
+          "27/209",
+          "162/209",
+          "10/209"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": true,
+      "optimal_first": [
+        [
+          "prepare"
+        ],
+        [
+          "task2"
+        ]
+      ],
+      "root": 101301,
+      "states": [
+        "05d508f07080d55232aff2bb7379fde2d9c420dcaa9f8a022b6a3dd96e13b0f1",
+        "bbb6e9463e7d6509953e37801e67a5f620c8057938524037a9a8f0cf8d24ccca"
+      ]
+    },
+    {
+      "H": [
+        7,
+        7
+      ],
+      "beliefs": [
+        [
+          "30/67",
+          "1/67",
+          "6/67",
+          "30/67"
+        ],
+        [
+          "18/205",
+          "3/41",
+          "2/41",
+          "162/205"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": true,
+      "optimal_first": [
+        [
+          "prepare"
+        ],
+        [
+          "task3"
+        ]
+      ],
+      "root": 101301,
+      "states": [
+        "05d508f07080d55232aff2bb7379fde2d9c420dcaa9f8a022b6a3dd96e13b0f1",
+        "da2d82ac9f821f8f09cbe37db417fe1d27c53212b98e309389ab59fc73461733"
+      ]
+    },
+    {
+      "H": [
+        7,
+        7
+      ],
+      "beliefs": [
+        [
+          "18/245",
+          "27/49",
+          "18/49",
+          "2/245"
+        ],
+        [
+          "162/205",
+          "3/41",
+          "2/41",
+          "18/205"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task1"
+        ],
+        [
+          "task0"
+        ]
+      ],
+      "root": 101301,
+      "states": [
+        "42079c1672cfecec29f4afc65200d7ebff3dc5f8095e46af6669efe1ded0f702",
+        "b374c31655b75019bd53d103122ff0cd975e9365daee84d01e3f2ecc34123773"
+      ]
+    },
+    {
+      "H": [
+        7,
+        7
+      ],
+      "beliefs": [
+        [
+          "18/245",
+          "27/49",
+          "18/49",
+          "2/245"
+        ],
+        [
+          "10/209",
+          "27/209",
+          "162/209",
+          "10/209"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task1"
+        ],
+        [
+          "task2"
+        ]
+      ],
+      "root": 101301,
+      "states": [
+        "42079c1672cfecec29f4afc65200d7ebff3dc5f8095e46af6669efe1ded0f702",
+        "bbb6e9463e7d6509953e37801e67a5f620c8057938524037a9a8f0cf8d24ccca"
+      ]
+    },
+    {
+      "H": [
+        7,
+        7
+      ],
+      "beliefs": [
+        [
+          "18/245",
+          "27/49",
+          "18/49",
+          "2/245"
+        ],
+        [
+          "18/205",
+          "3/41",
+          "2/41",
+          "162/205"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task1"
+        ],
+        [
+          "task3"
+        ]
+      ],
+      "root": 101301,
+      "states": [
+        "42079c1672cfecec29f4afc65200d7ebff3dc5f8095e46af6669efe1ded0f702",
+        "da2d82ac9f821f8f09cbe37db417fe1d27c53212b98e309389ab59fc73461733"
+      ]
+    },
+    {
+      "H": [
+        4,
+        4
+      ],
+      "beliefs": [
+        [
+          "10/209",
+          "27/209",
+          "162/209",
+          "10/209"
+        ],
+        [
+          "10/2369",
+          "2187/2369",
+          "162/2369",
+          "10/2369"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task2"
+        ],
+        [
+          "task1"
+        ]
+      ],
+      "root": 101301,
+      "states": [
+        "4af39765df2da074f6b1c4ee589bd87842ab2b8c49941cc31a978e87d36ca861",
+        "9274165735d3823662aa2d63e67e4a2c360e6b66b073708c7e2fe0ce66f52a35"
+      ]
+    },
+    {
+      "H": [
+        4,
+        4
+      ],
+      "beliefs": [
+        [
+          "10/209",
+          "27/209",
+          "162/209",
+          "10/209"
+        ],
+        [
+          "162/205",
+          "3/41",
+          "2/41",
+          "18/205"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task2"
+        ],
+        [
+          "task0"
+        ]
+      ],
+      "root": 101301,
+      "states": [
+        "4af39765df2da074f6b1c4ee589bd87842ab2b8c49941cc31a978e87d36ca861",
+        "94dc46232c5997cdfe8472c8f0990a531989835bf64265920de4a17611518d05"
+      ]
+    },
+    {
+      "H": [
+        6,
+        6
+      ],
+      "beliefs": [
+        [
+          "10/209",
+          "27/209",
+          "162/209",
+          "10/209"
+        ],
+        [
+          "162/205",
+          "3/41",
+          "2/41",
+          "18/205"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task2"
+        ],
+        [
+          "task0"
+        ]
+      ],
+      "root": 101301,
+      "states": [
+        "86773d3ff389ee024ed5d97713c6fad641abeb5d73cfd644e238f1d1e7c7f15f",
+        "be7c1dbb36ead60936072321e7a5637b59a716179b2dcdffe09616e238d88c8f"
+      ]
+    },
+    {
+      "H": [
+        6,
+        6
+      ],
+      "beliefs": [
+        [
+          "10/209",
+          "27/209",
+          "162/209",
+          "10/209"
+        ],
+        [
+          "10/281",
+          "243/281",
+          "18/281",
+          "10/281"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task2"
+        ],
+        [
+          "task1"
+        ]
+      ],
+      "root": 101301,
+      "states": [
+        "86773d3ff389ee024ed5d97713c6fad641abeb5d73cfd644e238f1d1e7c7f15f",
+        "e2ace02dc2c7386fe06615ce362e0d0632c3e1bd947008583b3a0b69b6ffa75f"
+      ]
+    },
+    {
+      "H": [
+        4,
+        4
+      ],
+      "beliefs": [
+        [
+          "10/2369",
+          "2187/2369",
+          "162/2369",
+          "10/2369"
+        ],
+        [
+          "162/205",
+          "3/41",
+          "2/41",
+          "18/205"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task1"
+        ],
+        [
+          "task0"
+        ]
+      ],
+      "root": 101301,
+      "states": [
+        "9274165735d3823662aa2d63e67e4a2c360e6b66b073708c7e2fe0ce66f52a35",
+        "94dc46232c5997cdfe8472c8f0990a531989835bf64265920de4a17611518d05"
+      ]
+    },
+    {
+      "H": [
+        4,
+        4
+      ],
+      "beliefs": [
+        [
+          "10/2369",
+          "2187/2369",
+          "162/2369",
+          "10/2369"
+        ],
+        [
+          "10/1721",
+          "243/1721",
+          "1458/1721",
+          "10/1721"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task1"
+        ],
+        [
+          "task2"
+        ]
+      ],
+      "root": 101301,
+      "states": [
+        "9274165735d3823662aa2d63e67e4a2c360e6b66b073708c7e2fe0ce66f52a35",
+        "d6ce7b70cc487305cbc650f55f96f8769d5733d35dd0c51089e688c8137901f1"
+      ]
+    },
+    {
+      "H": [
+        4,
+        4
+      ],
+      "beliefs": [
+        [
+          "162/205",
+          "3/41",
+          "2/41",
+          "18/205"
+        ],
+        [
+          "10/1721",
+          "243/1721",
+          "1458/1721",
+          "10/1721"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task0"
+        ],
+        [
+          "task2"
+        ]
+      ],
+      "root": 101301,
+      "states": [
+        "94dc46232c5997cdfe8472c8f0990a531989835bf64265920de4a17611518d05",
+        "d6ce7b70cc487305cbc650f55f96f8769d5733d35dd0c51089e688c8137901f1"
+      ]
+    },
+    {
+      "H": [
+        7,
+        7
+      ],
+      "beliefs": [
+        [
+          "162/205",
+          "3/41",
+          "2/41",
+          "18/205"
+        ],
+        [
+          "10/209",
+          "27/209",
+          "162/209",
+          "10/209"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task0"
+        ],
+        [
+          "task2"
+        ]
+      ],
+      "root": 101301,
+      "states": [
+        "b374c31655b75019bd53d103122ff0cd975e9365daee84d01e3f2ecc34123773",
+        "bbb6e9463e7d6509953e37801e67a5f620c8057938524037a9a8f0cf8d24ccca"
+      ]
+    },
+    {
+      "H": [
+        7,
+        7
+      ],
+      "beliefs": [
+        [
+          "162/205",
+          "3/41",
+          "2/41",
+          "18/205"
+        ],
+        [
+          "18/205",
+          "3/41",
+          "2/41",
+          "162/205"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task0"
+        ],
+        [
+          "task3"
+        ]
+      ],
+      "root": 101301,
+      "states": [
+        "b374c31655b75019bd53d103122ff0cd975e9365daee84d01e3f2ecc34123773",
+        "da2d82ac9f821f8f09cbe37db417fe1d27c53212b98e309389ab59fc73461733"
+      ]
+    },
+    {
+      "H": [
+        7,
+        7
+      ],
+      "beliefs": [
+        [
+          "10/209",
+          "27/209",
+          "162/209",
+          "10/209"
+        ],
+        [
+          "18/205",
+          "3/41",
+          "2/41",
+          "162/205"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task2"
+        ],
+        [
+          "task3"
+        ]
+      ],
+      "root": 101301,
+      "states": [
+        "bbb6e9463e7d6509953e37801e67a5f620c8057938524037a9a8f0cf8d24ccca",
+        "da2d82ac9f821f8f09cbe37db417fe1d27c53212b98e309389ab59fc73461733"
+      ]
+    },
+    {
+      "H": [
+        6,
+        6
+      ],
+      "beliefs": [
+        [
+          "162/205",
+          "3/41",
+          "2/41",
+          "18/205"
+        ],
+        [
+          "10/281",
+          "243/281",
+          "18/281",
+          "10/281"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task0"
+        ],
+        [
+          "task1"
+        ]
+      ],
+      "root": 101301,
+      "states": [
+        "be7c1dbb36ead60936072321e7a5637b59a716179b2dcdffe09616e238d88c8f",
+        "e2ace02dc2c7386fe06615ce362e0d0632c3e1bd947008583b3a0b69b6ffa75f"
+      ]
+    },
+    {
+      "H": [
+        5,
+        5
+      ],
+      "beliefs": [
+        [
+          "2/39",
+          "4/13",
+          "20/39",
+          "5/39"
+        ],
+        [
+          "2/9",
+          "1/12",
+          "5/36",
+          "5/9"
+        ]
+      ],
+      "condition": "hierarchy-sparse",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task2"
+        ],
+        [
+          "task3"
+        ]
+      ],
+      "root": 101001,
+      "states": [
+        "44b5565aec1f66cd94734e734e4135cb26cd37fc914ed443b9d8834a86145ef3",
+        "679efd9f518142a5fcb5eeb01b2f6c88bc0d8bcde061800d07b452d3ddbcd1ae"
+      ]
+    },
+    {
+      "H": [
+        7,
+        7
+      ],
+      "beliefs": [
+        [
+          "4/23",
+          "10/23",
+          "8/23",
+          "1/23"
+        ],
+        [
+          "8/49",
+          "5/49",
+          "4/49",
+          "32/49"
+        ]
+      ],
+      "condition": "hierarchy-five-channels",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task1"
+        ],
+        [
+          "task3"
+        ]
+      ],
+      "root": 102301,
+      "states": [
+        "2a86109f615566f04ecb812250dd8ad44f215ba43bd40a9b412d5aa91149672c",
+        "3714a89321701692855c5e788c3940f4c3ef64613e0ab903c7b21812d0d02afa"
+      ]
+    },
+    {
+      "H": [
+        7,
+        7
+      ],
+      "beliefs": [
+        [
+          "4/23",
+          "10/23",
+          "8/23",
+          "1/23"
+        ],
+        [
+          "32/49",
+          "5/49",
+          "4/49",
+          "8/49"
+        ]
+      ],
+      "condition": "hierarchy-five-channels",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task1"
+        ],
+        [
+          "task0"
+        ]
+      ],
+      "root": 102301,
+      "states": [
+        "2a86109f615566f04ecb812250dd8ad44f215ba43bd40a9b412d5aa91149672c",
+        "3ce3254cdd835aab3cab309947e90ae4ccdd0095a58d987ea180b232a4082fbc"
+      ]
+    },
+    {
+      "H": [
+        7,
+        7
+      ],
+      "beliefs": [
+        [
+          "1/23",
+          "10/23",
+          "8/23",
+          "4/23"
+        ],
+        [
+          "8/49",
+          "5/49",
+          "4/49",
+          "32/49"
+        ]
+      ],
+      "condition": "hierarchy-five-channels",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task1"
+        ],
+        [
+          "task3"
+        ]
+      ],
+      "root": 102301,
+      "states": [
+        "33d9f83844296f46833877310a1bf1ae7f0907040a24d6af9f904d9876ee9355",
+        "3714a89321701692855c5e788c3940f4c3ef64613e0ab903c7b21812d0d02afa"
+      ]
+    },
+    {
+      "H": [
+        7,
+        7
+      ],
+      "beliefs": [
+        [
+          "1/23",
+          "10/23",
+          "8/23",
+          "4/23"
+        ],
+        [
+          "32/49",
+          "5/49",
+          "4/49",
+          "8/49"
+        ]
+      ],
+      "condition": "hierarchy-five-channels",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task1"
+        ],
+        [
+          "task0"
+        ]
+      ],
+      "root": 102301,
+      "states": [
+        "33d9f83844296f46833877310a1bf1ae7f0907040a24d6af9f904d9876ee9355",
+        "3ce3254cdd835aab3cab309947e90ae4ccdd0095a58d987ea180b232a4082fbc"
+      ]
+    },
+    {
+      "H": [
+        7,
+        7
+      ],
+      "beliefs": [
+        [
+          "8/49",
+          "5/49",
+          "4/49",
+          "32/49"
+        ],
+        [
+          "32/49",
+          "5/49",
+          "4/49",
+          "8/49"
+        ]
+      ],
+      "condition": "hierarchy-five-channels",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task3"
+        ],
+        [
+          "task0"
+        ]
+      ],
+      "root": 102301,
+      "states": [
+        "3714a89321701692855c5e788c3940f4c3ef64613e0ab903c7b21812d0d02afa",
+        "3ce3254cdd835aab3cab309947e90ae4ccdd0095a58d987ea180b232a4082fbc"
+      ]
+    },
+    {
+      "H": [
+        5,
+        5
+      ],
+      "beliefs": [
+        [
+          "32/49",
+          "5/49",
+          "4/49",
+          "8/49"
+        ],
+        [
+          "4/23",
+          "10/23",
+          "8/23",
+          "1/23"
+        ]
+      ],
+      "condition": "hierarchy-five-channels",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task0"
+        ],
+        [
+          "task1"
+        ]
+      ],
+      "root": 102301,
+      "states": [
+        "3cc0f1a20f7a1c384796ca99073181e2183db3c2d90200ed7dffdf4989310643",
+        "eaaef8da3c92e0ca780ca407cf7786909b91f2decee339d99b855fbf57aaec43"
+      ]
+    },
+    {
+      "H": [
+        4,
+        4
+      ],
+      "beliefs": [
+        [
+          "32/49",
+          "5/49",
+          "4/49",
+          "8/49"
+        ],
+        [
+          "20/109",
+          "20/109",
+          "64/109",
+          "5/109"
+        ]
+      ],
+      "condition": "hierarchy-five-channels",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task0"
+        ],
+        [
+          "task2"
+        ]
+      ],
+      "root": 102301,
+      "states": [
+        "52443b5a672c38b356a3d6914e55d07b460acbefa1d3c7a7d24819042aea74bd",
+        "9adbaad97a9f6b247b0398faceb82c0e1a80bb5be5fd177e437040174fd2b4f5"
+      ]
+    },
+    {
+      "H": [
+        6,
+        6
+      ],
+      "beliefs": [
+        [
+          "4/23",
+          "10/23",
+          "8/23",
+          "1/23"
+        ],
+        [
+          "8/49",
+          "5/49",
+          "4/49",
+          "32/49"
+        ]
+      ],
+      "condition": "hierarchy-five-channels",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task1"
+        ],
+        [
+          "task3"
+        ]
+      ],
+      "root": 102301,
+      "states": [
+        "81003d700c532707f5eaf257a840ca47e5384c78f363fd1a7eccdfbcc9e8eb30",
+        "a293bff31922911832fc5b37bb8f42acdc8b11de8a6bb150ad2c2c4230f24228"
+      ]
+    },
+    {
+      "H": [
+        6,
+        6
+      ],
+      "beliefs": [
+        [
+          "4/23",
+          "10/23",
+          "8/23",
+          "1/23"
+        ],
+        [
+          "32/49",
+          "5/49",
+          "4/49",
+          "8/49"
+        ]
+      ],
+      "condition": "hierarchy-five-channels",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task1"
+        ],
+        [
+          "task0"
+        ]
+      ],
+      "root": 102301,
+      "states": [
+        "81003d700c532707f5eaf257a840ca47e5384c78f363fd1a7eccdfbcc9e8eb30",
+        "ca3eb34418a35a6bbb977ba47fa055d9e324b7057515af1820e4352aedae7b42"
+      ]
+    },
+    {
+      "H": [
+        9,
+        9
+      ],
+      "beliefs": [
+        [
+          "5/19",
+          "5/19",
+          "4/19",
+          "5/19"
+        ],
+        [
+          "5/46",
+          "10/23",
+          "8/23",
+          "5/46"
+        ]
+      ],
+      "condition": "hierarchy-five-channels",
+      "involves_measurement": true,
+      "optimal_first": [
+        [
+          "prepare"
+        ],
+        [
+          "task1"
+        ]
+      ],
+      "root": 102301,
+      "states": [
+        "87cc1cad774e2e3160971da1b552a3b28eff21048916337961843684420456e3",
+        "b0380d6c3fc7613e84b4ecdf0a7d1ea6ef2b3181a1e62d9262e97635544817f1"
+      ]
+    },
+    {
+      "H": [
+        6,
+        6
+      ],
+      "beliefs": [
+        [
+          "8/49",
+          "5/49",
+          "4/49",
+          "32/49"
+        ],
+        [
+          "32/49",
+          "5/49",
+          "4/49",
+          "8/49"
+        ]
+      ],
+      "condition": "hierarchy-five-channels",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task3"
+        ],
+        [
+          "task0"
+        ]
+      ],
+      "root": 102301,
+      "states": [
+        "a293bff31922911832fc5b37bb8f42acdc8b11de8a6bb150ad2c2c4230f24228",
+        "ca3eb34418a35a6bbb977ba47fa055d9e324b7057515af1820e4352aedae7b42"
+      ]
+    },
+    {
+      "H": [
+        5,
+        5
+      ],
+      "beliefs": [
+        [
+          "45/47",
+          "2/47"
+        ],
+        [
+          "5/23",
+          "18/23"
+        ]
+      ],
+      "condition": "binary-long",
+      "involves_measurement": false,
+      "optimal_first": [
+        [
+          "task0"
+        ],
+        [
+          "task1"
+        ]
+      ],
+      "root": 100401,
+      "states": [
+        "31e784fb1e7f823d558630c8b26d6cca31728ae3e98272140dc12a41d02cbe03",
+        "7a7de859c60c4b66f8805addbae2df10058ea82c034362641ec08cab23375002"
+      ]
+    }
+  ],
+  "horizon": [
+    {
+      "H": [
+        9,
+        11
+      ],
+      "beliefs": [
+        [
+          "1/6",
+          "5/12",
+          "1/4",
+          "1/6"
+        ],
+        [
+          "1/6",
+          "5/12",
+          "1/4",
+          "1/6"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": true,
+      "optimal_first": [
+        [
+          "task1"
+        ],
+        [
+          "prepare"
+        ]
+      ],
+      "root": 101401,
+      "states": [
+        "253a6756a1cd6bcddc5994b2810609fdd4a75be78883dd8f67ca9f43732b4470",
+        "341927f58efc0ca6ce2f309a1b7d28fd4217b2fe796f9b35cab4a071460c1ad9"
+      ]
+    },
+    {
+      "H": [
+        9,
+        12
+      ],
+      "beliefs": [
+        [
+          "1/6",
+          "5/12",
+          "1/4",
+          "1/6"
+        ],
+        [
+          "1/6",
+          "5/12",
+          "1/4",
+          "1/6"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": true,
+      "optimal_first": [
+        [
+          "task1"
+        ],
+        [
+          "prepare"
+        ]
+      ],
+      "root": 101401,
+      "states": [
+        "253a6756a1cd6bcddc5994b2810609fdd4a75be78883dd8f67ca9f43732b4470",
+        "3f11bf1e99a713ab264d25c28b4644bd504d396507263ed1c16d250de4aa92c1"
+      ]
+    },
+    {
+      "H": [
+        9,
+        10
+      ],
+      "beliefs": [
+        [
+          "1/6",
+          "5/12",
+          "1/4",
+          "1/6"
+        ],
+        [
+          "1/6",
+          "5/12",
+          "1/4",
+          "1/6"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": true,
+      "optimal_first": [
+        [
+          "task1"
+        ],
+        [
+          "prepare"
+        ]
+      ],
+      "root": 101401,
+      "states": [
+        "253a6756a1cd6bcddc5994b2810609fdd4a75be78883dd8f67ca9f43732b4470",
+        "ecf62ccf8abb82624c86dbd5e1ff19119687e24acf1007f504b26a61d3d373ac"
+      ]
+    },
+    {
+      "H": [
+        11,
+        8
+      ],
+      "beliefs": [
+        [
+          "1/6",
+          "5/12",
+          "1/4",
+          "1/6"
+        ],
+        [
+          "1/6",
+          "5/12",
+          "1/4",
+          "1/6"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": true,
+      "optimal_first": [
+        [
+          "prepare"
+        ],
+        [
+          "task1"
+        ]
+      ],
+      "root": 101401,
+      "states": [
+        "341927f58efc0ca6ce2f309a1b7d28fd4217b2fe796f9b35cab4a071460c1ad9",
+        "c0d9a15497e3048adb9e50e4cc382af8d0418212e1c3d46472ca39227c752858"
+      ]
+    },
+    {
+      "H": [
+        12,
+        8
+      ],
+      "beliefs": [
+        [
+          "1/6",
+          "5/12",
+          "1/4",
+          "1/6"
+        ],
+        [
+          "1/6",
+          "5/12",
+          "1/4",
+          "1/6"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": true,
+      "optimal_first": [
+        [
+          "prepare"
+        ],
+        [
+          "task1"
+        ]
+      ],
+      "root": 101401,
+      "states": [
+        "3f11bf1e99a713ab264d25c28b4644bd504d396507263ed1c16d250de4aa92c1",
+        "c0d9a15497e3048adb9e50e4cc382af8d0418212e1c3d46472ca39227c752858"
+      ]
+    },
+    {
+      "H": [
+        8,
+        10
+      ],
+      "beliefs": [
+        [
+          "1/6",
+          "5/12",
+          "1/4",
+          "1/6"
+        ],
+        [
+          "1/6",
+          "5/12",
+          "1/4",
+          "1/6"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": true,
+      "optimal_first": [
+        [
+          "task1"
+        ],
+        [
+          "prepare"
+        ]
+      ],
+      "root": 101401,
+      "states": [
+        "c0d9a15497e3048adb9e50e4cc382af8d0418212e1c3d46472ca39227c752858",
+        "ecf62ccf8abb82624c86dbd5e1ff19119687e24acf1007f504b26a61d3d373ac"
+      ]
+    },
+    {
+      "H": [
+        12,
+        11
+      ],
+      "beliefs": [
+        [
+          "1/3",
+          "2/3"
+        ],
+        [
+          "1/3",
+          "2/3"
+        ]
+      ],
+      "condition": "binary-long",
+      "involves_measurement": true,
+      "optimal_first": [
+        [
+          "prepare"
+        ],
+        [
+          "task1"
+        ]
+      ],
+      "root": 100301,
+      "states": [
+        "262ab624a8a9833205c9b2bf4adcbe35de1309d21057d8b70b00292d20d49354",
+        "5281d9c882cacf1a6241f4594ae0c2d04765f8a1c08a9bec0d86c4bd73157320"
+      ]
+    },
+    {
+      "H": [
+        12,
+        8
+      ],
+      "beliefs": [
+        [
+          "1/3",
+          "2/3"
+        ],
+        [
+          "1/3",
+          "2/3"
+        ]
+      ],
+      "condition": "binary-long",
+      "involves_measurement": true,
+      "optimal_first": [
+        [
+          "prepare"
+        ],
+        [
+          "task1"
+        ]
+      ],
+      "root": 100301,
+      "states": [
+        "262ab624a8a9833205c9b2bf4adcbe35de1309d21057d8b70b00292d20d49354",
+        "55a8c66d2822ec7e244e7254f25eccc8b2a6df783887a9cb4704b6be0f44eea1"
+      ]
+    },
+    {
+      "H": [
+        12,
+        10
+      ],
+      "beliefs": [
+        [
+          "1/3",
+          "2/3"
+        ],
+        [
+          "1/3",
+          "2/3"
+        ]
+      ],
+      "condition": "binary-long",
+      "involves_measurement": true,
+      "optimal_first": [
+        [
+          "prepare"
+        ],
+        [
+          "task1"
+        ]
+      ],
+      "root": 100301,
+      "states": [
+        "262ab624a8a9833205c9b2bf4adcbe35de1309d21057d8b70b00292d20d49354",
+        "94b36778687268683e335e3a60a97459fd06ab97ce93037dca3fd81d831fb552"
+      ]
+    },
+    {
+      "H": [
+        12,
+        9
+      ],
+      "beliefs": [
+        [
+          "1/3",
+          "2/3"
+        ],
+        [
+          "1/3",
+          "2/3"
+        ]
+      ],
+      "condition": "binary-long",
+      "involves_measurement": true,
+      "optimal_first": [
+        [
+          "prepare"
+        ],
+        [
+          "task1"
+        ]
+      ],
+      "root": 100301,
+      "states": [
+        "262ab624a8a9833205c9b2bf4adcbe35de1309d21057d8b70b00292d20d49354",
+        "bda94aca2f8125960bdc4c564ad8c8fa48d246835cca5f73fcbf2820468e2589"
+      ]
+    },
+    {
+      "H": [
+        10,
+        7
+      ],
+      "beliefs": [
+        [
+          "2/5",
+          "3/5"
+        ],
+        [
+          "2/5",
+          "3/5"
+        ]
+      ],
+      "condition": "binary-long",
+      "involves_measurement": true,
+      "optimal_first": [
+        [
+          "prepare"
+        ],
+        [
+          "task1"
+        ]
+      ],
+      "root": 100501,
+      "states": [
+        "191fff80b70701b566e7cdd6ff378ef52d5e2001cdae5f7e16d003488fde0978",
+        "714ebff0c300a07bb7fb3cea373849b1d6d66eaec5ba2bb106985c4f2b7348db"
+      ]
+    },
+    {
+      "H": [
+        10,
+        8
+      ],
+      "beliefs": [
+        [
+          "2/5",
+          "3/5"
+        ],
+        [
+          "2/5",
+          "3/5"
+        ]
+      ],
+      "condition": "binary-long",
+      "involves_measurement": true,
+      "optimal_first": [
+        [
+          "prepare"
+        ],
+        [
+          "task1"
+        ]
+      ],
+      "root": 100501,
+      "states": [
+        "191fff80b70701b566e7cdd6ff378ef52d5e2001cdae5f7e16d003488fde0978",
+        "7510ccd6c10b9e6f3d04f9ce836ff0d3918463f17f2e402606856bf32d8e566d"
+      ]
+    },
+    {
+      "H": [
+        11,
+        7
+      ],
+      "beliefs": [
+        [
+          "2/5",
+          "3/5"
+        ],
+        [
+          "2/5",
+          "3/5"
+        ]
+      ],
+      "condition": "binary-long",
+      "involves_measurement": true,
+      "optimal_first": [
+        [
+          "prepare"
+        ],
+        [
+          "task1"
+        ]
+      ],
+      "root": 100501,
+      "states": [
+        "3d4b20ab50fe306196d2b8707e4577edef5e494364561b67f8b2a27bf7d4be86",
+        "714ebff0c300a07bb7fb3cea373849b1d6d66eaec5ba2bb106985c4f2b7348db"
+      ]
+    },
+    {
+      "H": [
+        11,
+        8
+      ],
+      "beliefs": [
+        [
+          "2/5",
+          "3/5"
+        ],
+        [
+          "2/5",
+          "3/5"
+        ]
+      ],
+      "condition": "binary-long",
+      "involves_measurement": true,
+      "optimal_first": [
+        [
+          "prepare"
+        ],
+        [
+          "task1"
+        ]
+      ],
+      "root": 100501,
+      "states": [
+        "3d4b20ab50fe306196d2b8707e4577edef5e494364561b67f8b2a27bf7d4be86",
+        "7510ccd6c10b9e6f3d04f9ce836ff0d3918463f17f2e402606856bf32d8e566d"
+      ]
+    },
+    {
+      "H": [
+        7,
+        12
+      ],
+      "beliefs": [
+        [
+          "2/5",
+          "3/5"
+        ],
+        [
+          "2/5",
+          "3/5"
+        ]
+      ],
+      "condition": "binary-long",
+      "involves_measurement": true,
+      "optimal_first": [
+        [
+          "task1"
+        ],
+        [
+          "prepare"
+        ]
+      ],
+      "root": 100501,
+      "states": [
+        "714ebff0c300a07bb7fb3cea373849b1d6d66eaec5ba2bb106985c4f2b7348db",
+        "f1e063bb0a9cbbb9be53799967a7bb2b9166f5ed89ecdc3d786375cc771d800a"
+      ]
+    },
+    {
+      "H": [
+        8,
+        12
+      ],
+      "beliefs": [
+        [
+          "2/5",
+          "3/5"
+        ],
+        [
+          "2/5",
+          "3/5"
+        ]
+      ],
+      "condition": "binary-long",
+      "involves_measurement": true,
+      "optimal_first": [
+        [
+          "task1"
+        ],
+        [
+          "prepare"
+        ]
+      ],
+      "root": 100501,
+      "states": [
+        "7510ccd6c10b9e6f3d04f9ce836ff0d3918463f17f2e402606856bf32d8e566d",
+        "f1e063bb0a9cbbb9be53799967a7bb2b9166f5ed89ecdc3d786375cc771d800a"
+      ]
+    },
+    {
+      "H": [
+        8,
+        12
+      ],
+      "beliefs": [
+        [
+          "1/5",
+          "1/5",
+          "4/15",
+          "1/3"
+        ],
+        [
+          "1/5",
+          "1/5",
+          "4/15",
+          "1/3"
+        ]
+      ],
+      "condition": "hierarchy-five-channels",
+      "involves_measurement": true,
+      "optimal_first": [
+        [
+          "task3"
+        ],
+        [
+          "prepare"
+        ]
+      ],
+      "root": 102101,
+      "states": [
+        "05bb575d3ce497573f04249bd0cc0033c194ccebdac8c0ae74dac777d33d7d1d",
+        "7087f4824e97d12f4a1e1cf79ab862ed47860b78bcfed85c6559a2e95434f78c"
+      ]
+    },
+    {
+      "H": [
+        8,
+        10
+      ],
+      "beliefs": [
+        [
+          "1/5",
+          "1/5",
+          "4/15",
+          "1/3"
+        ],
+        [
+          "1/5",
+          "1/5",
+          "4/15",
+          "1/3"
+        ]
+      ],
+      "condition": "hierarchy-five-channels",
+      "involves_measurement": true,
+      "optimal_first": [
+        [
+          "task3"
+        ],
+        [
+          "prepare"
+        ]
+      ],
+      "root": 102101,
+      "states": [
+        "05bb575d3ce497573f04249bd0cc0033c194ccebdac8c0ae74dac777d33d7d1d",
+        "cfc43604c392ff1734b30755ff1ed0844e030b63903fb8ebdb14550876d6eef8"
+      ]
+    },
+    {
+      "H": [
+        8,
+        11
+      ],
+      "beliefs": [
+        [
+          "1/5",
+          "1/5",
+          "4/15",
+          "1/3"
+        ],
+        [
+          "1/5",
+          "1/5",
+          "4/15",
+          "1/3"
+        ]
+      ],
+      "condition": "hierarchy-five-channels",
+      "involves_measurement": true,
+      "optimal_first": [
+        [
+          "task3"
+        ],
+        [
+          "prepare"
+        ]
+      ],
+      "root": 102101,
+      "states": [
+        "05bb575d3ce497573f04249bd0cc0033c194ccebdac8c0ae74dac777d33d7d1d",
+        "fda70728645c883f1bc8207115f851ac80c7fef98279f409e27097967f124238"
+      ]
+    },
+    {
+      "H": [
+        12,
+        9
+      ],
+      "beliefs": [
+        [
+          "1/5",
+          "1/5",
+          "4/15",
+          "1/3"
+        ],
+        [
+          "1/5",
+          "1/5",
+          "4/15",
+          "1/3"
+        ]
+      ],
+      "condition": "hierarchy-five-channels",
+      "involves_measurement": true,
+      "optimal_first": [
+        [
+          "prepare"
+        ],
+        [
+          "task3"
+        ]
+      ],
+      "root": 102101,
+      "states": [
+        "7087f4824e97d12f4a1e1cf79ab862ed47860b78bcfed85c6559a2e95434f78c",
+        "f43ef64d00fee49b76601e17dfce4321cdadd4a7ee0b4728e8bb995a453890da"
+      ]
+    },
+    {
+      "H": [
+        10,
+        9
+      ],
+      "beliefs": [
+        [
+          "1/5",
+          "1/5",
+          "4/15",
+          "1/3"
+        ],
+        [
+          "1/5",
+          "1/5",
+          "4/15",
+          "1/3"
+        ]
+      ],
+      "condition": "hierarchy-five-channels",
+      "involves_measurement": true,
+      "optimal_first": [
+        [
+          "prepare"
+        ],
+        [
+          "task3"
+        ]
+      ],
+      "root": 102101,
+      "states": [
+        "cfc43604c392ff1734b30755ff1ed0844e030b63903fb8ebdb14550876d6eef8",
+        "f43ef64d00fee49b76601e17dfce4321cdadd4a7ee0b4728e8bb995a453890da"
+      ]
+    },
+    {
+      "H": [
+        9,
+        11
+      ],
+      "beliefs": [
+        [
+          "1/5",
+          "1/5",
+          "4/15",
+          "1/3"
+        ],
+        [
+          "1/5",
+          "1/5",
+          "4/15",
+          "1/3"
+        ]
+      ],
+      "condition": "hierarchy-five-channels",
+      "involves_measurement": true,
+      "optimal_first": [
+        [
+          "task3"
+        ],
+        [
+          "prepare"
+        ]
+      ],
+      "root": 102101,
+      "states": [
+        "f43ef64d00fee49b76601e17dfce4321cdadd4a7ee0b4728e8bb995a453890da",
+        "fda70728645c883f1bc8207115f851ac80c7fef98279f409e27097967f124238"
+      ]
+    },
+    {
+      "H": [
+        9,
+        8
+      ],
+      "beliefs": [
+        [
+          "2/11",
+          "2/11",
+          "4/11",
+          "3/11"
+        ],
+        [
+          "2/11",
+          "2/11",
+          "4/11",
+          "3/11"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": true,
+      "optimal_first": [
+        [
+          "prepare"
+        ],
+        [
+          "task2"
+        ]
+      ],
+      "root": 101201,
+      "states": [
+        "4a836de11f991bf648d231a9af24f01d92ad731a948cf051d00ba19ceda42e5e",
+        "81260ed65d256a265c0a4dc1ada2ecc4bb3aa412da6d2afb2b4944f4f9b6fd82"
+      ]
+    },
+    {
+      "H": [
+        10,
+        8
+      ],
+      "beliefs": [
+        [
+          "2/11",
+          "2/11",
+          "4/11",
+          "3/11"
+        ],
+        [
+          "2/11",
+          "2/11",
+          "4/11",
+          "3/11"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": true,
+      "optimal_first": [
+        [
+          "prepare"
+        ],
+        [
+          "task2"
+        ]
+      ],
+      "root": 101201,
+      "states": [
+        "5d2d77b8bca13ce7e96161a6e72bc5ad56ba70c7552103ae7260149223397b7f",
+        "81260ed65d256a265c0a4dc1ada2ecc4bb3aa412da6d2afb2b4944f4f9b6fd82"
+      ]
+    },
+    {
+      "H": [
+        8,
+        12
+      ],
+      "beliefs": [
+        [
+          "2/11",
+          "2/11",
+          "4/11",
+          "3/11"
+        ],
+        [
+          "2/11",
+          "2/11",
+          "4/11",
+          "3/11"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": true,
+      "optimal_first": [
+        [
+          "task2"
+        ],
+        [
+          "prepare"
+        ]
+      ],
+      "root": 101201,
+      "states": [
+        "81260ed65d256a265c0a4dc1ada2ecc4bb3aa412da6d2afb2b4944f4f9b6fd82",
+        "e7250ee5b3d5ffced15856daa8525cf5566e9f9a0053d039413dcf14140ed014"
+      ]
+    },
+    {
+      "H": [
+        8,
+        11
+      ],
+      "beliefs": [
+        [
+          "2/11",
+          "2/11",
+          "4/11",
+          "3/11"
+        ],
+        [
+          "2/11",
+          "2/11",
+          "4/11",
+          "3/11"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": true,
+      "optimal_first": [
+        [
+          "task2"
+        ],
+        [
+          "prepare"
+        ]
+      ],
+      "root": 101201,
+      "states": [
+        "81260ed65d256a265c0a4dc1ada2ecc4bb3aa412da6d2afb2b4944f4f9b6fd82",
+        "ec9b55adb0487d829b363972b6c7936a39ce19775424eaf9b6bf0e635c72283d"
+      ]
+    },
+    {
+      "H": [
+        11,
+        8
+      ],
+      "beliefs": [
+        [
+          "2/9",
+          "1/3",
+          "2/9",
+          "2/9"
+        ],
+        [
+          "2/9",
+          "1/3",
+          "2/9",
+          "2/9"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": true,
+      "optimal_first": [
+        [
+          "prepare"
+        ],
+        [
+          "task1"
+        ]
+      ],
+      "root": 101301,
+      "states": [
+        "0a676255c2aab946d3392cdd2f2e5c77441d78b16daf1ff32740f4db8ccd37c3",
+        "e775e389afa92fcf1fc9e30604caffdb6432612475dec6a84bde9361f8ac478d"
+      ]
+    },
+    {
+      "H": [
+        12,
+        8
+      ],
+      "beliefs": [
+        [
+          "2/9",
+          "1/3",
+          "2/9",
+          "2/9"
+        ],
+        [
+          "2/9",
+          "1/3",
+          "2/9",
+          "2/9"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": true,
+      "optimal_first": [
+        [
+          "prepare"
+        ],
+        [
+          "task1"
+        ]
+      ],
+      "root": 101301,
+      "states": [
+        "23f4267dae009fc75249cdefac66656e4718842e7a35e0da27feca999a94128d",
+        "e775e389afa92fcf1fc9e30604caffdb6432612475dec6a84bde9361f8ac478d"
+      ]
+    },
+    {
+      "H": [
+        10,
+        8
+      ],
+      "beliefs": [
+        [
+          "2/9",
+          "1/3",
+          "2/9",
+          "2/9"
+        ],
+        [
+          "2/9",
+          "1/3",
+          "2/9",
+          "2/9"
+        ]
+      ],
+      "condition": "hierarchy-dense",
+      "involves_measurement": true,
+      "optimal_first": [
+        [
+          "prepare"
+        ],
+        [
+          "task1"
+        ]
+      ],
+      "root": 101301,
+      "states": [
+        "3bd549dc2da63a635a538e3e50f59ccb676e57410993ea810d703df7105d2856",
+        "e775e389afa92fcf1fc9e30604caffdb6432612475dec6a84bde9361f8ac478d"
+      ]
+    }
+  ]
+}

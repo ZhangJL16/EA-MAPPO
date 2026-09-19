@@ -1,0 +1,493 @@
+{
+  "action_change_summary": {
+    "belief": {
+      "measurement_pairs": 12,
+      "pairs": 102,
+      "roots": 16
+    },
+    "horizon": {
+      "measurement_pairs": 29,
+      "pairs": 29,
+      "roots": 6
+    }
+  },
+  "archive_sha256": "f489508a0bcc30ee9a27b882bff0894a595ed96dd033428248fb30baffa64377",
+  "by_condition": {
+    "binary-long": {
+      "exact": 36,
+      "measurement_optimal": 5,
+      "measurement_required": 4,
+      "nonprior": 20,
+      "nonprior_measurement": 0,
+      "roots": 3,
+      "structural_groups": 1,
+      "ties": 1,
+      "unique_belief_vectors": 10,
+      "unresolved": 0
+    },
+    "binary-redundant": {
+      "exact": 30,
+      "measurement_optimal": 0,
+      "measurement_required": 0,
+      "nonprior": 12,
+      "nonprior_measurement": 0,
+      "roots": 3,
+      "structural_groups": 1,
+      "ties": 0,
+      "unique_belief_vectors": 12,
+      "unresolved": 0
+    },
+    "binary-short": {
+      "exact": 17,
+      "measurement_optimal": 0,
+      "measurement_required": 0,
+      "nonprior": 2,
+      "nonprior_measurement": 0,
+      "roots": 3,
+      "structural_groups": 1,
+      "ties": 4,
+      "unique_belief_vectors": 4,
+      "unresolved": 0
+    },
+    "hierarchy-cost": {
+      "exact": 20,
+      "measurement_optimal": 0,
+      "measurement_required": 0,
+      "nonprior": 5,
+      "nonprior_measurement": 0,
+      "roots": 3,
+      "structural_groups": 1,
+      "ties": 9,
+      "unique_belief_vectors": 5,
+      "unresolved": 0
+    },
+    "hierarchy-dense": {
+      "exact": 55,
+      "measurement_optimal": 16,
+      "measurement_required": 12,
+      "nonprior": 40,
+      "nonprior_measurement": 5,
+      "roots": 3,
+      "structural_groups": 1,
+      "ties": 4,
+      "unique_belief_vectors": 24,
+      "unresolved": 0
+    },
+    "hierarchy-five-channels": {
+      "exact": 53,
+      "measurement_optimal": 13,
+      "measurement_required": 11,
+      "nonprior": 38,
+      "nonprior_measurement": 0,
+      "roots": 3,
+      "structural_groups": 1,
+      "ties": 15,
+      "unique_belief_vectors": 27,
+      "unresolved": 0
+    },
+    "hierarchy-four-channels": {
+      "exact": 25,
+      "measurement_optimal": 0,
+      "measurement_required": 0,
+      "nonprior": 9,
+      "nonprior_measurement": 0,
+      "roots": 3,
+      "structural_groups": 1,
+      "ties": 5,
+      "unique_belief_vectors": 9,
+      "unresolved": 0
+    },
+    "hierarchy-sparse": {
+      "exact": 37,
+      "measurement_optimal": 3,
+      "measurement_required": 0,
+      "nonprior": 21,
+      "nonprior_measurement": 0,
+      "roots": 3,
+      "structural_groups": 3,
+      "ties": 20,
+      "unique_belief_vectors": 14,
+      "unresolved": 0
+    }
+  },
+  "by_source": {
+    "beam": {
+      "exact": 125,
+      "measurement_optimal": 24,
+      "measurement_required": 17,
+      "nonprior": 25,
+      "nonprior_measurement": 3,
+      "roots": 24,
+      "structural_groups": 8,
+      "ties": 43,
+      "unique_belief_vectors": 29,
+      "unresolved": 0
+    },
+    "exact": {
+      "exact": 131,
+      "measurement_optimal": 15,
+      "measurement_required": 9,
+      "nonprior": 55,
+      "nonprior_measurement": 4,
+      "roots": 24,
+      "structural_groups": 8,
+      "ties": 26,
+      "unique_belief_vectors": 44,
+      "unresolved": 0
+    },
+    "posterior_sampling": {
+      "exact": 120,
+      "measurement_optimal": 32,
+      "measurement_required": 25,
+      "nonprior": 0,
+      "nonprior_measurement": 0,
+      "roots": 24,
+      "structural_groups": 8,
+      "ties": 43,
+      "unique_belief_vectors": 19,
+      "unresolved": 0
+    },
+    "random": {
+      "exact": 132,
+      "measurement_optimal": 17,
+      "measurement_required": 12,
+      "nonprior": 70,
+      "nonprior_measurement": 2,
+      "roots": 24,
+      "structural_groups": 8,
+      "ties": 26,
+      "unique_belief_vectors": 74,
+      "unresolved": 0
+    },
+    "voi": {
+      "exact": 127,
+      "measurement_optimal": 15,
+      "measurement_required": 10,
+      "nonprior": 35,
+      "nonprior_measurement": 2,
+      "roots": 24,
+      "structural_groups": 8,
+      "ties": 38,
+      "unique_belief_vectors": 37,
+      "unresolved": 0
+    }
+  },
+  "input_sha256": {
+    "0630c2074cbfb062ef34bff7e61becd1f82a0654d4a3d9ef5f954f1b82288f08.shard.json": "8fb305f209a896d69b64a060d180f775d3d4053dd70b071f9feca79fcdbd3e0d",
+    "0ebfaf12ac5ae250af941f2457157ef8db7b1aa2ea1fe9695b3178cbb902c7de.shard.json": "8619d372fc24226d0b684a027d1490c33c86101510a45ea5d197a3120a8087cc",
+    "1193232aa2e3b4d468f21d4f3db591df1e974abe90fce39b7902d5f376a2ac13.shard.json": "503830b12030a375a4e50a437367e916fc7ca5e71c3a86c96f95410b05214ee6",
+    "14be1acd37db654180621d0c77e4d8be0ef901466a2c20fac434e8ffd165c335.shard.json": "5c84540ef92e4f252757f00bbad6502f027f7bee5c667c622d0418bbf0f499d9",
+    "1768b8fad0df1e932686e48ed53d65e19ab682f86fc511cec38270d30a1f2c43.shard.json": "bbb143e8dfb3ce94bc5c83ac5bf4e07e0bcba7dce24b7f2227b00d957ae1a255",
+    "18879a48b082e9856d502e733c40c1dd45218216f47f6e571ac7ff22459fa62f.shard.json": "90a8c3524fb81d12980b5fd191cecfb6abc0dc9ea53a56c6c8e284d0f0b4a533",
+    "29b33808fd080fbb7e452386d0126cbedcbd301d00eb83296d442db72665f737.shard.json": "1b76874261908826cced3e7277ccf70d03cfb0b92569e66c52100c0a7a405f68",
+    "34acd458701e540dbe57fff8a66a2ad32fb4f4a6c90d72c4d0fb8939e6f4ea71.shard.json": "fbf565e6e392f3c6449c8a78e36a834f6760c2c7b3d8ab22cc54415ffe6c2bed",
+    "370e959a736c355c83fd16d86d6434a7ea53c9fedbc45b7e5159130b01f86560.shard.json": "af77addd0e33cd95cb3a46111ea6bc31e3648fe2a1167cf6054f2ac6cfbe4c56",
+    "3afed972c40cb258ad1ba0b4f80474adc4289111b640130ff04b1be13840f9f5.shard.json": "8a9b97b4d72039c509bc44e8baf2299333e5028db140214b3ef70e50f981a2d0",
+    "4a336df6502fb7a39a8229554bc6c5a01af841bdfac2af2246e99c4b5ac3b234.shard.json": "fb32fbca3817818abb6352056200377fb24944867fdbbafa5510915a2206b427",
+    "5a1cb4951874f86620d6c235eeb67efb2f2751a4c27c47367e044c90e65b45ab.shard.json": "6667ad77e055760cdde05087b10b95921fbcdf92242d6aa53629c09ce9d676f9",
+    "745ef3e0aa45a4dbd932ff0701f4570669aea105f00c5707ae26c3ef0e15950e.shard.json": "554258525e305fe11c69be3d85eae29380f0f83f529bfe0d75d912dcf9c1059c",
+    "7f1c6f92bae53b94bedad887c3fdd3b608d1e04f739136b8e07e9bcada84faf8.shard.json": "ab5f9b982b019e6221ecbe0c1a307ae11392d7d1ec5680e0e1fe7ea883ee69a9",
+    "80dfe4097537b4d34169fbd3f80b1d0680138231068875f5ec2c6aa82ec7810a.shard.json": "73bf00b783c51e6b6f28099539d47cee47e161365f82071600c525d00c5aa627",
+    "8e0e94c79b3e13c485973c5aa938b4155d48f85e9b87ad7f2aeca4beed33a578.shard.json": "ff534fe1b35a2e1aafb2077423f7691948cc9db2f00f314a5ad460e716e3c137",
+    "af1cf26632d0bc6a0a8de298d295541754513913c4fc371b7a53d52ff214bbd9.shard.json": "61029ba54890fd6520e9cd9c9f4fae277e04b82889c4009e41bc7503e5e8588c",
+    "bb7081e8f78eb248ca1f360c2f92848c092db826eccea4ef35c0a6bae4443784.shard.json": "481848543ac60bdfb6bf69ecd57d2b76e4099f70ba6463de849fd62865343ccd",
+    "bbbdf76346e3120929acfe1f13d1942ab0a77a9bbbeff656661b6a4075097136.shard.json": "cf249c215ce7ed0489918ad63006d7c6e11703378a165be4a8fc9eabd12bf79c",
+    "cdc2943982bb979d966a1fdfaad62721db8007eedfaa9abac0a6f34b046edb54.shard.json": "a879abc718bd18c03d9628b9c76a662bbd7aacfeae49b762e6b39777fd33a71a",
+    "ddce8b6f57d6184a96566612a312fc2fc23859b381f41f084ed842ad0c0c74c6.shard.json": "80c4e87d3b28d1e5f32d5845d8cf7723a3143d27ba1a1d70dc7041357c7fafea",
+    "ed3cd8355ecea5977183c52d0b9f06477005c21b4277b5c20ffd20125376cee9.shard.json": "091156265f6ddc0b66d3e392f9b7a6146471609f00efb8abcf3d81527a40d642",
+    "fea6fba68fd21eaa3c4ddd393d718e6df54c0cf603ac7caae6f59de880af9211.shard.json": "aa196a225b1f61aee21c7fc83ccc620c6174d73940eaed30fb0b5ae299e14190",
+    "fffbab413a2cc7f631724159daa971618056df60ff89a474c75792492c8acf01.shard.json": "c2d7f1a42592152b51f0d6a79e99b5288293e9391aa0e71907038ac4a0f72f10"
+  },
+  "sampling_status": {
+    "complete": 120
+  },
+  "sampling_truncations": [],
+  "scope": "post-run TRAIN corpus census; no solver reruns, no prefix export or network",
+  "total": {
+    "exact": 273,
+    "measurement_optimal": 37,
+    "measurement_required": 27,
+    "nonprior": 147,
+    "nonprior_measurement": 5,
+    "roots": 24,
+    "structural_groups": 8,
+    "ties": 58,
+    "unique_belief_vectors": 100,
+    "unresolved": 0
+  },
+  "work_all": {
+    "cpu_seconds": {
+      "max": 0.26786673599999933,
+      "median": 0.0020551109999999984,
+      "total": 4.272652063999997
+    },
+    "expansions": {
+      "max": 1312,
+      "median": 85,
+      "total": 58340
+    },
+    "model_calls": {
+      "max": 142228,
+      "median": 700,
+      "total": 2199006
+    },
+    "solver_states": {
+      "max": 779,
+      "median": 27,
+      "total": 23576
+    },
+    "wall_seconds": {
+      "max": 0.2678852079989156,
+      "median": 0.00205492999884882,
+      "total": 4.27261104299032
+    }
+  },
+  "work_exact": {
+    "cpu_seconds": {
+      "max": 0.26786673599999933,
+      "median": 0.0020551109999999984,
+      "total": 4.272652063999997
+    },
+    "expansions": {
+      "max": 1312,
+      "median": 85,
+      "total": 58340
+    },
+    "model_calls": {
+      "max": 142228,
+      "median": 700,
+      "total": 2199006
+    },
+    "solver_states": {
+      "max": 779,
+      "median": 27,
+      "total": 23576
+    },
+    "wall_seconds": {
+      "max": 0.2678852079989156,
+      "median": 0.00205492999884882,
+      "total": 4.27261104299032
+    }
+  },
+  "work_unresolved": {},
+  "yield_by_channels": {
+    "1": {
+      "exact": 53,
+      "measurement_optimal": 5,
+      "measurement_required": 4,
+      "nonprior": 22,
+      "nonprior_measurement": 0,
+      "roots": 6,
+      "structural_groups": 1,
+      "ties": 5,
+      "unique_belief_vectors": 13,
+      "unresolved": 0
+    },
+    "2": {
+      "exact": 30,
+      "measurement_optimal": 0,
+      "measurement_required": 0,
+      "nonprior": 12,
+      "nonprior_measurement": 0,
+      "roots": 3,
+      "structural_groups": 1,
+      "ties": 0,
+      "unique_belief_vectors": 12,
+      "unresolved": 0
+    },
+    "3": {
+      "exact": 112,
+      "measurement_optimal": 19,
+      "measurement_required": 12,
+      "nonprior": 66,
+      "nonprior_measurement": 5,
+      "roots": 9,
+      "structural_groups": 4,
+      "ties": 33,
+      "unique_belief_vectors": 43,
+      "unresolved": 0
+    },
+    "4": {
+      "exact": 25,
+      "measurement_optimal": 0,
+      "measurement_required": 0,
+      "nonprior": 9,
+      "nonprior_measurement": 0,
+      "roots": 3,
+      "structural_groups": 1,
+      "ties": 5,
+      "unique_belief_vectors": 9,
+      "unresolved": 0
+    },
+    "5": {
+      "exact": 53,
+      "measurement_optimal": 13,
+      "measurement_required": 11,
+      "nonprior": 38,
+      "nonprior_measurement": 0,
+      "roots": 3,
+      "structural_groups": 1,
+      "ties": 15,
+      "unique_belief_vectors": 27,
+      "unresolved": 0
+    }
+  },
+  "yield_by_horizon": {
+    "0": {
+      "exact": 20,
+      "measurement_optimal": 0,
+      "measurement_required": 0,
+      "nonprior": 16,
+      "nonprior_measurement": 0,
+      "roots": 11,
+      "structural_groups": 6,
+      "ties": 0,
+      "unique_belief_vectors": 18,
+      "unresolved": 0
+    },
+    "1": {
+      "exact": 8,
+      "measurement_optimal": 0,
+      "measurement_required": 0,
+      "nonprior": 3,
+      "nonprior_measurement": 0,
+      "roots": 8,
+      "structural_groups": 4,
+      "ties": 1,
+      "unique_belief_vectors": 7,
+      "unresolved": 0
+    },
+    "10": {
+      "exact": 12,
+      "measurement_optimal": 7,
+      "measurement_required": 7,
+      "nonprior": 0,
+      "nonprior_measurement": 0,
+      "roots": 12,
+      "structural_groups": 3,
+      "ties": 4,
+      "unique_belief_vectors": 12,
+      "unresolved": 0
+    },
+    "11": {
+      "exact": 9,
+      "measurement_optimal": 7,
+      "measurement_required": 7,
+      "nonprior": 0,
+      "nonprior_measurement": 0,
+      "roots": 9,
+      "structural_groups": 3,
+      "ties": 3,
+      "unique_belief_vectors": 9,
+      "unresolved": 0
+    },
+    "12": {
+      "exact": 9,
+      "measurement_optimal": 8,
+      "measurement_required": 8,
+      "nonprior": 0,
+      "nonprior_measurement": 0,
+      "roots": 9,
+      "structural_groups": 3,
+      "ties": 2,
+      "unique_belief_vectors": 9,
+      "unresolved": 0
+    },
+    "2": {
+      "exact": 16,
+      "measurement_optimal": 0,
+      "measurement_required": 0,
+      "nonprior": 10,
+      "nonprior_measurement": 0,
+      "roots": 13,
+      "structural_groups": 7,
+      "ties": 4,
+      "unique_belief_vectors": 16,
+      "unresolved": 0
+    },
+    "3": {
+      "exact": 20,
+      "measurement_optimal": 0,
+      "measurement_required": 0,
+      "nonprior": 12,
+      "nonprior_measurement": 0,
+      "roots": 11,
+      "structural_groups": 7,
+      "ties": 5,
+      "unique_belief_vectors": 19,
+      "unresolved": 0
+    },
+    "4": {
+      "exact": 26,
+      "measurement_optimal": 0,
+      "measurement_required": 0,
+      "nonprior": 14,
+      "nonprior_measurement": 0,
+      "roots": 17,
+      "structural_groups": 8,
+      "ties": 8,
+      "unique_belief_vectors": 23,
+      "unresolved": 0
+    },
+    "5": {
+      "exact": 27,
+      "measurement_optimal": 0,
+      "measurement_required": 0,
+      "nonprior": 18,
+      "nonprior_measurement": 0,
+      "roots": 14,
+      "structural_groups": 8,
+      "ties": 6,
+      "unique_belief_vectors": 26,
+      "unresolved": 0
+    },
+    "6": {
+      "exact": 29,
+      "measurement_optimal": 0,
+      "measurement_required": 0,
+      "nonprior": 17,
+      "nonprior_measurement": 0,
+      "roots": 20,
+      "structural_groups": 8,
+      "ties": 5,
+      "unique_belief_vectors": 28,
+      "unresolved": 0
+    },
+    "7": {
+      "exact": 42,
+      "measurement_optimal": 1,
+      "measurement_required": 1,
+      "nonprior": 32,
+      "nonprior_measurement": 1,
+      "roots": 17,
+      "structural_groups": 7,
+      "ties": 6,
+      "unique_belief_vectors": 41,
+      "unresolved": 0
+    },
+    "8": {
+      "exact": 28,
+      "measurement_optimal": 5,
+      "measurement_required": 0,
+      "nonprior": 10,
+      "nonprior_measurement": 0,
+      "roots": 18,
+      "structural_groups": 7,
+      "ties": 6,
+      "unique_belief_vectors": 26,
+      "unresolved": 0
+    },
+    "9": {
+      "exact": 27,
+      "measurement_optimal": 9,
+      "measurement_required": 4,
+      "nonprior": 15,
+      "nonprior_measurement": 4,
+      "roots": 12,
+      "structural_groups": 3,
+      "ties": 8,
+      "unique_belief_vectors": 27,
+      "unresolved": 0
+    }
+  }
+}

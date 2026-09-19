@@ -1,0 +1,105 @@
+{
+  "archive_sha256": "f489508a0bcc30ee9a27b882bff0894a595ed96dd033428248fb30baffa64377",
+  "limitation": "not an independent proof of ExactBayes or a sufficient-training-coverage guarantee",
+  "scope": "all completed shards; arithmetic, reachability, completeness and seal replay",
+  "status": "passed",
+  "summary": {
+    "by_condition": {
+      "binary-long": {
+        "exact": 36,
+        "exact_nonprior": 20,
+        "roots": 3
+      },
+      "binary-redundant": {
+        "exact": 30,
+        "exact_nonprior": 12,
+        "roots": 3
+      },
+      "binary-short": {
+        "exact": 17,
+        "exact_nonprior": 2,
+        "roots": 3
+      },
+      "hierarchy-cost": {
+        "exact": 20,
+        "exact_nonprior": 5,
+        "roots": 3
+      },
+      "hierarchy-dense": {
+        "exact": 55,
+        "exact_nonprior": 40,
+        "roots": 3
+      },
+      "hierarchy-five-channels": {
+        "exact": 53,
+        "exact_nonprior": 38,
+        "roots": 3
+      },
+      "hierarchy-four-channels": {
+        "exact": 25,
+        "exact_nonprior": 9,
+        "roots": 3
+      },
+      "hierarchy-sparse": {
+        "exact": 37,
+        "exact_nonprior": 21,
+        "roots": 3
+      }
+    },
+    "channels": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "completed_roots": 24,
+    "exact_nonprior_states": 147,
+    "exact_remaining_horizons": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "exact_source_membership": {
+      "beam": 125,
+      "exact": 131,
+      "posterior_sampling": 120,
+      "random": 132,
+      "voi": 127
+    },
+    "exact_states_with_optimal_measurement": 37,
+    "exact_states_with_ties": 58,
+    "exact_unique_beliefs": 100,
+    "exhausted_strata": 0,
+    "hypothesis_counts": [
+      2,
+      4
+    ],
+    "labels": {
+      "exact": 273
+    },
+    "recorded_work": {
+      "label_expansions": 58340,
+      "label_model_calls": 2199006,
+      "sampling_expansions": 135966,
+      "sampling_model_calls": 1699992
+    },
+    "rejected_candidates": 1,
+    "scheduled_roots": 24,
+    "status": "complete",
+    "structural_groups": 8,
+    "total_cpu_seconds": 7.574426173,
+    "total_wall_seconds": 7.575036459003968,
+    "warning": "Descriptive TRAIN coverage, not generalization, population evidence, or neural advantage."
+  }
+}

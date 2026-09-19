@@ -6,8 +6,10 @@ Its public problem contract and classical comparison baselines are separate
 from the frozen [resource-separation paper](docs/ICML_RESOURCE_SEPARATION_PAPER_CORE_20260916.md).
 See [fourth-batch status](docs/FPL_FOURTH_BATCH_20260919.md) for exact-policy
 results and limits, and [T5.1 startup](docs/FPL_T5_1_STARTUP_20260919.md) for the
-TRAIN-only exact teacher pipeline and resume instructions. No neural FPL method
-has been trained.
+TRAIN-only exact teacher pipeline and resume instructions. Teacher V1 is now
+[complete and fully audited](docs/FPL_TEACHER_V1_COMPLETE_20260919.md): 273 exact
+labels, eight structures, limited non-prior sensing coverage. No neural FPL
+method has been trained.
 
 ## Historical PAI / PSPS entry (retained)
 
