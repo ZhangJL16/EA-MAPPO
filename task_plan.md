@@ -1,5 +1,17 @@
 # Current task plan
 
+## Feedback protocol second batch (completed implementation, 2026-09-19)
+
+- [x] Separate observation likelihood from declared task utility, preserving old fixture.
+- [x] Generate task families and enforce template/structural-clone grouping across splits.
+- [x] Implement tiny exact rational minimax policy-tree reference.
+- [x] Add bounded prefix-beam Bayes and independent posterior-sampling baselines.
+- [x] Pass 21 tests; run 12 capped profiling cells and verify explicit resume.
+
+See `docs/FPL_SECOND_BATCH_20260919.md`. Enumeration and belief-tree costs both
+appear; configured limits are not hardware infeasibility claims. No neural method
+or scientific performance advantage is established.
+
 ## Feedback protocol first batch (completed, 2026-09-19)
 
 - [x] Read expert_advice; local HEAD matches fff2b02; inventory confirms all 26 allowlisted evidence paths exist.

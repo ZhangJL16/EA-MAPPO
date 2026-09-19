@@ -9,15 +9,18 @@ from .problem import load_problem
 from .environment import Environment, PrivateTruth
 from .teachers.exact_bayes import ExactBayes, known_model_value
 from .policies.channel_cover import ChannelCover
+from .policies.beam_bayes import BeamBayes
+from .policies.posterior_sampling import PosteriorSampling
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--policy", choices=("channel_cover", "exact_bayes"), required=True)
+    parser.add_argument("--policy", choices=("channel_cover", "exact_bayes", "beam_bayes", "posterior_sampling"), required=True)
     parser.add_argument("--truth", type=int, default=0, help="evaluator-only hypothesis index")
     parser.add_argument("--noise-seed", type=int, default=0)
+    parser.add_argument("--policy-seed", type=int, default=0)
     parser.add_argument("--capacity", type=int)
     parser.add_argument("--budget", type=int)
     parser.add_argument("--bundling-off", action="store_true")
@@ -32,7 +35,10 @@ def main():
     if problem.split_id != "debug-only" or problem.budget > 12:
         parser.error("this entry point is limited to debug-only budget <= 12")
     plant = Environment(problem, PrivateTruth(args.truth, args.noise_seed))
-    policy = ExactBayes(problem) if args.policy == "exact_bayes" else ChannelCover(problem)
+    policy = {"exact_bayes": lambda: ExactBayes(problem),
+              "channel_cover": lambda: ChannelCover(problem),
+              "beam_bayes": lambda: BeamBayes(problem),
+              "posterior_sampling": lambda: PosteriorSampling(problem,args.policy_seed)}[args.policy]()
     events, reward, decision_time = [], 0, 0.
     while plant.time < problem.budget:
         state = plant.planner_state()
@@ -47,6 +53,7 @@ def main():
         events.append(dict(epoch=len(events), state=asdict(state), protocol=asdict(route),
                            result=asdict(result), decision_seconds=seconds,
                            solver_states=getattr(policy, "states", None),
+                           search=getattr(policy,"stats",None),
                            likelihood_branches=getattr(policy, "likelihood_branches", None)))
     # Oracle is computed only after policy execution and goes to evaluator output.
     oracle = known_model_value(problem, args.truth)
@@ -58,6 +65,7 @@ def main():
                   config_file_sha256=hashlib.sha256(args.config.read_bytes()).hexdigest(),
                   source_sha256=seals, policy=args.policy, evaluator_truth=args.truth,
                   noise_seed=args.noise_seed, reward=reward, known_model_value=oracle,
+                  policy_seed=args.policy_seed,
                   realized_shortfall=oracle-reward,
                   metric_note="Single-sample shortfall is not expected regret; it can be negative.",
                   decision_seconds=decision_time, consumed_time=plant.time, terminal="reset", events=events)

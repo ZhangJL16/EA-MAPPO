@@ -1,5 +1,16 @@
 # Current research notes
 
+## 2026-09-19 second FPL batch
+
+Utility is separate from sensing; hidden-model task payoff is evaluator-only and
+does not silently enter the posterior. Template grouping plus name-invariant
+structural fingerprints prevents configured split leakage. Rational minimax
+certificates are available for tiny policy-tree games. Beam and posterior-sampling
+baselines avoid complete catalogue enumeration. Twelve measured scaling cells
+show topology-dependent catalogue growth and a distinct belief-tree cost; low
+engineering caps must not be advertised as fundamental computational failure.
+See docs/FPL_SECOND_BATCH_20260919.md. Quality/compute comparisons remain open.
+
 ## 2026-09-19 isolated feedback-protocol implementation
 
 First batch from expert_advice is executable: committed reset-to-reset protocols,

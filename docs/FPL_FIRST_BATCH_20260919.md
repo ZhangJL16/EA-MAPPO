@@ -2,6 +2,10 @@
 
 Date: 2026-09-19. Status: A0/A1 and executable independent comparison skeleton complete. No method-performance finding is claimed.
 
+Post-hoc repository note (2026-09-19): this first batch was subsequently committed
+as `b71002f78ee659c8eca4e9493507bd8dfd5a416c` (`feedback_protocol`). The original
+uncommitted-state description below records the state when the report was written.
+
 ## Repository and evidence
 
 Local HEAD equals the audited `fff2b026ca3e4ea6b68cacc3964971b0749bfeb3`. Initially the tracked tree was clean; `expert_advice/` was untracked. No pull/reset was performed. The earlier user request to keep master only is retained: isolation is by `research/feedback_protocol/`, not an extra Git branch. This batch is uncommitted and has not been pushed.

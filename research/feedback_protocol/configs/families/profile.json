@@ -1,0 +1,14 @@
+{
+  "schema":"fpl-profile-v1",
+  "channels":[2,3,4,5,6,8],
+  "topologies":["complete","star"],
+  "hypotheses":3,
+  "seed":17,
+  "enumeration_nodes":20000,
+  "bayes_states":200,
+  "bayes_seconds":1,
+  "beam_width":4,
+  "beam_depth":2,
+  "beam_expansions":500,
+  "beam_seconds":1
+}

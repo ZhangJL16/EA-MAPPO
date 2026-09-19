@@ -2,6 +2,7 @@ from fractions import Fraction as F
 from time import monotonic
 from ..belief import expected_reward, outcomes
 from ..protocols import enumerate_protocols, PlanningLimit
+from ..utility import protocol_value
 
 
 class ExactBayes:
@@ -36,7 +37,7 @@ class ExactBayes:
             self.route_cache[remaining] = enumerate_protocols(self.problem, remaining, self.max_protocol_nodes)
         best, action = F(0), None  # Stop at reset; unused time earns zero.
         for route in self.route_cache[remaining]:
-            candidate = expected_reward(self.problem, prior, route.channels)
+            candidate = protocol_value(self.problem, prior, route)
             for _, mass, posterior in outcomes(self.problem, prior, route.channels, self.max_outcomes):
                 self.likelihood_branches += 1
                 candidate += mass*self.value(remaining-route.duration, posterior)
@@ -62,6 +63,6 @@ def known_model_value(problem, hypothesis_index, remaining=None):
     prior = tuple(F(int(i == hypothesis_index)) for i in range(len(problem.hypotheses)))
     values = [F(0)]*(horizon+1)
     for t in range(1, horizon+1):
-        values[t] = max([F(0)]+[expected_reward(problem, prior, route.channels)+values[t-route.duration]
+        values[t] = max([F(0)]+[protocol_value(problem, prior, route)+values[t-route.duration]
                                 for route in routes if route.duration <= t])
     return values[horizon]

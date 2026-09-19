@@ -1,0 +1,534 @@
+{
+  "schema": "fpl-second-batch-profile-summary-v1",
+  "base_commit": "b71002f78ee659c8eca4e9493507bd8dfd5a416c",
+  "raw_path": "/home/zjl/fpl_scaling_20260919_v2_final.jsonl",
+  "raw_sha256": "27a8af1c726fc806153202c06eedadffc33545422d0e0e3930aa3dec5efb61cb",
+  "source_sha256": {
+    "__init__.py": "82146ed498a13ae447d0afd2fbec5075d7e56c9eb05a603adf1b841dbae03543",
+    "belief.py": "f24577a5c41dcf01106491dafbcb5c433b50492886a88fc2ca3a7ace33532378",
+    "cli.py": "a99073a9dcea062edf652c3f2a8c1cd23f693e451454f29964afa7b369f7296b",
+    "dataset.py": "fc208da452ac8a2ee3aacacf5f9abe7d6d9ce2ab69f0c1c4ab50c786059479a3",
+    "environment.py": "db4668b24390de518aefe561335efbd8eb0435e484d1a1d4ac8b578b9d9e2f9d",
+    "generator.py": "87ee10c49b979201f111e1b2b2180038ecfbcb72b315c9beb78ccdca3df3c2f8",
+    "policies/__init__.py": "c9185f633cace3a14ee9910decc5d94232c8ff31636636e72e94b89b2d583287",
+    "policies/beam_bayes.py": "f61056a1097a49a2717540cd827cf68ec32deae65964dbd4e330c55fd652ca44",
+    "policies/channel_cover.py": "d31290664def8c1d3e90b0ed8feab58495370841452b127576a13d24f6fbbe35",
+    "policies/posterior_sampling.py": "9777f6bd17f413ed012f27b0471ed351b6278c8820b4e44134aa6aa77ecc023e",
+    "problem.py": "3beffbd552b6f771450882c6643e7a3e33449e08abbbe92d58e8114d418726ae",
+    "profile.py": "a47b7470a2e0a7cf471dabc8fe76668c629a71ee09d6905c0e014f88a16cb1af",
+    "protocols.py": "dd60b5f7fc77a322125b38ba042d6b41504174f7d610ca43bdd0d3ac06b45a28",
+    "registry.py": "506f0263dedf26825f0d9837656d5221ce71c3c0b115f3d5943fb57f82d15f41",
+    "teachers/__init__.py": "c4f409c93be84914932e0f38e5921ec92f473c29a1e48e66c6d4ec08cb168935",
+    "teachers/exact_bayes.py": "83cd035e398b135095353824f7b272797673b56579f7705bc9bd843ecfda2dec",
+    "teachers/minimax_small.py": "b74d2461f843dac41490736e3666acb83a5aa506ad537501ff0bec47e414ecc2",
+    "utility.py": "112a928de24802ba2c66f0b798c0caab2a09a0b61ed1903dd90fe0a06d04ebd9"
+  },
+  "config": {
+    "schema": "fpl-profile-v1",
+    "channels": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      8
+    ],
+    "topologies": [
+      "complete",
+      "star"
+    ],
+    "hypotheses": 3,
+    "seed": 17,
+    "enumeration_nodes": 20000,
+    "bayes_states": 200,
+    "bayes_seconds": 1,
+    "beam_width": 4,
+    "beam_depth": 2,
+    "beam_expansions": 500,
+    "beam_seconds": 1
+  },
+  "seal": "818e971820b01178ceb37be8115269b7594356606780f596755ee887ed0012ce",
+  "resume_rows": 12,
+  "rows": [
+    {
+      "schema": "fpl-profile-row-v1",
+      "topology": "complete",
+      "channels": 2,
+      "instance_hash": "1a946b1b290a977abe77570ba87ba54cc43c3a3414dab86b48b3d82fcfc5a4c7",
+      "enumeration": {
+        "status": "completed",
+        "result": 8,
+        "seconds": 0.00012619100016308948,
+        "python_peak_bytes": 6728
+      },
+      "bayes": {
+        "status": "completed",
+        "result": "4/3",
+        "seconds": 0.003213657000742387,
+        "python_peak_bytes": 21392,
+        "states": 17,
+        "likelihood_branches": 43
+      },
+      "beam": {
+        "status": "completed",
+        "result": {
+          "operations": [
+            "task0"
+          ],
+          "duration": 1,
+          "channels": []
+        },
+        "seconds": 0.007896647000052326,
+        "python_peak_bytes": 16423,
+        "search": {
+          "states": 7,
+          "expansions": 187,
+          "likelihood_branches": 7,
+          "truncated": true,
+          "seconds": 0.007823838000149408
+        }
+      }
+    },
+    {
+      "schema": "fpl-profile-row-v1",
+      "topology": "complete",
+      "channels": 3,
+      "instance_hash": "9ae32acf52ca43570c280dc5bb89268ed3f7351f033478c31a7110b39f54456e",
+      "enumeration": {
+        "status": "completed",
+        "result": 19,
+        "seconds": 0.00022566100051335525,
+        "python_peak_bytes": 2840
+      },
+      "bayes": {
+        "status": "completed",
+        "result": "5/3",
+        "seconds": 0.015077457999723265,
+        "python_peak_bytes": 61904,
+        "states": 56,
+        "likelihood_branches": 211
+      },
+      "beam": {
+        "status": "completed",
+        "result": {
+          "operations": [
+            "task0"
+          ],
+          "duration": 1,
+          "channels": []
+        },
+        "seconds": 0.025766219999241002,
+        "python_peak_bytes": 29448,
+        "search": {
+          "states": 7,
+          "expansions": 517,
+          "likelihood_branches": 7,
+          "truncated": true,
+          "seconds": 0.025711827999657544
+        }
+      }
+    },
+    {
+      "schema": "fpl-profile-row-v1",
+      "topology": "complete",
+      "channels": 4,
+      "instance_hash": "aef8b386eb19f5ba535230ce5373c7213311e0f4405a3a93848d5a948f980cbe",
+      "enumeration": {
+        "status": "completed",
+        "result": 68,
+        "seconds": 0.0009789339992494206,
+        "python_peak_bytes": 13088
+      },
+      "bayes": {
+        "status": "limit_reached",
+        "reason": "Bayes solver state/time limit; optimum unresolved",
+        "seconds": 0.08763130300030753,
+        "python_peak_bytes": 239568,
+        "states": 200,
+        "likelihood_branches": 1121
+      },
+      "beam": {
+        "status": "completed",
+        "result": {
+          "operations": [
+            "task0"
+          ],
+          "duration": 1,
+          "channels": []
+        },
+        "seconds": 0.062102300000333344,
+        "python_peak_bytes": 11584,
+        "search": {
+          "states": 11,
+          "expansions": 985,
+          "likelihood_branches": 11,
+          "truncated": true,
+          "seconds": 0.06205098000009457
+        }
+      }
+    },
+    {
+      "schema": "fpl-profile-row-v1",
+      "topology": "complete",
+      "channels": 5,
+      "instance_hash": "e0581779ecc9b69d7ef1076b2ba84f6cecb6d8f52e2fc481ec0933712dd003d0",
+      "enumeration": {
+        "status": "completed",
+        "result": 329,
+        "seconds": 0.006273064000197337,
+        "python_peak_bytes": 67360
+      },
+      "bayes": {
+        "status": "limit_reached",
+        "reason": "Bayes solver state/time limit; optimum unresolved",
+        "seconds": 0.07288937700013776,
+        "python_peak_bytes": 192984,
+        "states": 200,
+        "likelihood_branches": 884
+      },
+      "beam": {
+        "status": "completed",
+        "result": {
+          "operations": [
+            "task0"
+          ],
+          "duration": 1,
+          "channels": []
+        },
+        "seconds": 0.1299990119996437,
+        "python_peak_bytes": 12280,
+        "search": {
+          "states": 7,
+          "expansions": 1916,
+          "likelihood_branches": 7,
+          "truncated": true,
+          "seconds": 0.12994366099974286
+        }
+      }
+    },
+    {
+      "schema": "fpl-profile-row-v1",
+      "topology": "complete",
+      "channels": 6,
+      "instance_hash": "c05f408761a7b07321ac25064b8ee647309143608e2ab18092160f455e0c41c5",
+      "enumeration": {
+        "status": "completed",
+        "result": 1960,
+        "seconds": 0.0429156830005013,
+        "python_peak_bytes": 528088
+      },
+      "bayes": {
+        "status": "limit_reached",
+        "reason": "Bayes solver state/time limit; optimum unresolved",
+        "seconds": 0.08139515299990308,
+        "python_peak_bytes": 452336,
+        "states": 200,
+        "likelihood_branches": 354
+      },
+      "beam": {
+        "status": "completed",
+        "result": {
+          "operations": [
+            "task0"
+          ],
+          "duration": 1,
+          "channels": []
+        },
+        "seconds": 0.22124332200019126,
+        "python_peak_bytes": 15640,
+        "search": {
+          "states": 11,
+          "expansions": 3248,
+          "likelihood_branches": 11,
+          "truncated": true,
+          "seconds": 0.221195285000249
+        }
+      }
+    },
+    {
+      "schema": "fpl-profile-row-v1",
+      "topology": "complete",
+      "channels": 8,
+      "instance_hash": "5a69fbfd07e9054f819ac8ed6dcdc8c05740084e0b9a07d38b1ec6246cfc8305",
+      "enumeration": {
+        "status": "limit_reached",
+        "reason": "protocol enumeration node limit",
+        "seconds": 0.6586261920001562,
+        "python_peak_bytes": 6057840
+      },
+      "bayes": {
+        "status": "limit_reached",
+        "reason": "protocol enumeration node limit",
+        "seconds": 0.5974605259998498,
+        "python_peak_bytes": 4924872,
+        "states": 1,
+        "likelihood_branches": 0
+      },
+      "beam": {
+        "status": "completed",
+        "result": {
+          "operations": [
+            "task0"
+          ],
+          "duration": 1,
+          "channels": []
+        },
+        "seconds": 0.7620000870001604,
+        "python_peak_bytes": 109680,
+        "search": {
+          "states": 19,
+          "expansions": 8506,
+          "likelihood_branches": 19,
+          "truncated": true,
+          "seconds": 0.7619360070002585
+        }
+      }
+    },
+    {
+      "schema": "fpl-profile-row-v1",
+      "topology": "star",
+      "channels": 2,
+      "instance_hash": "6496f0b6aa12320e6e41fce82345905922c040f06a32a2b5ab62a6e3b9915d14",
+      "enumeration": {
+        "status": "completed",
+        "result": 6,
+        "seconds": 0.00006510999992315192,
+        "python_peak_bytes": 1112
+      },
+      "bayes": {
+        "status": "completed",
+        "result": "4/3",
+        "seconds": 0.0024752999997872394,
+        "python_peak_bytes": 12072,
+        "states": 13,
+        "likelihood_branches": 35
+      },
+      "beam": {
+        "status": "completed",
+        "result": {
+          "operations": [
+            "task0"
+          ],
+          "duration": 1,
+          "channels": []
+        },
+        "seconds": 0.0064382450000266545,
+        "python_peak_bytes": 6768,
+        "search": {
+          "states": 5,
+          "expansions": 167,
+          "likelihood_branches": 5,
+          "truncated": true,
+          "seconds": 0.006402850000085891
+        }
+      }
+    },
+    {
+      "schema": "fpl-profile-row-v1",
+      "topology": "star",
+      "channels": 3,
+      "instance_hash": "896fe74bb4d98a50250985d1eacceb4b51566aa7d4112715333dc6b23e9c0699",
+      "enumeration": {
+        "status": "completed",
+        "result": 7,
+        "seconds": 0.00007974700019985903,
+        "python_peak_bytes": 1200
+      },
+      "bayes": {
+        "status": "completed",
+        "result": "5/3",
+        "seconds": 0.005940824999925098,
+        "python_peak_bytes": 16824,
+        "states": 24,
+        "likelihood_branches": 79
+      },
+      "beam": {
+        "status": "completed",
+        "result": {
+          "operations": [
+            "task0"
+          ],
+          "duration": 1,
+          "channels": []
+        },
+        "seconds": 0.01317436000044836,
+        "python_peak_bytes": 7736,
+        "search": {
+          "states": 5,
+          "expansions": 245,
+          "likelihood_branches": 5,
+          "truncated": true,
+          "seconds": 0.01313583200044377
+        }
+      }
+    },
+    {
+      "schema": "fpl-profile-row-v1",
+      "topology": "star",
+      "channels": 4,
+      "instance_hash": "98510ca980be14a6518a0abb70a515d74123f56cfc583f55c2793d886796be83",
+      "enumeration": {
+        "status": "completed",
+        "result": 8,
+        "seconds": 0.00008309500026371097,
+        "python_peak_bytes": 1288
+      },
+      "bayes": {
+        "status": "completed",
+        "result": "2",
+        "seconds": 0.013679054999556683,
+        "python_peak_bytes": 36392,
+        "states": 75,
+        "likelihood_branches": 207
+      },
+      "beam": {
+        "status": "completed",
+        "result": {
+          "operations": [
+            "task0"
+          ],
+          "duration": 1,
+          "channels": []
+        },
+        "seconds": 0.01922070300042833,
+        "python_peak_bytes": 8032,
+        "search": {
+          "states": 5,
+          "expansions": 320,
+          "likelihood_branches": 5,
+          "truncated": true,
+          "seconds": 0.019180028000846505
+        }
+      }
+    },
+    {
+      "schema": "fpl-profile-row-v1",
+      "topology": "star",
+      "channels": 5,
+      "instance_hash": "a68c1d2bb941110f6028b0475a52ebdcc82cf2797bbf61aea6ad852d6650a44f",
+      "enumeration": {
+        "status": "completed",
+        "result": 9,
+        "seconds": 0.00010031100009655347,
+        "python_peak_bytes": 1376
+      },
+      "bayes": {
+        "status": "completed",
+        "result": "12/5",
+        "seconds": 0.03930675199990219,
+        "python_peak_bytes": 75936,
+        "states": 168,
+        "likelihood_branches": 592
+      },
+      "beam": {
+        "status": "completed",
+        "result": {
+          "operations": [
+            "prepare",
+            "probe4",
+            "return4"
+          ],
+          "duration": 3,
+          "channels": [
+            "c4"
+          ]
+        },
+        "seconds": 0.026140398000279674,
+        "python_peak_bytes": 8288,
+        "search": {
+          "states": 5,
+          "expansions": 356,
+          "likelihood_branches": 5,
+          "truncated": true,
+          "seconds": 0.026085278000209655
+        }
+      }
+    },
+    {
+      "schema": "fpl-profile-row-v1",
+      "topology": "star",
+      "channels": 6,
+      "instance_hash": "d153746b29c9678de5dfacff817458674d8126be8ec4582b63d0f6a5cb748808",
+      "enumeration": {
+        "status": "completed",
+        "result": 10,
+        "seconds": 0.000102359999800683,
+        "python_peak_bytes": 1528
+      },
+      "bayes": {
+        "status": "limit_reached",
+        "reason": "Bayes solver state/time limit; optimum unresolved",
+        "seconds": 0.04303830100070627,
+        "python_peak_bytes": 95032,
+        "states": 200,
+        "likelihood_branches": 644
+      },
+      "beam": {
+        "status": "completed",
+        "result": {
+          "operations": [
+            "prepare",
+            "probe2",
+            "return2"
+          ],
+          "duration": 3,
+          "channels": [
+            "c2"
+          ]
+        },
+        "seconds": 0.028958904000319308,
+        "python_peak_bytes": 8232,
+        "search": {
+          "states": 5,
+          "expansions": 390,
+          "likelihood_branches": 5,
+          "truncated": true,
+          "seconds": 0.028897029000290786
+        }
+      }
+    },
+    {
+      "schema": "fpl-profile-row-v1",
+      "topology": "star",
+      "channels": 8,
+      "instance_hash": "ffa1986da56909fcda7f0b531e333967e5557d5c403bd44620a95b5e7ca44b44",
+      "enumeration": {
+        "status": "completed",
+        "result": 12,
+        "seconds": 0.00013181699978304096,
+        "python_peak_bytes": 1704
+      },
+      "bayes": {
+        "status": "limit_reached",
+        "reason": "Bayes solver state/time limit; optimum unresolved",
+        "seconds": 0.031095235000066168,
+        "python_peak_bytes": 107852,
+        "states": 200,
+        "likelihood_branches": 442
+      },
+      "beam": {
+        "status": "completed",
+        "result": {
+          "operations": [
+            "prepare",
+            "probe0",
+            "return0"
+          ],
+          "duration": 3,
+          "channels": [
+            "c0"
+          ]
+        },
+        "seconds": 0.03324302999953943,
+        "python_peak_bytes": 8304,
+        "search": {
+          "states": 5,
+          "expansions": 442,
+          "likelihood_branches": 5,
+          "truncated": true,
+          "seconds": 0.033188630000040575
+        }
+      }
+    }
+  ]
+}

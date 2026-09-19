@@ -1,5 +1,9 @@
 # FPL v0.1 first-batch contract
 
+Historical v0.1 contract. For the current utility, generation, splitting and
+planning extensions see [CONTRACT_V02.md](CONTRACT_V02.md). Legacy fixture behavior
+and reset-terminal semantics below remain the regression reference.
+
 Scope: configurable finite public Bernoulli families on known deterministic operation graphs. This is the A0/A1 and comparison skeleton authorized on 2026-09-19, not completed delivery B/C.
 
 ## Decision and information contract

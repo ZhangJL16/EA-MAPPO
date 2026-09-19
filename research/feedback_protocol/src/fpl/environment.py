@@ -1,6 +1,8 @@
 """Evaluator-owned truth/RNG; policies receive only PlannerState and PublicProblem."""
 from dataclasses import dataclass
 import random
+from fractions import Fraction as F
+from .utility import operation_score
 from .problem import PublicProblem
 from .protocols import validate_protocol
 from .belief import PlannerState, ObservationHistory, update
@@ -16,7 +18,7 @@ class PrivateTruth:
 class BatchResult:
     operations: tuple[dict, ...]
     feedback: tuple[tuple[str, int], ...]
-    reward: int
+    reward: F  # Evaluator score; never passed to policy as feedback.
     released_at: int
 
 
@@ -39,6 +41,7 @@ class Environment:
         p = self.problem
         route = validate_protocol(p, names, p.budget-self.time)
         feedback, events = [], []
+        reward = F(0)
         battery = p.capacity
         for name in route.operations:
             op = next(o for o in p.operations if o.name == name)
@@ -46,9 +49,13 @@ class Environment:
             battery -= op.energy
             after_debit = battery
             self.time += op.duration
+            bits = []
             for channel in op.channels:
                 mean = p.hypotheses[self._truth.hypothesis_index][p.channels.index(channel)]
-                feedback.append((channel, int(self._rng.random() < mean)))
+                bit = int(self._rng.random() < mean)
+                feedback.append((channel, bit))
+                bits.append(bit)
+            reward += operation_score(op, self._truth.hypothesis_index, bits)
             if op.target == p.reset:
                 battery = p.capacity
             events.append(dict(operation=name, start=start, end=self.time,
@@ -58,4 +65,4 @@ class Environment:
         # No callback or policy call is made while physical execution is pending.
         self._belief = update(p, self._belief, feedback)
         self._history = ObservationHistory(self._history.released+tuple(feedback))
-        return BatchResult(tuple(events), tuple(feedback), sum(bit for _, bit in feedback), self.time)
+        return BatchResult(tuple(events), tuple(feedback), reward, self.time)

@@ -1,0 +1,10 @@
+{
+  "schema": "fpl-family-plan-v1",
+  "purpose": "engineering split validation; not a frozen scientific benchmark",
+  "families": [
+    {"split":"train", "generator":{"channels":2,"hypotheses":2,"topology":"complete","sharing":"paired"},"seeds":[11,12],"capacities":[3,4],"budgets":[4,6]},
+    {"split":"dev", "generator":{"channels":3,"hypotheses":3,"topology":"chain","duration":2,"energy":1},"seeds":[21],"capacities":[3,5],"budgets":[8,12]},
+    {"split":"test", "generator":{"channels":4,"hypotheses":3,"topology":"star","sharing":"paired"},"seeds":[31],"capacities":[3,6],"budgets":[6,8]},
+    {"split":"ood", "generator":{"channels":5,"hypotheses":4,"topology":"ring","energy":2},"seeds":[41],"capacities":[6,14],"budgets":[7,10]}
+  ]
+}

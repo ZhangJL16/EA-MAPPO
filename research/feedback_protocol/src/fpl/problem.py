@@ -7,6 +7,16 @@ from pathlib import Path
 
 
 @dataclass(frozen=True)
+class UtilitySpec:
+    """Task score: weighted feedback plus evaluator-only hypothesis payoff.
+
+    Payoffs are not an additional online observation channel.
+    """
+    observation_weights: tuple[F, ...] = ()
+    by_hypothesis: tuple[F, ...] = ()
+
+
+@dataclass(frozen=True)
 class Operation:
     name: str
     source: str
@@ -14,6 +24,7 @@ class Operation:
     duration: int
     energy: int
     channels: tuple[str, ...] = ()
+    utility: UtilitySpec | None = None  # Legacy adapter: sum observed bits.
 
 
 @dataclass(frozen=True)
@@ -41,9 +52,9 @@ class PublicProblem:
             value = getattr(self, name)
             if type(value) is not int or value < (1 if name == "per_channel_limit" else 0):
                 raise ValueError(f"invalid {name}")
-        if (self.terminal_rule, self.feedback_rule, self.reset_rule, self.objective) != (
-            "reset_by_budget", "batch_end", "debit_before_arrival_reload", "cumulative_bernoulli_reward"
-        ):
+        if (self.terminal_rule, self.feedback_rule, self.reset_rule) != (
+            "reset_by_budget", "batch_end", "debit_before_arrival_reload"
+        ) or self.objective not in ("cumulative_bernoulli_reward", "cumulative_task_utility"):
             raise ValueError("unsupported contract; explicit adapter required")
         if not self.nodes or len(set(self.nodes)) != len(self.nodes) or self.reset not in self.nodes:
             raise ValueError("invalid nodes/reset")
@@ -63,6 +74,13 @@ class PublicProblem:
                 raise ValueError("duration must be positive; energy nonnegative integers")
             if any(c not in self.channels for c in op.channels):
                 raise ValueError("unknown observation channel")
+            if op.utility is not None:
+                if len(op.utility.observation_weights) not in (0, len(op.channels)):
+                    raise ValueError("utility weights must match feedback channels")
+                if len(op.utility.by_hypothesis) not in (0, len(self.hypotheses)):
+                    raise ValueError("utility payoff must match hypotheses")
+                if self.objective != "cumulative_task_utility":
+                    raise ValueError("explicit utility requires cumulative_task_utility objective")
 
     @property
     def instance_hash(self):
@@ -75,6 +93,12 @@ def load_problem(path: str | Path) -> PublicProblem:
     data["channels"] = tuple(data["channels"])
     data["hypotheses"] = tuple(tuple(F(str(p)) for p in row) for row in data["hypotheses"])
     data["prior"] = tuple(F(str(p)) for p in data["prior"])
-    data["operations"] = tuple(Operation(**{**o, "channels": tuple(o.get("channels", []))})
-                               for o in data["operations"])
+    operations = []
+    for o in data["operations"]:
+        o = {**o, "channels": tuple(o.get("channels", []))}
+        if o.get("utility") is not None:
+            o["utility"] = UtilitySpec(**{k: tuple(F(str(v)) for v in values)
+                                          for k, values in o["utility"].items()})
+        operations.append(Operation(**o))
+    data["operations"] = tuple(operations)
     return PublicProblem(**data)

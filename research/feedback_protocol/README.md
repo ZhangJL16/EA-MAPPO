@@ -1,4 +1,25 @@
-# Feedback Protocol Lab — first implementation batch
+# Feedback Protocol Lab — finite Bernoulli testbed
+
+Second batch: [v0.2 contract](CONTRACT_V02.md), [implementation and profiling results](../../docs/FPL_SECOND_BATCH_20260919.md).
+Includes utility/observation separation, template-grouped task generation, a split
+registry, tiny exact minimax reference, prefix-beam Bayes planning, independent
+posterior sampling, and resumable bounded scaling profiling. No neural method is
+implemented or validated.
+
+```bash
+PYTHONPATH=research/feedback_protocol/src python3 -m fpl.dataset \
+  --plan research/feedback_protocol/configs/families/splits.json \
+  --output /tmp/fpl_tasks_new
+PYTHONPATH=research/feedback_protocol/src python3 -m fpl.profile \
+  --config research/feedback_protocol/configs/families/profile.json \
+  --output /tmp/fpl_profile_new.jsonl
+```
+
+Existing output is rejected unless `--resume` is explicitly passed to the profiler.
+The debug CLI below also accepts `beam_bayes` and `posterior_sampling`, with an
+independent `--policy-seed`. Scientific expected-risk evaluation remains future work.
+
+## First-batch commands and historical scope
 
 Implemented: config-driven deterministic operation graph, public/private interfaces, debit-before-reload safety, batch-end feedback, exact finite-family posterior, evaluator-only finite-budget oracle, rational Bayes reference and independent channel-coverage heuristic. Read [CONTRACT.md](CONTRACT.md) for objective and terminal semantics.
 

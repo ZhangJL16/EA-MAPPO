@@ -2,6 +2,7 @@ from collections import Counter
 from fractions import Fraction
 from ..belief import expected_reward
 from ..protocols import enumerate_protocols
+from ..utility import protocol_value
 
 
 class ChannelCover:
@@ -24,6 +25,6 @@ class ChannelCover:
                      if not seen[c] and len({row[j] for row in p.hypotheses}) > 1}
         def score(route):
             coverage = Fraction(len(set(route.channels) & uncovered), route.duration)
-            rate = expected_reward(p, state.posterior, route.channels)/route.duration
+            rate = protocol_value(p, state.posterior, route)/route.duration
             return coverage, rate
         return max(routes, key=score)
