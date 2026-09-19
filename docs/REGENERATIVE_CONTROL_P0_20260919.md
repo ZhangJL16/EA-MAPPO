@@ -1,6 +1,19 @@
 # Safe Regenerative Average-Reward Control for Persistent Agents
 
-## Material Passport
+## Current amendment — user-authorized P1, 2026-09-19
+
+**P0-A navigation qualification: PASS for research startup in the restricted
+study region. P0-B legacy energy-predictor qualification: cancelled / no longer
+required, not FAIL.** The user explicitly authorized continuing to P1 with
+measured frozen-SAC macro transitions; do not recover or retrain a critic.
+The earlier audit below preserves the evidence and its then-current stopping
+rule, which is superseded by this amendment. The 18-route data and frozen runner
+are unchanged. Old ReturnManager is no longer a mandatory baseline. This turn
+is P1 only; P2 requires subsequent user authorization.
+
+See [P1 implementation and audit](REGENERATIVE_CONTROL_P1_20260919.md).
+
+## Historical Material Passport
 
 - Date: 2026-09-19; mode: bounded code execution + artifact audit.
 - User question: 在具有可再生资源的持续任务流中，何时继续当前任务、何时主动返回补给，以最大化长期平均任务收益，同时维持可恢复性？

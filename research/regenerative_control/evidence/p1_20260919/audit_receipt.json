@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "raw_macro_rows": 128,
+  "trace_macro_transitions": 21,
+  "trace_reset_calls": 1,
+  "complete_regenerations": 6,
+  "source_and_checkpoint_hashes_match": true,
+  "continuous_time_battery_position_velocity": true,
+  "paid_docking_verified": true,
+  "canonical_regeneration_verified": true,
+  "task_rng_independence": "by IID generator construction; not inferred from six cycles",
+  "p2_kernel_complete": false,
+  "neural_updates": 0
+}

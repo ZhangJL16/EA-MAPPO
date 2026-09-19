@@ -1,12 +1,11 @@
 # EA-MAPPO research workspace
 
-Latest (2026-09-19): [persistent regenerative control P0](docs/REGENERATIVE_CONTROL_P0_20260919.md).
-Current user scope is P0 → P1 → minimal P2 under the provisional title
-**Safe Regenerative Average-Reward Control for Persistent Agents**.
-Frozen original SAC: 18/18 restricted navigation legs reached, zero contacts.
-P0 remains **not passed**: return/mission quantile coverage is unvalidated and
-no compatible frozen task+return predictor was identified. P1/P2 not started;
-no SAC or high-level neural training. Earlier active-line labels below are history.
+Latest (2026-09-19): [continuing regenerative control P1](docs/REGENERATIVE_CONTROL_P1_20260919.md).
+**P0-A passes for restricted research startup; P0-B legacy energy-critic
+qualification is cancelled, not failed.** P1 uses frozen SAC macro rollouts:
+single UAV, pre-task C/R decisions, paid station service, IID task stream, and
+explicit regeneration. No critic recovery/training, P2 oracle or high-level
+learning is authorized in this stage. Prior research-line labels below are history.
 
 Latest (2026-09-19): [control adaptation startup](docs/CONTROL_ADAPTATION_STARTUP_20260919.md).
 The active question is few-interaction pretrained control adaptation and nominal

@@ -1,18 +1,20 @@
 # Current task plan
 
-## Persistent regenerative control (current, 2026-09-19)
+## Continuing regenerative control — P1 only (2026-09-19)
 
-- [x] Freeze original navigation SAC checkpoint, seed, architecture, source hashes.
-- [x] Bounded 18-cell P0 navigation audit, one-step smoke and route-boundary resume.
-- [ ] P0 energy qualification: identify frozen four-quantile/mission predictor and measure coverage.
-- [ ] P1: continuing single-UAV IID task stream, paid recharge, C/R epochs, no hidden reset.
-- [ ] P2: empirical SMDP oracle, B0–B5 baselines and ΔQ dataset.
-- [ ] P3: frozen ≥98% simple-policy kill test and systematic sign-flip analysis.
-- [ ] P4/P5: NOT authorized before prior gates pass; no new neural training.
+- [x] P0-A: frozen navigator qualified for restricted research startup, 18/18 legs.
+- [x] P0-B: old energy-critic qualification CANCELLED by user; no restoration/training.
+- [x] P1: single-UAV continuing wrapper, pre-task C/R, persistent battery/time.
+- [x] P1: paid station capture/charge, canonical regeneration, IID task draws.
+- [x] P1: empirical macro collector with full audit state, sensor-only frozen actor.
+- [x] Nine focused tests, one-step smoke, atomic snapshot/resume parity.
+- [x] Complete 128-row smoke, 1,000-second trajectory, portable evidence and raw audit; hand back.
+- [ ] P2: NOT STARTED; requires next user authorization.
+- [ ] P3/P4/P5: NOT STARTED; ≥.98 simple/oracle kill criterion remains fixed.
 
-**Stop at P0 incomplete energy qualification.** Details and actual metrics:
-`docs/REGENERATIVE_CONTROL_P0_20260919.md`. Previous active plans below are superseded
-by the current user sequence; do not resume SAC/control-adaptation training.
+Details: `docs/REGENERATIVE_CONTROL_P1_20260919.md`. Planned P2 baselines are battery,
+distance, expected empirical mission reserve, empirical joint-mission q95 and
+MPC H=1/2/3. Old ReturnManager is optional/redundant, not mandatory.
 
 ## Control adaptation (active, 2026-09-19)
 

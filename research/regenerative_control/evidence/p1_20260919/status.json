@@ -1,0 +1,33 @@
+{
+  "status": "P1_smoke_complete",
+  "rows": 128,
+  "trace_audit": {
+    "reset_calls": 1,
+    "elapsed_time": 1000.0,
+    "completed": 14,
+    "abandoned": 7,
+    "collision_count": 0,
+    "energy_failure": false,
+    "failed": false,
+    "terminal_reason": null,
+    "evaluation_cutoff": 1000.0,
+    "truncated": true,
+    "cycle_count": 6,
+    "energy_balance_residual": -1.0806910921701274e-12,
+    "throughput_at_cutoff": 0.014,
+    "measured_rate": 0.014,
+    "config": {
+      "capacity": 60.0,
+      "cutoff": 1000.0,
+      "option_step_limit": 4000,
+      "obstacles": 24,
+      "recharge_overhead": 10.0,
+      "recharge_rate": 1.0,
+      "docking_speed": 1.0,
+      "docking_power": 0.02
+    },
+    "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760"
+  },
+  "p2_started": false,
+  "training_updates": 0
+}

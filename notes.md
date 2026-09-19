@@ -1,5 +1,24 @@
 # Current research notes
 
+## 2026-09-19 P1 continuing regenerative environment complete
+
+User cancelled P0-B critic qualification; P0-A PASS for restricted startup.
+No old critic recovery or training. New code preserves original navigation/source
+checkpoint and implements pre-task C/R, whole pickup/dropoff, paid station capture
+and charge, continuing IID task stream, exact physical state across goals.
+Final v2: 128/128 macro smoke successes, zero contact; 1,000-second trace has
+14 deliveries, six recharge completions and one initial reset, no depletion.
+Nine tests and raw/source/energy/regeneration audits pass. Initial v1 retained;
+cutoff guard fixed in v2 with independent same-budget evidence.
+Regeneration is conditional on fixed map and renewing controller state. Grouped
+quantiles reflect initial-velocity sampling, not independent navigation noise;
+no joint mission quantile or complete finite Markov kernel is claimed. P2 remains
+unstarted and requires the user's next authorization. Portable raw evidence is in
+`research/regenerative_control/evidence/p1_20260919`; report:
+`docs/REGENERATIVE_CONTROL_P1_20260919.md`.
+
+Earlier P0 stopping language below is historical and superseded by this amendment.
+
 ## 2026-09-19 persistent regenerative control: P0 not passed
 
 The user replaced open-ended research with ordered P0/P1/minimal P2 and no new

@@ -1,0 +1,58 @@
+[
+  {
+    "state_group": "near_light",
+    "option": "task",
+    "n": 32,
+    "success": 32,
+    "failures": 0,
+    "contact_trials": 0,
+    "mean_energy_all_observed": 3.978082484181437,
+    "mean_energy_success": 3.978082484181437,
+    "q95_energy_success": 4.020278833750402,
+    "q95_unconditional_completion_energy": 4.020278833750402,
+    "mean_time_all_observed": 17.39062499999997,
+    "mean_navigation_time": 17.39062499999997
+  },
+  {
+    "state_group": "near_light",
+    "option": "return",
+    "n": 32,
+    "success": 32,
+    "failures": 0,
+    "contact_trials": 0,
+    "mean_energy_all_observed": 2.484771342756482,
+    "mean_energy_success": 2.484771342756482,
+    "q95_energy_success": 2.533945979997444,
+    "q95_unconditional_completion_energy": 2.533945979997444,
+    "mean_time_all_observed": 27.491654338123382,
+    "mean_navigation_time": 10.278124999999996
+  },
+  {
+    "state_group": "far_dense",
+    "option": "task",
+    "n": 32,
+    "success": 32,
+    "failures": 0,
+    "contact_trials": 0,
+    "mean_energy_all_observed": 21.464950233160327,
+    "mean_energy_success": 21.464950233160327,
+    "q95_energy_success": 21.899696123806358,
+    "q95_unconditional_completion_energy": 21.899696123806358,
+    "mean_time_all_observed": 103.30625000000093,
+    "mean_navigation_time": 103.30625000000093
+  },
+  {
+    "state_group": "far_dense",
+    "option": "return",
+    "n": 32,
+    "success": 32,
+    "failures": 0,
+    "contact_trials": 0,
+    "mean_energy_all_observed": 9.948251835139896,
+    "mean_energy_success": 9.948251835139896,
+    "q95_energy_success": 10.027556388432764,
+    "q95_unconditional_completion_energy": 10.027556388432764,
+    "mean_time_all_observed": 69.56528834465338,
+    "mean_navigation_time": 44.8281250000001
+  }
+]

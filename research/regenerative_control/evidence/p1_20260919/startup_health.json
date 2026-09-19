@@ -1,0 +1,8 @@
+{
+  "rows": 128,
+  "finite": true,
+  "checkpoint_unchanged": true,
+  "reset_calls": 1,
+  "energy_balance_residual": -1.4166445794216997e-13,
+  "neural_updates": 0
+}
