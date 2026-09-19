@@ -1,0 +1,17 @@
+{
+  "schema": "fpl-planning-residual-v1",
+  "census_archive_sha256": "fe6cb38bc8f6ec8b04dd9284da6123f55b0714c4e767a7635c544abd4e6f6807",
+  "methods": ["one_step_voi", "beam_bayes"],
+  "tiers": {"small": {"max_expansions": 300, "max_model_calls": 3000}, "large": {"max_expansions": 4800, "max_model_calls": 48000}},
+  "beam_width": 8,
+  "beam_depth": 2,
+  "episode_multiplier": 4,
+  "policy_watchdog_seconds": 60,
+  "evaluation": {"max_nodes": 10000, "max_feedback": 32, "watchdog_seconds": 60},
+  "supplemental_label_limits": {"max_states": 3000, "max_protocol_nodes": 10000, "max_outcomes": 32, "max_expansions": 1000000, "max_model_calls": 3000000, "watchdog_seconds": 5},
+  "state_probe": "restart each method with a fresh episode work pool at each census sufficient state; these rows are not occupancy weights",
+  "occupancy": "start at the original prior, branch complete policy state including remaining episode work; exact prior-predictive feedback integration; supplemental V/Q only on visited states outside census",
+  "weighting": "report each instance; pooled summaries equally weight the 32 paired variants, not population claims; structure count remains 8",
+  "limits": "preserve unresolved; no retry, cap increase or replacement; negative residual or identity mismatch is a correctness error",
+  "next_stage": "report a single scoped route recommendation; no training, new roots, V2.1/V3, DEV/test/CONFIRM execution"
+}

@@ -1,5 +1,19 @@
 # Current task plan
 
+## T5.1e Bellman residual decomposition (completed, 2026-09-19)
+
+- [x] Freeze four planner settings; probe 1,171 states (4,684 exact rows).
+- [x] Preserve full policy work state; all 128 occupancy identities/cross-checks exact.
+- [x] Supplemental visited-state V/Q: 452 exact, same original 32 problems only.
+- [x] Deliver state residuals, occupancy, small/large pairs, category report/evidence.
+- [x] Choose Route C: stop current learned-planner main line; 63 tests pass.
+- [ ] AFPP / selective learned planner / V2.1 / V3: **not launched**.
+
+Large VOI is exact on all pilot episodes. Small VOI's losses are dominated by
+work-limited fallback and execution, not the six adaptive census states.
+See `docs/FPL_T51E_RESIDUAL_20260919.md`. The previous next-branch suggestions
+below are historical, superseded by this scoped decision.
+
 ## T5.1d depth-two census (completed, 2026-09-19)
 
 - [x] Freeze census of existing 8 pilot groups / 32 variants only.

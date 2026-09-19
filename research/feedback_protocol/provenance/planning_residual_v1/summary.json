@@ -1,0 +1,5226 @@
+{
+  "all_equalities_exact": true,
+  "census_rows": 4684,
+  "episodes": 128,
+  "fresh_probe_summary": [
+    {
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "nonzero_groups": 0,
+      "residual_sum": "0",
+      "rows": "1171",
+      "tier": "large"
+    },
+    {
+      "method": "beam_bayes",
+      "nonzero": "203",
+      "nonzero_groups": 7,
+      "residual_sum": "95527285873491872647842033024315824451102217527907337/1544716888354417119350261233018182084883033028683200",
+      "rows": "1171",
+      "tier": "small"
+    },
+    {
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "nonzero_groups": 0,
+      "residual_sum": "0",
+      "rows": "1171",
+      "tier": "large"
+    },
+    {
+      "method": "one_step_voi",
+      "nonzero": "9",
+      "nonzero_groups": 4,
+      "residual_sum": "20873/10850",
+      "rows": "1171",
+      "tier": "small"
+    }
+  ],
+  "no_new_roots": true,
+  "no_training": true,
+  "occupancy_attribution": [
+    {
+      "category": "3",
+      "dimension": "B",
+      "expected_visits": "156",
+      "gap_contribution": "0",
+      "gap_share": "0",
+      "method": "beam_bayes",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "5",
+      "dimension": "B",
+      "expected_visits": "153",
+      "gap_contribution": "1/5",
+      "gap_share": "1",
+      "method": "beam_bayes",
+      "positive_contexts": "3",
+      "tier": "large"
+    },
+    {
+      "category": "1",
+      "dimension": "H",
+      "expected_visits": "32",
+      "gap_contribution": "1/15",
+      "gap_share": "1/3",
+      "method": "beam_bayes",
+      "positive_contexts": "1",
+      "tier": "large"
+    },
+    {
+      "category": "10",
+      "dimension": "H",
+      "expected_visits": "9",
+      "gap_contribution": "0",
+      "gap_share": "0",
+      "method": "beam_bayes",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "11",
+      "dimension": "H",
+      "expected_visits": "9",
+      "gap_contribution": "0",
+      "gap_share": "0",
+      "method": "beam_bayes",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "12",
+      "dimension": "H",
+      "expected_visits": "16",
+      "gap_contribution": "0",
+      "gap_share": "0",
+      "method": "beam_bayes",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "2",
+      "dimension": "H",
+      "expected_visits": "32",
+      "gap_contribution": "1/15",
+      "gap_share": "1/3",
+      "method": "beam_bayes",
+      "positive_contexts": "1",
+      "tier": "large"
+    },
+    {
+      "category": "3",
+      "dimension": "H",
+      "expected_visits": "32",
+      "gap_contribution": "1/15",
+      "gap_share": "1/3",
+      "method": "beam_bayes",
+      "positive_contexts": "1",
+      "tier": "large"
+    },
+    {
+      "category": "4",
+      "dimension": "H",
+      "expected_visits": "32",
+      "gap_contribution": "0",
+      "gap_share": "0",
+      "method": "beam_bayes",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "5",
+      "dimension": "H",
+      "expected_visits": "32",
+      "gap_contribution": "0",
+      "gap_share": "0",
+      "method": "beam_bayes",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "6",
+      "dimension": "H",
+      "expected_visits": "32",
+      "gap_contribution": "0",
+      "gap_share": "0",
+      "method": "beam_bayes",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "7",
+      "dimension": "H",
+      "expected_visits": "26",
+      "gap_contribution": "0",
+      "gap_share": "0",
+      "method": "beam_bayes",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "8",
+      "dimension": "H",
+      "expected_visits": "26",
+      "gap_contribution": "0",
+      "gap_share": "0",
+      "method": "beam_bayes",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "9",
+      "dimension": "H",
+      "expected_visits": "31",
+      "gap_contribution": "0",
+      "gap_share": "0",
+      "method": "beam_bayes",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "normal",
+      "dimension": "autopilot",
+      "expected_visits": "309",
+      "gap_contribution": "1/5",
+      "gap_share": "1",
+      "method": "beam_bayes",
+      "positive_contexts": "3",
+      "tier": "large"
+    },
+    {
+      "category": "single_sensing",
+      "dimension": "chosen_type",
+      "expected_visits": "13",
+      "gap_contribution": "0",
+      "gap_share": "0",
+      "method": "beam_bayes",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "task",
+      "dimension": "chosen_type",
+      "expected_visits": "296",
+      "gap_contribution": "1/5",
+      "gap_share": "1",
+      "method": "beam_bayes",
+      "positive_contexts": "3",
+      "tier": "large"
+    },
+    {
+      "category": "measurement_optional",
+      "dimension": "decision_class",
+      "expected_visits": "1",
+      "gap_contribution": "0",
+      "gap_share": "0",
+      "method": "beam_bayes",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "measurement_required",
+      "dimension": "decision_class",
+      "expected_visits": "13",
+      "gap_contribution": "0",
+      "gap_share": "0",
+      "method": "beam_bayes",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "nonmeasuring_optimal",
+      "dimension": "decision_class",
+      "expected_visits": "295",
+      "gap_contribution": "1/5",
+      "gap_share": "1",
+      "method": "beam_bayes",
+      "positive_contexts": "3",
+      "tier": "large"
+    },
+    {
+      "category": "adaptive_hierarchy",
+      "dimension": "family",
+      "expected_visits": "76",
+      "gap_contribution": "1/5",
+      "gap_share": "1",
+      "method": "beam_bayes",
+      "positive_contexts": "3",
+      "tier": "large"
+    },
+    {
+      "category": "cost_horizon",
+      "dimension": "family",
+      "expected_visits": "84",
+      "gap_contribution": "0",
+      "gap_share": "0",
+      "method": "beam_bayes",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "decoy_redundancy",
+      "dimension": "family",
+      "expected_visits": "81",
+      "gap_contribution": "0",
+      "gap_share": "0",
+      "method": "beam_bayes",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "random_resource_graph",
+      "dimension": "family",
+      "expected_visits": "68",
+      "gap_contribution": "0",
+      "gap_share": "0",
+      "method": "beam_bayes",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "student_train",
+      "dimension": "fold",
+      "expected_visits": "202",
+      "gap_contribution": "1/5",
+      "gap_share": "1",
+      "method": "beam_bayes",
+      "positive_contexts": "3",
+      "tier": "large"
+    },
+    {
+      "category": "student_validation",
+      "dimension": "fold",
+      "expected_visits": "107",
+      "gap_contribution": "0",
+      "gap_share": "0",
+      "method": "beam_bayes",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "limit_hit",
+      "dimension": "limit",
+      "expected_visits": "7",
+      "gap_contribution": "1/5",
+      "gap_share": "1",
+      "method": "beam_bayes",
+      "positive_contexts": "3",
+      "tier": "large"
+    },
+    {
+      "category": "no_limit",
+      "dimension": "limit",
+      "expected_visits": "302",
+      "gap_contribution": "0",
+      "gap_share": "0",
+      "method": "beam_bayes",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "single_sensing",
+      "dimension": "optimal_types",
+      "expected_visits": "13",
+      "gap_contribution": "0",
+      "gap_share": "0",
+      "method": "beam_bayes",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "single_sensing+task",
+      "dimension": "optimal_types",
+      "expected_visits": "1",
+      "gap_contribution": "0",
+      "gap_share": "0",
+      "method": "beam_bayes",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "task",
+      "dimension": "optimal_types",
+      "expected_visits": "295",
+      "gap_contribution": "1/5",
+      "gap_share": "1",
+      "method": "beam_bayes",
+      "positive_contexts": "3",
+      "tier": "large"
+    },
+    {
+      "category": "nonprior",
+      "dimension": "prior",
+      "expected_visits": "98",
+      "gap_contribution": "0",
+      "gap_share": "0",
+      "method": "beam_bayes",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "prior",
+      "dimension": "prior",
+      "expected_visits": "211",
+      "gap_contribution": "1/5",
+      "gap_share": "1",
+      "method": "beam_bayes",
+      "positive_contexts": "3",
+      "tier": "large"
+    },
+    {
+      "category": "08266990c9b5029ea1c3a7ce99a018f9a27f2c63ad793c8d47a3f8d55caa2357",
+      "dimension": "structure",
+      "expected_visits": "34",
+      "gap_contribution": "0",
+      "gap_share": "0",
+      "method": "beam_bayes",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "249dec9a76ec99233d58619ba68a3a370d1213377bf0031b51d34aa2c21e521f",
+      "dimension": "structure",
+      "expected_visits": "34",
+      "gap_contribution": "0",
+      "gap_share": "0",
+      "method": "beam_bayes",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "2c950aa73de634c95f60fd3f229ae2dee55e5a6c6af6f105534cd0bb363fee07",
+      "dimension": "structure",
+      "expected_visits": "34",
+      "gap_contribution": "0",
+      "gap_share": "0",
+      "method": "beam_bayes",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "324c96768d64a0bcaff04628791733b1623b058aac34f61d057b6f84330703a8",
+      "dimension": "structure",
+      "expected_visits": "42",
+      "gap_contribution": "0",
+      "gap_share": "0",
+      "method": "beam_bayes",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "6a87c6b1c246269c2a071901698091fd7072b585fc228edf02744f7446fd20c4",
+      "dimension": "structure",
+      "expected_visits": "39",
+      "gap_contribution": "0",
+      "gap_share": "0",
+      "method": "beam_bayes",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "6bd414da33f5b92eba6ae2f0483ddbfd7e16ee0a9515ea81440e338c179a6f07",
+      "dimension": "structure",
+      "expected_visits": "42",
+      "gap_contribution": "0",
+      "gap_share": "0",
+      "method": "beam_bayes",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "cb9c4f76bcc7c41bbf19f9e66fc873468d638c282ef7b01ccd340dc34e558cf1",
+      "dimension": "structure",
+      "expected_visits": "42",
+      "gap_contribution": "0",
+      "gap_share": "0",
+      "method": "beam_bayes",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "fe7b7dea7f80dd3ef892f5f1cd07e19b7689269173182aa0288a61257d674cc6",
+      "dimension": "structure",
+      "expected_visits": "42",
+      "gap_contribution": "1/5",
+      "gap_share": "1",
+      "method": "beam_bayes",
+      "positive_contexts": "3",
+      "tier": "large"
+    },
+    {
+      "category": "3",
+      "dimension": "B",
+      "expected_visits": "168",
+      "gap_contribution": "8203/420",
+      "gap_share": "533195/1082322",
+      "method": "beam_bayes",
+      "positive_contexts": "119",
+      "tier": "small"
+    },
+    {
+      "category": "5",
+      "dimension": "B",
+      "expected_visits": "168",
+      "gap_contribution": "549127/27300",
+      "gap_share": "549127/1082322",
+      "method": "beam_bayes",
+      "positive_contexts": "126",
+      "tier": "small"
+    },
+    {
+      "category": "1",
+      "dimension": "H",
+      "expected_visits": "32",
+      "gap_contribution": "653/195",
+      "gap_share": "45710/541161",
+      "method": "beam_bayes",
+      "positive_contexts": "24",
+      "tier": "small"
+    },
+    {
+      "category": "10",
+      "dimension": "H",
+      "expected_visits": "16",
+      "gap_contribution": "2467/910",
+      "gap_share": "12335/180387",
+      "method": "beam_bayes",
+      "positive_contexts": "12",
+      "tier": "small"
+    },
+    {
+      "category": "11",
+      "dimension": "H",
+      "expected_visits": "16",
+      "gap_contribution": "6304/2275",
+      "gap_share": "12608/180387",
+      "method": "beam_bayes",
+      "positive_contexts": "12",
+      "tier": "small"
+    },
+    {
+      "category": "12",
+      "dimension": "H",
+      "expected_visits": "16",
+      "gap_contribution": "6577/2275",
+      "gap_share": "13154/180387",
+      "method": "beam_bayes",
+      "positive_contexts": "12",
+      "tier": "small"
+    },
+    {
+      "category": "2",
+      "dimension": "H",
+      "expected_visits": "32",
+      "gap_contribution": "653/195",
+      "gap_share": "45710/541161",
+      "method": "beam_bayes",
+      "positive_contexts": "24",
+      "tier": "small"
+    },
+    {
+      "category": "3",
+      "dimension": "H",
+      "expected_visits": "32",
+      "gap_contribution": "653/195",
+      "gap_share": "45710/541161",
+      "method": "beam_bayes",
+      "positive_contexts": "24",
+      "tier": "small"
+    },
+    {
+      "category": "4",
+      "dimension": "H",
+      "expected_visits": "32",
+      "gap_contribution": "653/195",
+      "gap_share": "45710/541161",
+      "method": "beam_bayes",
+      "positive_contexts": "24",
+      "tier": "small"
+    },
+    {
+      "category": "5",
+      "dimension": "H",
+      "expected_visits": "32",
+      "gap_contribution": "653/195",
+      "gap_share": "45710/541161",
+      "method": "beam_bayes",
+      "positive_contexts": "24",
+      "tier": "small"
+    },
+    {
+      "category": "6",
+      "dimension": "H",
+      "expected_visits": "32",
+      "gap_contribution": "613/260",
+      "gap_share": "21455/360774",
+      "method": "beam_bayes",
+      "positive_contexts": "17",
+      "tier": "small"
+    },
+    {
+      "category": "7",
+      "dimension": "H",
+      "expected_visits": "32",
+      "gap_contribution": "5169/1820",
+      "gap_share": "8615/120258",
+      "method": "beam_bayes",
+      "positive_contexts": "23",
+      "tier": "small"
+    },
+    {
+      "category": "8",
+      "dimension": "H",
+      "expected_visits": "32",
+      "gap_contribution": "5336/1365",
+      "gap_share": "53360/541161",
+      "method": "beam_bayes",
+      "positive_contexts": "25",
+      "tier": "small"
+    },
+    {
+      "category": "9",
+      "dimension": "H",
+      "expected_visits": "32",
+      "gap_contribution": "2467/455",
+      "gap_share": "24670/180387",
+      "method": "beam_bayes",
+      "positive_contexts": "24",
+      "tier": "small"
+    },
+    {
+      "category": "autopilot",
+      "dimension": "autopilot",
+      "expected_visits": "117",
+      "gap_contribution": "66527/5460",
+      "gap_share": "332635/1082322",
+      "method": "beam_bayes",
+      "positive_contexts": "88",
+      "tier": "small"
+    },
+    {
+      "category": "normal",
+      "dimension": "autopilot",
+      "expected_visits": "219",
+      "gap_contribution": "749687/27300",
+      "gap_share": "749687/1082322",
+      "method": "beam_bayes",
+      "positive_contexts": "157",
+      "tier": "small"
+    },
+    {
+      "category": "task",
+      "dimension": "chosen_type",
+      "expected_visits": "336",
+      "gap_contribution": "180387/4550",
+      "gap_share": "1",
+      "method": "beam_bayes",
+      "positive_contexts": "245",
+      "tier": "small"
+    },
+    {
+      "category": "measurement_optional",
+      "dimension": "decision_class",
+      "expected_visits": "9",
+      "gap_contribution": "31/30",
+      "gap_share": "14105/541161",
+      "method": "beam_bayes",
+      "positive_contexts": "8",
+      "tier": "small"
+    },
+    {
+      "category": "measurement_required",
+      "dimension": "decision_class",
+      "expected_visits": "40",
+      "gap_contribution": "5531/525",
+      "gap_share": "143806/541161",
+      "method": "beam_bayes",
+      "positive_contexts": "40",
+      "tier": "small"
+    },
+    {
+      "category": "nonmeasuring_optimal",
+      "dimension": "decision_class",
+      "expected_visits": "287",
+      "gap_contribution": "365/13",
+      "gap_share": "127750/180387",
+      "method": "beam_bayes",
+      "positive_contexts": "197",
+      "tier": "small"
+    },
+    {
+      "category": "adaptive_hierarchy",
+      "dimension": "family",
+      "expected_visits": "84",
+      "gap_contribution": "48/5",
+      "gap_share": "14560/60129",
+      "method": "beam_bayes",
+      "positive_contexts": "74",
+      "tier": "small"
+    },
+    {
+      "category": "cost_horizon",
+      "dimension": "family",
+      "expected_visits": "84",
+      "gap_contribution": "66/13",
+      "gap_share": "7700/60129",
+      "method": "beam_bayes",
+      "positive_contexts": "33",
+      "tier": "small"
+    },
+    {
+      "category": "decoy_redundancy",
+      "dimension": "family",
+      "expected_visits": "84",
+      "gap_contribution": "717/50",
+      "gap_share": "21749/60129",
+      "method": "beam_bayes",
+      "positive_contexts": "81",
+      "tier": "small"
+    },
+    {
+      "category": "random_resource_graph",
+      "dimension": "family",
+      "expected_visits": "84",
+      "gap_contribution": "372/35",
+      "gap_share": "16120/60129",
+      "method": "beam_bayes",
+      "positive_contexts": "57",
+      "tier": "small"
+    },
+    {
+      "category": "student_train",
+      "dimension": "fold",
+      "expected_visits": "210",
+      "gap_contribution": "4786/195",
+      "gap_share": "335020/541161",
+      "method": "beam_bayes",
+      "positive_contexts": "146",
+      "tier": "small"
+    },
+    {
+      "category": "student_validation",
+      "dimension": "fold",
+      "expected_visits": "126",
+      "gap_contribution": "15857/1050",
+      "gap_share": "206141/541161",
+      "method": "beam_bayes",
+      "positive_contexts": "99",
+      "tier": "small"
+    },
+    {
+      "category": "limit_hit",
+      "dimension": "limit",
+      "expected_visits": "336",
+      "gap_contribution": "180387/4550",
+      "gap_share": "1",
+      "method": "beam_bayes",
+      "positive_contexts": "245",
+      "tier": "small"
+    },
+    {
+      "category": "single_sensing",
+      "dimension": "optimal_types",
+      "expected_visits": "40",
+      "gap_contribution": "5531/525",
+      "gap_share": "143806/541161",
+      "method": "beam_bayes",
+      "positive_contexts": "40",
+      "tier": "small"
+    },
+    {
+      "category": "single_sensing+task",
+      "dimension": "optimal_types",
+      "expected_visits": "9",
+      "gap_contribution": "31/30",
+      "gap_share": "14105/541161",
+      "method": "beam_bayes",
+      "positive_contexts": "8",
+      "tier": "small"
+    },
+    {
+      "category": "task",
+      "dimension": "optimal_types",
+      "expected_visits": "287",
+      "gap_contribution": "365/13",
+      "gap_share": "127750/180387",
+      "method": "beam_bayes",
+      "positive_contexts": "197",
+      "tier": "small"
+    },
+    {
+      "category": "prior",
+      "dimension": "prior",
+      "expected_visits": "336",
+      "gap_contribution": "180387/4550",
+      "gap_share": "1",
+      "method": "beam_bayes",
+      "positive_contexts": "245",
+      "tier": "small"
+    },
+    {
+      "category": "08266990c9b5029ea1c3a7ce99a018f9a27f2c63ad793c8d47a3f8d55caa2357",
+      "dimension": "structure",
+      "expected_visits": "42",
+      "gap_contribution": "22/3",
+      "gap_share": "100100/541161",
+      "method": "beam_bayes",
+      "positive_contexts": "40",
+      "tier": "small"
+    },
+    {
+      "category": "249dec9a76ec99233d58619ba68a3a370d1213377bf0031b51d34aa2c21e521f",
+      "dimension": "structure",
+      "expected_visits": "42",
+      "gap_contribution": "24/7",
+      "gap_share": "5200/60129",
+      "method": "beam_bayes",
+      "positive_contexts": "18",
+      "tier": "small"
+    },
+    {
+      "category": "2c950aa73de634c95f60fd3f229ae2dee55e5a6c6af6f105534cd0bb363fee07",
+      "dimension": "structure",
+      "expected_visits": "42",
+      "gap_contribution": "36/5",
+      "gap_share": "3640/20043",
+      "method": "beam_bayes",
+      "positive_contexts": "39",
+      "tier": "small"
+    },
+    {
+      "category": "324c96768d64a0bcaff04628791733b1623b058aac34f61d057b6f84330703a8",
+      "dimension": "structure",
+      "expected_visits": "42",
+      "gap_contribution": "10",
+      "gap_share": "45500/180387",
+      "method": "beam_bayes",
+      "positive_contexts": "40",
+      "tier": "small"
+    },
+    {
+      "category": "6a87c6b1c246269c2a071901698091fd7072b585fc228edf02744f7446fd20c4",
+      "dimension": "structure",
+      "expected_visits": "42",
+      "gap_contribution": "217/50",
+      "gap_share": "19747/180387",
+      "method": "beam_bayes",
+      "positive_contexts": "41",
+      "tier": "small"
+    },
+    {
+      "category": "6bd414da33f5b92eba6ae2f0483ddbfd7e16ee0a9515ea81440e338c179a6f07",
+      "dimension": "structure",
+      "expected_visits": "42",
+      "gap_contribution": "66/13",
+      "gap_share": "7700/60129",
+      "method": "beam_bayes",
+      "positive_contexts": "33",
+      "tier": "small"
+    },
+    {
+      "category": "cb9c4f76bcc7c41bbf19f9e66fc873468d638c282ef7b01ccd340dc34e558cf1",
+      "dimension": "structure",
+      "expected_visits": "42",
+      "gap_contribution": "0",
+      "gap_share": "0",
+      "method": "beam_bayes",
+      "positive_contexts": "0",
+      "tier": "small"
+    },
+    {
+      "category": "fe7b7dea7f80dd3ef892f5f1cd07e19b7689269173182aa0288a61257d674cc6",
+      "dimension": "structure",
+      "expected_visits": "42",
+      "gap_contribution": "34/15",
+      "gap_share": "1820/31833",
+      "method": "beam_bayes",
+      "positive_contexts": "34",
+      "tier": "small"
+    },
+    {
+      "category": "3",
+      "dimension": "B",
+      "expected_visits": "156",
+      "gap_contribution": "0",
+      "gap_share": null,
+      "method": "one_step_voi",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "5",
+      "dimension": "B",
+      "expected_visits": "153",
+      "gap_contribution": "0",
+      "gap_share": null,
+      "method": "one_step_voi",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "1",
+      "dimension": "H",
+      "expected_visits": "32",
+      "gap_contribution": "0",
+      "gap_share": null,
+      "method": "one_step_voi",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "10",
+      "dimension": "H",
+      "expected_visits": "9",
+      "gap_contribution": "0",
+      "gap_share": null,
+      "method": "one_step_voi",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "11",
+      "dimension": "H",
+      "expected_visits": "9",
+      "gap_contribution": "0",
+      "gap_share": null,
+      "method": "one_step_voi",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "12",
+      "dimension": "H",
+      "expected_visits": "16",
+      "gap_contribution": "0",
+      "gap_share": null,
+      "method": "one_step_voi",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "2",
+      "dimension": "H",
+      "expected_visits": "32",
+      "gap_contribution": "0",
+      "gap_share": null,
+      "method": "one_step_voi",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "3",
+      "dimension": "H",
+      "expected_visits": "32",
+      "gap_contribution": "0",
+      "gap_share": null,
+      "method": "one_step_voi",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "4",
+      "dimension": "H",
+      "expected_visits": "32",
+      "gap_contribution": "0",
+      "gap_share": null,
+      "method": "one_step_voi",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "5",
+      "dimension": "H",
+      "expected_visits": "32",
+      "gap_contribution": "0",
+      "gap_share": null,
+      "method": "one_step_voi",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "6",
+      "dimension": "H",
+      "expected_visits": "32",
+      "gap_contribution": "0",
+      "gap_share": null,
+      "method": "one_step_voi",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "7",
+      "dimension": "H",
+      "expected_visits": "26",
+      "gap_contribution": "0",
+      "gap_share": null,
+      "method": "one_step_voi",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "8",
+      "dimension": "H",
+      "expected_visits": "26",
+      "gap_contribution": "0",
+      "gap_share": null,
+      "method": "one_step_voi",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "9",
+      "dimension": "H",
+      "expected_visits": "31",
+      "gap_contribution": "0",
+      "gap_share": null,
+      "method": "one_step_voi",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "normal",
+      "dimension": "autopilot",
+      "expected_visits": "309",
+      "gap_contribution": "0",
+      "gap_share": null,
+      "method": "one_step_voi",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "single_sensing",
+      "dimension": "chosen_type",
+      "expected_visits": "13",
+      "gap_contribution": "0",
+      "gap_share": null,
+      "method": "one_step_voi",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "task",
+      "dimension": "chosen_type",
+      "expected_visits": "296",
+      "gap_contribution": "0",
+      "gap_share": null,
+      "method": "one_step_voi",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "measurement_optional",
+      "dimension": "decision_class",
+      "expected_visits": "1",
+      "gap_contribution": "0",
+      "gap_share": null,
+      "method": "one_step_voi",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "measurement_required",
+      "dimension": "decision_class",
+      "expected_visits": "13",
+      "gap_contribution": "0",
+      "gap_share": null,
+      "method": "one_step_voi",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "nonmeasuring_optimal",
+      "dimension": "decision_class",
+      "expected_visits": "295",
+      "gap_contribution": "0",
+      "gap_share": null,
+      "method": "one_step_voi",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "adaptive_hierarchy",
+      "dimension": "family",
+      "expected_visits": "76",
+      "gap_contribution": "0",
+      "gap_share": null,
+      "method": "one_step_voi",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "cost_horizon",
+      "dimension": "family",
+      "expected_visits": "84",
+      "gap_contribution": "0",
+      "gap_share": null,
+      "method": "one_step_voi",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "decoy_redundancy",
+      "dimension": "family",
+      "expected_visits": "81",
+      "gap_contribution": "0",
+      "gap_share": null,
+      "method": "one_step_voi",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "random_resource_graph",
+      "dimension": "family",
+      "expected_visits": "68",
+      "gap_contribution": "0",
+      "gap_share": null,
+      "method": "one_step_voi",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "student_train",
+      "dimension": "fold",
+      "expected_visits": "202",
+      "gap_contribution": "0",
+      "gap_share": null,
+      "method": "one_step_voi",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "student_validation",
+      "dimension": "fold",
+      "expected_visits": "107",
+      "gap_contribution": "0",
+      "gap_share": null,
+      "method": "one_step_voi",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "no_limit",
+      "dimension": "limit",
+      "expected_visits": "309",
+      "gap_contribution": "0",
+      "gap_share": null,
+      "method": "one_step_voi",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "single_sensing",
+      "dimension": "optimal_types",
+      "expected_visits": "13",
+      "gap_contribution": "0",
+      "gap_share": null,
+      "method": "one_step_voi",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "single_sensing+task",
+      "dimension": "optimal_types",
+      "expected_visits": "1",
+      "gap_contribution": "0",
+      "gap_share": null,
+      "method": "one_step_voi",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "task",
+      "dimension": "optimal_types",
+      "expected_visits": "295",
+      "gap_contribution": "0",
+      "gap_share": null,
+      "method": "one_step_voi",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "nonprior",
+      "dimension": "prior",
+      "expected_visits": "98",
+      "gap_contribution": "0",
+      "gap_share": null,
+      "method": "one_step_voi",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "prior",
+      "dimension": "prior",
+      "expected_visits": "211",
+      "gap_contribution": "0",
+      "gap_share": null,
+      "method": "one_step_voi",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "08266990c9b5029ea1c3a7ce99a018f9a27f2c63ad793c8d47a3f8d55caa2357",
+      "dimension": "structure",
+      "expected_visits": "34",
+      "gap_contribution": "0",
+      "gap_share": null,
+      "method": "one_step_voi",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "249dec9a76ec99233d58619ba68a3a370d1213377bf0031b51d34aa2c21e521f",
+      "dimension": "structure",
+      "expected_visits": "34",
+      "gap_contribution": "0",
+      "gap_share": null,
+      "method": "one_step_voi",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "2c950aa73de634c95f60fd3f229ae2dee55e5a6c6af6f105534cd0bb363fee07",
+      "dimension": "structure",
+      "expected_visits": "34",
+      "gap_contribution": "0",
+      "gap_share": null,
+      "method": "one_step_voi",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "324c96768d64a0bcaff04628791733b1623b058aac34f61d057b6f84330703a8",
+      "dimension": "structure",
+      "expected_visits": "42",
+      "gap_contribution": "0",
+      "gap_share": null,
+      "method": "one_step_voi",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "6a87c6b1c246269c2a071901698091fd7072b585fc228edf02744f7446fd20c4",
+      "dimension": "structure",
+      "expected_visits": "39",
+      "gap_contribution": "0",
+      "gap_share": null,
+      "method": "one_step_voi",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "6bd414da33f5b92eba6ae2f0483ddbfd7e16ee0a9515ea81440e338c179a6f07",
+      "dimension": "structure",
+      "expected_visits": "42",
+      "gap_contribution": "0",
+      "gap_share": null,
+      "method": "one_step_voi",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "cb9c4f76bcc7c41bbf19f9e66fc873468d638c282ef7b01ccd340dc34e558cf1",
+      "dimension": "structure",
+      "expected_visits": "42",
+      "gap_contribution": "0",
+      "gap_share": null,
+      "method": "one_step_voi",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "fe7b7dea7f80dd3ef892f5f1cd07e19b7689269173182aa0288a61257d674cc6",
+      "dimension": "structure",
+      "expected_visits": "42",
+      "gap_contribution": "0",
+      "gap_share": null,
+      "method": "one_step_voi",
+      "positive_contexts": "0",
+      "tier": "large"
+    },
+    {
+      "category": "3",
+      "dimension": "B",
+      "expected_visits": "156",
+      "gap_contribution": "617/60",
+      "gap_share": "280735/659202",
+      "method": "one_step_voi",
+      "positive_contexts": "60",
+      "tier": "small"
+    },
+    {
+      "category": "5",
+      "dimension": "B",
+      "expected_visits": "160",
+      "gap_contribution": "378467/27300",
+      "gap_share": "378467/659202",
+      "method": "one_step_voi",
+      "positive_contexts": "89",
+      "tier": "small"
+    },
+    {
+      "category": "1",
+      "dimension": "H",
+      "expected_visits": "32",
+      "gap_contribution": "4736/1365",
+      "gap_share": "47360/329601",
+      "method": "one_step_voi",
+      "positive_contexts": "22",
+      "tier": "small"
+    },
+    {
+      "category": "10",
+      "dimension": "H",
+      "expected_visits": "16",
+      "gap_contribution": "3/7",
+      "gap_share": "1950/109867",
+      "method": "one_step_voi",
+      "positive_contexts": "2",
+      "tier": "small"
+    },
+    {
+      "category": "11",
+      "dimension": "H",
+      "expected_visits": "16",
+      "gap_contribution": "461/350",
+      "gap_share": "5993/109867",
+      "method": "one_step_voi",
+      "positive_contexts": "7",
+      "tier": "small"
+    },
+    {
+      "category": "12",
+      "dimension": "H",
+      "expected_visits": "16",
+      "gap_contribution": "503/350",
+      "gap_share": "6539/109867",
+      "method": "one_step_voi",
+      "positive_contexts": "7",
+      "tier": "small"
+    },
+    {
+      "category": "2",
+      "dimension": "H",
+      "expected_visits": "32",
+      "gap_contribution": "17579/5460",
+      "gap_share": "87895/659202",
+      "method": "one_step_voi",
+      "positive_contexts": "21",
+      "tier": "small"
+    },
+    {
+      "category": "3",
+      "dimension": "H",
+      "expected_visits": "32",
+      "gap_contribution": "3443/1092",
+      "gap_share": "86075/659202",
+      "method": "one_step_voi",
+      "positive_contexts": "20",
+      "tier": "small"
+    },
+    {
+      "category": "4",
+      "dimension": "H",
+      "expected_visits": "32",
+      "gap_contribution": "3275/1092",
+      "gap_share": "81875/659202",
+      "method": "one_step_voi",
+      "positive_contexts": "19",
+      "tier": "small"
+    },
+    {
+      "category": "5",
+      "dimension": "H",
+      "expected_visits": "32",
+      "gap_contribution": "3275/1092",
+      "gap_share": "81875/659202",
+      "method": "one_step_voi",
+      "positive_contexts": "19",
+      "tier": "small"
+    },
+    {
+      "category": "6",
+      "dimension": "H",
+      "expected_visits": "32",
+      "gap_contribution": "293/130",
+      "gap_share": "10255/109867",
+      "method": "one_step_voi",
+      "positive_contexts": "14",
+      "tier": "small"
+    },
+    {
+      "category": "7",
+      "dimension": "H",
+      "expected_visits": "26",
+      "gap_contribution": "565/546",
+      "gap_share": "14125/329601",
+      "method": "one_step_voi",
+      "positive_contexts": "8",
+      "tier": "small"
+    },
+    {
+      "category": "8",
+      "dimension": "H",
+      "expected_visits": "22",
+      "gap_contribution": "3761/2730",
+      "gap_share": "18805/329601",
+      "method": "one_step_voi",
+      "positive_contexts": "8",
+      "tier": "small"
+    },
+    {
+      "category": "9",
+      "dimension": "H",
+      "expected_visits": "28",
+      "gap_contribution": "16/35",
+      "gap_share": "2080/109867",
+      "method": "one_step_voi",
+      "positive_contexts": "2",
+      "tier": "small"
+    },
+    {
+      "category": "autopilot",
+      "dimension": "autopilot",
+      "expected_visits": "125",
+      "gap_contribution": "105107/5460",
+      "gap_share": "525535/659202",
+      "method": "one_step_voi",
+      "positive_contexts": "124",
+      "tier": "small"
+    },
+    {
+      "category": "normal",
+      "dimension": "autopilot",
+      "expected_visits": "191",
+      "gap_contribution": "133667/27300",
+      "gap_share": "133667/659202",
+      "method": "one_step_voi",
+      "positive_contexts": "25",
+      "tier": "small"
+    },
+    {
+      "category": "single_sensing",
+      "dimension": "chosen_type",
+      "expected_visits": "10",
+      "gap_contribution": "0",
+      "gap_share": "0",
+      "method": "one_step_voi",
+      "positive_contexts": "0",
+      "tier": "small"
+    },
+    {
+      "category": "task",
+      "dimension": "chosen_type",
+      "expected_visits": "306",
+      "gap_contribution": "109867/4550",
+      "gap_share": "1",
+      "method": "one_step_voi",
+      "positive_contexts": "149",
+      "tier": "small"
+    },
+    {
+      "category": "measurement_optional",
+      "dimension": "decision_class",
+      "expected_visits": "1",
+      "gap_contribution": "0",
+      "gap_share": "0",
+      "method": "one_step_voi",
+      "positive_contexts": "0",
+      "tier": "small"
+    },
+    {
+      "category": "measurement_required",
+      "dimension": "decision_class",
+      "expected_visits": "32",
+      "gap_contribution": "737/175",
+      "gap_share": "19162/109867",
+      "method": "one_step_voi",
+      "positive_contexts": "22",
+      "tier": "small"
+    },
+    {
+      "category": "nonmeasuring_optimal",
+      "dimension": "decision_class",
+      "expected_visits": "283",
+      "gap_contribution": "18141/910",
+      "gap_share": "90705/109867",
+      "method": "one_step_voi",
+      "positive_contexts": "127",
+      "tier": "small"
+    },
+    {
+      "category": "adaptive_hierarchy",
+      "dimension": "family",
+      "expected_visits": "76",
+      "gap_contribution": "6",
+      "gap_share": "27300/109867",
+      "method": "one_step_voi",
+      "positive_contexts": "44",
+      "tier": "small"
+    },
+    {
+      "category": "cost_horizon",
+      "dimension": "family",
+      "expected_visits": "84",
+      "gap_contribution": "22/13",
+      "gap_share": "7700/109867",
+      "method": "one_step_voi",
+      "positive_contexts": "11",
+      "tier": "small"
+    },
+    {
+      "category": "decoy_redundancy",
+      "dimension": "family",
+      "expected_visits": "84",
+      "gap_contribution": "417/50",
+      "gap_share": "37947/109867",
+      "method": "one_step_voi",
+      "positive_contexts": "50",
+      "tier": "small"
+    },
+    {
+      "category": "random_resource_graph",
+      "dimension": "family",
+      "expected_visits": "72",
+      "gap_contribution": "284/35",
+      "gap_share": "36920/109867",
+      "method": "one_step_voi",
+      "positive_contexts": "44",
+      "tier": "small"
+    },
+    {
+      "category": "student_train",
+      "dimension": "fold",
+      "expected_visits": "202",
+      "gap_contribution": "1689/130",
+      "gap_share": "59115/109867",
+      "method": "one_step_voi",
+      "positive_contexts": "76",
+      "tier": "small"
+    },
+    {
+      "category": "student_validation",
+      "dimension": "fold",
+      "expected_visits": "114",
+      "gap_contribution": "1952/175",
+      "gap_share": "50752/109867",
+      "method": "one_step_voi",
+      "positive_contexts": "73",
+      "tier": "small"
+    },
+    {
+      "category": "limit_hit",
+      "dimension": "limit",
+      "expected_visits": "209",
+      "gap_contribution": "109867/4550",
+      "gap_share": "1",
+      "method": "one_step_voi",
+      "positive_contexts": "149",
+      "tier": "small"
+    },
+    {
+      "category": "no_limit",
+      "dimension": "limit",
+      "expected_visits": "107",
+      "gap_contribution": "0",
+      "gap_share": "0",
+      "method": "one_step_voi",
+      "positive_contexts": "0",
+      "tier": "small"
+    },
+    {
+      "category": "single_sensing",
+      "dimension": "optimal_types",
+      "expected_visits": "32",
+      "gap_contribution": "737/175",
+      "gap_share": "19162/109867",
+      "method": "one_step_voi",
+      "positive_contexts": "22",
+      "tier": "small"
+    },
+    {
+      "category": "single_sensing+task",
+      "dimension": "optimal_types",
+      "expected_visits": "1",
+      "gap_contribution": "0",
+      "gap_share": "0",
+      "method": "one_step_voi",
+      "positive_contexts": "0",
+      "tier": "small"
+    },
+    {
+      "category": "task",
+      "dimension": "optimal_types",
+      "expected_visits": "283",
+      "gap_contribution": "18141/910",
+      "gap_share": "90705/109867",
+      "method": "one_step_voi",
+      "positive_contexts": "127",
+      "tier": "small"
+    },
+    {
+      "category": "nonprior",
+      "dimension": "prior",
+      "expected_visits": "64",
+      "gap_contribution": "64/7",
+      "gap_share": "41600/109867",
+      "method": "one_step_voi",
+      "positive_contexts": "53",
+      "tier": "small"
+    },
+    {
+      "category": "prior",
+      "dimension": "prior",
+      "expected_visits": "252",
+      "gap_contribution": "68267/4550",
+      "gap_share": "68267/109867",
+      "method": "one_step_voi",
+      "positive_contexts": "96",
+      "tier": "small"
+    },
+    {
+      "category": "08266990c9b5029ea1c3a7ce99a018f9a27f2c63ad793c8d47a3f8d55caa2357",
+      "dimension": "structure",
+      "expected_visits": "34",
+      "gap_contribution": "5",
+      "gap_share": "22750/109867",
+      "method": "one_step_voi",
+      "positive_contexts": "29",
+      "tier": "small"
+    },
+    {
+      "category": "249dec9a76ec99233d58619ba68a3a370d1213377bf0031b51d34aa2c21e521f",
+      "dimension": "structure",
+      "expected_visits": "38",
+      "gap_contribution": "116/35",
+      "gap_share": "15080/109867",
+      "method": "one_step_voi",
+      "positive_contexts": "16",
+      "tier": "small"
+    },
+    {
+      "category": "2c950aa73de634c95f60fd3f229ae2dee55e5a6c6af6f105534cd0bb363fee07",
+      "dimension": "structure",
+      "expected_visits": "34",
+      "gap_contribution": "24/5",
+      "gap_share": "21840/109867",
+      "method": "one_step_voi",
+      "positive_contexts": "28",
+      "tier": "small"
+    },
+    {
+      "category": "324c96768d64a0bcaff04628791733b1623b058aac34f61d057b6f84330703a8",
+      "dimension": "structure",
+      "expected_visits": "42",
+      "gap_contribution": "11/2",
+      "gap_share": "25025/109867",
+      "method": "one_step_voi",
+      "positive_contexts": "22",
+      "tier": "small"
+    },
+    {
+      "category": "6a87c6b1c246269c2a071901698091fd7072b585fc228edf02744f7446fd20c4",
+      "dimension": "structure",
+      "expected_visits": "42",
+      "gap_contribution": "71/25",
+      "gap_share": "12922/109867",
+      "method": "one_step_voi",
+      "positive_contexts": "28",
+      "tier": "small"
+    },
+    {
+      "category": "6bd414da33f5b92eba6ae2f0483ddbfd7e16ee0a9515ea81440e338c179a6f07",
+      "dimension": "structure",
+      "expected_visits": "42",
+      "gap_contribution": "22/13",
+      "gap_share": "7700/109867",
+      "method": "one_step_voi",
+      "positive_contexts": "11",
+      "tier": "small"
+    },
+    {
+      "category": "cb9c4f76bcc7c41bbf19f9e66fc873468d638c282ef7b01ccd340dc34e558cf1",
+      "dimension": "structure",
+      "expected_visits": "42",
+      "gap_contribution": "0",
+      "gap_share": "0",
+      "method": "one_step_voi",
+      "positive_contexts": "0",
+      "tier": "small"
+    },
+    {
+      "category": "fe7b7dea7f80dd3ef892f5f1cd07e19b7689269173182aa0288a61257d674cc6",
+      "dimension": "structure",
+      "expected_visits": "42",
+      "gap_contribution": "1",
+      "gap_share": "4550/109867",
+      "method": "one_step_voi",
+      "positive_contexts": "15",
+      "tier": "small"
+    }
+  ],
+  "occupancy_summary": [
+    {
+      "concentration_curve": [
+        {
+          "cumulative_gap": "1/15",
+          "rank": 1,
+          "share": "1/3"
+        },
+        {
+          "cumulative_gap": "2/15",
+          "rank": 2,
+          "share": "2/3"
+        },
+        {
+          "cumulative_gap": "1/5",
+          "rank": 3,
+          "share": "1"
+        }
+      ],
+      "context_rows": "407",
+      "episodes": "32",
+      "expected_bad_visits_sum": "3",
+      "expected_expansions_sum": "522099/2",
+      "expected_model_calls_sum": "2045696",
+      "expected_visits_sum": "309",
+      "gap_sum": "1/5",
+      "mean_gap": "1/160",
+      "method": "beam_bayes",
+      "positive_contexts": "3",
+      "positive_gap_episodes": "1",
+      "positive_gap_groups": 1,
+      "positive_sufficient_states": 3,
+      "tier": "large",
+      "top_state_share": "1/3"
+    },
+    {
+      "concentration_curve": [
+        {
+          "cumulative_gap": "1/3",
+          "rank": 1,
+          "share": "4550/541161"
+        },
+        {
+          "cumulative_gap": "2/3",
+          "rank": 2,
+          "share": "9100/541161"
+        },
+        {
+          "cumulative_gap": "1",
+          "rank": 3,
+          "share": "4550/180387"
+        },
+        {
+          "cumulative_gap": "4/3",
+          "rank": 4,
+          "share": "18200/541161"
+        },
+        {
+          "cumulative_gap": "5/3",
+          "rank": 5,
+          "share": "22750/541161"
+        },
+        {
+          "cumulative_gap": "2",
+          "rank": 6,
+          "share": "9100/180387"
+        },
+        {
+          "cumulative_gap": "7/3",
+          "rank": 7,
+          "share": "31850/541161"
+        },
+        {
+          "cumulative_gap": "8/3",
+          "rank": 8,
+          "share": "36400/541161"
+        },
+        {
+          "cumulative_gap": "3",
+          "rank": 9,
+          "share": "4550/60129"
+        },
+        {
+          "cumulative_gap": "10/3",
+          "rank": 10,
+          "share": "45500/541161"
+        },
+        {
+          "cumulative_gap": "11/3",
+          "rank": 11,
+          "share": "50050/541161"
+        },
+        {
+          "cumulative_gap": "4",
+          "rank": 12,
+          "share": "18200/180387"
+        },
+        {
+          "cumulative_gap": "13/3",
+          "rank": 13,
+          "share": "59150/541161"
+        },
+        {
+          "cumulative_gap": "14/3",
+          "rank": 14,
+          "share": "63700/541161"
+        },
+        {
+          "cumulative_gap": "5",
+          "rank": 15,
+          "share": "22750/180387"
+        },
+        {
+          "cumulative_gap": "16/3",
+          "rank": 16,
+          "share": "72800/541161"
+        },
+        {
+          "cumulative_gap": "17/3",
+          "rank": 17,
+          "share": "4550/31833"
+        },
+        {
+          "cumulative_gap": "6",
+          "rank": 18,
+          "share": "9100/60129"
+        },
+        {
+          "cumulative_gap": "19/3",
+          "rank": 19,
+          "share": "86450/541161"
+        },
+        {
+          "cumulative_gap": "20/3",
+          "rank": 20,
+          "share": "91000/541161"
+        },
+        {
+          "cumulative_gap": "521/75",
+          "rank": 21,
+          "share": "94822/541161"
+        },
+        {
+          "cumulative_gap": "2159/300",
+          "rank": 22,
+          "share": "11557/63666"
+        },
+        {
+          "cumulative_gap": "1117/150",
+          "rank": 23,
+          "share": "101647/541161"
+        },
+        {
+          "cumulative_gap": "2309/300",
+          "rank": 24,
+          "share": "210119/1082322"
+        },
+        {
+          "cumulative_gap": "596/75",
+          "rank": 25,
+          "share": "108472/541161"
+        },
+        {
+          "cumulative_gap": "2459/300",
+          "rank": 26,
+          "share": "223769/1082322"
+        },
+        {
+          "cumulative_gap": "1267/150",
+          "rank": 27,
+          "share": "115297/541161"
+        },
+        {
+          "cumulative_gap": "2609/300",
+          "rank": 28,
+          "share": "237419/1082322"
+        },
+        {
+          "cumulative_gap": "671/75",
+          "rank": 29,
+          "share": "122122/541161"
+        },
+        {
+          "cumulative_gap": "2759/300",
+          "rank": 30,
+          "share": "251069/1082322"
+        },
+        {
+          "cumulative_gap": "1417/150",
+          "rank": 31,
+          "share": "128947/541161"
+        },
+        {
+          "cumulative_gap": "2909/300",
+          "rank": 32,
+          "share": "264719/1082322"
+        },
+        {
+          "cumulative_gap": "746/75",
+          "rank": 33,
+          "share": "135772/541161"
+        },
+        {
+          "cumulative_gap": "3059/300",
+          "rank": 34,
+          "share": "278369/1082322"
+        },
+        {
+          "cumulative_gap": "1567/150",
+          "rank": 35,
+          "share": "142597/541161"
+        },
+        {
+          "cumulative_gap": "3209/300",
+          "rank": 36,
+          "share": "292019/1082322"
+        },
+        {
+          "cumulative_gap": "821/75",
+          "rank": 37,
+          "share": "149422/541161"
+        },
+        {
+          "cumulative_gap": "3359/300",
+          "rank": 38,
+          "share": "305669/1082322"
+        },
+        {
+          "cumulative_gap": "1717/150",
+          "rank": 39,
+          "share": "9191/31833"
+        },
+        {
+          "cumulative_gap": "3509/300",
+          "rank": 40,
+          "share": "319319/1082322"
+        },
+        {
+          "cumulative_gap": "896/75",
+          "rank": 41,
+          "share": "163072/541161"
+        },
+        {
+          "cumulative_gap": "3659/300",
+          "rank": 42,
+          "share": "332969/1082322"
+        },
+        {
+          "cumulative_gap": "1867/150",
+          "rank": 43,
+          "share": "169897/541161"
+        },
+        {
+          "cumulative_gap": "3809/300",
+          "rank": 44,
+          "share": "346619/1082322"
+        },
+        {
+          "cumulative_gap": "971/75",
+          "rank": 45,
+          "share": "176722/541161"
+        },
+        {
+          "cumulative_gap": "3959/300",
+          "rank": 46,
+          "share": "360269/1082322"
+        },
+        {
+          "cumulative_gap": "2017/150",
+          "rank": 47,
+          "share": "183547/541161"
+        },
+        {
+          "cumulative_gap": "4109/300",
+          "rank": 48,
+          "share": "373919/1082322"
+        },
+        {
+          "cumulative_gap": "1046/75",
+          "rank": 49,
+          "share": "190372/541161"
+        },
+        {
+          "cumulative_gap": "4259/300",
+          "rank": 50,
+          "share": "387569/1082322"
+        },
+        {
+          "cumulative_gap": "2167/150",
+          "rank": 51,
+          "share": "197197/541161"
+        },
+        {
+          "cumulative_gap": "4409/300",
+          "rank": 52,
+          "share": "401219/1082322"
+        },
+        {
+          "cumulative_gap": "1121/75",
+          "rank": 53,
+          "share": "204022/541161"
+        },
+        {
+          "cumulative_gap": "4559/300",
+          "rank": 54,
+          "share": "414869/1082322"
+        },
+        {
+          "cumulative_gap": "2317/150",
+          "rank": 55,
+          "share": "210847/541161"
+        },
+        {
+          "cumulative_gap": "4709/300",
+          "rank": 56,
+          "share": "25207/63666"
+        },
+        {
+          "cumulative_gap": "1196/75",
+          "rank": 57,
+          "share": "217672/541161"
+        },
+        {
+          "cumulative_gap": "4859/300",
+          "rank": 58,
+          "share": "442169/1082322"
+        },
+        {
+          "cumulative_gap": "2467/150",
+          "rank": 59,
+          "share": "224497/541161"
+        },
+        {
+          "cumulative_gap": "5009/300",
+          "rank": 60,
+          "share": "455819/1082322"
+        },
+        {
+          "cumulative_gap": "1271/75",
+          "rank": 61,
+          "share": "231322/541161"
+        },
+        {
+          "cumulative_gap": "9017/525",
+          "rank": 62,
+          "share": "234442/541161"
+        },
+        {
+          "cumulative_gap": "9137/525",
+          "rank": 63,
+          "share": "237562/541161"
+        },
+        {
+          "cumulative_gap": "9257/525",
+          "rank": 64,
+          "share": "240682/541161"
+        },
+        {
+          "cumulative_gap": "9377/525",
+          "rank": 65,
+          "share": "243802/541161"
+        },
+        {
+          "cumulative_gap": "9497/525",
+          "rank": 66,
+          "share": "246922/541161"
+        },
+        {
+          "cumulative_gap": "9617/525",
+          "rank": 67,
+          "share": "250042/541161"
+        },
+        {
+          "cumulative_gap": "1391/75",
+          "rank": 68,
+          "share": "253162/541161"
+        },
+        {
+          "cumulative_gap": "9857/525",
+          "rank": 69,
+          "share": "256282/541161"
+        },
+        {
+          "cumulative_gap": "9977/525",
+          "rank": 70,
+          "share": "259402/541161"
+        },
+        {
+          "cumulative_gap": "10097/525",
+          "rank": 71,
+          "share": "262522/541161"
+        },
+        {
+          "cumulative_gap": "10217/525",
+          "rank": 72,
+          "share": "15626/31833"
+        },
+        {
+          "cumulative_gap": "10337/525",
+          "rank": 73,
+          "share": "268762/541161"
+        },
+        {
+          "cumulative_gap": "10457/525",
+          "rank": 74,
+          "share": "271882/541161"
+        },
+        {
+          "cumulative_gap": "1511/75",
+          "rank": 75,
+          "share": "275002/541161"
+        },
+        {
+          "cumulative_gap": "1523/75",
+          "rank": 76,
+          "share": "277186/541161"
+        },
+        {
+          "cumulative_gap": "19949/975",
+          "rank": 77,
+          "share": "279286/541161"
+        },
+        {
+          "cumulative_gap": "20099/975",
+          "rank": 78,
+          "share": "281386/541161"
+        },
+        {
+          "cumulative_gap": "20249/975",
+          "rank": 79,
+          "share": "283486/541161"
+        },
+        {
+          "cumulative_gap": "20399/975",
+          "rank": 80,
+          "share": "285586/541161"
+        },
+        {
+          "cumulative_gap": "20549/975",
+          "rank": 81,
+          "share": "287686/541161"
+        },
+        {
+          "cumulative_gap": "20699/975",
+          "rank": 82,
+          "share": "289786/541161"
+        },
+        {
+          "cumulative_gap": "20849/975",
+          "rank": 83,
+          "share": "291886/541161"
+        },
+        {
+          "cumulative_gap": "20999/975",
+          "rank": 84,
+          "share": "293986/541161"
+        },
+        {
+          "cumulative_gap": "21149/975",
+          "rank": 85,
+          "share": "296086/541161"
+        },
+        {
+          "cumulative_gap": "21299/975",
+          "rank": 86,
+          "share": "298186/541161"
+        },
+        {
+          "cumulative_gap": "21449/975",
+          "rank": 87,
+          "share": "300286/541161"
+        },
+        {
+          "cumulative_gap": "21599/975",
+          "rank": 88,
+          "share": "302386/541161"
+        },
+        {
+          "cumulative_gap": "1673/75",
+          "rank": 89,
+          "share": "304486/541161"
+        },
+        {
+          "cumulative_gap": "21899/975",
+          "rank": 90,
+          "share": "306586/541161"
+        },
+        {
+          "cumulative_gap": "22049/975",
+          "rank": 91,
+          "share": "18158/31833"
+        },
+        {
+          "cumulative_gap": "22199/975",
+          "rank": 92,
+          "share": "310786/541161"
+        },
+        {
+          "cumulative_gap": "22349/975",
+          "rank": 93,
+          "share": "312886/541161"
+        },
+        {
+          "cumulative_gap": "22499/975",
+          "rank": 94,
+          "share": "314986/541161"
+        },
+        {
+          "cumulative_gap": "22649/975",
+          "rank": 95,
+          "share": "317086/541161"
+        },
+        {
+          "cumulative_gap": "22799/975",
+          "rank": 96,
+          "share": "319186/541161"
+        },
+        {
+          "cumulative_gap": "22949/975",
+          "rank": 97,
+          "share": "321286/541161"
+        },
+        {
+          "cumulative_gap": "23099/975",
+          "rank": 98,
+          "share": "323386/541161"
+        },
+        {
+          "cumulative_gap": "23249/975",
+          "rank": 99,
+          "share": "325486/541161"
+        },
+        {
+          "cumulative_gap": "23399/975",
+          "rank": 100,
+          "share": "327586/541161"
+        },
+        {
+          "cumulative_gap": "23549/975",
+          "rank": 101,
+          "share": "329686/541161"
+        },
+        {
+          "cumulative_gap": "1823/75",
+          "rank": 102,
+          "share": "331786/541161"
+        },
+        {
+          "cumulative_gap": "23849/975",
+          "rank": 103,
+          "share": "333886/541161"
+        },
+        {
+          "cumulative_gap": "23999/975",
+          "rank": 104,
+          "share": "335986/541161"
+        },
+        {
+          "cumulative_gap": "24149/975",
+          "rank": 105,
+          "share": "338086/541161"
+        },
+        {
+          "cumulative_gap": "24299/975",
+          "rank": 106,
+          "share": "340186/541161"
+        },
+        {
+          "cumulative_gap": "24449/975",
+          "rank": 107,
+          "share": "342286/541161"
+        },
+        {
+          "cumulative_gap": "24599/975",
+          "rank": 108,
+          "share": "20258/31833"
+        },
+        {
+          "cumulative_gap": "24749/975",
+          "rank": 109,
+          "share": "346486/541161"
+        },
+        {
+          "cumulative_gap": "8293/325",
+          "rank": 110,
+          "share": "116102/180387"
+        },
+        {
+          "cumulative_gap": "25009/975",
+          "rank": 111,
+          "share": "350126/541161"
+        },
+        {
+          "cumulative_gap": "25139/975",
+          "rank": 112,
+          "share": "351946/541161"
+        },
+        {
+          "cumulative_gap": "8423/325",
+          "rank": 113,
+          "share": "117922/180387"
+        },
+        {
+          "cumulative_gap": "25399/975",
+          "rank": 114,
+          "share": "355586/541161"
+        },
+        {
+          "cumulative_gap": "25529/975",
+          "rank": 115,
+          "share": "357406/541161"
+        },
+        {
+          "cumulative_gap": "8553/325",
+          "rank": 116,
+          "share": "39914/60129"
+        },
+        {
+          "cumulative_gap": "25789/975",
+          "rank": 117,
+          "share": "21238/31833"
+        },
+        {
+          "cumulative_gap": "25919/975",
+          "rank": 118,
+          "share": "362866/541161"
+        },
+        {
+          "cumulative_gap": "8683/325",
+          "rank": 119,
+          "share": "121562/180387"
+        },
+        {
+          "cumulative_gap": "26179/975",
+          "rank": 120,
+          "share": "366506/541161"
+        },
+        {
+          "cumulative_gap": "26309/975",
+          "rank": 121,
+          "share": "368326/541161"
+        },
+        {
+          "cumulative_gap": "8813/325",
+          "rank": 122,
+          "share": "123382/180387"
+        },
+        {
+          "cumulative_gap": "26569/975",
+          "rank": 123,
+          "share": "371966/541161"
+        },
+        {
+          "cumulative_gap": "26699/975",
+          "rank": 124,
+          "share": "373786/541161"
+        },
+        {
+          "cumulative_gap": "8943/325",
+          "rank": 125,
+          "share": "41734/60129"
+        },
+        {
+          "cumulative_gap": "26959/975",
+          "rank": 126,
+          "share": "377426/541161"
+        },
+        {
+          "cumulative_gap": "27089/975",
+          "rank": 127,
+          "share": "379246/541161"
+        },
+        {
+          "cumulative_gap": "9073/325",
+          "rank": 128,
+          "share": "127022/180387"
+        },
+        {
+          "cumulative_gap": "27349/975",
+          "rank": 129,
+          "share": "382886/541161"
+        },
+        {
+          "cumulative_gap": "27479/975",
+          "rank": 130,
+          "share": "384706/541161"
+        },
+        {
+          "cumulative_gap": "9203/325",
+          "rank": 131,
+          "share": "128842/180387"
+        },
+        {
+          "cumulative_gap": "27739/975",
+          "rank": 132,
+          "share": "388346/541161"
+        },
+        {
+          "cumulative_gap": "27869/975",
+          "rank": 133,
+          "share": "390166/541161"
+        },
+        {
+          "cumulative_gap": "9333/325",
+          "rank": 134,
+          "share": "854/1179"
+        },
+        {
+          "cumulative_gap": "28129/975",
+          "rank": 135,
+          "share": "393806/541161"
+        },
+        {
+          "cumulative_gap": "28259/975",
+          "rank": 136,
+          "share": "395626/541161"
+        },
+        {
+          "cumulative_gap": "9463/325",
+          "rank": 137,
+          "share": "132482/180387"
+        },
+        {
+          "cumulative_gap": "28519/975",
+          "rank": 138,
+          "share": "399266/541161"
+        },
+        {
+          "cumulative_gap": "28649/975",
+          "rank": 139,
+          "share": "401086/541161"
+        },
+        {
+          "cumulative_gap": "9593/325",
+          "rank": 140,
+          "share": "134302/180387"
+        },
+        {
+          "cumulative_gap": "28909/975",
+          "rank": 141,
+          "share": "404726/541161"
+        },
+        {
+          "cumulative_gap": "29039/975",
+          "rank": 142,
+          "share": "406546/541161"
+        },
+        {
+          "cumulative_gap": "9723/325",
+          "rank": 143,
+          "share": "45374/60129"
+        },
+        {
+          "cumulative_gap": "29299/975",
+          "rank": 144,
+          "share": "410186/541161"
+        },
+        {
+          "cumulative_gap": "29429/975",
+          "rank": 145,
+          "share": "412006/541161"
+        },
+        {
+          "cumulative_gap": "9853/325",
+          "rank": 146,
+          "share": "137942/180387"
+        },
+        {
+          "cumulative_gap": "29689/975",
+          "rank": 147,
+          "share": "415646/541161"
+        },
+        {
+          "cumulative_gap": "29819/975",
+          "rank": 148,
+          "share": "417466/541161"
+        },
+        {
+          "cumulative_gap": "9983/325",
+          "rank": 149,
+          "share": "139762/180387"
+        },
+        {
+          "cumulative_gap": "30079/975",
+          "rank": 150,
+          "share": "421106/541161"
+        },
+        {
+          "cumulative_gap": "30209/975",
+          "rank": 151,
+          "share": "24878/31833"
+        },
+        {
+          "cumulative_gap": "10113/325",
+          "rank": 152,
+          "share": "47194/60129"
+        },
+        {
+          "cumulative_gap": "30469/975",
+          "rank": 153,
+          "share": "426566/541161"
+        },
+        {
+          "cumulative_gap": "30599/975",
+          "rank": 154,
+          "share": "428386/541161"
+        },
+        {
+          "cumulative_gap": "10243/325",
+          "rank": 155,
+          "share": "143402/180387"
+        },
+        {
+          "cumulative_gap": "30859/975",
+          "rank": 156,
+          "share": "432026/541161"
+        },
+        {
+          "cumulative_gap": "30989/975",
+          "rank": 157,
+          "share": "433846/541161"
+        },
+        {
+          "cumulative_gap": "10373/325",
+          "rank": 158,
+          "share": "145222/180387"
+        },
+        {
+          "cumulative_gap": "31249/975",
+          "rank": 159,
+          "share": "437486/541161"
+        },
+        {
+          "cumulative_gap": "31379/975",
+          "rank": 160,
+          "share": "439306/541161"
+        },
+        {
+          "cumulative_gap": "10503/325",
+          "rank": 161,
+          "share": "5446/6681"
+        },
+        {
+          "cumulative_gap": "31639/975",
+          "rank": 162,
+          "share": "442946/541161"
+        },
+        {
+          "cumulative_gap": "31769/975",
+          "rank": 163,
+          "share": "444766/541161"
+        },
+        {
+          "cumulative_gap": "10633/325",
+          "rank": 164,
+          "share": "148862/180387"
+        },
+        {
+          "cumulative_gap": "32029/975",
+          "rank": 165,
+          "share": "448406/541161"
+        },
+        {
+          "cumulative_gap": "32159/975",
+          "rank": 166,
+          "share": "450226/541161"
+        },
+        {
+          "cumulative_gap": "10763/325",
+          "rank": 167,
+          "share": "150682/180387"
+        },
+        {
+          "cumulative_gap": "32419/975",
+          "rank": 168,
+          "share": "26698/31833"
+        },
+        {
+          "cumulative_gap": "65033/1950",
+          "rank": 169,
+          "share": "455231/541161"
+        },
+        {
+          "cumulative_gap": "32614/975",
+          "rank": 170,
+          "share": "456596/541161"
+        },
+        {
+          "cumulative_gap": "65423/1950",
+          "rank": 171,
+          "share": "457961/541161"
+        },
+        {
+          "cumulative_gap": "32809/975",
+          "rank": 172,
+          "share": "459326/541161"
+        },
+        {
+          "cumulative_gap": "65813/1950",
+          "rank": 173,
+          "share": "460691/541161"
+        },
+        {
+          "cumulative_gap": "33004/975",
+          "rank": 174,
+          "share": "462056/541161"
+        },
+        {
+          "cumulative_gap": "66203/1950",
+          "rank": 175,
+          "share": "463421/541161"
+        },
+        {
+          "cumulative_gap": "33199/975",
+          "rank": 176,
+          "share": "464786/541161"
+        },
+        {
+          "cumulative_gap": "66593/1950",
+          "rank": 177,
+          "share": "466151/541161"
+        },
+        {
+          "cumulative_gap": "33394/975",
+          "rank": 178,
+          "share": "467516/541161"
+        },
+        {
+          "cumulative_gap": "66983/1950",
+          "rank": 179,
+          "share": "468881/541161"
+        },
+        {
+          "cumulative_gap": "33589/975",
+          "rank": 180,
+          "share": "470246/541161"
+        },
+        {
+          "cumulative_gap": "67373/1950",
+          "rank": 181,
+          "share": "471611/541161"
+        },
+        {
+          "cumulative_gap": "33784/975",
+          "rank": 182,
+          "share": "472976/541161"
+        },
+        {
+          "cumulative_gap": "67763/1950",
+          "rank": 183,
+          "share": "474341/541161"
+        },
+        {
+          "cumulative_gap": "33979/975",
+          "rank": 184,
+          "share": "475706/541161"
+        },
+        {
+          "cumulative_gap": "68153/1950",
+          "rank": 185,
+          "share": "28063/31833"
+        },
+        {
+          "cumulative_gap": "34174/975",
+          "rank": 186,
+          "share": "478436/541161"
+        },
+        {
+          "cumulative_gap": "68543/1950",
+          "rank": 187,
+          "share": "479801/541161"
+        },
+        {
+          "cumulative_gap": "34369/975",
+          "rank": 188,
+          "share": "481166/541161"
+        },
+        {
+          "cumulative_gap": "68933/1950",
+          "rank": 189,
+          "share": "482531/541161"
+        },
+        {
+          "cumulative_gap": "34564/975",
+          "rank": 190,
+          "share": "483896/541161"
+        },
+        {
+          "cumulative_gap": "69323/1950",
+          "rank": 191,
+          "share": "485261/541161"
+        },
+        {
+          "cumulative_gap": "34759/975",
+          "rank": 192,
+          "share": "486626/541161"
+        },
+        {
+          "cumulative_gap": "69713/1950",
+          "rank": 193,
+          "share": "487991/541161"
+        },
+        {
+          "cumulative_gap": "34954/975",
+          "rank": 194,
+          "share": "489356/541161"
+        },
+        {
+          "cumulative_gap": "70103/1950",
+          "rank": 195,
+          "share": "490721/541161"
+        },
+        {
+          "cumulative_gap": "35149/975",
+          "rank": 196,
+          "share": "492086/541161"
+        },
+        {
+          "cumulative_gap": "70493/1950",
+          "rank": 197,
+          "share": "493451/541161"
+        },
+        {
+          "cumulative_gap": "35344/975",
+          "rank": 198,
+          "share": "494816/541161"
+        },
+        {
+          "cumulative_gap": "70883/1950",
+          "rank": 199,
+          "share": "496181/541161"
+        },
+        {
+          "cumulative_gap": "35539/975",
+          "rank": 200,
+          "share": "497546/541161"
+        },
+        {
+          "cumulative_gap": "71273/1950",
+          "rank": 201,
+          "share": "498911/541161"
+        },
+        {
+          "cumulative_gap": "35734/975",
+          "rank": 202,
+          "share": "29428/31833"
+        },
+        {
+          "cumulative_gap": "71663/1950",
+          "rank": 203,
+          "share": "501641/541161"
+        },
+        {
+          "cumulative_gap": "35929/975",
+          "rank": 204,
+          "share": "503006/541161"
+        },
+        {
+          "cumulative_gap": "72053/1950",
+          "rank": 205,
+          "share": "504371/541161"
+        },
+        {
+          "cumulative_gap": "36124/975",
+          "rank": 206,
+          "share": "505736/541161"
+        },
+        {
+          "cumulative_gap": "72443/1950",
+          "rank": 207,
+          "share": "3871/4131"
+        },
+        {
+          "cumulative_gap": "24191/650",
+          "rank": 208,
+          "share": "9961/10611"
+        },
+        {
+          "cumulative_gap": "72703/1950",
+          "rank": 209,
+          "share": "508921/541161"
+        },
+        {
+          "cumulative_gap": "72833/1950",
+          "rank": 210,
+          "share": "509831/541161"
+        },
+        {
+          "cumulative_gap": "24321/650",
+          "rank": 211,
+          "share": "56749/60129"
+        },
+        {
+          "cumulative_gap": "73093/1950",
+          "rank": 212,
+          "share": "511651/541161"
+        },
+        {
+          "cumulative_gap": "73223/1950",
+          "rank": 213,
+          "share": "512561/541161"
+        },
+        {
+          "cumulative_gap": "24451/650",
+          "rank": 214,
+          "share": "171157/180387"
+        },
+        {
+          "cumulative_gap": "73483/1950",
+          "rank": 215,
+          "share": "514381/541161"
+        },
+        {
+          "cumulative_gap": "73613/1950",
+          "rank": 216,
+          "share": "515291/541161"
+        },
+        {
+          "cumulative_gap": "24581/650",
+          "rank": 217,
+          "share": "172067/180387"
+        },
+        {
+          "cumulative_gap": "73873/1950",
+          "rank": 218,
+          "share": "517111/541161"
+        },
+        {
+          "cumulative_gap": "74003/1950",
+          "rank": 219,
+          "share": "518021/541161"
+        },
+        {
+          "cumulative_gap": "24711/650",
+          "rank": 220,
+          "share": "57659/60129"
+        },
+        {
+          "cumulative_gap": "74263/1950",
+          "rank": 221,
+          "share": "519841/541161"
+        },
+        {
+          "cumulative_gap": "74393/1950",
+          "rank": 222,
+          "share": "520751/541161"
+        },
+        {
+          "cumulative_gap": "24841/650",
+          "rank": 223,
+          "share": "173887/180387"
+        },
+        {
+          "cumulative_gap": "74653/1950",
+          "rank": 224,
+          "share": "522571/541161"
+        },
+        {
+          "cumulative_gap": "74783/1950",
+          "rank": 225,
+          "share": "30793/31833"
+        },
+        {
+          "cumulative_gap": "24971/650",
+          "rank": 226,
+          "share": "174797/180387"
+        },
+        {
+          "cumulative_gap": "75043/1950",
+          "rank": 227,
+          "share": "525301/541161"
+        },
+        {
+          "cumulative_gap": "75173/1950",
+          "rank": 228,
+          "share": "526211/541161"
+        },
+        {
+          "cumulative_gap": "25101/650",
+          "rank": 229,
+          "share": "19523/20043"
+        },
+        {
+          "cumulative_gap": "75433/1950",
+          "rank": 230,
+          "share": "528031/541161"
+        },
+        {
+          "cumulative_gap": "75563/1950",
+          "rank": 231,
+          "share": "528941/541161"
+        },
+        {
+          "cumulative_gap": "25231/650",
+          "rank": 232,
+          "share": "176617/180387"
+        },
+        {
+          "cumulative_gap": "75823/1950",
+          "rank": 233,
+          "share": "530761/541161"
+        },
+        {
+          "cumulative_gap": "75953/1950",
+          "rank": 234,
+          "share": "531671/541161"
+        },
+        {
+          "cumulative_gap": "25361/650",
+          "rank": 235,
+          "share": "177527/180387"
+        },
+        {
+          "cumulative_gap": "76213/1950",
+          "rank": 236,
+          "share": "533491/541161"
+        },
+        {
+          "cumulative_gap": "76343/1950",
+          "rank": 237,
+          "share": "534401/541161"
+        },
+        {
+          "cumulative_gap": "25491/650",
+          "rank": 238,
+          "share": "59479/60129"
+        },
+        {
+          "cumulative_gap": "76603/1950",
+          "rank": 239,
+          "share": "536221/541161"
+        },
+        {
+          "cumulative_gap": "76733/1950",
+          "rank": 240,
+          "share": "537131/541161"
+        },
+        {
+          "cumulative_gap": "25621/650",
+          "rank": 241,
+          "share": "179347/180387"
+        },
+        {
+          "cumulative_gap": "179607/4550",
+          "rank": 242,
+          "share": "59869/60129"
+        },
+        {
+          "cumulative_gap": "179867/4550",
+          "rank": 243,
+          "share": "179867/180387"
+        },
+        {
+          "cumulative_gap": "180127/4550",
+          "rank": 244,
+          "share": "180127/180387"
+        },
+        {
+          "cumulative_gap": "180387/4550",
+          "rank": 245,
+          "share": "1"
+        }
+      ],
+      "context_rows": "336",
+      "episodes": "32",
+      "expected_bad_visits_sum": "245",
+      "expected_expansions_sum": "35132",
+      "expected_model_calls_sum": "323568",
+      "expected_visits_sum": "336",
+      "gap_sum": "180387/4550",
+      "mean_gap": "180387/145600",
+      "method": "beam_bayes",
+      "positive_contexts": "245",
+      "positive_gap_episodes": "28",
+      "positive_gap_groups": 7,
+      "positive_sufficient_states": 245,
+      "tier": "small",
+      "top_state_share": "4550/541161"
+    },
+    {
+      "concentration_curve": [],
+      "context_rows": "407",
+      "episodes": "32",
+      "expected_bad_visits_sum": "0",
+      "expected_expansions_sum": "3500693/50",
+      "expected_model_calls_sum": "7584696/25",
+      "expected_visits_sum": "309",
+      "gap_sum": "0",
+      "mean_gap": "0",
+      "method": "one_step_voi",
+      "positive_contexts": "0",
+      "positive_gap_episodes": "0",
+      "positive_gap_groups": 0,
+      "positive_sufficient_states": 0,
+      "tier": "large",
+      "top_state_share": null
+    },
+    {
+      "concentration_curve": [
+        {
+          "cumulative_gap": "1/4",
+          "rank": 1,
+          "share": "2275/219734"
+        },
+        {
+          "cumulative_gap": "1/2",
+          "rank": 2,
+          "share": "2275/109867"
+        },
+        {
+          "cumulative_gap": "3/4",
+          "rank": 3,
+          "share": "6825/219734"
+        },
+        {
+          "cumulative_gap": "1",
+          "rank": 4,
+          "share": "4550/109867"
+        },
+        {
+          "cumulative_gap": "5/4",
+          "rank": 5,
+          "share": "11375/219734"
+        },
+        {
+          "cumulative_gap": "3/2",
+          "rank": 6,
+          "share": "6825/109867"
+        },
+        {
+          "cumulative_gap": "7/4",
+          "rank": 7,
+          "share": "15925/219734"
+        },
+        {
+          "cumulative_gap": "2",
+          "rank": 8,
+          "share": "9100/109867"
+        },
+        {
+          "cumulative_gap": "9/4",
+          "rank": 9,
+          "share": "20475/219734"
+        },
+        {
+          "cumulative_gap": "5/2",
+          "rank": 10,
+          "share": "11375/109867"
+        },
+        {
+          "cumulative_gap": "11/4",
+          "rank": 11,
+          "share": "25025/219734"
+        },
+        {
+          "cumulative_gap": "3",
+          "rank": 12,
+          "share": "13650/109867"
+        },
+        {
+          "cumulative_gap": "13/4",
+          "rank": 13,
+          "share": "29575/219734"
+        },
+        {
+          "cumulative_gap": "7/2",
+          "rank": 14,
+          "share": "15925/109867"
+        },
+        {
+          "cumulative_gap": "15/4",
+          "rank": 15,
+          "share": "34125/219734"
+        },
+        {
+          "cumulative_gap": "4",
+          "rank": 16,
+          "share": "18200/109867"
+        },
+        {
+          "cumulative_gap": "17/4",
+          "rank": 17,
+          "share": "38675/219734"
+        },
+        {
+          "cumulative_gap": "9/2",
+          "rank": 18,
+          "share": "20475/109867"
+        },
+        {
+          "cumulative_gap": "19/4",
+          "rank": 19,
+          "share": "43225/219734"
+        },
+        {
+          "cumulative_gap": "5",
+          "rank": 20,
+          "share": "22750/109867"
+        },
+        {
+          "cumulative_gap": "21/4",
+          "rank": 21,
+          "share": "47775/219734"
+        },
+        {
+          "cumulative_gap": "11/2",
+          "rank": 22,
+          "share": "25025/109867"
+        },
+        {
+          "cumulative_gap": "401/70",
+          "rank": 23,
+          "share": "26065/109867"
+        },
+        {
+          "cumulative_gap": "417/70",
+          "rank": 24,
+          "share": "27105/109867"
+        },
+        {
+          "cumulative_gap": "433/70",
+          "rank": 25,
+          "share": "28145/109867"
+        },
+        {
+          "cumulative_gap": "449/70",
+          "rank": 26,
+          "share": "29185/109867"
+        },
+        {
+          "cumulative_gap": "93/14",
+          "rank": 27,
+          "share": "30225/109867"
+        },
+        {
+          "cumulative_gap": "481/70",
+          "rank": 28,
+          "share": "31265/109867"
+        },
+        {
+          "cumulative_gap": "71/10",
+          "rank": 29,
+          "share": "32305/109867"
+        },
+        {
+          "cumulative_gap": "513/70",
+          "rank": 30,
+          "share": "33345/109867"
+        },
+        {
+          "cumulative_gap": "529/70",
+          "rank": 31,
+          "share": "34385/109867"
+        },
+        {
+          "cumulative_gap": "109/14",
+          "rank": 32,
+          "share": "35425/109867"
+        },
+        {
+          "cumulative_gap": "561/70",
+          "rank": 33,
+          "share": "36465/109867"
+        },
+        {
+          "cumulative_gap": "577/70",
+          "rank": 34,
+          "share": "37505/109867"
+        },
+        {
+          "cumulative_gap": "593/70",
+          "rank": 35,
+          "share": "38545/109867"
+        },
+        {
+          "cumulative_gap": "87/10",
+          "rank": 36,
+          "share": "39585/109867"
+        },
+        {
+          "cumulative_gap": "1339/150",
+          "rank": 37,
+          "share": "121849/329601"
+        },
+        {
+          "cumulative_gap": "1373/150",
+          "rank": 38,
+          "share": "124943/329601"
+        },
+        {
+          "cumulative_gap": "469/50",
+          "rank": 39,
+          "share": "42679/109867"
+        },
+        {
+          "cumulative_gap": "1441/150",
+          "rank": 40,
+          "share": "131131/329601"
+        },
+        {
+          "cumulative_gap": "59/6",
+          "rank": 41,
+          "share": "134225/329601"
+        },
+        {
+          "cumulative_gap": "503/50",
+          "rank": 42,
+          "share": "45773/109867"
+        },
+        {
+          "cumulative_gap": "1543/150",
+          "rank": 43,
+          "share": "140413/329601"
+        },
+        {
+          "cumulative_gap": "1577/150",
+          "rank": 44,
+          "share": "143507/329601"
+        },
+        {
+          "cumulative_gap": "537/50",
+          "rank": 45,
+          "share": "48867/109867"
+        },
+        {
+          "cumulative_gap": "329/30",
+          "rank": 46,
+          "share": "149695/329601"
+        },
+        {
+          "cumulative_gap": "1679/150",
+          "rank": 47,
+          "share": "152789/329601"
+        },
+        {
+          "cumulative_gap": "571/50",
+          "rank": 48,
+          "share": "51961/109867"
+        },
+        {
+          "cumulative_gap": "1747/150",
+          "rank": 49,
+          "share": "158977/329601"
+        },
+        {
+          "cumulative_gap": "1781/150",
+          "rank": 50,
+          "share": "162071/329601"
+        },
+        {
+          "cumulative_gap": "121/10",
+          "rank": 51,
+          "share": "55055/109867"
+        },
+        {
+          "cumulative_gap": "1849/150",
+          "rank": 52,
+          "share": "168259/329601"
+        },
+        {
+          "cumulative_gap": "1883/150",
+          "rank": 53,
+          "share": "171353/329601"
+        },
+        {
+          "cumulative_gap": "639/50",
+          "rank": 54,
+          "share": "58149/109867"
+        },
+        {
+          "cumulative_gap": "1951/150",
+          "rank": 55,
+          "share": "177541/329601"
+        },
+        {
+          "cumulative_gap": "397/30",
+          "rank": 56,
+          "share": "180635/329601"
+        },
+        {
+          "cumulative_gap": "673/50",
+          "rank": 57,
+          "share": "61243/109867"
+        },
+        {
+          "cumulative_gap": "2053/150",
+          "rank": 58,
+          "share": "186823/329601"
+        },
+        {
+          "cumulative_gap": "2087/150",
+          "rank": 59,
+          "share": "189917/329601"
+        },
+        {
+          "cumulative_gap": "707/50",
+          "rank": 60,
+          "share": "64337/109867"
+        },
+        {
+          "cumulative_gap": "717/50",
+          "rank": 61,
+          "share": "65247/109867"
+        },
+        {
+          "cumulative_gap": "727/50",
+          "rank": 62,
+          "share": "66157/109867"
+        },
+        {
+          "cumulative_gap": "737/50",
+          "rank": 63,
+          "share": "67067/109867"
+        },
+        {
+          "cumulative_gap": "747/50",
+          "rank": 64,
+          "share": "67977/109867"
+        },
+        {
+          "cumulative_gap": "757/50",
+          "rank": 65,
+          "share": "68887/109867"
+        },
+        {
+          "cumulative_gap": "767/50",
+          "rank": 66,
+          "share": "69797/109867"
+        },
+        {
+          "cumulative_gap": "777/50",
+          "rank": 67,
+          "share": "70707/109867"
+        },
+        {
+          "cumulative_gap": "787/50",
+          "rank": 68,
+          "share": "71617/109867"
+        },
+        {
+          "cumulative_gap": "797/50",
+          "rank": 69,
+          "share": "72527/109867"
+        },
+        {
+          "cumulative_gap": "403/25",
+          "rank": 70,
+          "share": "73346/109867"
+        },
+        {
+          "cumulative_gap": "5289/325",
+          "rank": 71,
+          "share": "74046/109867"
+        },
+        {
+          "cumulative_gap": "5339/325",
+          "rank": 72,
+          "share": "74746/109867"
+        },
+        {
+          "cumulative_gap": "5389/325",
+          "rank": 73,
+          "share": "75446/109867"
+        },
+        {
+          "cumulative_gap": "5439/325",
+          "rank": 74,
+          "share": "76146/109867"
+        },
+        {
+          "cumulative_gap": "5489/325",
+          "rank": 75,
+          "share": "76846/109867"
+        },
+        {
+          "cumulative_gap": "5539/325",
+          "rank": 76,
+          "share": "77546/109867"
+        },
+        {
+          "cumulative_gap": "5589/325",
+          "rank": 77,
+          "share": "78246/109867"
+        },
+        {
+          "cumulative_gap": "5639/325",
+          "rank": 78,
+          "share": "78946/109867"
+        },
+        {
+          "cumulative_gap": "5689/325",
+          "rank": 79,
+          "share": "79646/109867"
+        },
+        {
+          "cumulative_gap": "5739/325",
+          "rank": 80,
+          "share": "80346/109867"
+        },
+        {
+          "cumulative_gap": "5789/325",
+          "rank": 81,
+          "share": "81046/109867"
+        },
+        {
+          "cumulative_gap": "17471/975",
+          "rank": 82,
+          "share": "244594/329601"
+        },
+        {
+          "cumulative_gap": "703/39",
+          "rank": 83,
+          "share": "246050/329601"
+        },
+        {
+          "cumulative_gap": "5893/325",
+          "rank": 84,
+          "share": "82502/109867"
+        },
+        {
+          "cumulative_gap": "17783/975",
+          "rank": 85,
+          "share": "248962/329601"
+        },
+        {
+          "cumulative_gap": "17887/975",
+          "rank": 86,
+          "share": "250418/329601"
+        },
+        {
+          "cumulative_gap": "5997/325",
+          "rank": 87,
+          "share": "83958/109867"
+        },
+        {
+          "cumulative_gap": "3619/195",
+          "rank": 88,
+          "share": "253330/329601"
+        },
+        {
+          "cumulative_gap": "18199/975",
+          "rank": 89,
+          "share": "254786/329601"
+        },
+        {
+          "cumulative_gap": "6101/325",
+          "rank": 90,
+          "share": "85414/109867"
+        },
+        {
+          "cumulative_gap": "18407/975",
+          "rank": 91,
+          "share": "257698/329601"
+        },
+        {
+          "cumulative_gap": "18511/975",
+          "rank": 92,
+          "share": "259154/329601"
+        },
+        {
+          "cumulative_gap": "1241/65",
+          "rank": 93,
+          "share": "86870/109867"
+        },
+        {
+          "cumulative_gap": "18719/975",
+          "rank": 94,
+          "share": "262066/329601"
+        },
+        {
+          "cumulative_gap": "18823/975",
+          "rank": 95,
+          "share": "263522/329601"
+        },
+        {
+          "cumulative_gap": "6309/325",
+          "rank": 96,
+          "share": "88326/109867"
+        },
+        {
+          "cumulative_gap": "19031/975",
+          "rank": 97,
+          "share": "266434/329601"
+        },
+        {
+          "cumulative_gap": "3827/195",
+          "rank": 98,
+          "share": "267890/329601"
+        },
+        {
+          "cumulative_gap": "6413/325",
+          "rank": 99,
+          "share": "89782/109867"
+        },
+        {
+          "cumulative_gap": "19343/975",
+          "rank": 100,
+          "share": "270802/329601"
+        },
+        {
+          "cumulative_gap": "19447/975",
+          "rank": 101,
+          "share": "272258/329601"
+        },
+        {
+          "cumulative_gap": "6517/325",
+          "rank": 102,
+          "share": "91238/109867"
+        },
+        {
+          "cumulative_gap": "3931/195",
+          "rank": 103,
+          "share": "275170/329601"
+        },
+        {
+          "cumulative_gap": "19759/975",
+          "rank": 104,
+          "share": "276626/329601"
+        },
+        {
+          "cumulative_gap": "6621/325",
+          "rank": 105,
+          "share": "92694/109867"
+        },
+        {
+          "cumulative_gap": "13307/650",
+          "rank": 106,
+          "share": "93149/109867"
+        },
+        {
+          "cumulative_gap": "6686/325",
+          "rank": 107,
+          "share": "93604/109867"
+        },
+        {
+          "cumulative_gap": "13437/650",
+          "rank": 108,
+          "share": "94059/109867"
+        },
+        {
+          "cumulative_gap": "6751/325",
+          "rank": 109,
+          "share": "94514/109867"
+        },
+        {
+          "cumulative_gap": "13567/650",
+          "rank": 110,
+          "share": "94969/109867"
+        },
+        {
+          "cumulative_gap": "6816/325",
+          "rank": 111,
+          "share": "95424/109867"
+        },
+        {
+          "cumulative_gap": "13697/650",
+          "rank": 112,
+          "share": "95879/109867"
+        },
+        {
+          "cumulative_gap": "6881/325",
+          "rank": 113,
+          "share": "96334/109867"
+        },
+        {
+          "cumulative_gap": "13827/650",
+          "rank": 114,
+          "share": "96789/109867"
+        },
+        {
+          "cumulative_gap": "6946/325",
+          "rank": 115,
+          "share": "97244/109867"
+        },
+        {
+          "cumulative_gap": "13957/650",
+          "rank": 116,
+          "share": "97699/109867"
+        },
+        {
+          "cumulative_gap": "7011/325",
+          "rank": 117,
+          "share": "98154/109867"
+        },
+        {
+          "cumulative_gap": "14087/650",
+          "rank": 118,
+          "share": "98609/109867"
+        },
+        {
+          "cumulative_gap": "7076/325",
+          "rank": 119,
+          "share": "99064/109867"
+        },
+        {
+          "cumulative_gap": "14217/650",
+          "rank": 120,
+          "share": "99519/109867"
+        },
+        {
+          "cumulative_gap": "7141/325",
+          "rank": 121,
+          "share": "99974/109867"
+        },
+        {
+          "cumulative_gap": "14347/650",
+          "rank": 122,
+          "share": "100429/109867"
+        },
+        {
+          "cumulative_gap": "7206/325",
+          "rank": 123,
+          "share": "100884/109867"
+        },
+        {
+          "cumulative_gap": "14477/650",
+          "rank": 124,
+          "share": "101339/109867"
+        },
+        {
+          "cumulative_gap": "7271/325",
+          "rank": 125,
+          "share": "101794/109867"
+        },
+        {
+          "cumulative_gap": "14607/650",
+          "rank": 126,
+          "share": "102249/109867"
+        },
+        {
+          "cumulative_gap": "7336/325",
+          "rank": 127,
+          "share": "102704/109867"
+        },
+        {
+          "cumulative_gap": "14737/650",
+          "rank": 128,
+          "share": "103159/109867"
+        },
+        {
+          "cumulative_gap": "7401/325",
+          "rank": 129,
+          "share": "103614/109867"
+        },
+        {
+          "cumulative_gap": "14867/650",
+          "rank": 130,
+          "share": "104069/109867"
+        },
+        {
+          "cumulative_gap": "7466/325",
+          "rank": 131,
+          "share": "104524/109867"
+        },
+        {
+          "cumulative_gap": "22463/975",
+          "rank": 132,
+          "share": "314482/329601"
+        },
+        {
+          "cumulative_gap": "22528/975",
+          "rank": 133,
+          "share": "315392/329601"
+        },
+        {
+          "cumulative_gap": "7531/325",
+          "rank": 134,
+          "share": "105434/109867"
+        },
+        {
+          "cumulative_gap": "22658/975",
+          "rank": 135,
+          "share": "317212/329601"
+        },
+        {
+          "cumulative_gap": "22723/975",
+          "rank": 136,
+          "share": "318122/329601"
+        },
+        {
+          "cumulative_gap": "7596/325",
+          "rank": 137,
+          "share": "106344/109867"
+        },
+        {
+          "cumulative_gap": "22853/975",
+          "rank": 138,
+          "share": "319942/329601"
+        },
+        {
+          "cumulative_gap": "22918/975",
+          "rank": 139,
+          "share": "320852/329601"
+        },
+        {
+          "cumulative_gap": "7661/325",
+          "rank": 140,
+          "share": "107254/109867"
+        },
+        {
+          "cumulative_gap": "23048/975",
+          "rank": 141,
+          "share": "322672/329601"
+        },
+        {
+          "cumulative_gap": "23113/975",
+          "rank": 142,
+          "share": "323582/329601"
+        },
+        {
+          "cumulative_gap": "7726/325",
+          "rank": 143,
+          "share": "108164/109867"
+        },
+        {
+          "cumulative_gap": "23243/975",
+          "rank": 144,
+          "share": "325402/329601"
+        },
+        {
+          "cumulative_gap": "23308/975",
+          "rank": 145,
+          "share": "326312/329601"
+        },
+        {
+          "cumulative_gap": "7791/325",
+          "rank": 146,
+          "share": "109074/109867"
+        },
+        {
+          "cumulative_gap": "15621/650",
+          "rank": 147,
+          "share": "109347/109867"
+        },
+        {
+          "cumulative_gap": "109607/4550",
+          "rank": 148,
+          "share": "109607/109867"
+        },
+        {
+          "cumulative_gap": "109867/4550",
+          "rank": 149,
+          "share": "1"
+        }
+      ],
+      "context_rows": "380",
+      "episodes": "32",
+      "expected_bad_visits_sum": "245/2",
+      "expected_expansions_sum": "179928/5",
+      "expected_model_calls_sum": "4070192/25",
+      "expected_visits_sum": "316",
+      "gap_sum": "109867/4550",
+      "mean_gap": "109867/145600",
+      "method": "one_step_voi",
+      "positive_contexts": "149",
+      "positive_gap_episodes": "20",
+      "positive_gap_groups": 7,
+      "positive_sufficient_states": 149,
+      "tier": "small",
+      "top_state_share": "2275/219734"
+    }
+  ],
+  "schema": "planning-residual-summary-v1",
+  "seal_hash": "9f9f1b084f7783a7b933ef3380e5d2f602b08b1328cccdf4e784fe2da9509c20",
+  "study_cpu_seconds": 25.17269906600001,
+  "supplemental_states": 452,
+  "supplemental_unresolved": 0,
+  "uniform_state_attribution": [
+    {
+      "category": "3",
+      "dimension": "B",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "153",
+      "tier": "large"
+    },
+    {
+      "category": "5",
+      "dimension": "B",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "1018",
+      "tier": "large"
+    },
+    {
+      "category": "0",
+      "dimension": "H",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "162",
+      "tier": "large"
+    },
+    {
+      "category": "1",
+      "dimension": "H",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "200",
+      "tier": "large"
+    },
+    {
+      "category": "12",
+      "dimension": "H",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "16",
+      "tier": "large"
+    },
+    {
+      "category": "2",
+      "dimension": "H",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "186",
+      "tier": "large"
+    },
+    {
+      "category": "3",
+      "dimension": "H",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "154",
+      "tier": "large"
+    },
+    {
+      "category": "4",
+      "dimension": "H",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "170",
+      "tier": "large"
+    },
+    {
+      "category": "5",
+      "dimension": "H",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "65",
+      "tier": "large"
+    },
+    {
+      "category": "6",
+      "dimension": "H",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "114",
+      "tier": "large"
+    },
+    {
+      "category": "7",
+      "dimension": "H",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "34",
+      "tier": "large"
+    },
+    {
+      "category": "8",
+      "dimension": "H",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "26",
+      "tier": "large"
+    },
+    {
+      "category": "9",
+      "dimension": "H",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "44",
+      "tier": "large"
+    },
+    {
+      "category": "normal",
+      "dimension": "autopilot",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "1171",
+      "tier": "large"
+    },
+    {
+      "category": "single_sensing",
+      "dimension": "chosen_type",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "19",
+      "tier": "large"
+    },
+    {
+      "category": "stop",
+      "dimension": "chosen_type",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "162",
+      "tier": "large"
+    },
+    {
+      "category": "task",
+      "dimension": "chosen_type",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "990",
+      "tier": "large"
+    },
+    {
+      "category": "measurement_optional",
+      "dimension": "decision_class",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "1",
+      "tier": "large"
+    },
+    {
+      "category": "measurement_required",
+      "dimension": "decision_class",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "19",
+      "tier": "large"
+    },
+    {
+      "category": "nonmeasuring_optimal",
+      "dimension": "decision_class",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "1151",
+      "tier": "large"
+    },
+    {
+      "category": "adaptive_hierarchy",
+      "dimension": "family",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "345",
+      "tier": "large"
+    },
+    {
+      "category": "cost_horizon",
+      "dimension": "family",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "81",
+      "tier": "large"
+    },
+    {
+      "category": "decoy_redundancy",
+      "dimension": "family",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "433",
+      "tier": "large"
+    },
+    {
+      "category": "random_resource_graph",
+      "dimension": "family",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "312",
+      "tier": "large"
+    },
+    {
+      "category": "student_train",
+      "dimension": "fold",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "441",
+      "tier": "large"
+    },
+    {
+      "category": "student_validation",
+      "dimension": "fold",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "730",
+      "tier": "large"
+    },
+    {
+      "category": "limit_hit",
+      "dimension": "limit",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "3",
+      "tier": "large"
+    },
+    {
+      "category": "no_limit",
+      "dimension": "limit",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "1168",
+      "tier": "large"
+    },
+    {
+      "category": "single_sensing",
+      "dimension": "optimal_types",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "19",
+      "tier": "large"
+    },
+    {
+      "category": "single_sensing+task",
+      "dimension": "optimal_types",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "1",
+      "tier": "large"
+    },
+    {
+      "category": "stop",
+      "dimension": "optimal_types",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "162",
+      "tier": "large"
+    },
+    {
+      "category": "task",
+      "dimension": "optimal_types",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "989",
+      "tier": "large"
+    },
+    {
+      "category": "nonprior",
+      "dimension": "prior",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "1115",
+      "tier": "large"
+    },
+    {
+      "category": "prior",
+      "dimension": "prior",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "56",
+      "tier": "large"
+    },
+    {
+      "category": "08266990c9b5029ea1c3a7ce99a018f9a27f2c63ad793c8d47a3f8d55caa2357",
+      "dimension": "structure",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "287",
+      "tier": "large"
+    },
+    {
+      "category": "249dec9a76ec99233d58619ba68a3a370d1213377bf0031b51d34aa2c21e521f",
+      "dimension": "structure",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "175",
+      "tier": "large"
+    },
+    {
+      "category": "2c950aa73de634c95f60fd3f229ae2dee55e5a6c6af6f105534cd0bb363fee07",
+      "dimension": "structure",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "137",
+      "tier": "large"
+    },
+    {
+      "category": "324c96768d64a0bcaff04628791733b1623b058aac34f61d057b6f84330703a8",
+      "dimension": "structure",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "165",
+      "tier": "large"
+    },
+    {
+      "category": "6a87c6b1c246269c2a071901698091fd7072b585fc228edf02744f7446fd20c4",
+      "dimension": "structure",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "268",
+      "tier": "large"
+    },
+    {
+      "category": "6bd414da33f5b92eba6ae2f0483ddbfd7e16ee0a9515ea81440e338c179a6f07",
+      "dimension": "structure",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "37",
+      "tier": "large"
+    },
+    {
+      "category": "cb9c4f76bcc7c41bbf19f9e66fc873468d638c282ef7b01ccd340dc34e558cf1",
+      "dimension": "structure",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "44",
+      "tier": "large"
+    },
+    {
+      "category": "fe7b7dea7f80dd3ef892f5f1cd07e19b7689269173182aa0288a61257d674cc6",
+      "dimension": "structure",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "58",
+      "tier": "large"
+    },
+    {
+      "category": "3",
+      "dimension": "B",
+      "method": "beam_bayes",
+      "nonzero": "78",
+      "residual_sum": "1246138727061945176171649821027/50823850090373935689350035800",
+      "states": "153",
+      "tier": "small"
+    },
+    {
+      "category": "5",
+      "dimension": "B",
+      "method": "beam_bayes",
+      "nonzero": "125",
+      "residual_sum": "69000093534197915934570528359376413391130785453709/1848752668033792657257411985986291255980128747200",
+      "states": "1018",
+      "tier": "small"
+    },
+    {
+      "category": "0",
+      "dimension": "H",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "162",
+      "tier": "small"
+    },
+    {
+      "category": "1",
+      "dimension": "H",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "200",
+      "tier": "small"
+    },
+    {
+      "category": "12",
+      "dimension": "H",
+      "method": "beam_bayes",
+      "nonzero": "12",
+      "residual_sum": "6577/2275",
+      "states": "16",
+      "tier": "small"
+    },
+    {
+      "category": "2",
+      "dimension": "H",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "186",
+      "tier": "small"
+    },
+    {
+      "category": "3",
+      "dimension": "H",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "154",
+      "tier": "small"
+    },
+    {
+      "category": "4",
+      "dimension": "H",
+      "method": "beam_bayes",
+      "nonzero": "62",
+      "residual_sum": "41531248667004852571887165355236863757806917/2249961259993273136392682310171442548309600",
+      "states": "170",
+      "tier": "small"
+    },
+    {
+      "category": "5",
+      "dimension": "H",
+      "method": "beam_bayes",
+      "nonzero": "18",
+      "residual_sum": "6279525041549/1182662781300",
+      "states": "65",
+      "tier": "small"
+    },
+    {
+      "category": "6",
+      "dimension": "H",
+      "method": "beam_bayes",
+      "nonzero": "45",
+      "residual_sum": "167948364970879126104100781/10498626335545122018043800",
+      "states": "114",
+      "tier": "small"
+    },
+    {
+      "category": "7",
+      "dimension": "H",
+      "method": "beam_bayes",
+      "nonzero": "10",
+      "residual_sum": "21279850451/6816828200",
+      "states": "34",
+      "tier": "small"
+    },
+    {
+      "category": "8",
+      "dimension": "H",
+      "method": "beam_bayes",
+      "nonzero": "20",
+      "residual_sum": "10210437297239/1720236772800",
+      "states": "26",
+      "tier": "small"
+    },
+    {
+      "category": "9",
+      "dimension": "H",
+      "method": "beam_bayes",
+      "nonzero": "36",
+      "residual_sum": "953330273/94131180",
+      "states": "44",
+      "tier": "small"
+    },
+    {
+      "category": "normal",
+      "dimension": "autopilot",
+      "method": "beam_bayes",
+      "nonzero": "203",
+      "residual_sum": "95527285873491872647842033024315824451102217527907337/1544716888354417119350261233018182084883033028683200",
+      "states": "1171",
+      "tier": "small"
+    },
+    {
+      "category": "stop",
+      "dimension": "chosen_type",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "162",
+      "tier": "small"
+    },
+    {
+      "category": "task",
+      "dimension": "chosen_type",
+      "method": "beam_bayes",
+      "nonzero": "203",
+      "residual_sum": "95527285873491872647842033024315824451102217527907337/1544716888354417119350261233018182084883033028683200",
+      "states": "1009",
+      "tier": "small"
+    },
+    {
+      "category": "measurement_optional",
+      "dimension": "decision_class",
+      "method": "beam_bayes",
+      "nonzero": "1",
+      "residual_sum": "1/10",
+      "states": "1",
+      "tier": "small"
+    },
+    {
+      "category": "measurement_required",
+      "dimension": "decision_class",
+      "method": "beam_bayes",
+      "nonzero": "19",
+      "residual_sum": "25000343/4866225",
+      "states": "19",
+      "tier": "small"
+    },
+    {
+      "category": "nonmeasuring_optimal",
+      "dimension": "decision_class",
+      "method": "beam_bayes",
+      "nonzero": "183",
+      "residual_sum": "87436795598020356042364585832309316805004485849366121/1544716888354417119350261233018182084883033028683200",
+      "states": "1151",
+      "tier": "small"
+    },
+    {
+      "category": "adaptive_hierarchy",
+      "dimension": "family",
+      "method": "beam_bayes",
+      "nonzero": "80",
+      "residual_sum": "7991753777599896031999125243934163761/317305655603732028574095847645873320",
+      "states": "345",
+      "tier": "small"
+    },
+    {
+      "category": "cost_horizon",
+      "dimension": "family",
+      "method": "beam_bayes",
+      "nonzero": "7",
+      "residual_sum": "39625/26936",
+      "states": "81",
+      "tier": "small"
+    },
+    {
+      "category": "decoy_redundancy",
+      "dimension": "family",
+      "method": "beam_bayes",
+      "nonzero": "63",
+      "residual_sum": "43747749619420220906207881/2473939217296009042641600",
+      "states": "433",
+      "tier": "small"
+    },
+    {
+      "category": "random_resource_graph",
+      "dimension": "family",
+      "method": "beam_bayes",
+      "nonzero": "53",
+      "residual_sum": "342367007398436567468658449/19563293952088959077525520",
+      "states": "312",
+      "tier": "small"
+    },
+    {
+      "category": "student_train",
+      "dimension": "fold",
+      "method": "beam_bayes",
+      "nonzero": "70",
+      "residual_sum": "51030731938456719801016471/2481923159222808451550400",
+      "states": "441",
+      "tier": "small"
+    },
+    {
+      "category": "student_validation",
+      "dimension": "fold",
+      "method": "beam_bayes",
+      "nonzero": "133",
+      "residual_sum": "7617456162579039431437778832396932983402207684237/184529938227868511900837010091005874478327613600",
+      "states": "730",
+      "tier": "small"
+    },
+    {
+      "category": "limit_hit",
+      "dimension": "limit",
+      "method": "beam_bayes",
+      "nonzero": "203",
+      "residual_sum": "95527285873491872647842033024315824451102217527907337/1544716888354417119350261233018182084883033028683200",
+      "states": "551",
+      "tier": "small"
+    },
+    {
+      "category": "no_limit",
+      "dimension": "limit",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "620",
+      "tier": "small"
+    },
+    {
+      "category": "single_sensing",
+      "dimension": "optimal_types",
+      "method": "beam_bayes",
+      "nonzero": "19",
+      "residual_sum": "25000343/4866225",
+      "states": "19",
+      "tier": "small"
+    },
+    {
+      "category": "single_sensing+task",
+      "dimension": "optimal_types",
+      "method": "beam_bayes",
+      "nonzero": "1",
+      "residual_sum": "1/10",
+      "states": "1",
+      "tier": "small"
+    },
+    {
+      "category": "stop",
+      "dimension": "optimal_types",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "162",
+      "tier": "small"
+    },
+    {
+      "category": "task",
+      "dimension": "optimal_types",
+      "method": "beam_bayes",
+      "nonzero": "183",
+      "residual_sum": "87436795598020356042364585832309316805004485849366121/1544716888354417119350261233018182084883033028683200",
+      "states": "989",
+      "tier": "small"
+    },
+    {
+      "category": "nonprior",
+      "dimension": "prior",
+      "method": "beam_bayes",
+      "nonzero": "176",
+      "residual_sum": "86307419622355530409914964659740195819630388450040841/1544716888354417119350261233018182084883033028683200",
+      "states": "1115",
+      "tier": "small"
+    },
+    {
+      "category": "prior",
+      "dimension": "prior",
+      "method": "beam_bayes",
+      "nonzero": "27",
+      "residual_sum": "40736/6825",
+      "states": "56",
+      "tier": "small"
+    },
+    {
+      "category": "08266990c9b5029ea1c3a7ce99a018f9a27f2c63ad793c8d47a3f8d55caa2357",
+      "dimension": "structure",
+      "method": "beam_bayes",
+      "nonzero": "67",
+      "residual_sum": "230867013707614702447384744554142429/10647840792071544583023350592143400",
+      "states": "287",
+      "tier": "small"
+    },
+    {
+      "category": "249dec9a76ec99233d58619ba68a3a370d1213377bf0031b51d34aa2c21e521f",
+      "dimension": "structure",
+      "method": "beam_bayes",
+      "nonzero": "19",
+      "residual_sum": "8866437045412/1262647003345",
+      "states": "175",
+      "tier": "small"
+    },
+    {
+      "category": "2c950aa73de634c95f60fd3f229ae2dee55e5a6c6af6f105534cd0bb363fee07",
+      "dimension": "structure",
+      "method": "beam_bayes",
+      "nonzero": "34",
+      "residual_sum": "2289955746613356313/218541096967873680",
+      "states": "137",
+      "tier": "small"
+    },
+    {
+      "category": "324c96768d64a0bcaff04628791733b1623b058aac34f61d057b6f84330703a8",
+      "dimension": "structure",
+      "method": "beam_bayes",
+      "nonzero": "16",
+      "residual_sum": "28906049183/5659792320",
+      "states": "165",
+      "tier": "small"
+    },
+    {
+      "category": "6a87c6b1c246269c2a071901698091fd7072b585fc228edf02744f7446fd20c4",
+      "dimension": "structure",
+      "method": "beam_bayes",
+      "nonzero": "47",
+      "residual_sum": "17688488621045668396563/1406507908022746328800",
+      "states": "268",
+      "tier": "small"
+    },
+    {
+      "category": "6bd414da33f5b92eba6ae2f0483ddbfd7e16ee0a9515ea81440e338c179a6f07",
+      "dimension": "structure",
+      "method": "beam_bayes",
+      "nonzero": "7",
+      "residual_sum": "39625/26936",
+      "states": "37",
+      "tier": "small"
+    },
+    {
+      "category": "cb9c4f76bcc7c41bbf19f9e66fc873468d638c282ef7b01ccd340dc34e558cf1",
+      "dimension": "structure",
+      "method": "beam_bayes",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "44",
+      "tier": "small"
+    },
+    {
+      "category": "fe7b7dea7f80dd3ef892f5f1cd07e19b7689269173182aa0288a61257d674cc6",
+      "dimension": "structure",
+      "method": "beam_bayes",
+      "nonzero": "13",
+      "residual_sum": "620058463/176944950",
+      "states": "58",
+      "tier": "small"
+    },
+    {
+      "category": "3",
+      "dimension": "B",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "153",
+      "tier": "large"
+    },
+    {
+      "category": "5",
+      "dimension": "B",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "1018",
+      "tier": "large"
+    },
+    {
+      "category": "0",
+      "dimension": "H",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "162",
+      "tier": "large"
+    },
+    {
+      "category": "1",
+      "dimension": "H",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "200",
+      "tier": "large"
+    },
+    {
+      "category": "12",
+      "dimension": "H",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "16",
+      "tier": "large"
+    },
+    {
+      "category": "2",
+      "dimension": "H",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "186",
+      "tier": "large"
+    },
+    {
+      "category": "3",
+      "dimension": "H",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "154",
+      "tier": "large"
+    },
+    {
+      "category": "4",
+      "dimension": "H",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "170",
+      "tier": "large"
+    },
+    {
+      "category": "5",
+      "dimension": "H",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "65",
+      "tier": "large"
+    },
+    {
+      "category": "6",
+      "dimension": "H",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "114",
+      "tier": "large"
+    },
+    {
+      "category": "7",
+      "dimension": "H",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "34",
+      "tier": "large"
+    },
+    {
+      "category": "8",
+      "dimension": "H",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "26",
+      "tier": "large"
+    },
+    {
+      "category": "9",
+      "dimension": "H",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "44",
+      "tier": "large"
+    },
+    {
+      "category": "normal",
+      "dimension": "autopilot",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "1171",
+      "tier": "large"
+    },
+    {
+      "category": "single_sensing",
+      "dimension": "chosen_type",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "19",
+      "tier": "large"
+    },
+    {
+      "category": "stop",
+      "dimension": "chosen_type",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "162",
+      "tier": "large"
+    },
+    {
+      "category": "task",
+      "dimension": "chosen_type",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "990",
+      "tier": "large"
+    },
+    {
+      "category": "measurement_optional",
+      "dimension": "decision_class",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "1",
+      "tier": "large"
+    },
+    {
+      "category": "measurement_required",
+      "dimension": "decision_class",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "19",
+      "tier": "large"
+    },
+    {
+      "category": "nonmeasuring_optimal",
+      "dimension": "decision_class",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "1151",
+      "tier": "large"
+    },
+    {
+      "category": "adaptive_hierarchy",
+      "dimension": "family",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "345",
+      "tier": "large"
+    },
+    {
+      "category": "cost_horizon",
+      "dimension": "family",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "81",
+      "tier": "large"
+    },
+    {
+      "category": "decoy_redundancy",
+      "dimension": "family",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "433",
+      "tier": "large"
+    },
+    {
+      "category": "random_resource_graph",
+      "dimension": "family",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "312",
+      "tier": "large"
+    },
+    {
+      "category": "student_train",
+      "dimension": "fold",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "441",
+      "tier": "large"
+    },
+    {
+      "category": "student_validation",
+      "dimension": "fold",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "730",
+      "tier": "large"
+    },
+    {
+      "category": "no_limit",
+      "dimension": "limit",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "1171",
+      "tier": "large"
+    },
+    {
+      "category": "single_sensing",
+      "dimension": "optimal_types",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "19",
+      "tier": "large"
+    },
+    {
+      "category": "single_sensing+task",
+      "dimension": "optimal_types",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "1",
+      "tier": "large"
+    },
+    {
+      "category": "stop",
+      "dimension": "optimal_types",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "162",
+      "tier": "large"
+    },
+    {
+      "category": "task",
+      "dimension": "optimal_types",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "989",
+      "tier": "large"
+    },
+    {
+      "category": "nonprior",
+      "dimension": "prior",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "1115",
+      "tier": "large"
+    },
+    {
+      "category": "prior",
+      "dimension": "prior",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "56",
+      "tier": "large"
+    },
+    {
+      "category": "08266990c9b5029ea1c3a7ce99a018f9a27f2c63ad793c8d47a3f8d55caa2357",
+      "dimension": "structure",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "287",
+      "tier": "large"
+    },
+    {
+      "category": "249dec9a76ec99233d58619ba68a3a370d1213377bf0031b51d34aa2c21e521f",
+      "dimension": "structure",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "175",
+      "tier": "large"
+    },
+    {
+      "category": "2c950aa73de634c95f60fd3f229ae2dee55e5a6c6af6f105534cd0bb363fee07",
+      "dimension": "structure",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "137",
+      "tier": "large"
+    },
+    {
+      "category": "324c96768d64a0bcaff04628791733b1623b058aac34f61d057b6f84330703a8",
+      "dimension": "structure",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "165",
+      "tier": "large"
+    },
+    {
+      "category": "6a87c6b1c246269c2a071901698091fd7072b585fc228edf02744f7446fd20c4",
+      "dimension": "structure",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "268",
+      "tier": "large"
+    },
+    {
+      "category": "6bd414da33f5b92eba6ae2f0483ddbfd7e16ee0a9515ea81440e338c179a6f07",
+      "dimension": "structure",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "37",
+      "tier": "large"
+    },
+    {
+      "category": "cb9c4f76bcc7c41bbf19f9e66fc873468d638c282ef7b01ccd340dc34e558cf1",
+      "dimension": "structure",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "44",
+      "tier": "large"
+    },
+    {
+      "category": "fe7b7dea7f80dd3ef892f5f1cd07e19b7689269173182aa0288a61257d674cc6",
+      "dimension": "structure",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "58",
+      "tier": "large"
+    },
+    {
+      "category": "3",
+      "dimension": "B",
+      "method": "one_step_voi",
+      "nonzero": "3",
+      "residual_sum": "22/35",
+      "states": "153",
+      "tier": "small"
+    },
+    {
+      "category": "5",
+      "dimension": "B",
+      "method": "one_step_voi",
+      "nonzero": "6",
+      "residual_sum": "14053/10850",
+      "states": "1018",
+      "tier": "small"
+    },
+    {
+      "category": "0",
+      "dimension": "H",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "162",
+      "tier": "small"
+    },
+    {
+      "category": "1",
+      "dimension": "H",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "200",
+      "tier": "small"
+    },
+    {
+      "category": "12",
+      "dimension": "H",
+      "method": "one_step_voi",
+      "nonzero": "7",
+      "residual_sum": "503/350",
+      "states": "16",
+      "tier": "small"
+    },
+    {
+      "category": "2",
+      "dimension": "H",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "186",
+      "tier": "small"
+    },
+    {
+      "category": "3",
+      "dimension": "H",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "154",
+      "tier": "small"
+    },
+    {
+      "category": "4",
+      "dimension": "H",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "170",
+      "tier": "small"
+    },
+    {
+      "category": "5",
+      "dimension": "H",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "65",
+      "tier": "small"
+    },
+    {
+      "category": "6",
+      "dimension": "H",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "114",
+      "tier": "small"
+    },
+    {
+      "category": "7",
+      "dimension": "H",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "34",
+      "tier": "small"
+    },
+    {
+      "category": "8",
+      "dimension": "H",
+      "method": "one_step_voi",
+      "nonzero": "1",
+      "residual_sum": "8/31",
+      "states": "26",
+      "tier": "small"
+    },
+    {
+      "category": "9",
+      "dimension": "H",
+      "method": "one_step_voi",
+      "nonzero": "1",
+      "residual_sum": "8/35",
+      "states": "44",
+      "tier": "small"
+    },
+    {
+      "category": "normal",
+      "dimension": "autopilot",
+      "method": "one_step_voi",
+      "nonzero": "9",
+      "residual_sum": "20873/10850",
+      "states": "1171",
+      "tier": "small"
+    },
+    {
+      "category": "single_sensing",
+      "dimension": "chosen_type",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "10",
+      "tier": "small"
+    },
+    {
+      "category": "stop",
+      "dimension": "chosen_type",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "162",
+      "tier": "small"
+    },
+    {
+      "category": "task",
+      "dimension": "chosen_type",
+      "method": "one_step_voi",
+      "nonzero": "9",
+      "residual_sum": "20873/10850",
+      "states": "999",
+      "tier": "small"
+    },
+    {
+      "category": "measurement_optional",
+      "dimension": "decision_class",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "1",
+      "tier": "small"
+    },
+    {
+      "category": "measurement_required",
+      "dimension": "decision_class",
+      "method": "one_step_voi",
+      "nonzero": "9",
+      "residual_sum": "20873/10850",
+      "states": "19",
+      "tier": "small"
+    },
+    {
+      "category": "nonmeasuring_optimal",
+      "dimension": "decision_class",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "1151",
+      "tier": "small"
+    },
+    {
+      "category": "adaptive_hierarchy",
+      "dimension": "family",
+      "method": "one_step_voi",
+      "nonzero": "2",
+      "residual_sum": "2/5",
+      "states": "345",
+      "tier": "small"
+    },
+    {
+      "category": "cost_horizon",
+      "dimension": "family",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "81",
+      "tier": "small"
+    },
+    {
+      "category": "decoy_redundancy",
+      "dimension": "family",
+      "method": "one_step_voi",
+      "nonzero": "1",
+      "residual_sum": "9/50",
+      "states": "433",
+      "tier": "small"
+    },
+    {
+      "category": "random_resource_graph",
+      "dimension": "family",
+      "method": "one_step_voi",
+      "nonzero": "6",
+      "residual_sum": "1458/1085",
+      "states": "312",
+      "tier": "small"
+    },
+    {
+      "category": "student_train",
+      "dimension": "fold",
+      "method": "one_step_voi",
+      "nonzero": "2",
+      "residual_sum": "2/5",
+      "states": "441",
+      "tier": "small"
+    },
+    {
+      "category": "student_validation",
+      "dimension": "fold",
+      "method": "one_step_voi",
+      "nonzero": "7",
+      "residual_sum": "16533/10850",
+      "states": "730",
+      "tier": "small"
+    },
+    {
+      "category": "limit_hit",
+      "dimension": "limit",
+      "method": "one_step_voi",
+      "nonzero": "9",
+      "residual_sum": "20873/10850",
+      "states": "167",
+      "tier": "small"
+    },
+    {
+      "category": "no_limit",
+      "dimension": "limit",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "1004",
+      "tier": "small"
+    },
+    {
+      "category": "single_sensing",
+      "dimension": "optimal_types",
+      "method": "one_step_voi",
+      "nonzero": "9",
+      "residual_sum": "20873/10850",
+      "states": "19",
+      "tier": "small"
+    },
+    {
+      "category": "single_sensing+task",
+      "dimension": "optimal_types",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "1",
+      "tier": "small"
+    },
+    {
+      "category": "stop",
+      "dimension": "optimal_types",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "162",
+      "tier": "small"
+    },
+    {
+      "category": "task",
+      "dimension": "optimal_types",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "989",
+      "tier": "small"
+    },
+    {
+      "category": "nonprior",
+      "dimension": "prior",
+      "method": "one_step_voi",
+      "nonzero": "1",
+      "residual_sum": "8/31",
+      "states": "1115",
+      "tier": "small"
+    },
+    {
+      "category": "prior",
+      "dimension": "prior",
+      "method": "one_step_voi",
+      "nonzero": "8",
+      "residual_sum": "583/350",
+      "states": "56",
+      "tier": "small"
+    },
+    {
+      "category": "08266990c9b5029ea1c3a7ce99a018f9a27f2c63ad793c8d47a3f8d55caa2357",
+      "dimension": "structure",
+      "method": "one_step_voi",
+      "nonzero": "2",
+      "residual_sum": "2/5",
+      "states": "287",
+      "tier": "small"
+    },
+    {
+      "category": "249dec9a76ec99233d58619ba68a3a370d1213377bf0031b51d34aa2c21e521f",
+      "dimension": "structure",
+      "method": "one_step_voi",
+      "nonzero": "4",
+      "residual_sum": "1024/1085",
+      "states": "175",
+      "tier": "small"
+    },
+    {
+      "category": "2c950aa73de634c95f60fd3f229ae2dee55e5a6c6af6f105534cd0bb363fee07",
+      "dimension": "structure",
+      "method": "one_step_voi",
+      "nonzero": "2",
+      "residual_sum": "2/5",
+      "states": "137",
+      "tier": "small"
+    },
+    {
+      "category": "324c96768d64a0bcaff04628791733b1623b058aac34f61d057b6f84330703a8",
+      "dimension": "structure",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "165",
+      "tier": "small"
+    },
+    {
+      "category": "6a87c6b1c246269c2a071901698091fd7072b585fc228edf02744f7446fd20c4",
+      "dimension": "structure",
+      "method": "one_step_voi",
+      "nonzero": "1",
+      "residual_sum": "9/50",
+      "states": "268",
+      "tier": "small"
+    },
+    {
+      "category": "6bd414da33f5b92eba6ae2f0483ddbfd7e16ee0a9515ea81440e338c179a6f07",
+      "dimension": "structure",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "37",
+      "tier": "small"
+    },
+    {
+      "category": "cb9c4f76bcc7c41bbf19f9e66fc873468d638c282ef7b01ccd340dc34e558cf1",
+      "dimension": "structure",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "44",
+      "tier": "small"
+    },
+    {
+      "category": "fe7b7dea7f80dd3ef892f5f1cd07e19b7689269173182aa0288a61257d674cc6",
+      "dimension": "structure",
+      "method": "one_step_voi",
+      "nonzero": "0",
+      "residual_sum": "0",
+      "states": "58",
+      "tier": "small"
+    }
+  ]
+}

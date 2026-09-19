@@ -1,0 +1,8 @@
+{
+  "route": "C",
+  "action": "stop_current_learned_planner_main_line",
+  "scope": "these 8 teacher pilot structures and tested planners",
+  "reason": "Large VOI exact; Small VOI deployment loss dominated by work-limited fallback/nonmeasuring execution",
+  "not_claimed": "global impossibility of beneficial amortization or invalidity of previous DEV results",
+  "further_training_authorized": false
+}

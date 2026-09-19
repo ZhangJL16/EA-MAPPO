@@ -1,6 +1,14 @@
 # Feedback Protocol Lab — finite Bernoulli testbed
 
-Latest: [T5.1d depth-two measurement census](../../docs/FPL_T51D_CENSUS_20260919.md),
+Current decision: **Route C — stop the learned-planner main line on current
+evidence.** [T5.1e report](../../docs/FPL_T51E_RESIDUAL_20260919.md),
+[contract](CONTRACT_T51E_RESIDUAL.md), [results](provenance/planning_residual_v1/RESULTS.md).
+4,684 exact census probes; 128 exact occupancy identities. Large VOI is optimal
+on all 32 pilot variants; Small VOI loss is dominated by limited-work fallback/
+execution. Adaptive census states contribute zero deployed gap. No full or
+selective learned method, V2.1/V3 or held-out run is started.
+
+Previous: [T5.1d depth-two measurement census](../../docs/FPL_T51D_CENSUS_20260919.md),
 [contract](CONTRACT_T51D_CENSUS.md), [tables](provenance/teacher_v2_census/RESULTS.md).
 1,171 exact states; 6 adaptive states across 3 structures (5 missed previously).
 Collection gap demonstrated, but only one adaptive training structure remains.

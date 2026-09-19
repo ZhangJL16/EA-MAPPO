@@ -1,5 +1,19 @@
 # Current research notes
 
+## 2026-09-19 residual decomposition: Route C
+
+All 4,684 census decision probes and 128 exact episode decompositions completed.
+Large VOI has zero fresh-state and episode gaps on all 32 pilot variants. Small
+VOI has 9/1,171 fresh nonzero residuals, yet 20/32 positive episode gaps due to
+the actual cumulative compute contract. 79.72% of its pooled gap is explicitly
+autopilot; 82.56% is at nonmeasuring-optimal states; all positive loss accompanies
+work-limit hits. No evaluated policy visits non-prior measurement-required
+states, so that subset contributes zero occupancy-weighted gap. This qualifies
+the old curriculum focus and supports stopping the current learned-planner line,
+not invalidating previous DEV findings or claiming amortization is impossible.
+No new roots/DEV/training; 452 supplemental evaluation-only states on the same
+problems. 63 tests pass. See `docs/FPL_T51E_RESIDUAL_20260919.md`.
+
 ## 2026-09-19 bounded census qualifies the Case C diagnosis
 
 Depth≤2 measurement-only closure (including joint batches) completed for the

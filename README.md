@@ -1,5 +1,12 @@
 # EA-MAPPO research workspace
 
+Latest (2026-09-19): [T5.1e residual decomposition](docs/FPL_T51E_RESIDUAL_20260919.md)
+selects **Route C: stop the current learned-planner main line**. Large VOI is
+exact on all 32 pilot variants; Small VOI losses are dominated by work-limited
+fallback/nonmeasuring execution. Continued-sensing states contribute zero to
+the actual occupancy gap. No AFPP/selective learner, V2.1 or V3 is launched.
+The theory and planning/evaluation infrastructure remain separate assets.
+
 Current entry (2026-09-19): [Feedback Protocol Lab](research/feedback_protocol/README.md)
 implements the bounded planning/evaluation stages of the [A/B/C plan](expert_advice/EA_MAPPO_ABC_RESEARCH_PLAN.md).
 Its public problem contract and classical comparison baselines are separate

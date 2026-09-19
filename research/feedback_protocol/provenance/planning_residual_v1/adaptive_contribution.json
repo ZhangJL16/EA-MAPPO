@@ -1,0 +1,30 @@
+[
+  {
+    "method": "beam_bayes",
+    "tier": "large",
+    "contexts": 0,
+    "occupancy": "0",
+    "gap_contribution": "0"
+  },
+  {
+    "method": "beam_bayes",
+    "tier": "small",
+    "contexts": 0,
+    "occupancy": "0",
+    "gap_contribution": "0"
+  },
+  {
+    "method": "one_step_voi",
+    "tier": "large",
+    "contexts": 0,
+    "occupancy": "0",
+    "gap_contribution": "0"
+  },
+  {
+    "method": "one_step_voi",
+    "tier": "small",
+    "contexts": 0,
+    "occupancy": "0",
+    "gap_contribution": "0"
+  }
+]
