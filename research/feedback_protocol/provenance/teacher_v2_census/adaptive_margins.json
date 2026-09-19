@@ -1,0 +1,50 @@
+[
+  {
+    "best_nonmeasuring_first_Q": "75/23",
+    "execute_forever_value": "75/23",
+    "instance": "v2-300001-h12-b3",
+    "state": "e200f71a89aec4a58577db13bad1ba397375dd093d478e252cc9030e9db31946",
+    "strict_first_decision_gap": "17/115",
+    "value": "392/115"
+  },
+  {
+    "best_nonmeasuring_first_Q": "75/23",
+    "execute_forever_value": "75/23",
+    "instance": "v2-300129-h12-b3",
+    "state": "674c5867472440ceff51cf1bf03bdb25ebd404b88cd1d51ca4601d441de6ce74",
+    "strict_first_decision_gap": "17/115",
+    "value": "392/115"
+  },
+  {
+    "best_nonmeasuring_first_Q": "75/23",
+    "execute_forever_value": "75/23",
+    "instance": "v2-300001-h12-b5",
+    "state": "b2faed6aa18df6b4647e6ccf71cda772bc6a728666335fc66c0dfe78ee6d625a",
+    "strict_first_decision_gap": "17/115",
+    "value": "392/115"
+  },
+  {
+    "best_nonmeasuring_first_Q": "75/23",
+    "execute_forever_value": "75/23",
+    "instance": "v2-300129-h12-b5",
+    "state": "f9dcc8606761bc084eae158f598cf8b6fadc4ed36f7029419148474847ec58f9",
+    "strict_first_decision_gap": "17/115",
+    "value": "392/115"
+  },
+  {
+    "best_nonmeasuring_first_Q": "246/65",
+    "execute_forever_value": "48/13",
+    "instance": "v2-300130-h12-b5",
+    "state": "4ef8121f3d3abf5836622c4d0b451d8a0ad0af6bf980851421e1f25aab783419",
+    "strict_first_decision_gap": "24/65",
+    "value": "54/13"
+  },
+  {
+    "best_nonmeasuring_first_Q": "82/31",
+    "execute_forever_value": "80/31",
+    "instance": "v2-300130-h12-b5",
+    "state": "a01386a3dbac8811d9ddda0293394e509e41dffe44b030c94b4a9005b63fdc2d",
+    "strict_first_decision_gap": "8/31",
+    "value": "90/31"
+  }
+]

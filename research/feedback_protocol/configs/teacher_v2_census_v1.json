@@ -1,0 +1,14 @@
+{
+  "schema": "teacher-v2-depth2-census-v1",
+  "source_archive_sha256": "72f211419542540e3366b33e092d905326316e2db8cba50d2173ffa8b07dfc01",
+  "scope": "only the 32 completed variants of the existing eight pilot groups",
+  "depth": 2,
+  "measurement_only": "nonempty observation channels; every operation has identically zero task utility",
+  "history_semantics": "complete reset-to-first-reset batches; joint routes included; no intervening task or idle batches",
+  "deduplication": "posterior,remaining,resource within variant; expand separately at each reachable depth",
+  "closure_limits": {"max_states": 100000, "max_edges": 1000000, "max_protocol_nodes": 10000, "max_outcomes": 32, "max_expansions": 1000000, "max_model_calls": 3000000, "watchdog_seconds": 30},
+  "label_limits": {"max_states": 3000, "max_protocol_nodes": 10000, "max_outcomes": 32, "max_expansions": 1000000, "max_model_calls": 3000000, "watchdog_seconds": 5},
+  "failure_rule": "closure cap makes variant incomplete; label cap remains unresolved; no retries or cap increases",
+  "interpretation": "report adaptive-state and group counts, new/missed versus old collector, and fold/depth breakdown; no inference beyond depth-two measurement-only reachability",
+  "no_automatic_next_stage": ["remaining V2 roots", "V2.1 collection", "V3 generation", "neural training", "DEV", "test", "OOD", "CONFIRM"]
+}

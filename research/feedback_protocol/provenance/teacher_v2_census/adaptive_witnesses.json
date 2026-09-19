@@ -1,0 +1,304 @@
+[
+  {
+    "adaptive": 1,
+    "depths": [
+      1
+    ],
+    "exact": 1,
+    "family": "adaptive_hierarchy",
+    "fold": "student_validation",
+    "history": [
+      {
+        "feedback": [
+          [
+            "c1",
+            0
+          ]
+        ],
+        "operations": [
+          "prepare",
+          "probe_c1",
+          "return_c1"
+        ]
+      }
+    ],
+    "instance": "v2-300001-h12-b3",
+    "missed_adaptive": 1,
+    "new": 1,
+    "nonprior": 1,
+    "nonprior_measurement_optimal": 1,
+    "optimal_set": [
+      [
+        "prepare",
+        "probe_c0",
+        "return_c0"
+      ]
+    ],
+    "posterior": [
+      "8/23",
+      "25/69",
+      "10/69",
+      "10/69"
+    ],
+    "remaining": 9,
+    "required": 1,
+    "root": 300001,
+    "seen_old": 0,
+    "state": "e200f71a89aec4a58577db13bad1ba397375dd093d478e252cc9030e9db31946",
+    "states": 1,
+    "unresolved": 0,
+    "value": "392/115"
+  },
+  {
+    "adaptive": 1,
+    "depths": [
+      1
+    ],
+    "exact": 1,
+    "family": "adaptive_hierarchy",
+    "fold": "student_validation",
+    "history": [
+      {
+        "feedback": [
+          [
+            "c1",
+            0
+          ]
+        ],
+        "operations": [
+          "prepare",
+          "probe_c1",
+          "return_c1"
+        ]
+      }
+    ],
+    "instance": "v2-300001-h12-b5",
+    "missed_adaptive": 1,
+    "new": 1,
+    "nonprior": 1,
+    "nonprior_measurement_optimal": 1,
+    "optimal_set": [
+      [
+        "prepare",
+        "probe_c0",
+        "return_c0"
+      ]
+    ],
+    "posterior": [
+      "8/23",
+      "25/69",
+      "10/69",
+      "10/69"
+    ],
+    "remaining": 9,
+    "required": 1,
+    "root": 300001,
+    "seen_old": 0,
+    "state": "b2faed6aa18df6b4647e6ccf71cda772bc6a728666335fc66c0dfe78ee6d625a",
+    "states": 1,
+    "unresolved": 0,
+    "value": "392/115"
+  },
+  {
+    "adaptive": 1,
+    "depths": [
+      1
+    ],
+    "exact": 1,
+    "family": "random_resource_graph",
+    "fold": "student_train",
+    "history": [
+      {
+        "feedback": [
+          [
+            "c2",
+            0
+          ]
+        ],
+        "operations": [
+          "prepare",
+          "probe_c2",
+          "return_c2"
+        ]
+      }
+    ],
+    "instance": "v2-300129-h12-b3",
+    "missed_adaptive": 1,
+    "new": 1,
+    "nonprior": 1,
+    "nonprior_measurement_optimal": 1,
+    "optimal_set": [
+      [
+        "prepare",
+        "probe_c0",
+        "return_c0"
+      ]
+    ],
+    "posterior": [
+      "8/23",
+      "10/69",
+      "10/69",
+      "25/69"
+    ],
+    "remaining": 9,
+    "required": 1,
+    "root": 300129,
+    "seen_old": 0,
+    "state": "674c5867472440ceff51cf1bf03bdb25ebd404b88cd1d51ca4601d441de6ce74",
+    "states": 1,
+    "unresolved": 0,
+    "value": "392/115"
+  },
+  {
+    "adaptive": 1,
+    "depths": [
+      1
+    ],
+    "exact": 1,
+    "family": "random_resource_graph",
+    "fold": "student_train",
+    "history": [
+      {
+        "feedback": [
+          [
+            "c2",
+            0
+          ]
+        ],
+        "operations": [
+          "prepare",
+          "probe_c2",
+          "return_c2"
+        ]
+      }
+    ],
+    "instance": "v2-300129-h12-b5",
+    "missed_adaptive": 1,
+    "new": 1,
+    "nonprior": 1,
+    "nonprior_measurement_optimal": 1,
+    "optimal_set": [
+      [
+        "prepare",
+        "probe_c0",
+        "return_c0"
+      ]
+    ],
+    "posterior": [
+      "8/23",
+      "10/69",
+      "10/69",
+      "25/69"
+    ],
+    "remaining": 9,
+    "required": 1,
+    "root": 300129,
+    "seen_old": 0,
+    "state": "f9dcc8606761bc084eae158f598cf8b6fadc4ed36f7029419148474847ec58f9",
+    "states": 1,
+    "unresolved": 0,
+    "value": "392/115"
+  },
+  {
+    "adaptive": 1,
+    "depths": [
+      1
+    ],
+    "exact": 1,
+    "family": "random_resource_graph",
+    "fold": "student_validation",
+    "history": [
+      {
+        "feedback": [
+          [
+            "c0",
+            1
+          ]
+        ],
+        "operations": [
+          "prepare",
+          "probe_c0",
+          "return_c0",
+          "cleanup_return"
+        ]
+      }
+    ],
+    "instance": "v2-300130-h12-b5",
+    "missed_adaptive": 0,
+    "new": 0,
+    "nonprior": 1,
+    "nonprior_measurement_optimal": 1,
+    "optimal_set": [
+      [
+        "prepare",
+        "probe_c2",
+        "return_c2"
+      ]
+    ],
+    "posterior": [
+      "6/13",
+      "6/13",
+      "1/39",
+      "2/39"
+    ],
+    "remaining": 8,
+    "required": 1,
+    "root": 300130,
+    "seen_old": 1,
+    "state": "4ef8121f3d3abf5836622c4d0b451d8a0ad0af6bf980851421e1f25aab783419",
+    "states": 1,
+    "unresolved": 0,
+    "value": "54/13"
+  },
+  {
+    "adaptive": 1,
+    "depths": [
+      1
+    ],
+    "exact": 1,
+    "family": "random_resource_graph",
+    "fold": "student_validation",
+    "history": [
+      {
+        "feedback": [
+          [
+            "c1",
+            1
+          ]
+        ],
+        "operations": [
+          "prepare",
+          "probe_c1",
+          "return_c1",
+          "cleanup_return"
+        ]
+      }
+    ],
+    "instance": "v2-300130-h12-b5",
+    "missed_adaptive": 1,
+    "new": 1,
+    "nonprior": 1,
+    "nonprior_measurement_optimal": 1,
+    "optimal_set": [
+      [
+        "prepare",
+        "probe_c2",
+        "return_c2"
+      ]
+    ],
+    "posterior": [
+      "10/31",
+      "10/31",
+      "9/31",
+      "2/31"
+    ],
+    "remaining": 8,
+    "required": 1,
+    "root": 300130,
+    "seen_old": 0,
+    "state": "a01386a3dbac8811d9ddda0293394e509e41dffe44b030c94b4a9005b63fdc2d",
+    "states": 1,
+    "unresolved": 0,
+    "value": "90/31"
+  }
+]

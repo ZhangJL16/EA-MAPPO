@@ -1,5 +1,19 @@
 # Current task plan
 
+## T5.1d depth-two census (completed, 2026-09-19)
+
+- [x] Freeze census of existing 8 pilot groups / 32 variants only.
+- [x] Exhaust all measuring-only complete batches/outcomes through depth 2.
+- [x] All closures complete; 1,171 exact labels; zero unresolved; 59 tests.
+- [x] Independent traversal cross-check, old-label agreement and portable evidence.
+- [x] Diagnose 5 missed adaptive states; total 6 across 3 structures, 2 families.
+- [ ] V2.1 measurement-closure collector redesign: next branch, not executed.
+- [ ] Remaining V2 groups, V3, neural training: not executed/auto-promoted.
+
+Qualified C1, not a global economics-impossibility result. Train has only one
+adaptive structure. See `docs/FPL_T51D_CENSUS_20260919.md`; earlier sections
+retain historical conclusions and are superseded where explicitly noted.
+
 ## T5.1c V2 sizing / decoder feasibility (completed, 2026-09-19)
 
 - [x] Implement frozen four-family V2 and independent RNG streams.

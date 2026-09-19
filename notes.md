@@ -1,5 +1,18 @@
 # Current research notes
 
+## 2026-09-19 bounded census qualifies the Case C diagnosis
+
+Depth≤2 measurement-only closure (including joint batches) completed for the
+same 32 pilot variants: 1,171 exact states / 1,115 non-prior / 6 adaptive;
+zero unresolved. Five adaptive states were missed by the old collector, across
+three structures/two families. Train has 2 adaptive states in one structure;
+validation has 4 in two structures. All adaptive states are depth 1, H_initial12.
+This demonstrates a collection gap (qualified C1) while coverage remains sparse.
+It does not prove economics is the sole cause or that arbitrary V2 histories
+lack adaptive states. Prefer V2.1 measurement-closure collection design before
+V3; no new roots, design changes, full run or training executed. See
+`docs/FPL_T51D_CENSUS_20260919.md`. Old source/evidence and mask remain frozen.
+
 ## 2026-09-19 V2 sizing: Case C, not a solver failure
 
 All 32 structural identities / 128 paired variants were admitted before labels;

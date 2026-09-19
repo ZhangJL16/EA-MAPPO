@@ -1,6 +1,13 @@
 # Feedback Protocol Lab — finite Bernoulli testbed
 
-Latest: [T5.1c V2 sizing + catalogue-free mask](../../docs/FPL_T51C_V2_SIZING_20260919.md),
+Latest: [T5.1d depth-two measurement census](../../docs/FPL_T51D_CENSUS_20260919.md),
+[contract](CONTRACT_T51D_CENSUS.md), [tables](provenance/teacher_v2_census/RESULTS.md).
+1,171 exact states; 6 adaptive states across 3 structures (5 missed previously).
+Collection gap demonstrated, but only one adaptive training structure remains.
+No V2.1/full V2/V3 run or neural training. The census is bounded to two
+measurement batches, not all possible histories.
+
+Previous: [T5.1c V2 sizing + catalogue-free mask](../../docs/FPL_T51C_V2_SIZING_20260919.md),
 [contract](CONTRACT_T51C_V2.md), [audit tables](provenance/teacher_v2_sizing/RESULTS.md).
 32 identities frozen; only 8 groups / 32 variants labeled: 591 exact, 0 unresolved.
 12,232 V1/V2 mask checks pass. **Case C: train has zero post-feedback

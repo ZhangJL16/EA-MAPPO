@@ -12,9 +12,11 @@ labels, eight structures, limited non-prior sensing coverage. No neural FPL
 method has been trained. [T5.1b export and V2 design](docs/FPL_T51B_EXPORT_V2_DESIGN_20260919.md)
 are available: exact prefix targets are derived without new solves.
 [T5.1c sizing and decoder-mask checks](docs/FPL_T51C_V2_SIZING_20260919.md)
-are now complete: 591 exact labels and zero mask mismatches, but only one
-post-feedback required-sensing state (validation; train zero). **Case C: stop
-V2 expansion and do not train AFPP.** Remaining 24 groups are admitted, not labeled.
+are complete: 591 exact labels and zero mask mismatches. The subsequent
+[depth-two census](docs/FPL_T51D_CENSUS_20260919.md) finds 6 adaptive states over
+3 structures, including 5 missed by the collector. This demonstrates a collection
+gap, but train still has only one adaptive structure. No full V2 expansion,
+V3 generation or AFPP training has started.
 
 ## Historical PAI / PSPS entry (retained)
 

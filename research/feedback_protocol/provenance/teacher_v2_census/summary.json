@@ -1,0 +1,527 @@
+{
+  "by_depth": [
+    {
+      "adaptive": 0,
+      "depth": 0,
+      "exact": 32,
+      "missed_adaptive": 0,
+      "new": 0,
+      "nonprior": 0,
+      "nonprior_measurement_optimal": 0,
+      "required": 13,
+      "seen_old": 32,
+      "states": 32,
+      "unresolved": 0
+    },
+    {
+      "adaptive": 6,
+      "depth": 1,
+      "exact": 238,
+      "missed_adaptive": 5,
+      "new": 170,
+      "nonprior": 238,
+      "nonprior_measurement_optimal": 6,
+      "required": 6,
+      "seen_old": 68,
+      "states": 238,
+      "unresolved": 0
+    },
+    {
+      "adaptive": 0,
+      "depth": 2,
+      "exact": 909,
+      "missed_adaptive": 0,
+      "new": 845,
+      "nonprior": 885,
+      "nonprior_measurement_optimal": 0,
+      "required": 0,
+      "seen_old": 64,
+      "states": 909,
+      "unresolved": 0
+    }
+  ],
+  "by_family_fold": [
+    {
+      "adaptive": 6,
+      "adaptive_groups": 3,
+      "exact": 1171,
+      "family": "ALL",
+      "fold": "ALL",
+      "groups": 8,
+      "missed_adaptive": 5,
+      "new": 1007,
+      "nonprior": 1115,
+      "nonprior_measurement_optimal": 6,
+      "required": 19,
+      "seen_old": 164,
+      "states": 1171,
+      "unresolved": 0,
+      "variants": 32
+    },
+    {
+      "adaptive": 2,
+      "adaptive_groups": 1,
+      "exact": 441,
+      "family": "ALL",
+      "fold": "student_train",
+      "groups": 5,
+      "missed_adaptive": 2,
+      "new": 355,
+      "nonprior": 407,
+      "nonprior_measurement_optimal": 2,
+      "required": 6,
+      "seen_old": 86,
+      "states": 441,
+      "unresolved": 0,
+      "variants": 20
+    },
+    {
+      "adaptive": 4,
+      "adaptive_groups": 2,
+      "exact": 730,
+      "family": "ALL",
+      "fold": "student_validation",
+      "groups": 3,
+      "missed_adaptive": 3,
+      "new": 652,
+      "nonprior": 708,
+      "nonprior_measurement_optimal": 4,
+      "required": 13,
+      "seen_old": 78,
+      "states": 730,
+      "unresolved": 0,
+      "variants": 12
+    },
+    {
+      "adaptive": 2,
+      "adaptive_groups": 1,
+      "exact": 345,
+      "family": "adaptive_hierarchy",
+      "fold": "ALL",
+      "groups": 2,
+      "missed_adaptive": 2,
+      "new": 305,
+      "nonprior": 330,
+      "nonprior_measurement_optimal": 2,
+      "required": 6,
+      "seen_old": 40,
+      "states": 345,
+      "unresolved": 0,
+      "variants": 8
+    },
+    {
+      "adaptive": 0,
+      "adaptive_groups": 0,
+      "exact": 58,
+      "family": "adaptive_hierarchy",
+      "fold": "student_train",
+      "groups": 1,
+      "missed_adaptive": 0,
+      "new": 46,
+      "nonprior": 52,
+      "nonprior_measurement_optimal": 0,
+      "required": 0,
+      "seen_old": 12,
+      "states": 58,
+      "unresolved": 0,
+      "variants": 4
+    },
+    {
+      "adaptive": 2,
+      "adaptive_groups": 1,
+      "exact": 287,
+      "family": "adaptive_hierarchy",
+      "fold": "student_validation",
+      "groups": 1,
+      "missed_adaptive": 2,
+      "new": 259,
+      "nonprior": 278,
+      "nonprior_measurement_optimal": 2,
+      "required": 6,
+      "seen_old": 28,
+      "states": 287,
+      "unresolved": 0,
+      "variants": 4
+    },
+    {
+      "adaptive": 0,
+      "adaptive_groups": 0,
+      "exact": 81,
+      "family": "cost_horizon",
+      "fold": "ALL",
+      "groups": 2,
+      "missed_adaptive": 0,
+      "new": 55,
+      "nonprior": 71,
+      "nonprior_measurement_optimal": 0,
+      "required": 0,
+      "seen_old": 26,
+      "states": 81,
+      "unresolved": 0,
+      "variants": 8
+    },
+    {
+      "adaptive": 0,
+      "adaptive_groups": 0,
+      "exact": 81,
+      "family": "cost_horizon",
+      "fold": "student_train",
+      "groups": 2,
+      "missed_adaptive": 0,
+      "new": 55,
+      "nonprior": 71,
+      "nonprior_measurement_optimal": 0,
+      "required": 0,
+      "seen_old": 26,
+      "states": 81,
+      "unresolved": 0,
+      "variants": 8
+    },
+    {
+      "adaptive": 0,
+      "adaptive_groups": 0,
+      "exact": 433,
+      "family": "decoy_redundancy",
+      "fold": "ALL",
+      "groups": 2,
+      "missed_adaptive": 0,
+      "new": 383,
+      "nonprior": 417,
+      "nonprior_measurement_optimal": 0,
+      "required": 1,
+      "seen_old": 50,
+      "states": 433,
+      "unresolved": 0,
+      "variants": 8
+    },
+    {
+      "adaptive": 0,
+      "adaptive_groups": 0,
+      "exact": 165,
+      "family": "decoy_redundancy",
+      "fold": "student_train",
+      "groups": 1,
+      "missed_adaptive": 0,
+      "new": 141,
+      "nonprior": 156,
+      "nonprior_measurement_optimal": 0,
+      "required": 0,
+      "seen_old": 24,
+      "states": 165,
+      "unresolved": 0,
+      "variants": 4
+    },
+    {
+      "adaptive": 0,
+      "adaptive_groups": 0,
+      "exact": 268,
+      "family": "decoy_redundancy",
+      "fold": "student_validation",
+      "groups": 1,
+      "missed_adaptive": 0,
+      "new": 242,
+      "nonprior": 261,
+      "nonprior_measurement_optimal": 0,
+      "required": 1,
+      "seen_old": 26,
+      "states": 268,
+      "unresolved": 0,
+      "variants": 4
+    },
+    {
+      "adaptive": 4,
+      "adaptive_groups": 2,
+      "exact": 312,
+      "family": "random_resource_graph",
+      "fold": "ALL",
+      "groups": 2,
+      "missed_adaptive": 3,
+      "new": 264,
+      "nonprior": 297,
+      "nonprior_measurement_optimal": 4,
+      "required": 12,
+      "seen_old": 48,
+      "states": 312,
+      "unresolved": 0,
+      "variants": 8
+    },
+    {
+      "adaptive": 2,
+      "adaptive_groups": 1,
+      "exact": 137,
+      "family": "random_resource_graph",
+      "fold": "student_train",
+      "groups": 1,
+      "missed_adaptive": 2,
+      "new": 113,
+      "nonprior": 128,
+      "nonprior_measurement_optimal": 2,
+      "required": 6,
+      "seen_old": 24,
+      "states": 137,
+      "unresolved": 0,
+      "variants": 4
+    },
+    {
+      "adaptive": 2,
+      "adaptive_groups": 1,
+      "exact": 175,
+      "family": "random_resource_graph",
+      "fold": "student_validation",
+      "groups": 1,
+      "missed_adaptive": 1,
+      "new": 151,
+      "nonprior": 169,
+      "nonprior_measurement_optimal": 2,
+      "required": 6,
+      "seen_old": 24,
+      "states": 175,
+      "unresolved": 0,
+      "variants": 4
+    }
+  ],
+  "census_hashes": {
+    "v2-300001-h12-b3.census.json": "505f31d674c70b5e6dc7d549130ffb59a2c575a565f1fcc04081b97a61ae6678",
+    "v2-300001-h12-b5.census.json": "e430db4ee57d12b28e0feb6c959e3a354e8c462ab2f63ac57cf6d81e9b6158b0",
+    "v2-300001-h9-b3.census.json": "b1aa293919d0c8f4125ea71eb00c3c7eff8295ae469ab15b9a5b42da58276b12",
+    "v2-300001-h9-b5.census.json": "ab1e2df569d19e10dde367a334bf53947d66ce2809545d4a2dbef1b6a6f1fdff",
+    "v2-300002-h12-b3.census.json": "408bf3ac475cfb3fbdf947bde681d4617c1da276b99e95df67f55775e421770d",
+    "v2-300002-h12-b5.census.json": "3c0d754ca3c42ae6e34c9520d0291293ba0f3516462aff46f3728ba4104cf28f",
+    "v2-300002-h9-b3.census.json": "b19e61b37844c9d2edaf4e8035ccf42684b657687ba16bc73debeaac3d36ddbc",
+    "v2-300002-h9-b5.census.json": "e623d057d75b6240246dc5363d7fa0e59d87b4ec791fde1c095070812f16bf99",
+    "v2-300129-h12-b3.census.json": "8518ede51932b5e791c017f8ae290ce8d4bba0cd28a08d33de9438ac5201a432",
+    "v2-300129-h12-b5.census.json": "5e0516349c96b5133c87aab26751a548d84a7d494ce86a115d23c5ddea184061",
+    "v2-300129-h9-b3.census.json": "14bb4f4d2d66e0db9d1065bf5400be5f98d9aa5ea0c1fd998b6f745c32871460",
+    "v2-300129-h9-b5.census.json": "3cb1130f4c9f7d856e3a1d7e112a3c7330580b62beea3db7919a75777ae4b3fc",
+    "v2-300130-h12-b3.census.json": "9122d3289209680bff339f3bf200b5d5b06b5e2d95a2a50dd4dd0515bc024d3b",
+    "v2-300130-h12-b5.census.json": "45563ea8d080e59075ac06882c0cbe69bb8950685e782b8d249f456e20d0a8d9",
+    "v2-300130-h9-b3.census.json": "5a226ae2b0a2e184d70c6a94077de3542cd1f47c160a5ec770af403192695297",
+    "v2-300130-h9-b5.census.json": "9ad824accf32803a6c5e27d129c8a65108eda64fa86a34b467a1d91202430567",
+    "v2-300257-h12-b3.census.json": "980b24b30b6023158f24d0d4b04cd47213230c41a5effa997c252e1bc08bb6aa",
+    "v2-300257-h12-b5.census.json": "456e84f74f205c50ecd8f0856552e8ca1b36be41ac119f7857b43cd30eb40db1",
+    "v2-300257-h9-b3.census.json": "61cf1dc12a4daec7dd750532636540516d7c23a950ec1dc62a9e853c144de81e",
+    "v2-300257-h9-b5.census.json": "193ab8346d2f3391521492cad53f4d30eddb9662f90d8016d1616c50762f0e35",
+    "v2-300258-h12-b3.census.json": "dc3a29315cdfbd5efc47723eaf8f9f09e60030895fd23c21ca49051a9d404459",
+    "v2-300258-h12-b5.census.json": "27a8cc0d7bf8488edbae59987da7e65c5ad7018a0dd4ebb311e072d389fd6756",
+    "v2-300258-h9-b3.census.json": "fd9952e453dabc7a7534c34f8625547562504ebfb729c9c653f2400694d28f99",
+    "v2-300258-h9-b5.census.json": "8ad14c27aa42774b4548bde8342fcd990c2abe15504795c590cdd0ff0644eb78",
+    "v2-300385-h12-b3.census.json": "8398e07c9df8d320e9fb9958d51207690b95d389b8e6e0b6385cc835c9c95a2e",
+    "v2-300385-h12-b5.census.json": "5a9569ce37da260bb5836ea916fc8365fffeb0438f7702fb3f89c4d76bc57ec3",
+    "v2-300385-h9-b3.census.json": "460b916c5238a889b5d6e7692f919e8b3f5d9e9816113a22b47dd45c871ffbe1",
+    "v2-300385-h9-b5.census.json": "21c655e9e57be873855d9309fbe9cd9bfd4ed0f936b87fb74e189b7d0c13c3d8",
+    "v2-300386-h12-b3.census.json": "f876e0589fd9dd80b5bfa87690fe6916683d1541f411a7c2e2910572460adc5a",
+    "v2-300386-h12-b5.census.json": "c12ac6462313a54c22144005d7a98f22074c6a7697887c5e45f688d5b3c9fb0c",
+    "v2-300386-h9-b3.census.json": "6c25631beeb865c00d4591c1e7a1a1890ab8f8b7165212a4f35aaf40d17aa3e4",
+    "v2-300386-h9-b5.census.json": "cfe4d4cd6dd09124ab38d5cf6f8435e664bf376fa4ad4b4f49c339f4bd37bbff"
+  },
+  "closure_checks": [
+    {
+      "edges": 42,
+      "states": 28,
+      "status": "complete_checked",
+      "variant": "v2-300001-h12-b3"
+    },
+    {
+      "edges": 418,
+      "states": 147,
+      "status": "complete_checked",
+      "variant": "v2-300001-h12-b5"
+    },
+    {
+      "edges": 42,
+      "states": 28,
+      "status": "complete_checked",
+      "variant": "v2-300001-h9-b3"
+    },
+    {
+      "edges": 226,
+      "states": 84,
+      "status": "complete_checked",
+      "variant": "v2-300001-h9-b5"
+    },
+    {
+      "edges": 0,
+      "states": 1,
+      "status": "complete_checked",
+      "variant": "v2-300002-h12-b3"
+    },
+    {
+      "edges": 42,
+      "states": 28,
+      "status": "complete_checked",
+      "variant": "v2-300002-h12-b5"
+    },
+    {
+      "edges": 0,
+      "states": 1,
+      "status": "complete_checked",
+      "variant": "v2-300002-h9-b3"
+    },
+    {
+      "edges": 42,
+      "states": 28,
+      "status": "complete_checked",
+      "variant": "v2-300002-h9-b5"
+    },
+    {
+      "edges": 20,
+      "states": 15,
+      "status": "complete_checked",
+      "variant": "v2-300129-h12-b3"
+    },
+    {
+      "edges": 110,
+      "states": 61,
+      "status": "complete_checked",
+      "variant": "v2-300129-h12-b5"
+    },
+    {
+      "edges": 20,
+      "states": 15,
+      "status": "complete_checked",
+      "variant": "v2-300129-h9-b3"
+    },
+    {
+      "edges": 78,
+      "states": 46,
+      "status": "complete_checked",
+      "variant": "v2-300129-h9-b5"
+    },
+    {
+      "edges": 6,
+      "states": 6,
+      "status": "complete_checked",
+      "variant": "v2-300130-h12-b3"
+    },
+    {
+      "edges": 156,
+      "states": 86,
+      "status": "complete_checked",
+      "variant": "v2-300130-h12-b5"
+    },
+    {
+      "edges": 6,
+      "states": 6,
+      "status": "complete_checked",
+      "variant": "v2-300130-h9-b3"
+    },
+    {
+      "edges": 140,
+      "states": 77,
+      "status": "complete_checked",
+      "variant": "v2-300130-h9-b5"
+    },
+    {
+      "edges": 6,
+      "states": 6,
+      "status": "complete_checked",
+      "variant": "v2-300257-h12-b3"
+    },
+    {
+      "edges": 42,
+      "states": 28,
+      "status": "complete_checked",
+      "variant": "v2-300257-h12-b5"
+    },
+    {
+      "edges": 2,
+      "states": 3,
+      "status": "complete_checked",
+      "variant": "v2-300257-h9-b3"
+    },
+    {
+      "edges": 6,
+      "states": 7,
+      "status": "complete_checked",
+      "variant": "v2-300257-h9-b5"
+    },
+    {
+      "edges": 0,
+      "states": 1,
+      "status": "complete_checked",
+      "variant": "v2-300258-h12-b3"
+    },
+    {
+      "edges": 42,
+      "states": 28,
+      "status": "complete_checked",
+      "variant": "v2-300258-h12-b5"
+    },
+    {
+      "edges": 0,
+      "states": 1,
+      "status": "complete_checked",
+      "variant": "v2-300258-h9-b3"
+    },
+    {
+      "edges": 6,
+      "states": 7,
+      "status": "complete_checked",
+      "variant": "v2-300258-h9-b5"
+    },
+    {
+      "edges": 6,
+      "states": 6,
+      "status": "complete_checked",
+      "variant": "v2-300385-h12-b3"
+    },
+    {
+      "edges": 224,
+      "states": 110,
+      "status": "complete_checked",
+      "variant": "v2-300385-h12-b5"
+    },
+    {
+      "edges": 6,
+      "states": 6,
+      "status": "complete_checked",
+      "variant": "v2-300385-h9-b3"
+    },
+    {
+      "edges": 64,
+      "states": 43,
+      "status": "complete_checked",
+      "variant": "v2-300385-h9-b5"
+    },
+    {
+      "edges": 20,
+      "states": 15,
+      "status": "complete_checked",
+      "variant": "v2-300386-h12-b3"
+    },
+    {
+      "edges": 372,
+      "states": 172,
+      "status": "complete_checked",
+      "variant": "v2-300386-h12-b5"
+    },
+    {
+      "edges": 20,
+      "states": 15,
+      "status": "complete_checked",
+      "variant": "v2-300386-h9-b3"
+    },
+    {
+      "edges": 110,
+      "states": 66,
+      "status": "complete_checked",
+      "variant": "v2-300386-h9-b5"
+    }
+  ],
+  "no_new_roots": true,
+  "no_training": true,
+  "schema": "teacher-v2-census-summary-v1",
+  "scope": "depth<=2 measurement-only complete batches; no claim about all reachable histories",
+  "seal_hash": "a7ad6d7e174d23ad7ad7df9ad371f0f85ccc6465fa92261d8b48d99a27174b65",
+  "unchanged_objective": true,
+  "work": {
+    "closure_cpu_seconds": 0.0739440830000002,
+    "closure_expansions": 2499,
+    "closure_model_calls": 12392,
+    "label_cpu_seconds": 2.3581160469999976,
+    "label_expansions": 75081,
+    "label_likelihood_branches": 103333,
+    "label_model_calls": 1051232,
+    "label_solver_states": 24819
+  }
+}
