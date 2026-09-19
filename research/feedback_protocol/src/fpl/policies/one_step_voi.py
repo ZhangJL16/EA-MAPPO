@@ -17,10 +17,11 @@ class OneStepVOI:
         self.problem,self.width = problem,width
         self.budget_limits = budget_limits or {}
 
-    def select(self,state):
+    def select(self,state,budget=None):
         if state.resource!=self.problem.capacity:
             raise ValueError("selection only at reset")
-        p,budget = self.problem,SearchBudget(**self.budget_limits)
+        p = self.problem
+        budget = budget if budget is not None else SearchBudget(**self.budget_limits)
         best,bestq = None,F(0)
         self.stats = dict(truncated=False,likelihood_branches=0)
         cache = {}

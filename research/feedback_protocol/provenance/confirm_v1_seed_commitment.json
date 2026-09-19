@@ -1,0 +1,14 @@
+{
+  "axes": [
+    "iid",
+    "size",
+    "topology",
+    "cost",
+    "hypothesis"
+  ],
+  "custody": "local user-controlled file outside repository; NOT independently externally blinded",
+  "derivation": "After method/protocol freeze: HMAC-SHA256(master_seed, axis || index), specified in final protocol.",
+  "schema": "fpl-confirm-seed-commitment-v1",
+  "sha256": "86caa6443e8c4ad8b662af495ff96f1f029a797bbb3ef8d91702a69a286b6bd4",
+  "status": "seed material committed; NO instances generated; final protocol NOT frozen"
+}

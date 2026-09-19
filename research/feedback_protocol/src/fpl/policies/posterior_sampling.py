@@ -13,12 +13,12 @@ class PosteriorSampling:
         self.width,self.max_expansions = width,max_expansions
         self.budget_limits = budget_limits or dict(max_expansions=max_expansions)
 
-    def select(self,state):
+    def select(self,state,budget=None):
         if state.resource != self.problem.capacity:
             raise ValueError("selection only at reset")
         index = self.rng.choices(range(len(state.posterior)),weights=list(map(float,state.posterior)))[0]
         belief = tuple(F(int(i == index)) for i in range(len(state.posterior)))
-        budget = SearchBudget(**self.budget_limits)
+        budget = budget if budget is not None else SearchBudget(**self.budget_limits)
         best = None
         self.stats = {"truncated":False}
         try:

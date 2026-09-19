@@ -4,6 +4,10 @@ Base commit: `3ecc0351c473387aef3efd919bcaa2ac1d82098e`, master.
 This batch is a local implementation and bounded DEV study, not a new trained
 method or complete A/B/C. No commit/push was performed by this execution.
 
+Post-implementation note (2026-09-19): this third batch was subsequently committed
+as `f557b3c47e4e8b1ccdb5623526405e3167acf4f0`. The original execution-time
+statement above remains unchanged as a historical record.
+
 ## Deliverables
 
 | Requested item | Implemented evidence | Boundary |

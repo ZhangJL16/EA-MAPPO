@@ -1,5 +1,18 @@
 # Current research notes
 
+## 2026-09-19 fourth FPL batch: exact fixed-policy evaluation
+
+371 fixed-policy expectations are exact, conditional on owned internal RNG state;
+no MC fallback needed. The old sparse-T12 estimate 3.0 becomes exactly 5.25 for
+Beam/VOI/cached Bayes. Fresh hierarchical DEV solves Bayes 10/12. Frozen operational
+GO rule passes: two redundant-channel configurations show low-work exact gaps
+closed by higher-work Beam; same-model H12→H18 reference work rises >6x even
+excluding failed smaller-cap attempts. Cheap VOI remains a serious competitor.
+Dimension changes also alter prior/sparse edges in this generator; do not claim
+an isolated causal redundancy effect. MCTS is a custom fixed-seed baseline.
+No neural training, no new pre-B2 gate, no final-test execution. Local seed
+commitment is not independent external blinding. See FPL_FOURTH_BATCH_20260919.md.
+
 ## 2026-09-19 third FPL batch: bounded scientific comparison
 
 RegistryV2 separates distribution/template/clone identity. Global selection

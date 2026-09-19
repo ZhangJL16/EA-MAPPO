@@ -57,10 +57,10 @@ class BeamBayes:
         self.max_states,self.max_outcomes = max_states,max_outcomes
         self.limits = budget_limits or dict(max_expansions=max_expansions,max_model_calls=100000,max_seconds=max_seconds)
 
-    def select(self,state):
+    def select(self,state,budget=None):
         if state.resource != self.problem.capacity:
             raise ValueError("selection only at reset")
-        budget = SearchBudget(**self.limits)
+        budget = budget if budget is not None else SearchBudget(**self.limits)
         self.stats = dict(states=0,likelihood_branches=0,truncated=False)
         best = None
 

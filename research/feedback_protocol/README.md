@@ -1,5 +1,29 @@
 # Feedback Protocol Lab — finite Bernoulli testbed
 
+Fourth batch: [contract](CONTRACT_V04.md),
+[final pre-B2 report](../../docs/FPL_FOURTH_BATCH_20260919.md).
+Exact fixed-policy expectations replace MC where resolvable; deterministic
+episode work accounting, hierarchical DEV and belief-MCTS are implemented.
+The frozen operational criterion returns a **scoped GO for later amortized
+planning research**, not an implemented/trained neural method.
+
+```bash
+PYTHONPATH=research/feedback_protocol/src python3 -m fpl.necessity \
+  --plan research/feedback_protocol/configs/difficulty_dev_v2.json \
+  --output /tmp/fpl_necessity_new --max-new 1
+PYTHONPATH=research/feedback_protocol/src python3 -m fpl.necessity \
+  --plan research/feedback_protocol/configs/difficulty_dev_v2.json \
+  --output /tmp/fpl_necessity_new --resume
+```
+
+Optionally pass both `--legacy-dataset` and `--legacy-study` to separately audit
+the old DEV policies; pass the same arguments on resume. Exact evaluation is
+conditional on owned RNG/policy state, not all algorithm seeds. Watchdog expiry
+invalidates evaluation instead of choosing an action. Current old published
+test/OOD seeds are public fixtures, not blinded confirmation.
+
+## Historical third-batch scope
+
 Third batch: [v0.3 contract](CONTRACT_V03.md), scientific clone-disjoint datasets,
 independent rational minimax bases, global compute budgets, OneStepVOI and a
 sealed/resumable DEV-only expected-risk evaluator. No neural training.

@@ -1,5 +1,18 @@
 # Current task plan
 
+## Feedback protocol fourth batch (completed final pre-B2 study, 2026-09-19)
+
+- [x] Full-state ExactPolicyEvaluator, deterministic work limits and episode pools.
+- [x] Hierarchical difficulty DEV-V2, independent generative belief-MCTS baseline.
+- [x] Frozen 371-cell study: all fixed-policy expectations exact; new Bayes 10/12.
+- [x] Legacy sparse T=12 Beam/VOI/cached Bayes risk resolves to exactly 5.25.
+- [x] Frozen operational GO criterion passes on two roots; no fifth-batch training.
+- [x] Work/latency figures, raw evidence, 37 tests, local future-seed commitment.
+
+See `docs/FPL_FOURTH_BATCH_20260919.md`. GO is a scoped amortization research
+decision, not neural superiority or general hardness. Two deeper-hierarchy
+references remain unresolved. No additional pre-B2 gate or final-test run.
+
 ## Feedback protocol third batch (completed implementation + DEV pilot, 2026-09-19)
 
 - [x] RegistryV2 and clone-disjoint same-generator IID / explicit OOD manifests.

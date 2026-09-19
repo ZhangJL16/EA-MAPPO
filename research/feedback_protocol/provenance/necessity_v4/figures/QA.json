@@ -1,0 +1,16 @@
+{
+  "all_source_rows": 371,
+  "fresh_plot_rows": 240,
+  "legacy_separate_rows": 131,
+  "plotted_counts": {
+    "expected_model_calls": 240,
+    "expected_expansions": 240,
+    "expected_latency": 240
+  },
+  "risk": "exact expectation over environment feedback, conditional on seed",
+  "latency": "single measured node timings integrated over feedback; not deterministic/exact latency",
+  "unit": "two fresh root groups; six repeated axis conditions per root; no significance tests",
+  "missing_reference": "two unresolved deeper-hierarchy optima explicitly labeled; no substituted line",
+  "exclusions": "Legacy audit is not mixed with fresh DEV. All 371 rows exported to source CSV.",
+  "line_semantics": "Connect tier settings, not an optimal Pareto frontier or a monotonicity assertion."
+}

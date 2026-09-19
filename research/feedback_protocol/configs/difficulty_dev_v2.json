@@ -1,0 +1,42 @@
+{
+  "schema":"fpl-necessity-v4",
+  "root_seeds":[2201,2202],
+  "base":{"depth":2,"redundancy":0,"quality":"9/10","budget":12,"capacity":5,"prepare":1,"probe":1,"transit":1,"cleanup":1,"task":1,"energy":1,"topology":"sparse"},
+  "conditions":[
+    {"id":"base","overrides":{}},
+    {"id":"weak_information","overrides":{"quality":"7/10"}},
+    {"id":"costly_acquisition","overrides":{"prepare":2,"cleanup":2}},
+    {"id":"long_horizon","overrides":{"budget":18}},
+    {"id":"redundant_channels","overrides":{"redundancy":2}},
+    {"id":"deeper_hierarchy","overrides":{"depth":3,"budget":18}}
+  ],
+  "methods":["channel_cover","posterior_sampling","beam_bayes","one_step_voi","belief_mcts"],
+  "policy_seeds":[17],
+  "tiers":{
+    "small":{"max_expansions":300,"max_model_calls":3000},
+    "medium":{"max_expansions":1200,"max_model_calls":12000},
+    "large":{"max_expansions":4800,"max_model_calls":48000}
+  },
+  "episode_multiplier":4,
+  "selection_only_tier":"medium",
+  "beam_width":8,
+  "beam_depth":2,
+  "mcts_exploration":1.0,
+  "evaluation":{"max_nodes":600,"max_feedback":256,"watchdog_seconds":8},
+  "fallback_noise_seeds":[71,72,73,74],
+  "reference_budgets":[
+    {"max_states":2000,"max_expansions":200000,"max_model_calls":2000000,"watchdog_seconds":15},
+    {"max_states":12000,"max_expansions":1000000,"max_model_calls":12000000,"watchdog_seconds":30}
+  ],
+  "decision_rule":{
+    "scope":"operational decision on these DEV roots and this fixed policy seed, not an ML necessity theorem",
+    "low_tier":"small","high_tier":"large",
+    "strong_methods":["beam_bayes","one_step_voi","belief_mcts"],
+    "minimum_normalized_low_gap":"1/20",
+    "maximum_normalized_high_gap":"1/50",
+    "minimum_roots":2,
+    "minimum_work_increase":4,
+    "go_requires":"same condition across two roots; all strong low policies exact and poor; a high policy exact and close to solved Bayes; realized model-call increase >=4; plus growing reference work on a scale axis at both roots",
+    "otherwise":"HOLD if scale reference unresolved; STOP otherwise; no further B2 gate or neural training in this batch"
+  }
+}

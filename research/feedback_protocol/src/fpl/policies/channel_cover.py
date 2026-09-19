@@ -16,11 +16,11 @@ class ChannelCover:
         self.problem = problem
         self.budget_limits = budget_limits or {}
 
-    def select(self, state):
+    def select(self, state, budget=None):
         p = self.problem
         if state.resource != p.capacity:
             raise ValueError("selection only at reset")
-        budget = SearchBudget(**self.budget_limits)
+        budget = budget if budget is not None else SearchBudget(**self.budget_limits)
         best = None
         self.stats = {"truncated":False}
         try:
