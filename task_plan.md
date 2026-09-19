@@ -1,5 +1,33 @@
 # Current task plan
 
+## Persistent regenerative control (current, 2026-09-19)
+
+- [x] Freeze original navigation SAC checkpoint, seed, architecture, source hashes.
+- [x] Bounded 18-cell P0 navigation audit, one-step smoke and route-boundary resume.
+- [ ] P0 energy qualification: identify frozen four-quantile/mission predictor and measure coverage.
+- [ ] P1: continuing single-UAV IID task stream, paid recharge, C/R epochs, no hidden reset.
+- [ ] P2: empirical SMDP oracle, B0–B5 baselines and ΔQ dataset.
+- [ ] P3: frozen ≥98% simple-policy kill test and systematic sign-flip analysis.
+- [ ] P4/P5: NOT authorized before prior gates pass; no new neural training.
+
+**Stop at P0 incomplete energy qualification.** Details and actual metrics:
+`docs/REGENERATIVE_CONTROL_P0_20260919.md`. Previous active plans below are superseded
+by the current user sequence; do not resume SAC/control-adaptation training.
+
+## Control adaptation (active, 2026-09-19)
+
+- [x] Isolated pinned public 2D tracking task, public short-history interface.
+- [x] Resumable SB3 SAC; five focused tests including exact pause/resume parity.
+- [x] First checkpoint: seed 5101, 1,573 transitions, 617 updates; paused.
+- [x] Diagnose upstream multi-client damping omission and reset distribution.
+- [ ] Resolve native reset states above terminal altitude before long training.
+- [ ] Competent independent base SAC seeds; then matched-budget adaptation curves.
+- [ ] Plain fine-tuning, old-data retention, residual learning, estimated calibration.
+
+See `docs/CONTROL_ADAPTATION_STARTUP_20260919.md`. Do not automatically resume
+long training, select favorable seeds, change reset distribution, or launch
+adaptation. Earlier research-line plans below are retained history, not active tasks.
+
 ## Public-task mechanism prototype (completed first DEV round, 2026-09-19)
 
 - [x] Replace theorem-first escalation with a bounded empirical hypothesis.

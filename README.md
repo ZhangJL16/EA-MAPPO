@@ -1,6 +1,21 @@
 # EA-MAPPO research workspace
 
-Latest (2026-09-19): [public-task budget-reading prototype](docs/BUDGET_READING_PILOT_20260919.md)
+Latest (2026-09-19): [persistent regenerative control P0](docs/REGENERATIVE_CONTROL_P0_20260919.md).
+Current user scope is P0 → P1 → minimal P2 under the provisional title
+**Safe Regenerative Average-Reward Control for Persistent Agents**.
+Frozen original SAC: 18/18 restricted navigation legs reached, zero contacts.
+P0 remains **not passed**: return/mission quantile coverage is unvalidated and
+no compatible frozen task+return predictor was identified. P1/P2 not started;
+no SAC or high-level neural training. Earlier active-line labels below are history.
+
+Latest (2026-09-19): [control adaptation startup](docs/CONTROL_ADAPTATION_STARTUP_20260919.md).
+The active question is few-interaction pretrained control adaptation and nominal
+capability retention. Public 2D quadrotor interface and resumable SAC startup are
+implemented; the first checkpoint is paused. An upstream reset-distribution issue
+must be resolved before long training. No adaptation comparison is complete.
+Budget-reading is paused; AFPP/V3 and full-vector escalation remain stopped.
+
+Previous (2026-09-19): [public-task budget-reading prototype](docs/BUDGET_READING_PILOT_20260919.md)
 completed 15 actual training runs and 84 paired evaluation cells on DAD source
 location finding. In this short DEV run, budget-conditioned reading does **not**
 outperform output-side budget concatenation or fixed-query attention on average.

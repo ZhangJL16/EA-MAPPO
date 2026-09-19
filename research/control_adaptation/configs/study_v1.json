@@ -1,0 +1,28 @@
+{
+  "source_commit": "6b5391d014f36fdfa0f9d22d92c77387e5274308",
+  "task_yaml": "examples/rl/config_overrides/quadrotor_2D/quadrotor_2D_track.yaml",
+  "base_seeds": [5101, 5102, 5103],
+  "base_steps": 200000,
+  "checkpoint_steps": 5000,
+  "first_checkpoint_steps": 1500,
+  "replay_size": 200000,
+  "learning_starts": 1000,
+  "batch_size": 256,
+  "learning_rate": 0.001,
+  "entropy_coefficient": 0.2,
+  "hidden": [128, 128],
+  "train_freq": "one_episode",
+  "gradient_steps_per_transition": 1,
+  "threads": 1,
+  "max_invocation_seconds": 3600,
+  "evaluation_seeds": [8101, 8102, 8103, 8104, 8105],
+  "deployment_gains": {
+    "nominal": [1.0, 1.0],
+    "reduced": [0.95, 0.95],
+    "increased": [1.05, 1.05],
+    "asymmetric": [0.95, 1.05]
+  },
+  "planned_adaptation_budgets": [0, 1000, 5000, 10000],
+  "planned_methods": ["frozen", "sac_finetune", "sac_old_replay", "frozen_plus_residual", "estimated_input_calibration"],
+  "scope": "DEV task restoration and base policy training first; adaptation is not automatically launched"
+}

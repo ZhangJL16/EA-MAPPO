@@ -1,5 +1,35 @@
 # Current research notes
 
+## 2026-09-19 persistent regenerative control: P0 not passed
+
+The user replaced open-ended research with ordered P0/P1/minimal P2 and no new
+SAC or high-level training. Original navigator checkpoint SHA256
+fb79482ae7d832b40137ff1a080ee84912eabb95867e118aca80c846f6ae62be is frozen.
+18 target-role legs (100/300/600 distance, 4/24 obstacles): 18 reached, 0 contacts.
+One scene per cell is an engineering check, not broad reliability evidence.
+Retained energy heads are return-only mean/q95/defective, not a validated joint
+pickup/dropoff/return four-quantile predictor. Runtime energy estimator defaults
+to None. Coverage remains unavailable, not an observed calibration failure.
+Stop before P1/P2; user confirmed the intended critic probably no longer exists. No method comparison,
+ΔQ plot or sign-flip result exists. Preserve ≥.98 simple/oracle kill criterion.
+See `docs/REGENERATIVE_CONTROL_P0_20260919.md`; raw outputs in
+`artifacts/regenerative_p0_20260919`. Earlier entries retain historical provenance.
+
+## 2026-09-19 control adaptation startup
+
+User selected pretrained continuous-control adaptation/retention as the new
+problem, not a predeclared novel mechanism. Budget-reading paused; no AFPP/V3
+or full-vector escalation. New `research/control_adaptation` leaves old runtime intact.
+Seed 5101 startup paused at 1,573 transitions / 617 updates, finite parameters.
+Five tests pass. Native parity requires serial clients: upstream changeDynamics
+omits physicsClientId. Actual trainer uses one client.
+Further diagnostic: Quadrotor overwrites supplied init randomization after its
+base constructor; perturbations are additive. Native z=1 plus U(.1,1.5) can start
+above z=2 termination boundary. Seed 8101 starts at z=2.203167; both controllers
+terminate after one step. Preserve this failure, no seed replacement or quiet fix.
+This is startup evidence only, not a competent base or adaptation comparison.
+Details: `docs/CONTROL_ADAPTATION_STARTUP_20260919.md`.
+
 ## 2026-09-19 public-task prototype: mechanism hypothesis not supported yet
 
 The user withdrew theorem-only escalation and authorized an actual low-cost
