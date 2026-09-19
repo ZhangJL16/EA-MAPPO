@@ -1,5 +1,19 @@
 # Current task plan
 
+## P1.1 only — remove task-screening confound (2026-09-19)
+
+- [x] Accept user P1 PASS; preserve historical P1 source/evidence.
+- [x] D-state after delivery: no pending task; C/R available.
+- [x] C draws only after commitment; R never draws/discards.
+- [x] H-state: canonical recharge, no C/R; mandatory first fresh IID task.
+- [x] Original nine tests plus six new semantic/resume tests pass.
+- [x] Three requested 1,000-second traces, raw audit and portable evidence complete; no background run.
+- [ ] P2-A reachable-state census / state sufficiency / empirical reference: NOT STARTED.
+
+No critic, q95 risk baseline, oracle, new neural training or broader sweep.
+Future P2-A planning uses mean/max complete mission costs, not group-q95 risk.
+Details: `docs/REGENERATIVE_CONTROL_P11_20260919.md`.
+
 ## Continuing regenerative control — P1 only (2026-09-19)
 
 - [x] P0-A: frozen navigator qualified for restricted research startup, 18/18 legs.

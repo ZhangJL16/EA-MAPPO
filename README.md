@@ -1,5 +1,12 @@
 # EA-MAPPO research workspace
 
+Latest (2026-09-19): [P1.1 post-delivery C/R](docs/REGENERATIVE_CONTROL_P11_20260919.md).
+P1 passed user review. P1.1 removes task screening: task-free D decisions;
+C draws then executes a job, R draws/discards nothing, and charged H forces its
+first IID job without C/R choice. Frozen navigation/physics/service are unchanged.
+Only three 1,000-second semantic sanity traces are authorized; P2 remains deferred.
+Earlier P1 pre-task rejection semantics below are historical, not the current task.
+
 Latest (2026-09-19): [continuing regenerative control P1](docs/REGENERATIVE_CONTROL_P1_20260919.md).
 **P0-A passes for restricted research startup; P0-B legacy energy-critic
 qualification is cancelled, not failed.** P1 uses frozen SAC macro rollouts:

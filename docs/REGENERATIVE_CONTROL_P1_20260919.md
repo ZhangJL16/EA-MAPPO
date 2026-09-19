@@ -1,5 +1,13 @@
 # P1 — continuing regenerative single-UAV control
 
+## Subsequent user review and P1.1 amendment
+
+P1 passed review. Its task-rejection semantics are superseded by
+[P1.1](REGENERATIVE_CONTROL_P11_20260919.md): C/R only at task-free post-delivery
+states; R never discards a task; H forces the first fresh IID task. Original P1
+source and measurements below remain historical evidence, not current C/R semantics.
+P2 is deferred; no claim about reserve insufficiency follows from this amendment.
+
 ## Material Passport / scope
 
 2026-09-19, based on repository `43f48be5`. Working title:

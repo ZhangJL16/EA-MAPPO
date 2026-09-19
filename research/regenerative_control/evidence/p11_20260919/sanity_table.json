@@ -1,0 +1,38 @@
+[
+  {
+    "policy": "after_1",
+    "deliveries": 11,
+    "recharge": 11,
+    "depletion": 0,
+    "failure_reason": null,
+    "collision_count": 0,
+    "elapsed_time": 999.9778177244893,
+    "cutoff": 1000.0,
+    "task_draws": 12,
+    "reset_calls": 1
+  },
+  {
+    "policy": "after_2",
+    "deliveries": 13,
+    "recharge": 6,
+    "depletion": 0,
+    "failure_reason": null,
+    "collision_count": 0,
+    "elapsed_time": 999.9787813918311,
+    "cutoff": 1000.0,
+    "task_draws": 14,
+    "reset_calls": 1
+  },
+  {
+    "policy": "threshold_30",
+    "deliveries": 13,
+    "recharge": 4,
+    "depletion": 0,
+    "failure_reason": null,
+    "collision_count": 0,
+    "elapsed_time": 999.9858271662057,
+    "cutoff": 1000.0,
+    "task_draws": 14,
+    "reset_calls": 1
+  }
+]

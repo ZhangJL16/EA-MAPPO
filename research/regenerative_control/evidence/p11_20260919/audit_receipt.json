@@ -1,0 +1,38 @@
+{
+  "passed": true,
+  "decision_has_no_pending_task": true,
+  "R_never_draws_or_discards": true,
+  "H_has_no_CR_choice": true,
+  "draws_only_after_C_or_forced_H": true,
+  "task_sequence_common_prefix_preserved": true,
+  "canonical_recharge": true,
+  "source_and_checkpoint_hashes_match": true,
+  "policies": [
+    {
+      "policy": "after_1",
+      "macros": 23,
+      "draws": 12,
+      "reset_calls": 1,
+      "recharge": 11,
+      "energy_balance_residual": -1.7335022306497194e-12
+    },
+    {
+      "policy": "after_2",
+      "macros": 20,
+      "draws": 14,
+      "reset_calls": 1,
+      "recharge": 6,
+      "energy_balance_residual": -1.350808354061428e-12
+    },
+    {
+      "policy": "threshold_30",
+      "macros": 18,
+      "draws": 14,
+      "reset_calls": 1,
+      "recharge": 4,
+      "energy_balance_residual": -2.750022431996513e-13
+    }
+  ],
+  "P2_started": false,
+  "neural_updates": 0
+}

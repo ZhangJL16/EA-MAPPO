@@ -1,0 +1,35 @@
+{
+  "policy": "threshold_30",
+  "macros": 18,
+  "reset_calls": 1,
+  "checkpoint_unchanged": true,
+  "audit": {
+    "reset_calls": 1,
+    "elapsed_time": 999.9858271662057,
+    "completed": 13,
+    "task_draw_count": 14,
+    "collision_count": 0,
+    "energy_failure": false,
+    "failed": false,
+    "terminal_reason": null,
+    "evaluation_cutoff": 1000.0,
+    "truncated": true,
+    "cycle_count": 4,
+    "energy_balance_residual": -2.750022431996513e-13,
+    "throughput_at_cutoff": 0.013,
+    "config": {
+      "capacity": 60.0,
+      "cutoff": 1000.0,
+      "option_step_limit": 4000,
+      "obstacles": 24,
+      "recharge_overhead": 10.0,
+      "recharge_rate": 1.0,
+      "docking_speed": 1.0,
+      "docking_power": 0.02
+    },
+    "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760",
+    "semantics": "P1.1_post_delivery",
+    "task_rejections": 0
+  },
+  "neural_updates": 0
+}

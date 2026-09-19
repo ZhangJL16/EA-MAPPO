@@ -1,5 +1,21 @@
 # Current research notes
 
+## 2026-09-19 P1.1: task screening removed
+
+P1 passed user review. This bounded correction moves C/R to task-free post-delivery
+D-states; C draws only after commitment, R draws/discards nothing. Charged H has
+no C/R choice and forces its first fresh IID task. New PostDeliveryUAV inherits
+unchanged P1 navigation/service; historical source/evidence are preserved.
+15 tests (9 original + 6 new), real one-step smoke, checkpoint resume and raw audit
+pass. Three single-seed 1,000-second windows: after-1 11 deliveries / 11 recharges,
+after-2 13/6, threshold-30 13/4; no depletion/contact, exactly one initial reset
+each. All policies consume the same task-sequence prefix, with no R-induced RNG
+advance. Final fractions <.05s are censored on the physics grid. This is semantic
+sanity evidence, not reserve insufficiency or a benchmark. P2-A remains deferred;
+no oracle/census/branching, energy critic, q95 fitting or neural learning.
+Report: `docs/REGENERATIVE_CONTROL_P11_20260919.md`; portable raw traces:
+`research/regenerative_control/evidence/p11_20260919`. Nothing left running.
+
 ## 2026-09-19 P1 continuing regenerative environment complete
 
 User cancelled P0-B critic qualification; P0-A PASS for restricted startup.
