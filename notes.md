@@ -1,5 +1,18 @@
 # Current research notes
 
+## 2026-09-19 third FPL batch: bounded scientific comparison
+
+RegistryV2 separates distribution/template/clone identity. Global selection
+budgets include recursive calls. Rational minimax bases retain independent
+primal and dual supports. Paired-CRN DEV study completed 1,920 planned records,
+retaining 144 unresolved-reference attempts; no test evaluation or training.
+Bayes exact 11/12; minimax exact 4/12; cached policy values replayed rationally.
+The sparse T=12 MC estimate (3.0) falls below exact Bayes risk (5.25): it is
+small-sample optimism, not beating the oracle, even with empirical SE zero.
+The sole unresolved Bayes condition hit a configured 2,000-state cap. This does
+not establish the quality–compute gap required for a neural method. No B2 promotion.
+See `docs/FPL_THIRD_BATCH_20260919.md` and its portable DEV evidence archive.
+
 ## 2026-09-19 second FPL batch
 
 Utility is separate from sensing; hidden-model task payoff is evaluator-only and

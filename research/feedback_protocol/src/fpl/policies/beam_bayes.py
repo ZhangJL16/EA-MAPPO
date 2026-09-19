@@ -1,111 +1,106 @@
-"""Bounded prefix generation + finite-depth posterior lookahead, no full catalogue."""
+"""Prefix beam and finite-depth Bayes search with one global selection budget."""
 from collections import Counter
 from fractions import Fraction as F
-from time import monotonic
-from ..protocols import Protocol, PlanningLimit
+from ..protocols import Protocol,PlanningLimit
 from ..utility import protocol_value
 from ..belief import outcomes
+from ..budget import SearchBudget,reset_fallback
 
-
-def route_score(problem, prior, route):
-    # Heuristic for candidate generation only, not a Bayes value certificate.
+def route_score(problem,prior,route,budget=None):
     uncertainty = F(0)
     for c in set(route.channels):
+        if budget is not None:
+            budget.consume(model_calls=2*len(prior))
         j = problem.channels.index(c)
         mean = sum(w*row[j] for w,row in zip(prior,problem.hypotheses))
         uncertainty += sum(w*(row[j]-mean)**2 for w,row in zip(prior,problem.hypotheses))
-    return (protocol_value(problem,prior,route)+uncertainty)/route.duration
+    return (protocol_value(problem,prior,route,budget)+uncertainty)/route.duration
 
-
-def beam_protocols(problem, remaining, prior, width=8, max_expansions=2000):
-    if width < 1 or max_expansions < 1:
-        raise ValueError("positive search limits required")
+def beam_protocols(problem,remaining,prior,width=8,max_expansions=2000,budget=None):
+    if width<1:
+        raise ValueError("positive beam width required")
+    budget = budget if budget is not None else SearchBudget(max_expansions=max_expansions)
+    start_exp = budget.expansions
     frontier = [(problem.reset,problem.capacity,0,(),())]
-    completed, expanded, truncated = {}, 0, False
+    completed,pruned = {},False
     while frontier:
         pending = []
         for node,battery,t,names,channels in frontier:
             for op in problem.operations:
                 if op.source != node:
                     continue
-                expanded += 1
-                if expanded > max_expansions:
-                    return tuple(completed.values()), expanded-1, True
+                budget.consume(expansions=1)
                 cs = channels+op.channels
-                if (op.energy > battery or t+op.duration > remaining or
-                    len(cs)>problem.max_measurements or
-                    any(v>problem.per_channel_limit for v in Counter(cs).values())):
+                if (op.energy>battery or t+op.duration>remaining or len(cs)>problem.max_measurements
+                    or any(v>problem.per_channel_limit for v in Counter(cs).values())):
                     continue
-                ns, duration = names+(op.name,), t+op.duration
+                ns,duration = names+(op.name,),t+op.duration
                 if op.target == problem.reset:
                     completed[ns] = Protocol(ns,duration,cs)
                 else:
                     pending.append((op.target,battery-op.energy,duration,ns,cs))
-        pending.sort(key=lambda x: route_score(problem,prior,Protocol(x[3],x[2],x[4])), reverse=True)
-        truncated |= len(pending)>width
+        pending.sort(key=lambda x:route_score(problem,prior,Protocol(x[3],x[2],x[4]),budget),reverse=True)
+        pruned |= len(pending)>width
         frontier = pending[:width]
-        # Bound completed storage too; pruning changes approximation, not legality.
         if len(completed)>width:
-            keep = sorted(completed.values(),key=lambda r:route_score(problem,prior,r),reverse=True)[:width]
+            keep = sorted(completed.values(),key=lambda r:route_score(problem,prior,r,budget),reverse=True)[:width]
             completed = {r.operations:r for r in keep}
-            truncated = True
-    return tuple(completed.values()), expanded, truncated
-
+            pruned = True
+    return tuple(completed.values()),budget.expansions-start_exp,pruned
 
 class BeamBayes:
-    def __init__(self, problem, width=8, depth=2, max_states=1000,
-                 max_expansions=2000, max_seconds=2, max_outcomes=256):
-        if depth<1 or max_states<1 or max_seconds<=0:
-            raise ValueError("positive planner limits required")
-        self.problem, self.width, self.depth = problem,width,depth
-        self.max_states,self.max_expansions,self.max_seconds = max_states,max_expansions,max_seconds
-        self.max_outcomes = max_outcomes
+    def __init__(self,problem,width=8,depth=2,max_states=1000,max_expansions=2000,
+                 max_seconds=2,max_outcomes=256,budget_limits=None):
+        if width<1 or depth<1 or max_states<1:
+            raise ValueError("positive search limits required")
+        self.problem,self.width,self.depth = problem,width,depth
+        self.max_states,self.max_outcomes = max_states,max_outcomes
+        self.limits = budget_limits or dict(max_expansions=max_expansions,max_model_calls=100000,max_seconds=max_seconds)
 
     def select(self,state):
         if state.resource != self.problem.capacity:
             raise ValueError("selection only at reset")
-        start = monotonic()
-        self.stats = dict(states=0, expansions=0, likelihood_branches=0, truncated=False)
-        candidates, count, pruned = beam_protocols(self.problem,state.remaining,state.posterior,
-                                                  self.width,self.max_expansions)
-        self.stats["expansions"] += count
-        self.stats["truncated"] |= pruned
-        best = max(candidates,key=lambda r:route_score(self.problem,state.posterior,r),default=None)
+        budget = SearchBudget(**self.limits)
+        self.stats = dict(states=0,likelihood_branches=0,truncated=False)
+        best = None
+
+        def candidates(t,prior):
+            routes,_,pruned = beam_protocols(self.problem,t,prior,self.width,budget=budget)
+            self.stats["truncated"] |= pruned
+            return routes
+
+        def tail(t,prior):
+            return max([F(0)]+[(t//r.duration)*protocol_value(self.problem,prior,r,budget)
+                              for r in candidates(t,prior)])
 
         def q(route,t,prior,depth):
-            result = protocol_value(self.problem,prior,route)
+            result = protocol_value(self.problem,prior,route,budget)
             if depth>1:
-                for _,mass,posterior in outcomes(self.problem,prior,route.channels,self.max_outcomes):
+                for _,mass,posterior in outcomes(self.problem,prior,route.channels,self.max_outcomes,budget):
                     self.stats["likelihood_branches"] += 1
                     result += mass*value(t-route.duration,posterior,depth-1)
             else:
-                # Feasible open-loop tail: repeat one protocol, ignore feedback.
-                routes,n,pruned = beam_protocols(self.problem,t-route.duration,prior,
-                                                 self.width,self.max_expansions)
-                self.stats["expansions"] += n
-                self.stats["truncated"] |= pruned
-                result += max([F(0)]+[(t-route.duration)//r.duration * protocol_value(self.problem,prior,r)
-                                      for r in routes])
+                result += tail(t-route.duration,prior)
             return result
 
         def value(t,prior,depth):
-            if self.stats["states"] >= self.max_states or monotonic()-start>self.max_seconds:
-                raise PlanningLimit("approximate search exhausted")
+            budget.consume()
+            if self.stats["states"]>=self.max_states:
+                raise PlanningLimit("state limit")
             self.stats["states"] += 1
-            routes,n,pruned = beam_protocols(self.problem,t,prior,self.width,self.max_expansions)
-            self.stats["expansions"] += n
-            self.stats["truncated"] |= pruned
-            return max([F(0)]+[q(r,t,prior,depth) for r in routes])
+            return max([F(0)]+[q(r,t,prior,depth) for r in candidates(t,prior)])
 
-        best_value = None
         try:
-            for route in candidates:
-                if monotonic()-start>self.max_seconds:
-                    raise PlanningLimit("approximate search time exhausted")
+            best = reset_fallback(self.problem,state.remaining,budget)
+            routes = candidates(state.remaining,state.posterior)
+            best_value,selected = F(0),None
+            for route in routes:
                 score = q(route,state.remaining,state.posterior,self.depth)
-                if best_value is None or score>best_value:
-                    best_value,best = score,route
-        except PlanningLimit:
-            self.stats["truncated"] = True
-        self.stats["seconds"] = monotonic()-start
+                if score>best_value:
+                    best_value,selected = score,route
+                    best = selected
+            best = selected
+        except PlanningLimit as exc:
+            self.stats.update(truncated=True,limit_reason=str(exc))
+        self.stats.update(budget.snapshot())
         return best

@@ -1,0 +1,14 @@
+{
+  "schema": "fpl-scientific-plan-v1",
+  "groups": [
+    {"name":"iid-train","distribution_id":"directed-m3-k2-p05","split":"train","template":"directed","channels":3,"hypotheses":2,"roots":2,"structure_seed":110,"parameter_seed":1110,"capacities":[3,5],"budgets":[4,8]},
+    {"name":"iid-dev","distribution_id":"directed-m3-k2-p05","split":"dev","template":"directed","channels":3,"hypotheses":2,"roots":2,"structure_seed":210,"parameter_seed":1210,"capacities":[3,5],"budgets":[4,8]},
+    {"name":"iid-test","distribution_id":"directed-m3-k2-p05","split":"test","template":"directed","channels":3,"hypotheses":2,"roots":2,"structure_seed":310,"parameter_seed":1310,"capacities":[3,5],"budgets":[4,8]},
+    {"name":"scale-dense-dev","distribution_id":"directed-m5-k2-p08","split":"dev","template":"directed","channels":5,"hypotheses":2,"edge_probability":0.8,"roots":1,"structure_seed":810,"parameter_seed":1810,"capacities":[7],"budgets":[8,12]},
+    {"name":"scale-sparse-dev","distribution_id":"directed-m5-k2-p01","split":"dev","template":"directed","channels":5,"hypotheses":2,"edge_probability":0.1,"roots":1,"structure_seed":910,"parameter_seed":1910,"capacities":[7],"budgets":[8,12]},
+    {"name":"size-ood","distribution_id":"directed-m6-k2-p05","split":"ood","ood_axis":"size","template":"directed","channels":6,"hypotheses":2,"roots":1,"structure_seed":410,"parameter_seed":1410,"capacities":[3,8],"budgets":[8,12]},
+    {"name":"topology-ood","distribution_id":"dag-m3-k2-p05","split":"ood","ood_axis":"topology","template":"dag","channels":3,"hypotheses":2,"roots":1,"structure_seed":510,"parameter_seed":1510,"capacities":[3,5],"budgets":[4,8]},
+    {"name":"cost-ood","distribution_id":"directed-m3-k2-p05-d2-e1","split":"ood","ood_axis":"cost_ratio","template":"directed","channels":3,"hypotheses":2,"roots":1,"structure_seed":610,"parameter_seed":1610,"duration":2,"energy":1,"capacities":[3,5],"budgets":[8,16]},
+    {"name":"hypothesis-ood","distribution_id":"directed-m3-k3-p05","split":"ood","ood_axis":"hypothesis_count","template":"directed","channels":3,"hypotheses":3,"roots":1,"structure_seed":710,"parameter_seed":1710,"capacities":[3,5],"budgets":[4,8]}
+  ]
+}

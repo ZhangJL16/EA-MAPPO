@@ -39,17 +39,21 @@ def expected_reward(p, prior, channels):
                 for w, row in zip(prior, p.hypotheses)), F(0))
 
 
-def outcomes(p, prior, channels, max_outcomes=4096):
+def outcomes(p, prior, channels, max_outcomes=4096, budget=None):
     if 2**len(channels) > max_outcomes:
         raise PlanningLimit("joint-feedback enumeration limit")
     for bits in product((0, 1), repeat=len(channels)):
+        if budget is not None:
+            budget.consume(model_calls=len(p.hypotheses)*max(1,len(channels)))
         feedback = tuple(zip(channels, bits))
         mass = F(0)
+        weights = []
         for w, row in zip(prior, p.hypotheses):
             likelihood = w
             for c, bit in feedback:
                 v = row[p.channels.index(c)]
                 likelihood *= v if bit else 1-v
             mass += likelihood
+            weights.append(likelihood)
         if mass:
-            yield feedback, mass, update(p, prior, feedback)
+            yield feedback, mass, tuple(w/mass for w in weights)

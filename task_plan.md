@@ -1,5 +1,19 @@
 # Current task plan
 
+## Feedback protocol third batch (completed implementation + DEV pilot, 2026-09-19)
+
+- [x] RegistryV2 and clone-disjoint same-generator IID / explicit OOD manifests.
+- [x] Independent rational primal/dual bases; 60 random-matrix SciPy checks.
+- [x] Shared global search budgets; independent OneStepVOI baseline.
+- [x] DEV-only paired-CRN evaluator, atomic resume and expected-risk analyzer.
+- [x] 1,920-record frozen pilot; 1,776 completed executions / 144 unresolved-reference records.
+- [x] 30 tests and 15 rational cached-policy replays; portable raw evidence.
+
+See `docs/FPL_THIRD_BATCH_20260919.md`. Exact Bayes solved 11/12 conditions;
+the capped dense T=12 reference remains unresolved. Small-sample risk estimates
+do not establish the quality–compute gap needed to justify B2. **No neural training
+or final-test evaluation; do not promote the algorithm claim.**
+
 ## Feedback protocol second batch (completed implementation, 2026-09-19)
 
 - [x] Separate observation likelihood from declared task utility, preserving old fixture.

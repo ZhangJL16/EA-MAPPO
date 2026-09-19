@@ -1,0 +1,19 @@
+{
+  "schema": "fpl-dev-pilot-v1",
+  "split": "dev",
+  "noise_seeds": [31,32,33,34],
+  "policy_seeds": [11,12],
+  "methods": ["channel_cover","posterior_sampling","beam_bayes","one_step_voi"],
+  "tiers": {
+    "small": {"max_expansions":300,"max_model_calls":3000,"max_seconds":0.2},
+    "large": {"max_expansions":3000,"max_model_calls":30000,"max_seconds":0.5}
+  },
+  "beam_width":8,
+  "beam_depth":2,
+  "references": {
+    "max_states":2000,"max_seconds":1.0,"max_protocol_nodes":20000,
+    "max_trees":300,"max_combinations":3000,
+    "budget":{"max_expansions":200000,"max_model_calls":2000000,"max_seconds":1.0}
+  },
+  "analysis": "DEV descriptive pilot only; root graph is the independent unit; no significance tests or B2 automatic promotion"
+}

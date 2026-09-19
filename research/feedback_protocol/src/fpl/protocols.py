@@ -45,7 +45,7 @@ def validate_protocol(p: PublicProblem, names: tuple[str, ...], remaining: int) 
     return Protocol(tuple(names), elapsed, tuple(channels))
 
 
-def enumerate_protocols(p: PublicProblem, remaining: int, max_nodes: int = 10000) -> tuple[Protocol, ...]:
+def enumerate_protocols(p: PublicProblem, remaining: int, max_nodes: int = 10000, budget=None) -> tuple[Protocol, ...]:
     if type(remaining) is not int or not 0 <= remaining <= p.budget:
         raise ValueError("invalid remaining budget")
     stack = [(p.reset, p.capacity, 0, (), ())]
@@ -56,6 +56,10 @@ def enumerate_protocols(p: PublicProblem, remaining: int, max_nodes: int = 10000
         if expanded > max_nodes:
             raise PlanningLimit("protocol enumeration node limit")
         for op in p.operations:
+            if op.source != node:
+                continue
+            if budget is not None:
+                budget.consume(expansions=1)
             next_channels = channels + op.channels
             if (op.source != node or op.energy > battery or elapsed+op.duration > remaining
                 or len(next_channels) > p.max_measurements

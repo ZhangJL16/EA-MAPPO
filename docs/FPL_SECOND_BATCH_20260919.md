@@ -3,6 +3,10 @@
 Base: `b71002f78ee659c8eca4e9493507bd8dfd5a416c` (`feedback_protocol`).
 The tracked working tree was clean at entry. This batch is local and uncommitted.
 
+Post-implementation repository note (2026-09-19): the batch was subsequently
+committed as `3ecc0351c473387aef3efd919bcaa2ac1d82098e` (第二批五项已实现).
+The original execution-time statement above is retained as history.
+
 ## Delivered scope
 
 1. Observation/utility separation through `UtilitySpec`; old Bernoulli-bit reward

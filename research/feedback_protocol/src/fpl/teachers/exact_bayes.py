@@ -3,6 +3,7 @@ from time import monotonic
 from ..belief import expected_reward, outcomes
 from ..protocols import enumerate_protocols, PlanningLimit
 from ..utility import protocol_value
+from ..budget import SearchBudget
 
 
 class ExactBayes:
@@ -11,16 +12,18 @@ class ExactBayes:
     Limits fail explicitly; no timeout result is labeled optimal.
     """
     def __init__(self, problem, max_states=20000, max_seconds=15,
-                 max_protocol_nodes=10000, max_outcomes=4096):
+                 max_protocol_nodes=10000, max_outcomes=4096, budget_limits=None):
         self.problem = problem
         self.max_states, self.max_seconds = max_states, max_seconds
         self.max_protocol_nodes, self.max_outcomes = max_protocol_nodes, max_outcomes
+        self.budget_limits = budget_limits or dict(max_expansions=1000000,max_model_calls=10000000,max_seconds=max_seconds)
         self.reset_cache()
 
     def reset_cache(self):
         self.cache, self.route_cache, self.actions = {}, {}, {}
         self.states, self.likelihood_branches = 0, 0
         self.started = monotonic()
+        self.search_budget = SearchBudget(**self.budget_limits)
 
     def value(self, remaining, prior):
         if type(remaining) is not int or not 0 <= remaining <= self.problem.budget:
@@ -33,12 +36,13 @@ class ExactBayes:
         if monotonic()-self.started > self.max_seconds or self.states >= self.max_states:
             raise PlanningLimit("Bayes solver state/time limit; optimum unresolved")
         self.states += 1
+        self.search_budget.consume()
         if remaining not in self.route_cache:
-            self.route_cache[remaining] = enumerate_protocols(self.problem, remaining, self.max_protocol_nodes)
+            self.route_cache[remaining] = enumerate_protocols(self.problem, remaining, self.max_protocol_nodes,self.search_budget)
         best, action = F(0), None  # Stop at reset; unused time earns zero.
         for route in self.route_cache[remaining]:
-            candidate = protocol_value(self.problem, prior, route)
-            for _, mass, posterior in outcomes(self.problem, prior, route.channels, self.max_outcomes):
+            candidate = protocol_value(self.problem, prior, route,self.search_budget)
+            for _, mass, posterior in outcomes(self.problem, prior, route.channels, self.max_outcomes,self.search_budget):
                 self.likelihood_branches += 1
                 candidate += mass*self.value(remaining-route.duration, posterior)
             if candidate > best:
@@ -54,15 +58,19 @@ class ExactBayes:
         return self.actions[(state.remaining, tuple(state.posterior))]
 
 
-def known_model_value(problem, hypothesis_index, remaining=None):
+def known_model_value(problem, hypothesis_index, remaining=None, budget=None):
     """Evaluator-only deterministic finite-budget DP, with the same terminals."""
     if not 0 <= hypothesis_index < len(problem.hypotheses):
         raise ValueError("invalid hypothesis")
     horizon = problem.budget if remaining is None else remaining
-    routes = enumerate_protocols(problem, horizon)
+    routes = enumerate_protocols(problem, horizon,budget=budget)
     prior = tuple(F(int(i == hypothesis_index)) for i in range(len(problem.hypotheses)))
     values = [F(0)]*(horizon+1)
+    costs = [(route.duration,protocol_value(problem,prior,route,budget)) for route in routes]
     for t in range(1, horizon+1):
-        values[t] = max([F(0)]+[protocol_value(problem, prior, route)+values[t-route.duration]
-                                for route in routes if route.duration <= t])
+        for duration,value in costs:
+            if budget is not None:
+                budget.consume(expansions=1)
+            if duration<=t:
+                values[t] = max(values[t],value+values[t-duration])
     return values[horizon]

@@ -1,0 +1,185 @@
+{
+  "03a03cb71b1557608d9f3ef6d4316e77e85b20b3519c168acb244aed0de473a1": {
+    "certified_minimax": {
+      "risk_by_hypothesis": [
+        "2",
+        "2"
+      ],
+      "status": "rational_policy_replay_checked"
+    },
+    "exact_bayes": {
+      "risk_by_hypothesis": [
+        "0",
+        "4"
+      ],
+      "status": "rational_policy_replay_checked",
+      "utility_by_hypothesis": [
+        "4",
+        "0"
+      ],
+      "weighted_utility": "2"
+    }
+  },
+  "0987ca174b89af264c26a76eb6d6830a30b281e19d460296115c7aab6520c3d9": {
+    "exact_bayes": {
+      "risk_by_hypothesis": [
+        "4",
+        "4"
+      ],
+      "status": "rational_policy_replay_checked",
+      "utility_by_hypothesis": [
+        "4",
+        "4"
+      ],
+      "weighted_utility": "4"
+    }
+  },
+  "276747e0dfaf515f2826aba23140cabd992bfe4940e2c405cf1d6e0d6c50596b": {
+    "exact_bayes": {
+      "risk_by_hypothesis": [
+        "7/2",
+        "7/2"
+      ],
+      "status": "rational_policy_replay_checked",
+      "utility_by_hypothesis": [
+        "9/2",
+        "9/2"
+      ],
+      "weighted_utility": "9/2"
+    }
+  },
+  "485129b0b17ffa2d3cb2616296e97df8a4baf09b3679c4bbbb86a1bd1568e4d3": {
+    "exact_bayes": {
+      "risk_by_hypothesis": [
+        "33/5",
+        "39/10"
+      ],
+      "status": "rational_policy_replay_checked",
+      "utility_by_hypothesis": [
+        "27/5",
+        "81/10"
+      ],
+      "weighted_utility": "27/4"
+    }
+  },
+  "7486c25492fc20e2a5fde37290e949bc52c84cc1dbf72bbeefb53958abe3c328": {
+    "exact_bayes": {
+      "risk_by_hypothesis": [
+        "7/2",
+        "7/2"
+      ],
+      "status": "rational_policy_replay_checked",
+      "utility_by_hypothesis": [
+        "9/2",
+        "9/2"
+      ],
+      "weighted_utility": "9/2"
+    }
+  },
+  "976af1e276eb47df1ed6628ab20cc136a4c1a93e8bac90afdf5bb1b8418387f5": {
+    "exact_bayes": {
+      "risk_by_hypothesis": [
+        "4",
+        "4"
+      ],
+      "status": "rational_policy_replay_checked",
+      "utility_by_hypothesis": [
+        "4",
+        "4"
+      ],
+      "weighted_utility": "4"
+    }
+  },
+  "c8f1750bbbcaf75bb8e031e47dae9b9ff74d0c4ba4ee69e6216486895fdb2807": {
+    "certified_minimax": {
+      "risk_by_hypothesis": [
+        "2",
+        "2"
+      ],
+      "status": "rational_policy_replay_checked"
+    },
+    "exact_bayes": {
+      "risk_by_hypothesis": [
+        "0",
+        "4"
+      ],
+      "status": "rational_policy_replay_checked",
+      "utility_by_hypothesis": [
+        "4",
+        "0"
+      ],
+      "weighted_utility": "2"
+    }
+  },
+  "e15e0ffc4d85199bd2e056ad306110cfd59d17944b944855dbaddf911fa9d8b6": {
+    "certified_minimax": {
+      "risk_by_hypothesis": [
+        "2",
+        "2"
+      ],
+      "status": "rational_policy_replay_checked"
+    },
+    "exact_bayes": {
+      "risk_by_hypothesis": [
+        "0",
+        "4"
+      ],
+      "status": "rational_policy_replay_checked",
+      "utility_by_hypothesis": [
+        "4",
+        "0"
+      ],
+      "weighted_utility": "2"
+    }
+  },
+  "e19582907542c2955c18e51122da93dafbd3b0fd8b7b069c9c4691286d930869": {
+    "exact_bayes": {
+      "risk_by_hypothesis": [
+        "9/2",
+        "7/2"
+      ],
+      "status": "rational_policy_replay_checked",
+      "utility_by_hypothesis": [
+        "7/2",
+        "9/2"
+      ],
+      "weighted_utility": "4"
+    }
+  },
+  "e5c57dfd528180eccd9b8a9a7daf5b54c19b527a3949e1acaa8d5c05dc2ee140": {
+    "exact_bayes": {
+      "risk_by_hypothesis": [
+        "0",
+        "8"
+      ],
+      "status": "rational_policy_replay_checked",
+      "utility_by_hypothesis": [
+        "8",
+        "0"
+      ],
+      "weighted_utility": "4"
+    }
+  },
+  "f8f11ac80d4bdcde93f643dd8beb542ce9e2fae98ff96a2137745e5bbb605498": {
+    "certified_minimax": {
+      "risk_by_hypothesis": [
+        "2",
+        "2"
+      ],
+      "status": "rational_policy_replay_checked"
+    },
+    "exact_bayes": {
+      "risk_by_hypothesis": [
+        "0",
+        "4"
+      ],
+      "status": "rational_policy_replay_checked",
+      "utility_by_hypothesis": [
+        "4",
+        "0"
+      ],
+      "weighted_utility": "2"
+    }
+  },
+  "f95fb13d852faa2d81ff74a4d92326c30ebbf15933058931ff97df7173bd9a03": {}
+}

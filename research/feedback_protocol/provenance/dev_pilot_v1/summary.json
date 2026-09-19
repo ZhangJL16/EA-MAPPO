@@ -1,0 +1,5808 @@
+{
+  "cells": [
+    {
+      "average_utility": 2.0,
+      "bayes_risk": 2.0,
+      "capacity": 5,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 2.0,
+      "expansions": 435,
+      "group_id": "iid-dev-1",
+      "horizon": 4,
+      "instance_hash": "03a03cb71b1557608d9f3ef6d4316e77e85b20b3519c168acb244aed0de473a1",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "beam_bayes",
+      "model_calls": 1022,
+      "planning_seconds": 0.0023839184998450946,
+      "protocols": 4,
+      "risk_by_hypothesis": [
+        0.0,
+        4.0
+      ],
+      "status": "estimated",
+      "tier": "large",
+      "truncated_selections": 1,
+      "utility_by_hypothesis": [
+        4.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 4.0
+    },
+    {
+      "average_utility": 2.0,
+      "bayes_risk": 2.0,
+      "capacity": 5,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 2.0,
+      "expansions": 435,
+      "group_id": "iid-dev-1",
+      "horizon": 4,
+      "instance_hash": "03a03cb71b1557608d9f3ef6d4316e77e85b20b3519c168acb244aed0de473a1",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "beam_bayes",
+      "model_calls": 1022,
+      "planning_seconds": 0.0023793757500811807,
+      "protocols": 4,
+      "risk_by_hypothesis": [
+        0.0,
+        4.0
+      ],
+      "status": "estimated",
+      "tier": "small",
+      "truncated_selections": 1,
+      "utility_by_hypothesis": [
+        4.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 4.0
+    },
+    {
+      "average_utility": 2.0,
+      "bayes_risk": 2.0,
+      "capacity": 5,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 2.0,
+      "expansions": 0,
+      "group_id": "iid-dev-1",
+      "horizon": 4,
+      "instance_hash": "03a03cb71b1557608d9f3ef6d4316e77e85b20b3519c168acb244aed0de473a1",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "certified_minimax",
+      "model_calls": 0,
+      "planning_seconds": 2.1281437454945262e-05,
+      "protocols": 4,
+      "risk_by_hypothesis": [
+        2.0,
+        2.0
+      ],
+      "status": "estimated",
+      "tier": "offline_reference",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        2.0,
+        2.0
+      ],
+      "worst_hypothesis_risk": 2.0
+    },
+    {
+      "average_utility": 0.0,
+      "bayes_risk": 4.0,
+      "capacity": 5,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 2.0,
+      "expansions": 26,
+      "group_id": "iid-dev-1",
+      "horizon": 4,
+      "instance_hash": "03a03cb71b1557608d9f3ef6d4316e77e85b20b3519c168acb244aed0de473a1",
+      "mc_excess_over_exact_bayes": 2.0,
+      "mean_protocol_duration": 4,
+      "measurements": 2,
+      "method": "channel_cover",
+      "model_calls": 64,
+      "planning_seconds": 0.0001752321875301277,
+      "protocols": 1,
+      "risk_by_hypothesis": [
+        4.0,
+        4.0
+      ],
+      "status": "estimated",
+      "tier": "large",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        0.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 4.0
+    },
+    {
+      "average_utility": 0.0,
+      "bayes_risk": 4.0,
+      "capacity": 5,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 2.0,
+      "expansions": 26,
+      "group_id": "iid-dev-1",
+      "horizon": 4,
+      "instance_hash": "03a03cb71b1557608d9f3ef6d4316e77e85b20b3519c168acb244aed0de473a1",
+      "mc_excess_over_exact_bayes": 2.0,
+      "mean_protocol_duration": 4,
+      "measurements": 2,
+      "method": "channel_cover",
+      "model_calls": 64,
+      "planning_seconds": 0.00018801618745101223,
+      "protocols": 1,
+      "risk_by_hypothesis": [
+        4.0,
+        4.0
+      ],
+      "status": "estimated",
+      "tier": "small",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        0.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 4.0
+    },
+    {
+      "average_utility": 2.0,
+      "bayes_risk": 2.0,
+      "capacity": 5,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 2.0,
+      "expansions": 0,
+      "group_id": "iid-dev-1",
+      "horizon": 4,
+      "instance_hash": "03a03cb71b1557608d9f3ef6d4316e77e85b20b3519c168acb244aed0de473a1",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "exact_bayes",
+      "model_calls": 0,
+      "planning_seconds": 1.8640437531303178e-05,
+      "protocols": 4,
+      "risk_by_hypothesis": [
+        0.0,
+        4.0
+      ],
+      "status": "estimated",
+      "tier": "offline_reference",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        4.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 4.0
+    },
+    {
+      "average_utility": 2.0,
+      "bayes_risk": 2.0,
+      "capacity": 5,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 2.0,
+      "expansions": 234,
+      "group_id": "iid-dev-1",
+      "horizon": 4,
+      "instance_hash": "03a03cb71b1557608d9f3ef6d4316e77e85b20b3519c168acb244aed0de473a1",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "one_step_voi",
+      "model_calls": 702,
+      "planning_seconds": 0.0015597780625853375,
+      "protocols": 4,
+      "risk_by_hypothesis": [
+        0.0,
+        4.0
+      ],
+      "status": "estimated",
+      "tier": "large",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        4.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 4.0
+    },
+    {
+      "average_utility": 2.0,
+      "bayes_risk": 2.0,
+      "capacity": 5,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 2.0,
+      "expansions": 234,
+      "group_id": "iid-dev-1",
+      "horizon": 4,
+      "instance_hash": "03a03cb71b1557608d9f3ef6d4316e77e85b20b3519c168acb244aed0de473a1",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "one_step_voi",
+      "model_calls": 702,
+      "planning_seconds": 0.0015592406876976384,
+      "protocols": 4,
+      "risk_by_hypothesis": [
+        0.0,
+        4.0
+      ],
+      "status": "estimated",
+      "tier": "small",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        4.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 4.0
+    },
+    {
+      "average_utility": 2.0,
+      "bayes_risk": 2.0,
+      "capacity": 5,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 2.0,
+      "expansions": 75,
+      "group_id": "iid-dev-1",
+      "horizon": 4,
+      "instance_hash": "03a03cb71b1557608d9f3ef6d4316e77e85b20b3519c168acb244aed0de473a1",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "posterior_sampling",
+      "model_calls": 414,
+      "planning_seconds": 0.0008345896874288883,
+      "protocols": 4,
+      "risk_by_hypothesis": [
+        2.0,
+        2.0
+      ],
+      "status": "estimated",
+      "tier": "large",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        2.0,
+        2.0
+      ],
+      "worst_hypothesis_risk": 2.0
+    },
+    {
+      "average_utility": 2.0,
+      "bayes_risk": 2.0,
+      "capacity": 5,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 2.0,
+      "expansions": 75,
+      "group_id": "iid-dev-1",
+      "horizon": 4,
+      "instance_hash": "03a03cb71b1557608d9f3ef6d4316e77e85b20b3519c168acb244aed0de473a1",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "posterior_sampling",
+      "model_calls": 414,
+      "planning_seconds": 0.0008361956252542768,
+      "protocols": 4,
+      "risk_by_hypothesis": [
+        2.0,
+        2.0
+      ],
+      "status": "estimated",
+      "tier": "small",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        2.0,
+        2.0
+      ],
+      "worst_hypothesis_risk": 2.0
+    },
+    {
+      "average_utility": 4.0,
+      "bayes_risk": 4.0,
+      "capacity": 5,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 4.0,
+      "expansions": 6351,
+      "group_id": "iid-dev-1",
+      "horizon": 8,
+      "instance_hash": "0987ca174b89af264c26a76eb6d6830a30b281e19d460296115c7aab6520c3d9",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "beam_bayes",
+      "model_calls": 30078,
+      "planning_seconds": 0.05739565049975681,
+      "protocols": 8,
+      "risk_by_hypothesis": [
+        0.0,
+        8.0
+      ],
+      "status": "estimated",
+      "tier": "large",
+      "truncated_selections": 5,
+      "utility_by_hypothesis": [
+        8.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 8.0
+    },
+    {
+      "average_utility": 4.0,
+      "bayes_risk": 4.0,
+      "capacity": 5,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 4.0,
+      "expansions": 1557,
+      "group_id": "iid-dev-1",
+      "horizon": 8,
+      "instance_hash": "0987ca174b89af264c26a76eb6d6830a30b281e19d460296115c7aab6520c3d9",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "beam_bayes",
+      "model_calls": 11060,
+      "planning_seconds": 0.019365727562728807,
+      "protocols": 8,
+      "risk_by_hypothesis": [
+        0.0,
+        8.0
+      ],
+      "status": "estimated",
+      "tier": "small",
+      "truncated_selections": 5,
+      "utility_by_hypothesis": [
+        8.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 8.0
+    },
+    {
+      "attempts": 16,
+      "capacity": 5,
+      "channels": 3,
+      "distribution_id": "directed-m3-k2-p05",
+      "group_id": "iid-dev-1",
+      "horizon": 8,
+      "instance_hash": "0987ca174b89af264c26a76eb6d6830a30b281e19d460296115c7aab6520c3d9",
+      "method": "certified_minimax",
+      "status": "unresolved",
+      "tier": "offline_reference"
+    },
+    {
+      "average_utility": 3.5,
+      "bayes_risk": 4.5,
+      "capacity": 5,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.5,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 4.0,
+      "expansions": 101,
+      "group_id": "iid-dev-1",
+      "horizon": 8,
+      "instance_hash": "0987ca174b89af264c26a76eb6d6830a30b281e19d460296115c7aab6520c3d9",
+      "mc_excess_over_exact_bayes": 0.5,
+      "mean_protocol_duration": 1.6,
+      "measurements": 2,
+      "method": "channel_cover",
+      "model_calls": 204,
+      "planning_seconds": 0.0005255251872426925,
+      "protocols": 5,
+      "risk_by_hypothesis": [
+        4.0,
+        5.0
+      ],
+      "status": "estimated",
+      "tier": "large",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        4.0,
+        3.0
+      ],
+      "worst_hypothesis_risk": 5.0
+    },
+    {
+      "average_utility": 3.5,
+      "bayes_risk": 4.5,
+      "capacity": 5,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.5,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 4.0,
+      "expansions": 101,
+      "group_id": "iid-dev-1",
+      "horizon": 8,
+      "instance_hash": "0987ca174b89af264c26a76eb6d6830a30b281e19d460296115c7aab6520c3d9",
+      "mc_excess_over_exact_bayes": 0.5,
+      "mean_protocol_duration": 1.6,
+      "measurements": 2,
+      "method": "channel_cover",
+      "model_calls": 204,
+      "planning_seconds": 0.0005083836248900298,
+      "protocols": 5,
+      "risk_by_hypothesis": [
+        4.0,
+        5.0
+      ],
+      "status": "estimated",
+      "tier": "small",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        4.0,
+        3.0
+      ],
+      "worst_hypothesis_risk": 5.0
+    },
+    {
+      "average_utility": 4.375,
+      "bayes_risk": 3.625,
+      "capacity": 5,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.625,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 4.0,
+      "expansions": 0,
+      "group_id": "iid-dev-1",
+      "horizon": 8,
+      "instance_hash": "0987ca174b89af264c26a76eb6d6830a30b281e19d460296115c7aab6520c3d9",
+      "mc_excess_over_exact_bayes": -0.375,
+      "mean_protocol_duration": 1.3333333333333333,
+      "measurements": 1,
+      "method": "exact_bayes",
+      "model_calls": 0,
+      "planning_seconds": 2.6548124992586963e-05,
+      "protocols": 6,
+      "risk_by_hypothesis": [
+        3.0,
+        4.25
+      ],
+      "status": "estimated",
+      "tier": "offline_reference",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        5.0,
+        3.75
+      ],
+      "worst_hypothesis_risk": 4.25
+    },
+    {
+      "average_utility": 4.0,
+      "bayes_risk": 4.0,
+      "capacity": 5,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 4.0,
+      "expansions": 2368,
+      "group_id": "iid-dev-1",
+      "horizon": 8,
+      "instance_hash": "0987ca174b89af264c26a76eb6d6830a30b281e19d460296115c7aab6520c3d9",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "one_step_voi",
+      "model_calls": 10790,
+      "planning_seconds": 0.019632065124824294,
+      "protocols": 8,
+      "risk_by_hypothesis": [
+        0.0,
+        8.0
+      ],
+      "status": "estimated",
+      "tier": "large",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        8.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 8.0
+    },
+    {
+      "average_utility": 4.0,
+      "bayes_risk": 4.0,
+      "capacity": 5,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 4.0,
+      "expansions": 1362,
+      "group_id": "iid-dev-1",
+      "horizon": 8,
+      "instance_hash": "0987ca174b89af264c26a76eb6d6830a30b281e19d460296115c7aab6520c3d9",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "one_step_voi",
+      "model_calls": 6472,
+      "planning_seconds": 0.011924811874621355,
+      "protocols": 8,
+      "risk_by_hypothesis": [
+        0.0,
+        8.0
+      ],
+      "status": "estimated",
+      "tier": "small",
+      "truncated_selections": 3,
+      "utility_by_hypothesis": [
+        8.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 8.0
+    },
+    {
+      "average_utility": 4.0,
+      "bayes_risk": 4.0,
+      "capacity": 5,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 4.0,
+      "expansions": 179,
+      "group_id": "iid-dev-1",
+      "horizon": 8,
+      "instance_hash": "0987ca174b89af264c26a76eb6d6830a30b281e19d460296115c7aab6520c3d9",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "posterior_sampling",
+      "model_calls": 1934,
+      "planning_seconds": 0.0033304028759175708,
+      "protocols": 8,
+      "risk_by_hypothesis": [
+        4.0,
+        4.0
+      ],
+      "status": "estimated",
+      "tier": "large",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        4.0,
+        4.0
+      ],
+      "worst_hypothesis_risk": 4.0
+    },
+    {
+      "average_utility": 4.0,
+      "bayes_risk": 4.0,
+      "capacity": 5,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 4.0,
+      "expansions": 179,
+      "group_id": "iid-dev-1",
+      "horizon": 8,
+      "instance_hash": "0987ca174b89af264c26a76eb6d6830a30b281e19d460296115c7aab6520c3d9",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "posterior_sampling",
+      "model_calls": 1934,
+      "planning_seconds": 0.0033018255625734128,
+      "protocols": 8,
+      "risk_by_hypothesis": [
+        4.0,
+        4.0
+      ],
+      "status": "estimated",
+      "tier": "small",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        4.0,
+        4.0
+      ],
+      "worst_hypothesis_risk": 4.0
+    },
+    {
+      "average_utility": 4.375,
+      "bayes_risk": 3.625,
+      "capacity": 3,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.625,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 3.5,
+      "expansions": 2244,
+      "group_id": "iid-dev-0",
+      "horizon": 8,
+      "instance_hash": "276747e0dfaf515f2826aba23140cabd992bfe4940e2c405cf1d6e0d6c50596b",
+      "mc_excess_over_exact_bayes": 0.125,
+      "mean_protocol_duration": 1.3333333333333333,
+      "measurements": 1,
+      "method": "beam_bayes",
+      "model_calls": 7792,
+      "planning_seconds": 0.01658296912529522,
+      "protocols": 6,
+      "risk_by_hypothesis": [
+        3.0,
+        4.25
+      ],
+      "status": "estimated",
+      "tier": "large",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        5.0,
+        3.75
+      ],
+      "worst_hypothesis_risk": 4.25
+    },
+    {
+      "average_utility": 4.0,
+      "bayes_risk": 4.0,
+      "capacity": 3,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 3.5,
+      "expansions": 1646,
+      "group_id": "iid-dev-0",
+      "horizon": 8,
+      "instance_hash": "276747e0dfaf515f2826aba23140cabd992bfe4940e2c405cf1d6e0d6c50596b",
+      "mc_excess_over_exact_bayes": 0.5,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "beam_bayes",
+      "model_calls": 5782,
+      "planning_seconds": 0.012037008875040556,
+      "protocols": 8,
+      "risk_by_hypothesis": [
+        0.0,
+        8.0
+      ],
+      "status": "estimated",
+      "tier": "small",
+      "truncated_selections": 4,
+      "utility_by_hypothesis": [
+        8.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 8.0
+    },
+    {
+      "attempts": 16,
+      "capacity": 3,
+      "channels": 3,
+      "distribution_id": "directed-m3-k2-p05",
+      "group_id": "iid-dev-0",
+      "horizon": 8,
+      "instance_hash": "276747e0dfaf515f2826aba23140cabd992bfe4940e2c405cf1d6e0d6c50596b",
+      "method": "certified_minimax",
+      "status": "unresolved",
+      "tier": "offline_reference"
+    },
+    {
+      "average_utility": 1.75,
+      "bayes_risk": 6.25,
+      "capacity": 3,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.25,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 3.5,
+      "expansions": 75,
+      "group_id": "iid-dev-0",
+      "horizon": 8,
+      "instance_hash": "276747e0dfaf515f2826aba23140cabd992bfe4940e2c405cf1d6e0d6c50596b",
+      "mc_excess_over_exact_bayes": 2.75,
+      "mean_protocol_duration": 2,
+      "measurements": 2,
+      "method": "channel_cover",
+      "model_calls": 88,
+      "planning_seconds": 0.00028431925011318526,
+      "protocols": 4,
+      "risk_by_hypothesis": [
+        6.0,
+        6.5
+      ],
+      "status": "estimated",
+      "tier": "large",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        2.0,
+        1.5
+      ],
+      "worst_hypothesis_risk": 6.5
+    },
+    {
+      "average_utility": 1.75,
+      "bayes_risk": 6.25,
+      "capacity": 3,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.25,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 3.5,
+      "expansions": 75,
+      "group_id": "iid-dev-0",
+      "horizon": 8,
+      "instance_hash": "276747e0dfaf515f2826aba23140cabd992bfe4940e2c405cf1d6e0d6c50596b",
+      "mc_excess_over_exact_bayes": 2.75,
+      "mean_protocol_duration": 2,
+      "measurements": 2,
+      "method": "channel_cover",
+      "model_calls": 88,
+      "planning_seconds": 0.00028552025008821147,
+      "protocols": 4,
+      "risk_by_hypothesis": [
+        6.0,
+        6.5
+      ],
+      "status": "estimated",
+      "tier": "small",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        2.0,
+        1.5
+      ],
+      "worst_hypothesis_risk": 6.5
+    },
+    {
+      "average_utility": 4.375,
+      "bayes_risk": 3.625,
+      "capacity": 3,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.625,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 3.5,
+      "expansions": 0,
+      "group_id": "iid-dev-0",
+      "horizon": 8,
+      "instance_hash": "276747e0dfaf515f2826aba23140cabd992bfe4940e2c405cf1d6e0d6c50596b",
+      "mc_excess_over_exact_bayes": 0.125,
+      "mean_protocol_duration": 1.3333333333333333,
+      "measurements": 1,
+      "method": "exact_bayes",
+      "model_calls": 0,
+      "planning_seconds": 3.0314562707189907e-05,
+      "protocols": 6,
+      "risk_by_hypothesis": [
+        3.0,
+        4.25
+      ],
+      "status": "estimated",
+      "tier": "offline_reference",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        5.0,
+        3.75
+      ],
+      "worst_hypothesis_risk": 4.25
+    },
+    {
+      "average_utility": 4.375,
+      "bayes_risk": 3.625,
+      "capacity": 3,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.625,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 3.5,
+      "expansions": 952,
+      "group_id": "iid-dev-0",
+      "horizon": 8,
+      "instance_hash": "276747e0dfaf515f2826aba23140cabd992bfe4940e2c405cf1d6e0d6c50596b",
+      "mc_excess_over_exact_bayes": 0.125,
+      "mean_protocol_duration": 1.3333333333333333,
+      "measurements": 1,
+      "method": "one_step_voi",
+      "model_calls": 2062,
+      "planning_seconds": 0.004787342249812809,
+      "protocols": 6,
+      "risk_by_hypothesis": [
+        3.0,
+        4.25
+      ],
+      "status": "estimated",
+      "tier": "large",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        5.0,
+        3.75
+      ],
+      "worst_hypothesis_risk": 4.25
+    },
+    {
+      "average_utility": 4.375,
+      "bayes_risk": 3.625,
+      "capacity": 3,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.625,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 3.5,
+      "expansions": 785,
+      "group_id": "iid-dev-0",
+      "horizon": 8,
+      "instance_hash": "276747e0dfaf515f2826aba23140cabd992bfe4940e2c405cf1d6e0d6c50596b",
+      "mc_excess_over_exact_bayes": 0.125,
+      "mean_protocol_duration": 1.3333333333333333,
+      "measurements": 1,
+      "method": "one_step_voi",
+      "model_calls": 1726,
+      "planning_seconds": 0.0040429226253309025,
+      "protocols": 6,
+      "risk_by_hypothesis": [
+        3.0,
+        4.25
+      ],
+      "status": "estimated",
+      "tier": "small",
+      "truncated_selections": 1,
+      "utility_by_hypothesis": [
+        5.0,
+        3.75
+      ],
+      "worst_hypothesis_risk": 4.25
+    },
+    {
+      "average_utility": 4.0,
+      "bayes_risk": 4.0,
+      "capacity": 3,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 3.5,
+      "expansions": 175,
+      "group_id": "iid-dev-0",
+      "horizon": 8,
+      "instance_hash": "276747e0dfaf515f2826aba23140cabd992bfe4940e2c405cf1d6e0d6c50596b",
+      "mc_excess_over_exact_bayes": 0.5,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "posterior_sampling",
+      "model_calls": 688,
+      "planning_seconds": 0.0014524673127880305,
+      "protocols": 8,
+      "risk_by_hypothesis": [
+        4.0,
+        4.0
+      ],
+      "status": "estimated",
+      "tier": "large",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        4.0,
+        4.0
+      ],
+      "worst_hypothesis_risk": 4.0
+    },
+    {
+      "average_utility": 4.0,
+      "bayes_risk": 4.0,
+      "capacity": 3,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 3.5,
+      "expansions": 175,
+      "group_id": "iid-dev-0",
+      "horizon": 8,
+      "instance_hash": "276747e0dfaf515f2826aba23140cabd992bfe4940e2c405cf1d6e0d6c50596b",
+      "mc_excess_over_exact_bayes": 0.5,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "posterior_sampling",
+      "model_calls": 688,
+      "planning_seconds": 0.0014480705625032897,
+      "protocols": 8,
+      "risk_by_hypothesis": [
+        4.0,
+        4.0
+      ],
+      "status": "estimated",
+      "tier": "small",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        4.0,
+        4.0
+      ],
+      "worst_hypothesis_risk": 4.0
+    },
+    {
+      "average_utility": 9.0,
+      "bayes_risk": 3.0,
+      "capacity": 7,
+      "channels": 5,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m5-k2-p01",
+      "episodes": 16,
+      "exact_bayes_risk": 5.25,
+      "expansions": 10016,
+      "group_id": "scale-sparse-dev-0",
+      "horizon": 12,
+      "instance_hash": "485129b0b17ffa2d3cb2616296e97df8a4baf09b3679c4bbbb86a1bd1568e4d3",
+      "mc_excess_over_exact_bayes": -2.25,
+      "mean_protocol_duration": 1.2,
+      "measurements": 1,
+      "method": "beam_bayes",
+      "model_calls": 66830,
+      "planning_seconds": 0.13418996093759006,
+      "protocols": 10,
+      "risk_by_hypothesis": [
+        3.0,
+        3.0
+      ],
+      "status": "estimated",
+      "tier": "large",
+      "truncated_selections": 7,
+      "utility_by_hypothesis": [
+        9.0,
+        9.0
+      ],
+      "worst_hypothesis_risk": 3.0
+    },
+    {
+      "average_utility": 6.0,
+      "bayes_risk": 6.0,
+      "capacity": 7,
+      "channels": 5,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m5-k2-p01",
+      "episodes": 16,
+      "exact_bayes_risk": 5.25,
+      "expansions": 2862,
+      "group_id": "scale-sparse-dev-0",
+      "horizon": 12,
+      "instance_hash": "485129b0b17ffa2d3cb2616296e97df8a4baf09b3679c4bbbb86a1bd1568e4d3",
+      "mc_excess_over_exact_bayes": 0.75,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "beam_bayes",
+      "model_calls": 21068,
+      "planning_seconds": 0.04066501268783895,
+      "protocols": 12,
+      "risk_by_hypothesis": [
+        0.0,
+        12.0
+      ],
+      "status": "estimated",
+      "tier": "small",
+      "truncated_selections": 9,
+      "utility_by_hypothesis": [
+        12.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 12.0
+    },
+    {
+      "attempts": 16,
+      "capacity": 7,
+      "channels": 5,
+      "distribution_id": "directed-m5-k2-p01",
+      "group_id": "scale-sparse-dev-0",
+      "horizon": 12,
+      "instance_hash": "485129b0b17ffa2d3cb2616296e97df8a4baf09b3679c4bbbb86a1bd1568e4d3",
+      "method": "certified_minimax",
+      "status": "unresolved",
+      "tier": "offline_reference"
+    },
+    {
+      "average_utility": 1.75,
+      "bayes_risk": 10.25,
+      "capacity": 7,
+      "channels": 5,
+      "conditional_noise_mc_se": 0.25,
+      "distribution_id": "directed-m5-k2-p01",
+      "episodes": 16,
+      "exact_bayes_risk": 5.25,
+      "expansions": 82,
+      "group_id": "scale-sparse-dev-0",
+      "horizon": 12,
+      "instance_hash": "485129b0b17ffa2d3cb2616296e97df8a4baf09b3679c4bbbb86a1bd1568e4d3",
+      "mc_excess_over_exact_bayes": 5.0,
+      "mean_protocol_duration": 2.4,
+      "measurements": 4,
+      "method": "channel_cover",
+      "model_calls": 200,
+      "planning_seconds": 0.00048690781221694124,
+      "protocols": 5,
+      "risk_by_hypothesis": [
+        10.5,
+        10.0
+      ],
+      "status": "estimated",
+      "tier": "large",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        1.5,
+        2.0
+      ],
+      "worst_hypothesis_risk": 10.5
+    },
+    {
+      "average_utility": 1.75,
+      "bayes_risk": 10.25,
+      "capacity": 7,
+      "channels": 5,
+      "conditional_noise_mc_se": 0.25,
+      "distribution_id": "directed-m5-k2-p01",
+      "episodes": 16,
+      "exact_bayes_risk": 5.25,
+      "expansions": 82,
+      "group_id": "scale-sparse-dev-0",
+      "horizon": 12,
+      "instance_hash": "485129b0b17ffa2d3cb2616296e97df8a4baf09b3679c4bbbb86a1bd1568e4d3",
+      "mc_excess_over_exact_bayes": 5.0,
+      "mean_protocol_duration": 2.4,
+      "measurements": 4,
+      "method": "channel_cover",
+      "model_calls": 200,
+      "planning_seconds": 0.0005252468128560395,
+      "protocols": 5,
+      "risk_by_hypothesis": [
+        10.5,
+        10.0
+      ],
+      "status": "estimated",
+      "tier": "small",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        1.5,
+        2.0
+      ],
+      "worst_hypothesis_risk": 10.5
+    },
+    {
+      "average_utility": 9.0,
+      "bayes_risk": 3.0,
+      "capacity": 7,
+      "channels": 5,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m5-k2-p01",
+      "episodes": 16,
+      "exact_bayes_risk": 5.25,
+      "expansions": 0,
+      "group_id": "scale-sparse-dev-0",
+      "horizon": 12,
+      "instance_hash": "485129b0b17ffa2d3cb2616296e97df8a4baf09b3679c4bbbb86a1bd1568e4d3",
+      "mc_excess_over_exact_bayes": -2.25,
+      "mean_protocol_duration": 1.2,
+      "measurements": 1,
+      "method": "exact_bayes",
+      "model_calls": 0,
+      "planning_seconds": 4.0757250360456965e-05,
+      "protocols": 10,
+      "risk_by_hypothesis": [
+        3.0,
+        3.0
+      ],
+      "status": "estimated",
+      "tier": "offline_reference",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        9.0,
+        9.0
+      ],
+      "worst_hypothesis_risk": 3.0
+    },
+    {
+      "average_utility": 9.0,
+      "bayes_risk": 3.0,
+      "capacity": 7,
+      "channels": 5,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m5-k2-p01",
+      "episodes": 16,
+      "exact_bayes_risk": 5.25,
+      "expansions": 4769,
+      "group_id": "scale-sparse-dev-0",
+      "horizon": 12,
+      "instance_hash": "485129b0b17ffa2d3cb2616296e97df8a4baf09b3679c4bbbb86a1bd1568e4d3",
+      "mc_excess_over_exact_bayes": -2.25,
+      "mean_protocol_duration": 1.2,
+      "measurements": 1,
+      "method": "one_step_voi",
+      "model_calls": 13092,
+      "planning_seconds": 0.027670584437601065,
+      "protocols": 10,
+      "risk_by_hypothesis": [
+        3.0,
+        3.0
+      ],
+      "status": "estimated",
+      "tier": "large",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        9.0,
+        9.0
+      ],
+      "worst_hypothesis_risk": 3.0
+    },
+    {
+      "average_utility": 6.0,
+      "bayes_risk": 6.0,
+      "capacity": 7,
+      "channels": 5,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m5-k2-p01",
+      "episodes": 16,
+      "exact_bayes_risk": 5.25,
+      "expansions": 2701,
+      "group_id": "scale-sparse-dev-0",
+      "horizon": 12,
+      "instance_hash": "485129b0b17ffa2d3cb2616296e97df8a4baf09b3679c4bbbb86a1bd1568e4d3",
+      "mc_excess_over_exact_bayes": 0.75,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "one_step_voi",
+      "model_calls": 8122,
+      "planning_seconds": 0.017306073000440847,
+      "protocols": 12,
+      "risk_by_hypothesis": [
+        0.0,
+        12.0
+      ],
+      "status": "estimated",
+      "tier": "small",
+      "truncated_selections": 8,
+      "utility_by_hypothesis": [
+        12.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 12.0
+    },
+    {
+      "average_utility": 6.0,
+      "bayes_risk": 6.0,
+      "capacity": 7,
+      "channels": 5,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m5-k2-p01",
+      "episodes": 16,
+      "exact_bayes_risk": 5.25,
+      "expansions": 208,
+      "group_id": "scale-sparse-dev-0",
+      "horizon": 12,
+      "instance_hash": "485129b0b17ffa2d3cb2616296e97df8a4baf09b3679c4bbbb86a1bd1568e4d3",
+      "mc_excess_over_exact_bayes": 0.75,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "posterior_sampling",
+      "model_calls": 1662,
+      "planning_seconds": 0.0032962268749088253,
+      "protocols": 12,
+      "risk_by_hypothesis": [
+        7.0,
+        5.0
+      ],
+      "status": "estimated",
+      "tier": "large",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        5.0,
+        7.0
+      ],
+      "worst_hypothesis_risk": 7.0
+    },
+    {
+      "average_utility": 6.0,
+      "bayes_risk": 6.0,
+      "capacity": 7,
+      "channels": 5,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m5-k2-p01",
+      "episodes": 16,
+      "exact_bayes_risk": 5.25,
+      "expansions": 208,
+      "group_id": "scale-sparse-dev-0",
+      "horizon": 12,
+      "instance_hash": "485129b0b17ffa2d3cb2616296e97df8a4baf09b3679c4bbbb86a1bd1568e4d3",
+      "mc_excess_over_exact_bayes": 0.75,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "posterior_sampling",
+      "model_calls": 1662,
+      "planning_seconds": 0.0033070642492702973,
+      "protocols": 12,
+      "risk_by_hypothesis": [
+        7.0,
+        5.0
+      ],
+      "status": "estimated",
+      "tier": "small",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        5.0,
+        7.0
+      ],
+      "worst_hypothesis_risk": 7.0
+    },
+    {
+      "average_utility": 4.375,
+      "bayes_risk": 3.625,
+      "capacity": 5,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.625,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 3.5,
+      "expansions": 3946,
+      "group_id": "iid-dev-0",
+      "horizon": 8,
+      "instance_hash": "7486c25492fc20e2a5fde37290e949bc52c84cc1dbf72bbeefb53958abe3c328",
+      "mc_excess_over_exact_bayes": 0.125,
+      "mean_protocol_duration": 1.3333333333333333,
+      "measurements": 1,
+      "method": "beam_bayes",
+      "model_calls": 18802,
+      "planning_seconds": 0.03604888050000454,
+      "protocols": 6,
+      "risk_by_hypothesis": [
+        3.0,
+        4.25
+      ],
+      "status": "estimated",
+      "tier": "large",
+      "truncated_selections": 3,
+      "utility_by_hypothesis": [
+        5.0,
+        3.75
+      ],
+      "worst_hypothesis_risk": 4.25
+    },
+    {
+      "average_utility": 4.0,
+      "bayes_risk": 4.0,
+      "capacity": 5,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 3.5,
+      "expansions": 1628,
+      "group_id": "iid-dev-0",
+      "horizon": 8,
+      "instance_hash": "7486c25492fc20e2a5fde37290e949bc52c84cc1dbf72bbeefb53958abe3c328",
+      "mc_excess_over_exact_bayes": 0.5,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "beam_bayes",
+      "model_calls": 11120,
+      "planning_seconds": 0.019462829625410905,
+      "protocols": 8,
+      "risk_by_hypothesis": [
+        0.0,
+        8.0
+      ],
+      "status": "estimated",
+      "tier": "small",
+      "truncated_selections": 5,
+      "utility_by_hypothesis": [
+        8.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 8.0
+    },
+    {
+      "attempts": 16,
+      "capacity": 5,
+      "channels": 3,
+      "distribution_id": "directed-m3-k2-p05",
+      "group_id": "iid-dev-0",
+      "horizon": 8,
+      "instance_hash": "7486c25492fc20e2a5fde37290e949bc52c84cc1dbf72bbeefb53958abe3c328",
+      "method": "certified_minimax",
+      "status": "unresolved",
+      "tier": "offline_reference"
+    },
+    {
+      "average_utility": 2.625,
+      "bayes_risk": 5.375,
+      "capacity": 5,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.375,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 3.5,
+      "expansions": 82,
+      "group_id": "iid-dev-0",
+      "horizon": 8,
+      "instance_hash": "7486c25492fc20e2a5fde37290e949bc52c84cc1dbf72bbeefb53958abe3c328",
+      "mc_excess_over_exact_bayes": 1.875,
+      "mean_protocol_duration": 2,
+      "measurements": 3,
+      "method": "channel_cover",
+      "model_calls": 150,
+      "planning_seconds": 0.00038951875001203007,
+      "protocols": 4,
+      "risk_by_hypothesis": [
+        5.0,
+        5.75
+      ],
+      "status": "estimated",
+      "tier": "large",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        3.0,
+        2.25
+      ],
+      "worst_hypothesis_risk": 5.75
+    },
+    {
+      "average_utility": 2.625,
+      "bayes_risk": 5.375,
+      "capacity": 5,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.375,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 3.5,
+      "expansions": 82,
+      "group_id": "iid-dev-0",
+      "horizon": 8,
+      "instance_hash": "7486c25492fc20e2a5fde37290e949bc52c84cc1dbf72bbeefb53958abe3c328",
+      "mc_excess_over_exact_bayes": 1.875,
+      "mean_protocol_duration": 2,
+      "measurements": 3,
+      "method": "channel_cover",
+      "model_calls": 150,
+      "planning_seconds": 0.00040633318724303535,
+      "protocols": 4,
+      "risk_by_hypothesis": [
+        5.0,
+        5.75
+      ],
+      "status": "estimated",
+      "tier": "small",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        3.0,
+        2.25
+      ],
+      "worst_hypothesis_risk": 5.75
+    },
+    {
+      "average_utility": 4.375,
+      "bayes_risk": 3.625,
+      "capacity": 5,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.625,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 3.5,
+      "expansions": 0,
+      "group_id": "iid-dev-0",
+      "horizon": 8,
+      "instance_hash": "7486c25492fc20e2a5fde37290e949bc52c84cc1dbf72bbeefb53958abe3c328",
+      "mc_excess_over_exact_bayes": 0.125,
+      "mean_protocol_duration": 1.3333333333333333,
+      "measurements": 1,
+      "method": "exact_bayes",
+      "model_calls": 0,
+      "planning_seconds": 2.8480687888077227e-05,
+      "protocols": 6,
+      "risk_by_hypothesis": [
+        3.0,
+        4.25
+      ],
+      "status": "estimated",
+      "tier": "offline_reference",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        5.0,
+        3.75
+      ],
+      "worst_hypothesis_risk": 4.25
+    },
+    {
+      "average_utility": 4.375,
+      "bayes_risk": 3.625,
+      "capacity": 5,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.625,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 3.5,
+      "expansions": 1569,
+      "group_id": "iid-dev-0",
+      "horizon": 8,
+      "instance_hash": "7486c25492fc20e2a5fde37290e949bc52c84cc1dbf72bbeefb53958abe3c328",
+      "mc_excess_over_exact_bayes": 0.125,
+      "mean_protocol_duration": 1.3333333333333333,
+      "measurements": 1,
+      "method": "one_step_voi",
+      "model_calls": 6894,
+      "planning_seconds": 0.012905974500256434,
+      "protocols": 6,
+      "risk_by_hypothesis": [
+        3.0,
+        4.25
+      ],
+      "status": "estimated",
+      "tier": "large",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        5.0,
+        3.75
+      ],
+      "worst_hypothesis_risk": 4.25
+    },
+    {
+      "average_utility": 4.375,
+      "bayes_risk": 3.625,
+      "capacity": 5,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.625,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 3.5,
+      "expansions": 787,
+      "group_id": "iid-dev-0",
+      "horizon": 8,
+      "instance_hash": "7486c25492fc20e2a5fde37290e949bc52c84cc1dbf72bbeefb53958abe3c328",
+      "mc_excess_over_exact_bayes": 0.125,
+      "mean_protocol_duration": 1.3333333333333333,
+      "measurements": 1,
+      "method": "one_step_voi",
+      "model_calls": 3810,
+      "planning_seconds": 0.0070667466247869015,
+      "protocols": 6,
+      "risk_by_hypothesis": [
+        3.0,
+        4.25
+      ],
+      "status": "estimated",
+      "tier": "small",
+      "truncated_selections": 1,
+      "utility_by_hypothesis": [
+        5.0,
+        3.75
+      ],
+      "worst_hypothesis_risk": 4.25
+    },
+    {
+      "average_utility": 4.0,
+      "bayes_risk": 4.0,
+      "capacity": 5,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 3.5,
+      "expansions": 210,
+      "group_id": "iid-dev-0",
+      "horizon": 8,
+      "instance_hash": "7486c25492fc20e2a5fde37290e949bc52c84cc1dbf72bbeefb53958abe3c328",
+      "mc_excess_over_exact_bayes": 0.5,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "posterior_sampling",
+      "model_calls": 2122,
+      "planning_seconds": 0.0035037002497233516,
+      "protocols": 8,
+      "risk_by_hypothesis": [
+        4.0,
+        4.0
+      ],
+      "status": "estimated",
+      "tier": "large",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        4.0,
+        4.0
+      ],
+      "worst_hypothesis_risk": 4.0
+    },
+    {
+      "average_utility": 4.0,
+      "bayes_risk": 4.0,
+      "capacity": 5,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 3.5,
+      "expansions": 210,
+      "group_id": "iid-dev-0",
+      "horizon": 8,
+      "instance_hash": "7486c25492fc20e2a5fde37290e949bc52c84cc1dbf72bbeefb53958abe3c328",
+      "mc_excess_over_exact_bayes": 0.5,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "posterior_sampling",
+      "model_calls": 2122,
+      "planning_seconds": 0.003579345812227075,
+      "protocols": 8,
+      "risk_by_hypothesis": [
+        4.0,
+        4.0
+      ],
+      "status": "estimated",
+      "tier": "small",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        4.0,
+        4.0
+      ],
+      "worst_hypothesis_risk": 4.0
+    },
+    {
+      "average_utility": 4.0,
+      "bayes_risk": 4.0,
+      "capacity": 3,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 4.0,
+      "expansions": 4035,
+      "group_id": "iid-dev-1",
+      "horizon": 8,
+      "instance_hash": "976af1e276eb47df1ed6628ab20cc136a4c1a93e8bac90afdf5bb1b8418387f5",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "beam_bayes",
+      "model_calls": 14882,
+      "planning_seconds": 0.030986198249593144,
+      "protocols": 8,
+      "risk_by_hypothesis": [
+        0.0,
+        8.0
+      ],
+      "status": "estimated",
+      "tier": "large",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        8.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 8.0
+    },
+    {
+      "average_utility": 4.0,
+      "bayes_risk": 4.0,
+      "capacity": 3,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 4.0,
+      "expansions": 1642,
+      "group_id": "iid-dev-1",
+      "horizon": 8,
+      "instance_hash": "976af1e276eb47df1ed6628ab20cc136a4c1a93e8bac90afdf5bb1b8418387f5",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "beam_bayes",
+      "model_calls": 5980,
+      "planning_seconds": 0.012279714500209593,
+      "protocols": 8,
+      "risk_by_hypothesis": [
+        0.0,
+        8.0
+      ],
+      "status": "estimated",
+      "tier": "small",
+      "truncated_selections": 4,
+      "utility_by_hypothesis": [
+        8.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 8.0
+    },
+    {
+      "attempts": 16,
+      "capacity": 3,
+      "channels": 3,
+      "distribution_id": "directed-m3-k2-p05",
+      "group_id": "iid-dev-1",
+      "horizon": 8,
+      "instance_hash": "976af1e276eb47df1ed6628ab20cc136a4c1a93e8bac90afdf5bb1b8418387f5",
+      "method": "certified_minimax",
+      "status": "unresolved",
+      "tier": "offline_reference"
+    },
+    {
+      "average_utility": 1.75,
+      "bayes_risk": 6.25,
+      "capacity": 3,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.25,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 4.0,
+      "expansions": 73,
+      "group_id": "iid-dev-1",
+      "horizon": 8,
+      "instance_hash": "976af1e276eb47df1ed6628ab20cc136a4c1a93e8bac90afdf5bb1b8418387f5",
+      "mc_excess_over_exact_bayes": 2.25,
+      "mean_protocol_duration": 2,
+      "measurements": 2,
+      "method": "channel_cover",
+      "model_calls": 88,
+      "planning_seconds": 0.0002822974377636456,
+      "protocols": 4,
+      "risk_by_hypothesis": [
+        6.0,
+        6.5
+      ],
+      "status": "estimated",
+      "tier": "large",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        2.0,
+        1.5
+      ],
+      "worst_hypothesis_risk": 6.5
+    },
+    {
+      "average_utility": 1.75,
+      "bayes_risk": 6.25,
+      "capacity": 3,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.25,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 4.0,
+      "expansions": 73,
+      "group_id": "iid-dev-1",
+      "horizon": 8,
+      "instance_hash": "976af1e276eb47df1ed6628ab20cc136a4c1a93e8bac90afdf5bb1b8418387f5",
+      "mc_excess_over_exact_bayes": 2.25,
+      "mean_protocol_duration": 2,
+      "measurements": 2,
+      "method": "channel_cover",
+      "model_calls": 88,
+      "planning_seconds": 0.000280051687411742,
+      "protocols": 4,
+      "risk_by_hypothesis": [
+        6.0,
+        6.5
+      ],
+      "status": "estimated",
+      "tier": "small",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        2.0,
+        1.5
+      ],
+      "worst_hypothesis_risk": 6.5
+    },
+    {
+      "average_utility": 4.375,
+      "bayes_risk": 3.625,
+      "capacity": 3,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.625,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 4.0,
+      "expansions": 0,
+      "group_id": "iid-dev-1",
+      "horizon": 8,
+      "instance_hash": "976af1e276eb47df1ed6628ab20cc136a4c1a93e8bac90afdf5bb1b8418387f5",
+      "mc_excess_over_exact_bayes": -0.375,
+      "mean_protocol_duration": 1.3333333333333333,
+      "measurements": 1,
+      "method": "exact_bayes",
+      "model_calls": 0,
+      "planning_seconds": 2.7448874845958926e-05,
+      "protocols": 6,
+      "risk_by_hypothesis": [
+        3.0,
+        4.25
+      ],
+      "status": "estimated",
+      "tier": "offline_reference",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        5.0,
+        3.75
+      ],
+      "worst_hypothesis_risk": 4.25
+    },
+    {
+      "average_utility": 4.0,
+      "bayes_risk": 4.0,
+      "capacity": 3,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 4.0,
+      "expansions": 1539,
+      "group_id": "iid-dev-1",
+      "horizon": 8,
+      "instance_hash": "976af1e276eb47df1ed6628ab20cc136a4c1a93e8bac90afdf5bb1b8418387f5",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "one_step_voi",
+      "model_calls": 3678,
+      "planning_seconds": 0.00786382856227874,
+      "protocols": 8,
+      "risk_by_hypothesis": [
+        0.0,
+        8.0
+      ],
+      "status": "estimated",
+      "tier": "large",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        8.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 8.0
+    },
+    {
+      "average_utility": 4.0,
+      "bayes_risk": 4.0,
+      "capacity": 3,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 4.0,
+      "expansions": 1347,
+      "group_id": "iid-dev-1",
+      "horizon": 8,
+      "instance_hash": "976af1e276eb47df1ed6628ab20cc136a4c1a93e8bac90afdf5bb1b8418387f5",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "one_step_voi",
+      "model_calls": 3304,
+      "planning_seconds": 0.007027423562590229,
+      "protocols": 8,
+      "risk_by_hypothesis": [
+        0.0,
+        8.0
+      ],
+      "status": "estimated",
+      "tier": "small",
+      "truncated_selections": 3,
+      "utility_by_hypothesis": [
+        8.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 8.0
+    },
+    {
+      "average_utility": 4.0,
+      "bayes_risk": 4.0,
+      "capacity": 3,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 4.0,
+      "expansions": 169,
+      "group_id": "iid-dev-1",
+      "horizon": 8,
+      "instance_hash": "976af1e276eb47df1ed6628ab20cc136a4c1a93e8bac90afdf5bb1b8418387f5",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "posterior_sampling",
+      "model_calls": 688,
+      "planning_seconds": 0.001449167437158394,
+      "protocols": 8,
+      "risk_by_hypothesis": [
+        4.0,
+        4.0
+      ],
+      "status": "estimated",
+      "tier": "large",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        4.0,
+        4.0
+      ],
+      "worst_hypothesis_risk": 4.0
+    },
+    {
+      "average_utility": 4.0,
+      "bayes_risk": 4.0,
+      "capacity": 3,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 4.0,
+      "expansions": 169,
+      "group_id": "iid-dev-1",
+      "horizon": 8,
+      "instance_hash": "976af1e276eb47df1ed6628ab20cc136a4c1a93e8bac90afdf5bb1b8418387f5",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "posterior_sampling",
+      "model_calls": 688,
+      "planning_seconds": 0.001468250437540064,
+      "protocols": 8,
+      "risk_by_hypothesis": [
+        4.0,
+        4.0
+      ],
+      "status": "estimated",
+      "tier": "small",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        4.0,
+        4.0
+      ],
+      "worst_hypothesis_risk": 4.0
+    },
+    {
+      "average_utility": 2.0,
+      "bayes_risk": 2.0,
+      "capacity": 3,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 2.0,
+      "expansions": 442,
+      "group_id": "iid-dev-1",
+      "horizon": 4,
+      "instance_hash": "c8f1750bbbcaf75bb8e031e47dae9b9ff74d0c4ba4ee69e6216486895fdb2807",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "beam_bayes",
+      "model_calls": 858,
+      "planning_seconds": 0.002225804250258534,
+      "protocols": 4,
+      "risk_by_hypothesis": [
+        0.0,
+        4.0
+      ],
+      "status": "estimated",
+      "tier": "large",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        4.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 4.0
+    },
+    {
+      "average_utility": 2.0,
+      "bayes_risk": 2.0,
+      "capacity": 3,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 2.0,
+      "expansions": 442,
+      "group_id": "iid-dev-1",
+      "horizon": 4,
+      "instance_hash": "c8f1750bbbcaf75bb8e031e47dae9b9ff74d0c4ba4ee69e6216486895fdb2807",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "beam_bayes",
+      "model_calls": 858,
+      "planning_seconds": 0.002292995499828976,
+      "protocols": 4,
+      "risk_by_hypothesis": [
+        0.0,
+        4.0
+      ],
+      "status": "estimated",
+      "tier": "small",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        4.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 4.0
+    },
+    {
+      "average_utility": 2.0,
+      "bayes_risk": 2.0,
+      "capacity": 3,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 2.0,
+      "expansions": 0,
+      "group_id": "iid-dev-1",
+      "horizon": 4,
+      "instance_hash": "c8f1750bbbcaf75bb8e031e47dae9b9ff74d0c4ba4ee69e6216486895fdb2807",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "certified_minimax",
+      "model_calls": 0,
+      "planning_seconds": 1.714556270826506e-05,
+      "protocols": 4,
+      "risk_by_hypothesis": [
+        2.0,
+        2.0
+      ],
+      "status": "estimated",
+      "tier": "offline_reference",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        2.0,
+        2.0
+      ],
+      "worst_hypothesis_risk": 2.0
+    },
+    {
+      "average_utility": 0.25,
+      "bayes_risk": 3.75,
+      "capacity": 3,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.14433756729740643,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 2.0,
+      "expansions": 33,
+      "group_id": "iid-dev-1",
+      "horizon": 4,
+      "instance_hash": "c8f1750bbbcaf75bb8e031e47dae9b9ff74d0c4ba4ee69e6216486895fdb2807",
+      "mc_excess_over_exact_bayes": 1.75,
+      "mean_protocol_duration": 2,
+      "measurements": 1,
+      "method": "channel_cover",
+      "model_calls": 42,
+      "planning_seconds": 0.00015547787501191124,
+      "protocols": 2,
+      "risk_by_hypothesis": [
+        3.5,
+        4.0
+      ],
+      "status": "estimated",
+      "tier": "large",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        0.5,
+        0.0
+      ],
+      "worst_hypothesis_risk": 4.0
+    },
+    {
+      "average_utility": 0.25,
+      "bayes_risk": 3.75,
+      "capacity": 3,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.14433756729740643,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 2.0,
+      "expansions": 33,
+      "group_id": "iid-dev-1",
+      "horizon": 4,
+      "instance_hash": "c8f1750bbbcaf75bb8e031e47dae9b9ff74d0c4ba4ee69e6216486895fdb2807",
+      "mc_excess_over_exact_bayes": 1.75,
+      "mean_protocol_duration": 2,
+      "measurements": 1,
+      "method": "channel_cover",
+      "model_calls": 42,
+      "planning_seconds": 0.00015296856264512826,
+      "protocols": 2,
+      "risk_by_hypothesis": [
+        3.5,
+        4.0
+      ],
+      "status": "estimated",
+      "tier": "small",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        0.5,
+        0.0
+      ],
+      "worst_hypothesis_risk": 4.0
+    },
+    {
+      "average_utility": 2.0,
+      "bayes_risk": 2.0,
+      "capacity": 3,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 2.0,
+      "expansions": 0,
+      "group_id": "iid-dev-1",
+      "horizon": 4,
+      "instance_hash": "c8f1750bbbcaf75bb8e031e47dae9b9ff74d0c4ba4ee69e6216486895fdb2807",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "exact_bayes",
+      "model_calls": 0,
+      "planning_seconds": 1.670475018045181e-05,
+      "protocols": 4,
+      "risk_by_hypothesis": [
+        0.0,
+        4.0
+      ],
+      "status": "estimated",
+      "tier": "offline_reference",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        4.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 4.0
+    },
+    {
+      "average_utility": 2.0,
+      "bayes_risk": 2.0,
+      "capacity": 3,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 2.0,
+      "expansions": 237,
+      "group_id": "iid-dev-1",
+      "horizon": 4,
+      "instance_hash": "c8f1750bbbcaf75bb8e031e47dae9b9ff74d0c4ba4ee69e6216486895fdb2807",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "one_step_voi",
+      "model_calls": 520,
+      "planning_seconds": 0.0013232322499447946,
+      "protocols": 4,
+      "risk_by_hypothesis": [
+        0.0,
+        4.0
+      ],
+      "status": "estimated",
+      "tier": "large",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        4.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 4.0
+    },
+    {
+      "average_utility": 2.0,
+      "bayes_risk": 2.0,
+      "capacity": 3,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 2.0,
+      "expansions": 237,
+      "group_id": "iid-dev-1",
+      "horizon": 4,
+      "instance_hash": "c8f1750bbbcaf75bb8e031e47dae9b9ff74d0c4ba4ee69e6216486895fdb2807",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "one_step_voi",
+      "model_calls": 520,
+      "planning_seconds": 0.0013299444376571046,
+      "protocols": 4,
+      "risk_by_hypothesis": [
+        0.0,
+        4.0
+      ],
+      "status": "estimated",
+      "tier": "small",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        4.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 4.0
+    },
+    {
+      "average_utility": 2.0,
+      "bayes_risk": 2.0,
+      "capacity": 3,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 2.0,
+      "expansions": 73,
+      "group_id": "iid-dev-1",
+      "horizon": 4,
+      "instance_hash": "c8f1750bbbcaf75bb8e031e47dae9b9ff74d0c4ba4ee69e6216486895fdb2807",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "posterior_sampling",
+      "model_calls": 256,
+      "planning_seconds": 0.0005967989378063976,
+      "protocols": 4,
+      "risk_by_hypothesis": [
+        2.0,
+        2.0
+      ],
+      "status": "estimated",
+      "tier": "large",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        2.0,
+        2.0
+      ],
+      "worst_hypothesis_risk": 2.0
+    },
+    {
+      "average_utility": 2.0,
+      "bayes_risk": 2.0,
+      "capacity": 3,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 2.0,
+      "expansions": 73,
+      "group_id": "iid-dev-1",
+      "horizon": 4,
+      "instance_hash": "c8f1750bbbcaf75bb8e031e47dae9b9ff74d0c4ba4ee69e6216486895fdb2807",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "posterior_sampling",
+      "model_calls": 256,
+      "planning_seconds": 0.0006022016245879058,
+      "protocols": 4,
+      "risk_by_hypothesis": [
+        2.0,
+        2.0
+      ],
+      "status": "estimated",
+      "tier": "small",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        2.0,
+        2.0
+      ],
+      "worst_hypothesis_risk": 2.0
+    },
+    {
+      "average_utility": 2.0,
+      "bayes_risk": 2.0,
+      "capacity": 3,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 2.0,
+      "expansions": 446,
+      "group_id": "iid-dev-0",
+      "horizon": 4,
+      "instance_hash": "e15e0ffc4d85199bd2e056ad306110cfd59d17944b944855dbaddf911fa9d8b6",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "beam_bayes",
+      "model_calls": 858,
+      "planning_seconds": 0.002305705625133214,
+      "protocols": 4,
+      "risk_by_hypothesis": [
+        0.0,
+        4.0
+      ],
+      "status": "estimated",
+      "tier": "large",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        4.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 4.0
+    },
+    {
+      "average_utility": 2.0,
+      "bayes_risk": 2.0,
+      "capacity": 3,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 2.0,
+      "expansions": 446,
+      "group_id": "iid-dev-0",
+      "horizon": 4,
+      "instance_hash": "e15e0ffc4d85199bd2e056ad306110cfd59d17944b944855dbaddf911fa9d8b6",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "beam_bayes",
+      "model_calls": 858,
+      "planning_seconds": 0.0022365900623526613,
+      "protocols": 4,
+      "risk_by_hypothesis": [
+        0.0,
+        4.0
+      ],
+      "status": "estimated",
+      "tier": "small",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        4.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 4.0
+    },
+    {
+      "average_utility": 2.0,
+      "bayes_risk": 2.0,
+      "capacity": 3,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 2.0,
+      "expansions": 0,
+      "group_id": "iid-dev-0",
+      "horizon": 4,
+      "instance_hash": "e15e0ffc4d85199bd2e056ad306110cfd59d17944b944855dbaddf911fa9d8b6",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "certified_minimax",
+      "model_calls": 0,
+      "planning_seconds": 1.7886624959828623e-05,
+      "protocols": 4,
+      "risk_by_hypothesis": [
+        2.0,
+        2.0
+      ],
+      "status": "estimated",
+      "tier": "offline_reference",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        2.0,
+        2.0
+      ],
+      "worst_hypothesis_risk": 2.0
+    },
+    {
+      "average_utility": 0.5,
+      "bayes_risk": 3.5,
+      "capacity": 3,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 2.0,
+      "expansions": 34,
+      "group_id": "iid-dev-0",
+      "horizon": 4,
+      "instance_hash": "e15e0ffc4d85199bd2e056ad306110cfd59d17944b944855dbaddf911fa9d8b6",
+      "mc_excess_over_exact_bayes": 1.5,
+      "mean_protocol_duration": 2,
+      "measurements": 1,
+      "method": "channel_cover",
+      "model_calls": 42,
+      "planning_seconds": 0.00016343299995469351,
+      "protocols": 2,
+      "risk_by_hypothesis": [
+        4.0,
+        3.0
+      ],
+      "status": "estimated",
+      "tier": "large",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        0.0,
+        1.0
+      ],
+      "worst_hypothesis_risk": 4.0
+    },
+    {
+      "average_utility": 0.5,
+      "bayes_risk": 3.5,
+      "capacity": 3,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 2.0,
+      "expansions": 34,
+      "group_id": "iid-dev-0",
+      "horizon": 4,
+      "instance_hash": "e15e0ffc4d85199bd2e056ad306110cfd59d17944b944855dbaddf911fa9d8b6",
+      "mc_excess_over_exact_bayes": 1.5,
+      "mean_protocol_duration": 2,
+      "measurements": 1,
+      "method": "channel_cover",
+      "model_calls": 42,
+      "planning_seconds": 0.0001629758748435961,
+      "protocols": 2,
+      "risk_by_hypothesis": [
+        4.0,
+        3.0
+      ],
+      "status": "estimated",
+      "tier": "small",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        0.0,
+        1.0
+      ],
+      "worst_hypothesis_risk": 4.0
+    },
+    {
+      "average_utility": 2.0,
+      "bayes_risk": 2.0,
+      "capacity": 3,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 2.0,
+      "expansions": 0,
+      "group_id": "iid-dev-0",
+      "horizon": 4,
+      "instance_hash": "e15e0ffc4d85199bd2e056ad306110cfd59d17944b944855dbaddf911fa9d8b6",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "exact_bayes",
+      "model_calls": 0,
+      "planning_seconds": 1.878200009741704e-05,
+      "protocols": 4,
+      "risk_by_hypothesis": [
+        0.0,
+        4.0
+      ],
+      "status": "estimated",
+      "tier": "offline_reference",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        4.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 4.0
+    },
+    {
+      "average_utility": 2.0,
+      "bayes_risk": 2.0,
+      "capacity": 3,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 2.0,
+      "expansions": 252,
+      "group_id": "iid-dev-0",
+      "horizon": 4,
+      "instance_hash": "e15e0ffc4d85199bd2e056ad306110cfd59d17944b944855dbaddf911fa9d8b6",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "one_step_voi",
+      "model_calls": 526,
+      "planning_seconds": 0.0013540932499722658,
+      "protocols": 4,
+      "risk_by_hypothesis": [
+        0.0,
+        4.0
+      ],
+      "status": "estimated",
+      "tier": "large",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        4.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 4.0
+    },
+    {
+      "average_utility": 2.0,
+      "bayes_risk": 2.0,
+      "capacity": 3,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 2.0,
+      "expansions": 252,
+      "group_id": "iid-dev-0",
+      "horizon": 4,
+      "instance_hash": "e15e0ffc4d85199bd2e056ad306110cfd59d17944b944855dbaddf911fa9d8b6",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "one_step_voi",
+      "model_calls": 526,
+      "planning_seconds": 0.001345575687651035,
+      "protocols": 4,
+      "risk_by_hypothesis": [
+        0.0,
+        4.0
+      ],
+      "status": "estimated",
+      "tier": "small",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        4.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 4.0
+    },
+    {
+      "average_utility": 2.0,
+      "bayes_risk": 2.0,
+      "capacity": 3,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 2.0,
+      "expansions": 75,
+      "group_id": "iid-dev-0",
+      "horizon": 4,
+      "instance_hash": "e15e0ffc4d85199bd2e056ad306110cfd59d17944b944855dbaddf911fa9d8b6",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "posterior_sampling",
+      "model_calls": 256,
+      "planning_seconds": 0.0006067116875101419,
+      "protocols": 4,
+      "risk_by_hypothesis": [
+        2.0,
+        2.0
+      ],
+      "status": "estimated",
+      "tier": "large",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        2.0,
+        2.0
+      ],
+      "worst_hypothesis_risk": 2.0
+    },
+    {
+      "average_utility": 2.0,
+      "bayes_risk": 2.0,
+      "capacity": 3,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 2.0,
+      "expansions": 75,
+      "group_id": "iid-dev-0",
+      "horizon": 4,
+      "instance_hash": "e15e0ffc4d85199bd2e056ad306110cfd59d17944b944855dbaddf911fa9d8b6",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "posterior_sampling",
+      "model_calls": 256,
+      "planning_seconds": 0.000593206937423929,
+      "protocols": 4,
+      "risk_by_hypothesis": [
+        2.0,
+        2.0
+      ],
+      "status": "estimated",
+      "tier": "small",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        2.0,
+        2.0
+      ],
+      "worst_hypothesis_risk": 2.0
+    },
+    {
+      "average_utility": 4.0,
+      "bayes_risk": 4.0,
+      "capacity": 7,
+      "channels": 5,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m5-k2-p08",
+      "episodes": 16,
+      "exact_bayes_risk": 4.0,
+      "expansions": 9086,
+      "group_id": "scale-dense-dev-0",
+      "horizon": 8,
+      "instance_hash": "e19582907542c2955c18e51122da93dafbd3b0fd8b7b069c9c4691286d930869",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "beam_bayes",
+      "model_calls": 53636,
+      "planning_seconds": 0.08933610868740516,
+      "protocols": 8,
+      "risk_by_hypothesis": [
+        0.0,
+        8.0
+      ],
+      "status": "estimated",
+      "tier": "large",
+      "truncated_selections": 6,
+      "utility_by_hypothesis": [
+        8.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 8.0
+    },
+    {
+      "average_utility": 4.0,
+      "bayes_risk": 4.0,
+      "capacity": 7,
+      "channels": 5,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m5-k2-p08",
+      "episodes": 16,
+      "exact_bayes_risk": 4.0,
+      "expansions": 1586,
+      "group_id": "scale-dense-dev-0",
+      "horizon": 8,
+      "instance_hash": "e19582907542c2955c18e51122da93dafbd3b0fd8b7b069c9c4691286d930869",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "beam_bayes",
+      "model_calls": 13576,
+      "planning_seconds": 0.021432578812607517,
+      "protocols": 8,
+      "risk_by_hypothesis": [
+        0.0,
+        8.0
+      ],
+      "status": "estimated",
+      "tier": "small",
+      "truncated_selections": 6,
+      "utility_by_hypothesis": [
+        8.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 8.0
+    },
+    {
+      "attempts": 16,
+      "capacity": 7,
+      "channels": 5,
+      "distribution_id": "directed-m5-k2-p08",
+      "group_id": "scale-dense-dev-0",
+      "horizon": 8,
+      "instance_hash": "e19582907542c2955c18e51122da93dafbd3b0fd8b7b069c9c4691286d930869",
+      "method": "certified_minimax",
+      "status": "unresolved",
+      "tier": "offline_reference"
+    },
+    {
+      "average_utility": 0.875,
+      "bayes_risk": 7.125,
+      "capacity": 7,
+      "channels": 5,
+      "conditional_noise_mc_se": 0.125,
+      "distribution_id": "directed-m5-k2-p08",
+      "episodes": 16,
+      "exact_bayes_risk": 4.0,
+      "expansions": 495,
+      "group_id": "scale-dense-dev-0",
+      "horizon": 8,
+      "instance_hash": "e19582907542c2955c18e51122da93dafbd3b0fd8b7b069c9c4691286d930869",
+      "mc_excess_over_exact_bayes": 3.125,
+      "mean_protocol_duration": 4,
+      "measurements": 5,
+      "method": "channel_cover",
+      "model_calls": 1458,
+      "planning_seconds": 0.0026813588124241505,
+      "protocols": 2,
+      "risk_by_hypothesis": [
+        7.0,
+        7.25
+      ],
+      "status": "estimated",
+      "tier": "large",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        1.0,
+        0.75
+      ],
+      "worst_hypothesis_risk": 7.25
+    },
+    {
+      "average_utility": 2.0,
+      "bayes_risk": 6.0,
+      "capacity": 7,
+      "channels": 5,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m5-k2-p08",
+      "episodes": 16,
+      "exact_bayes_risk": 4.0,
+      "expansions": 1400,
+      "group_id": "scale-dense-dev-0",
+      "horizon": 8,
+      "instance_hash": "e19582907542c2955c18e51122da93dafbd3b0fd8b7b069c9c4691286d930869",
+      "mc_excess_over_exact_bayes": 2.0,
+      "mean_protocol_duration": 1.6,
+      "measurements": 2,
+      "method": "channel_cover",
+      "model_calls": 160,
+      "planning_seconds": 0.0015498711874784021,
+      "protocols": 5,
+      "risk_by_hypothesis": [
+        4.0,
+        8.0
+      ],
+      "status": "estimated",
+      "tier": "small",
+      "truncated_selections": 4,
+      "utility_by_hypothesis": [
+        4.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 8.0
+    },
+    {
+      "average_utility": 4.375,
+      "bayes_risk": 3.625,
+      "capacity": 7,
+      "channels": 5,
+      "conditional_noise_mc_se": 0.625,
+      "distribution_id": "directed-m5-k2-p08",
+      "episodes": 16,
+      "exact_bayes_risk": 4.0,
+      "expansions": 0,
+      "group_id": "scale-dense-dev-0",
+      "horizon": 8,
+      "instance_hash": "e19582907542c2955c18e51122da93dafbd3b0fd8b7b069c9c4691286d930869",
+      "mc_excess_over_exact_bayes": -0.375,
+      "mean_protocol_duration": 1.3333333333333333,
+      "measurements": 1,
+      "method": "exact_bayes",
+      "model_calls": 0,
+      "planning_seconds": 3.2393499793670344e-05,
+      "protocols": 6,
+      "risk_by_hypothesis": [
+        4.25,
+        3.0
+      ],
+      "status": "estimated",
+      "tier": "offline_reference",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        3.75,
+        5.0
+      ],
+      "worst_hypothesis_risk": 4.25
+    },
+    {
+      "average_utility": 4.0,
+      "bayes_risk": 4.0,
+      "capacity": 7,
+      "channels": 5,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m5-k2-p08",
+      "episodes": 16,
+      "exact_bayes_risk": 4.0,
+      "expansions": 5805,
+      "group_id": "scale-dense-dev-0",
+      "horizon": 8,
+      "instance_hash": "e19582907542c2955c18e51122da93dafbd3b0fd8b7b069c9c4691286d930869",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "one_step_voi",
+      "model_calls": 29510,
+      "planning_seconds": 0.05032095862469532,
+      "protocols": 8,
+      "risk_by_hypothesis": [
+        0.0,
+        8.0
+      ],
+      "status": "estimated",
+      "tier": "large",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        8.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 8.0
+    },
+    {
+      "average_utility": 4.0,
+      "bayes_risk": 4.0,
+      "capacity": 7,
+      "channels": 5,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m5-k2-p08",
+      "episodes": 16,
+      "exact_bayes_risk": 4.0,
+      "expansions": 1439,
+      "group_id": "scale-dense-dev-0",
+      "horizon": 8,
+      "instance_hash": "e19582907542c2955c18e51122da93dafbd3b0fd8b7b069c9c4691286d930869",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "one_step_voi",
+      "model_calls": 12874,
+      "planning_seconds": 0.020176517749803224,
+      "protocols": 8,
+      "risk_by_hypothesis": [
+        0.0,
+        8.0
+      ],
+      "status": "estimated",
+      "tier": "small",
+      "truncated_selections": 4,
+      "utility_by_hypothesis": [
+        8.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 8.0
+    },
+    {
+      "average_utility": 4.0,
+      "bayes_risk": 4.0,
+      "capacity": 7,
+      "channels": 5,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m5-k2-p08",
+      "episodes": 16,
+      "exact_bayes_risk": 4.0,
+      "expansions": 744,
+      "group_id": "scale-dense-dev-0",
+      "horizon": 8,
+      "instance_hash": "e19582907542c2955c18e51122da93dafbd3b0fd8b7b069c9c4691286d930869",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "posterior_sampling",
+      "model_calls": 8672,
+      "planning_seconds": 0.012930702812695927,
+      "protocols": 8,
+      "risk_by_hypothesis": [
+        4.0,
+        4.0
+      ],
+      "status": "estimated",
+      "tier": "large",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        4.0,
+        4.0
+      ],
+      "worst_hypothesis_risk": 4.0
+    },
+    {
+      "average_utility": 4.0,
+      "bayes_risk": 4.0,
+      "capacity": 7,
+      "channels": 5,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m5-k2-p08",
+      "episodes": 16,
+      "exact_bayes_risk": 4.0,
+      "expansions": 744,
+      "group_id": "scale-dense-dev-0",
+      "horizon": 8,
+      "instance_hash": "e19582907542c2955c18e51122da93dafbd3b0fd8b7b069c9c4691286d930869",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "posterior_sampling",
+      "model_calls": 8672,
+      "planning_seconds": 0.012852545437624485,
+      "protocols": 8,
+      "risk_by_hypothesis": [
+        4.0,
+        4.0
+      ],
+      "status": "estimated",
+      "tier": "small",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        4.0,
+        4.0
+      ],
+      "worst_hypothesis_risk": 4.0
+    },
+    {
+      "average_utility": 4.0,
+      "bayes_risk": 4.0,
+      "capacity": 7,
+      "channels": 5,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m5-k2-p01",
+      "episodes": 16,
+      "exact_bayes_risk": 4.0,
+      "expansions": 5712,
+      "group_id": "scale-sparse-dev-0",
+      "horizon": 8,
+      "instance_hash": "e5c57dfd528180eccd9b8a9a7daf5b54c19b527a3949e1acaa8d5c05dc2ee140",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "beam_bayes",
+      "model_calls": 26862,
+      "planning_seconds": 0.05620094243738549,
+      "protocols": 8,
+      "risk_by_hypothesis": [
+        0.0,
+        8.0
+      ],
+      "status": "estimated",
+      "tier": "large",
+      "truncated_selections": 5,
+      "utility_by_hypothesis": [
+        8.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 8.0
+    },
+    {
+      "average_utility": 4.0,
+      "bayes_risk": 4.0,
+      "capacity": 7,
+      "channels": 5,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m5-k2-p01",
+      "episodes": 16,
+      "exact_bayes_risk": 4.0,
+      "expansions": 1702,
+      "group_id": "scale-sparse-dev-0",
+      "horizon": 8,
+      "instance_hash": "e5c57dfd528180eccd9b8a9a7daf5b54c19b527a3949e1acaa8d5c05dc2ee140",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "beam_bayes",
+      "model_calls": 9084,
+      "planning_seconds": 0.01849109287502415,
+      "protocols": 8,
+      "risk_by_hypothesis": [
+        0.0,
+        8.0
+      ],
+      "status": "estimated",
+      "tier": "small",
+      "truncated_selections": 5,
+      "utility_by_hypothesis": [
+        8.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 8.0
+    },
+    {
+      "attempts": 16,
+      "capacity": 7,
+      "channels": 5,
+      "distribution_id": "directed-m5-k2-p01",
+      "group_id": "scale-sparse-dev-0",
+      "horizon": 8,
+      "instance_hash": "e5c57dfd528180eccd9b8a9a7daf5b54c19b527a3949e1acaa8d5c05dc2ee140",
+      "method": "certified_minimax",
+      "status": "unresolved",
+      "tier": "offline_reference"
+    },
+    {
+      "average_utility": 0.875,
+      "bayes_risk": 7.125,
+      "capacity": 7,
+      "channels": 5,
+      "conditional_noise_mc_se": 0.125,
+      "distribution_id": "directed-m5-k2-p01",
+      "episodes": 16,
+      "exact_bayes_risk": 4.0,
+      "expansions": 47,
+      "group_id": "scale-sparse-dev-0",
+      "horizon": 8,
+      "instance_hash": "e5c57dfd528180eccd9b8a9a7daf5b54c19b527a3949e1acaa8d5c05dc2ee140",
+      "mc_excess_over_exact_bayes": 3.125,
+      "mean_protocol_duration": 2.6666666666666665,
+      "measurements": 3,
+      "method": "channel_cover",
+      "model_calls": 126,
+      "planning_seconds": 0.0003226846872621536,
+      "protocols": 3,
+      "risk_by_hypothesis": [
+        7.25,
+        7.0
+      ],
+      "status": "estimated",
+      "tier": "large",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        0.75,
+        1.0
+      ],
+      "worst_hypothesis_risk": 7.25
+    },
+    {
+      "average_utility": 0.875,
+      "bayes_risk": 7.125,
+      "capacity": 7,
+      "channels": 5,
+      "conditional_noise_mc_se": 0.125,
+      "distribution_id": "directed-m5-k2-p01",
+      "episodes": 16,
+      "exact_bayes_risk": 4.0,
+      "expansions": 47,
+      "group_id": "scale-sparse-dev-0",
+      "horizon": 8,
+      "instance_hash": "e5c57dfd528180eccd9b8a9a7daf5b54c19b527a3949e1acaa8d5c05dc2ee140",
+      "mc_excess_over_exact_bayes": 3.125,
+      "mean_protocol_duration": 2.6666666666666665,
+      "measurements": 3,
+      "method": "channel_cover",
+      "model_calls": 126,
+      "planning_seconds": 0.0003081410625895842,
+      "protocols": 3,
+      "risk_by_hypothesis": [
+        7.25,
+        7.0
+      ],
+      "status": "estimated",
+      "tier": "small",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        0.75,
+        1.0
+      ],
+      "worst_hypothesis_risk": 7.25
+    },
+    {
+      "average_utility": 4.0,
+      "bayes_risk": 4.0,
+      "capacity": 7,
+      "channels": 5,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m5-k2-p01",
+      "episodes": 16,
+      "exact_bayes_risk": 4.0,
+      "expansions": 0,
+      "group_id": "scale-sparse-dev-0",
+      "horizon": 8,
+      "instance_hash": "e5c57dfd528180eccd9b8a9a7daf5b54c19b527a3949e1acaa8d5c05dc2ee140",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "exact_bayes",
+      "model_calls": 0,
+      "planning_seconds": 3.063793712954066e-05,
+      "protocols": 8,
+      "risk_by_hypothesis": [
+        0.0,
+        8.0
+      ],
+      "status": "estimated",
+      "tier": "offline_reference",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        8.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 8.0
+    },
+    {
+      "average_utility": 4.0,
+      "bayes_risk": 4.0,
+      "capacity": 7,
+      "channels": 5,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m5-k2-p01",
+      "episodes": 16,
+      "exact_bayes_risk": 4.0,
+      "expansions": 2621,
+      "group_id": "scale-sparse-dev-0",
+      "horizon": 8,
+      "instance_hash": "e5c57dfd528180eccd9b8a9a7daf5b54c19b527a3949e1acaa8d5c05dc2ee140",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "one_step_voi",
+      "model_calls": 7916,
+      "planning_seconds": 0.0169008163747435,
+      "protocols": 8,
+      "risk_by_hypothesis": [
+        0.0,
+        8.0
+      ],
+      "status": "estimated",
+      "tier": "large",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        8.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 8.0
+    },
+    {
+      "average_utility": 4.0,
+      "bayes_risk": 4.0,
+      "capacity": 7,
+      "channels": 5,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m5-k2-p01",
+      "episodes": 16,
+      "exact_bayes_risk": 4.0,
+      "expansions": 1501,
+      "group_id": "scale-sparse-dev-0",
+      "horizon": 8,
+      "instance_hash": "e5c57dfd528180eccd9b8a9a7daf5b54c19b527a3949e1acaa8d5c05dc2ee140",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "one_step_voi",
+      "model_calls": 4592,
+      "planning_seconds": 0.009910591562629634,
+      "protocols": 8,
+      "risk_by_hypothesis": [
+        0.0,
+        8.0
+      ],
+      "status": "estimated",
+      "tier": "small",
+      "truncated_selections": 4,
+      "utility_by_hypothesis": [
+        8.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 8.0
+    },
+    {
+      "average_utility": 4.0,
+      "bayes_risk": 4.0,
+      "capacity": 7,
+      "channels": 5,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m5-k2-p01",
+      "episodes": 16,
+      "exact_bayes_risk": 4.0,
+      "expansions": 136,
+      "group_id": "scale-sparse-dev-0",
+      "horizon": 8,
+      "instance_hash": "e5c57dfd528180eccd9b8a9a7daf5b54c19b527a3949e1acaa8d5c05dc2ee140",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "posterior_sampling",
+      "model_calls": 990,
+      "planning_seconds": 0.002004798062387181,
+      "protocols": 8,
+      "risk_by_hypothesis": [
+        4.0,
+        4.0
+      ],
+      "status": "estimated",
+      "tier": "large",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        4.0,
+        4.0
+      ],
+      "worst_hypothesis_risk": 4.0
+    },
+    {
+      "average_utility": 4.0,
+      "bayes_risk": 4.0,
+      "capacity": 7,
+      "channels": 5,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m5-k2-p01",
+      "episodes": 16,
+      "exact_bayes_risk": 4.0,
+      "expansions": 136,
+      "group_id": "scale-sparse-dev-0",
+      "horizon": 8,
+      "instance_hash": "e5c57dfd528180eccd9b8a9a7daf5b54c19b527a3949e1acaa8d5c05dc2ee140",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "posterior_sampling",
+      "model_calls": 990,
+      "planning_seconds": 0.002007244812546105,
+      "protocols": 8,
+      "risk_by_hypothesis": [
+        4.0,
+        4.0
+      ],
+      "status": "estimated",
+      "tier": "small",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        4.0,
+        4.0
+      ],
+      "worst_hypothesis_risk": 4.0
+    },
+    {
+      "average_utility": 2.0,
+      "bayes_risk": 2.0,
+      "capacity": 5,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 2.0,
+      "expansions": 444,
+      "group_id": "iid-dev-0",
+      "horizon": 4,
+      "instance_hash": "f8f11ac80d4bdcde93f643dd8beb542ce9e2fae98ff96a2137745e5bbb605498",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "beam_bayes",
+      "model_calls": 1042,
+      "planning_seconds": 0.002519057312724726,
+      "protocols": 4,
+      "risk_by_hypothesis": [
+        0.0,
+        4.0
+      ],
+      "status": "estimated",
+      "tier": "large",
+      "truncated_selections": 1,
+      "utility_by_hypothesis": [
+        4.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 4.0
+    },
+    {
+      "average_utility": 2.0,
+      "bayes_risk": 2.0,
+      "capacity": 5,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 2.0,
+      "expansions": 444,
+      "group_id": "iid-dev-0",
+      "horizon": 4,
+      "instance_hash": "f8f11ac80d4bdcde93f643dd8beb542ce9e2fae98ff96a2137745e5bbb605498",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "beam_bayes",
+      "model_calls": 1042,
+      "planning_seconds": 0.002495255999974688,
+      "protocols": 4,
+      "risk_by_hypothesis": [
+        0.0,
+        4.0
+      ],
+      "status": "estimated",
+      "tier": "small",
+      "truncated_selections": 1,
+      "utility_by_hypothesis": [
+        4.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 4.0
+    },
+    {
+      "average_utility": 2.0,
+      "bayes_risk": 2.0,
+      "capacity": 5,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 2.0,
+      "expansions": 0,
+      "group_id": "iid-dev-0",
+      "horizon": 4,
+      "instance_hash": "f8f11ac80d4bdcde93f643dd8beb542ce9e2fae98ff96a2137745e5bbb605498",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "certified_minimax",
+      "model_calls": 0,
+      "planning_seconds": 1.805524999554109e-05,
+      "protocols": 4,
+      "risk_by_hypothesis": [
+        2.0,
+        2.0
+      ],
+      "status": "estimated",
+      "tier": "offline_reference",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        2.0,
+        2.0
+      ],
+      "worst_hypothesis_risk": 2.0
+    },
+    {
+      "average_utility": 0.0,
+      "bayes_risk": 4.0,
+      "capacity": 5,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 2.0,
+      "expansions": 32,
+      "group_id": "iid-dev-0",
+      "horizon": 4,
+      "instance_hash": "f8f11ac80d4bdcde93f643dd8beb542ce9e2fae98ff96a2137745e5bbb605498",
+      "mc_excess_over_exact_bayes": 2.0,
+      "mean_protocol_duration": 4,
+      "measurements": 2,
+      "method": "channel_cover",
+      "model_calls": 64,
+      "planning_seconds": 0.0002014798751588387,
+      "protocols": 1,
+      "risk_by_hypothesis": [
+        4.0,
+        4.0
+      ],
+      "status": "estimated",
+      "tier": "large",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        0.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 4.0
+    },
+    {
+      "average_utility": 0.0,
+      "bayes_risk": 4.0,
+      "capacity": 5,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 2.0,
+      "expansions": 32,
+      "group_id": "iid-dev-0",
+      "horizon": 4,
+      "instance_hash": "f8f11ac80d4bdcde93f643dd8beb542ce9e2fae98ff96a2137745e5bbb605498",
+      "mc_excess_over_exact_bayes": 2.0,
+      "mean_protocol_duration": 4,
+      "measurements": 2,
+      "method": "channel_cover",
+      "model_calls": 64,
+      "planning_seconds": 0.00018779181249328758,
+      "protocols": 1,
+      "risk_by_hypothesis": [
+        4.0,
+        4.0
+      ],
+      "status": "estimated",
+      "tier": "small",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        0.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 4.0
+    },
+    {
+      "average_utility": 2.0,
+      "bayes_risk": 2.0,
+      "capacity": 5,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 2.0,
+      "expansions": 0,
+      "group_id": "iid-dev-0",
+      "horizon": 4,
+      "instance_hash": "f8f11ac80d4bdcde93f643dd8beb542ce9e2fae98ff96a2137745e5bbb605498",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "exact_bayes",
+      "model_calls": 0,
+      "planning_seconds": 1.8456624786722386e-05,
+      "protocols": 4,
+      "risk_by_hypothesis": [
+        0.0,
+        4.0
+      ],
+      "status": "estimated",
+      "tier": "offline_reference",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        4.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 4.0
+    },
+    {
+      "average_utility": 2.0,
+      "bayes_risk": 2.0,
+      "capacity": 5,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 2.0,
+      "expansions": 257,
+      "group_id": "iid-dev-0",
+      "horizon": 4,
+      "instance_hash": "f8f11ac80d4bdcde93f643dd8beb542ce9e2fae98ff96a2137745e5bbb605498",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "one_step_voi",
+      "model_calls": 722,
+      "planning_seconds": 0.0016841005622154626,
+      "protocols": 4,
+      "risk_by_hypothesis": [
+        0.0,
+        4.0
+      ],
+      "status": "estimated",
+      "tier": "large",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        4.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 4.0
+    },
+    {
+      "average_utility": 2.0,
+      "bayes_risk": 2.0,
+      "capacity": 5,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 2.0,
+      "expansions": 257,
+      "group_id": "iid-dev-0",
+      "horizon": 4,
+      "instance_hash": "f8f11ac80d4bdcde93f643dd8beb542ce9e2fae98ff96a2137745e5bbb605498",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "one_step_voi",
+      "model_calls": 722,
+      "planning_seconds": 0.0016465920625137187,
+      "protocols": 4,
+      "risk_by_hypothesis": [
+        0.0,
+        4.0
+      ],
+      "status": "estimated",
+      "tier": "small",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        4.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 4.0
+    },
+    {
+      "average_utility": 2.0,
+      "bayes_risk": 2.0,
+      "capacity": 5,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 2.0,
+      "expansions": 82,
+      "group_id": "iid-dev-0",
+      "horizon": 4,
+      "instance_hash": "f8f11ac80d4bdcde93f643dd8beb542ce9e2fae98ff96a2137745e5bbb605498",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "posterior_sampling",
+      "model_calls": 434,
+      "planning_seconds": 0.0009011223748416342,
+      "protocols": 4,
+      "risk_by_hypothesis": [
+        2.0,
+        2.0
+      ],
+      "status": "estimated",
+      "tier": "large",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        2.0,
+        2.0
+      ],
+      "worst_hypothesis_risk": 2.0
+    },
+    {
+      "average_utility": 2.0,
+      "bayes_risk": 2.0,
+      "capacity": 5,
+      "channels": 3,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m3-k2-p05",
+      "episodes": 16,
+      "exact_bayes_risk": 2.0,
+      "expansions": 82,
+      "group_id": "iid-dev-0",
+      "horizon": 4,
+      "instance_hash": "f8f11ac80d4bdcde93f643dd8beb542ce9e2fae98ff96a2137745e5bbb605498",
+      "mc_excess_over_exact_bayes": 0.0,
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "posterior_sampling",
+      "model_calls": 434,
+      "planning_seconds": 0.00088397706304022,
+      "protocols": 4,
+      "risk_by_hypothesis": [
+        2.0,
+        2.0
+      ],
+      "status": "estimated",
+      "tier": "small",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        2.0,
+        2.0
+      ],
+      "worst_hypothesis_risk": 2.0
+    },
+    {
+      "average_utility": 6.0,
+      "bayes_risk": 6.0,
+      "capacity": 7,
+      "channels": 5,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m5-k2-p08",
+      "episodes": 16,
+      "expansions": 18515,
+      "group_id": "scale-dense-dev-0",
+      "horizon": 12,
+      "instance_hash": "f95fb13d852faa2d81ff74a4d92326c30ebbf15933058931ff97df7173bd9a03",
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "beam_bayes",
+      "model_calls": 173626,
+      "planning_seconds": 0.26466444231272135,
+      "protocols": 12,
+      "risk_by_hypothesis": [
+        0.0,
+        12.0
+      ],
+      "status": "estimated",
+      "tier": "large",
+      "truncated_selections": 10,
+      "utility_by_hypothesis": [
+        12.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 12.0
+    },
+    {
+      "average_utility": 6.0,
+      "bayes_risk": 6.0,
+      "capacity": 7,
+      "channels": 5,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m5-k2-p08",
+      "episodes": 16,
+      "expansions": 2522,
+      "group_id": "scale-dense-dev-0",
+      "horizon": 12,
+      "instance_hash": "f95fb13d852faa2d81ff74a4d92326c30ebbf15933058931ff97df7173bd9a03",
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "beam_bayes",
+      "model_calls": 25568,
+      "planning_seconds": 0.038975319999963176,
+      "protocols": 12,
+      "risk_by_hypothesis": [
+        0.0,
+        12.0
+      ],
+      "status": "estimated",
+      "tier": "small",
+      "truncated_selections": 10,
+      "utility_by_hypothesis": [
+        12.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 12.0
+    },
+    {
+      "attempts": 16,
+      "capacity": 7,
+      "channels": 5,
+      "distribution_id": "directed-m5-k2-p08",
+      "group_id": "scale-dense-dev-0",
+      "horizon": 12,
+      "instance_hash": "f95fb13d852faa2d81ff74a4d92326c30ebbf15933058931ff97df7173bd9a03",
+      "method": "certified_minimax",
+      "status": "unresolved",
+      "tier": "offline_reference"
+    },
+    {
+      "average_utility": 4.375,
+      "bayes_risk": 7.625,
+      "capacity": 7,
+      "channels": 5,
+      "conditional_noise_mc_se": 0.625,
+      "distribution_id": "directed-m5-k2-p08",
+      "episodes": 16,
+      "expansions": 1177,
+      "group_id": "scale-dense-dev-0",
+      "horizon": 12,
+      "instance_hash": "f95fb13d852faa2d81ff74a4d92326c30ebbf15933058931ff97df7173bd9a03",
+      "mean_protocol_duration": 2,
+      "measurements": 5,
+      "method": "channel_cover",
+      "model_calls": 2154,
+      "planning_seconds": 0.004168661312462518,
+      "protocols": 6,
+      "risk_by_hypothesis": [
+        7.0,
+        8.25
+      ],
+      "status": "estimated",
+      "tier": "large",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        5.0,
+        3.75
+      ],
+      "worst_hypothesis_risk": 8.25
+    },
+    {
+      "average_utility": 4.0,
+      "bayes_risk": 8.0,
+      "capacity": 7,
+      "channels": 5,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m5-k2-p08",
+      "episodes": 16,
+      "expansions": 2600,
+      "group_id": "scale-dense-dev-0",
+      "horizon": 12,
+      "instance_hash": "f95fb13d852faa2d81ff74a4d92326c30ebbf15933058931ff97df7173bd9a03",
+      "mean_protocol_duration": 1.3333333333333333,
+      "measurements": 2,
+      "method": "channel_cover",
+      "model_calls": 160,
+      "planning_seconds": 0.002777240062528108,
+      "protocols": 9,
+      "risk_by_hypothesis": [
+        4.0,
+        12.0
+      ],
+      "status": "estimated",
+      "tier": "small",
+      "truncated_selections": 8,
+      "utility_by_hypothesis": [
+        8.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 12.0
+    },
+    {
+      "attempts": 16,
+      "capacity": 7,
+      "channels": 5,
+      "distribution_id": "directed-m5-k2-p08",
+      "group_id": "scale-dense-dev-0",
+      "horizon": 12,
+      "instance_hash": "f95fb13d852faa2d81ff74a4d92326c30ebbf15933058931ff97df7173bd9a03",
+      "method": "exact_bayes",
+      "status": "unresolved",
+      "tier": "offline_reference"
+    },
+    {
+      "average_utility": 7.0,
+      "bayes_risk": 5.0,
+      "capacity": 7,
+      "channels": 5,
+      "conditional_noise_mc_se": 1.0,
+      "distribution_id": "directed-m5-k2-p08",
+      "episodes": 16,
+      "expansions": 8474,
+      "group_id": "scale-dense-dev-0",
+      "horizon": 12,
+      "instance_hash": "f95fb13d852faa2d81ff74a4d92326c30ebbf15933058931ff97df7173bd9a03",
+      "mean_protocol_duration": 1.3333333333333333,
+      "measurements": 2,
+      "method": "one_step_voi",
+      "model_calls": 59506,
+      "planning_seconds": 0.09460747768753208,
+      "protocols": 9,
+      "risk_by_hypothesis": [
+        6.0,
+        4.0
+      ],
+      "status": "estimated",
+      "tier": "large",
+      "truncated_selections": 1,
+      "utility_by_hypothesis": [
+        6.0,
+        8.0
+      ],
+      "worst_hypothesis_risk": 6.0
+    },
+    {
+      "average_utility": 6.0,
+      "bayes_risk": 6.0,
+      "capacity": 7,
+      "channels": 5,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m5-k2-p08",
+      "episodes": 16,
+      "expansions": 2375,
+      "group_id": "scale-dense-dev-0",
+      "horizon": 12,
+      "instance_hash": "f95fb13d852faa2d81ff74a4d92326c30ebbf15933058931ff97df7173bd9a03",
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "one_step_voi",
+      "model_calls": 24866,
+      "planning_seconds": 0.03775209749994701,
+      "protocols": 12,
+      "risk_by_hypothesis": [
+        0.0,
+        12.0
+      ],
+      "status": "estimated",
+      "tier": "small",
+      "truncated_selections": 8,
+      "utility_by_hypothesis": [
+        12.0,
+        0.0
+      ],
+      "worst_hypothesis_risk": 12.0
+    },
+    {
+      "average_utility": 6.0,
+      "bayes_risk": 6.0,
+      "capacity": 7,
+      "channels": 5,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m5-k2-p08",
+      "episodes": 16,
+      "expansions": 1320,
+      "group_id": "scale-dense-dev-0",
+      "horizon": 12,
+      "instance_hash": "f95fb13d852faa2d81ff74a4d92326c30ebbf15933058931ff97df7173bd9a03",
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "posterior_sampling",
+      "model_calls": 17168,
+      "planning_seconds": 0.024409683499982293,
+      "protocols": 12,
+      "risk_by_hypothesis": [
+        7.0,
+        5.0
+      ],
+      "status": "estimated",
+      "tier": "large",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        5.0,
+        7.0
+      ],
+      "worst_hypothesis_risk": 7.0
+    },
+    {
+      "average_utility": 6.0,
+      "bayes_risk": 6.0,
+      "capacity": 7,
+      "channels": 5,
+      "conditional_noise_mc_se": 0.0,
+      "distribution_id": "directed-m5-k2-p08",
+      "episodes": 16,
+      "expansions": 1320,
+      "group_id": "scale-dense-dev-0",
+      "horizon": 12,
+      "instance_hash": "f95fb13d852faa2d81ff74a4d92326c30ebbf15933058931ff97df7173bd9a03",
+      "mean_protocol_duration": 1,
+      "measurements": 0,
+      "method": "posterior_sampling",
+      "model_calls": 17168,
+      "planning_seconds": 0.024929517812608992,
+      "protocols": 12,
+      "risk_by_hypothesis": [
+        7.0,
+        5.0
+      ],
+      "status": "estimated",
+      "tier": "small",
+      "truncated_selections": 0,
+      "utility_by_hypothesis": [
+        5.0,
+        7.0
+      ],
+      "worst_hypothesis_risk": 7.0
+    }
+  ],
+  "empirical_frontier": [
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "03a03cb71b1557608d9f3ef6d4316e77e85b20b3519c168acb244aed0de473a1",
+      "method": "beam_bayes",
+      "tier": "large"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "03a03cb71b1557608d9f3ef6d4316e77e85b20b3519c168acb244aed0de473a1",
+      "method": "beam_bayes",
+      "tier": "small"
+    },
+    {
+      "empirical_nondominated": true,
+      "instance_hash": "03a03cb71b1557608d9f3ef6d4316e77e85b20b3519c168acb244aed0de473a1",
+      "method": "channel_cover",
+      "tier": "large"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "03a03cb71b1557608d9f3ef6d4316e77e85b20b3519c168acb244aed0de473a1",
+      "method": "channel_cover",
+      "tier": "small"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "03a03cb71b1557608d9f3ef6d4316e77e85b20b3519c168acb244aed0de473a1",
+      "method": "one_step_voi",
+      "tier": "large"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "03a03cb71b1557608d9f3ef6d4316e77e85b20b3519c168acb244aed0de473a1",
+      "method": "one_step_voi",
+      "tier": "small"
+    },
+    {
+      "empirical_nondominated": true,
+      "instance_hash": "03a03cb71b1557608d9f3ef6d4316e77e85b20b3519c168acb244aed0de473a1",
+      "method": "posterior_sampling",
+      "tier": "large"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "03a03cb71b1557608d9f3ef6d4316e77e85b20b3519c168acb244aed0de473a1",
+      "method": "posterior_sampling",
+      "tier": "small"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "0987ca174b89af264c26a76eb6d6830a30b281e19d460296115c7aab6520c3d9",
+      "method": "beam_bayes",
+      "tier": "large"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "0987ca174b89af264c26a76eb6d6830a30b281e19d460296115c7aab6520c3d9",
+      "method": "beam_bayes",
+      "tier": "small"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "0987ca174b89af264c26a76eb6d6830a30b281e19d460296115c7aab6520c3d9",
+      "method": "channel_cover",
+      "tier": "large"
+    },
+    {
+      "empirical_nondominated": true,
+      "instance_hash": "0987ca174b89af264c26a76eb6d6830a30b281e19d460296115c7aab6520c3d9",
+      "method": "channel_cover",
+      "tier": "small"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "0987ca174b89af264c26a76eb6d6830a30b281e19d460296115c7aab6520c3d9",
+      "method": "one_step_voi",
+      "tier": "large"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "0987ca174b89af264c26a76eb6d6830a30b281e19d460296115c7aab6520c3d9",
+      "method": "one_step_voi",
+      "tier": "small"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "0987ca174b89af264c26a76eb6d6830a30b281e19d460296115c7aab6520c3d9",
+      "method": "posterior_sampling",
+      "tier": "large"
+    },
+    {
+      "empirical_nondominated": true,
+      "instance_hash": "0987ca174b89af264c26a76eb6d6830a30b281e19d460296115c7aab6520c3d9",
+      "method": "posterior_sampling",
+      "tier": "small"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "276747e0dfaf515f2826aba23140cabd992bfe4940e2c405cf1d6e0d6c50596b",
+      "method": "beam_bayes",
+      "tier": "large"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "276747e0dfaf515f2826aba23140cabd992bfe4940e2c405cf1d6e0d6c50596b",
+      "method": "beam_bayes",
+      "tier": "small"
+    },
+    {
+      "empirical_nondominated": true,
+      "instance_hash": "276747e0dfaf515f2826aba23140cabd992bfe4940e2c405cf1d6e0d6c50596b",
+      "method": "channel_cover",
+      "tier": "large"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "276747e0dfaf515f2826aba23140cabd992bfe4940e2c405cf1d6e0d6c50596b",
+      "method": "channel_cover",
+      "tier": "small"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "276747e0dfaf515f2826aba23140cabd992bfe4940e2c405cf1d6e0d6c50596b",
+      "method": "one_step_voi",
+      "tier": "large"
+    },
+    {
+      "empirical_nondominated": true,
+      "instance_hash": "276747e0dfaf515f2826aba23140cabd992bfe4940e2c405cf1d6e0d6c50596b",
+      "method": "one_step_voi",
+      "tier": "small"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "276747e0dfaf515f2826aba23140cabd992bfe4940e2c405cf1d6e0d6c50596b",
+      "method": "posterior_sampling",
+      "tier": "large"
+    },
+    {
+      "empirical_nondominated": true,
+      "instance_hash": "276747e0dfaf515f2826aba23140cabd992bfe4940e2c405cf1d6e0d6c50596b",
+      "method": "posterior_sampling",
+      "tier": "small"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "485129b0b17ffa2d3cb2616296e97df8a4baf09b3679c4bbbb86a1bd1568e4d3",
+      "method": "beam_bayes",
+      "tier": "large"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "485129b0b17ffa2d3cb2616296e97df8a4baf09b3679c4bbbb86a1bd1568e4d3",
+      "method": "beam_bayes",
+      "tier": "small"
+    },
+    {
+      "empirical_nondominated": true,
+      "instance_hash": "485129b0b17ffa2d3cb2616296e97df8a4baf09b3679c4bbbb86a1bd1568e4d3",
+      "method": "channel_cover",
+      "tier": "large"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "485129b0b17ffa2d3cb2616296e97df8a4baf09b3679c4bbbb86a1bd1568e4d3",
+      "method": "channel_cover",
+      "tier": "small"
+    },
+    {
+      "empirical_nondominated": true,
+      "instance_hash": "485129b0b17ffa2d3cb2616296e97df8a4baf09b3679c4bbbb86a1bd1568e4d3",
+      "method": "one_step_voi",
+      "tier": "large"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "485129b0b17ffa2d3cb2616296e97df8a4baf09b3679c4bbbb86a1bd1568e4d3",
+      "method": "one_step_voi",
+      "tier": "small"
+    },
+    {
+      "empirical_nondominated": true,
+      "instance_hash": "485129b0b17ffa2d3cb2616296e97df8a4baf09b3679c4bbbb86a1bd1568e4d3",
+      "method": "posterior_sampling",
+      "tier": "large"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "485129b0b17ffa2d3cb2616296e97df8a4baf09b3679c4bbbb86a1bd1568e4d3",
+      "method": "posterior_sampling",
+      "tier": "small"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "7486c25492fc20e2a5fde37290e949bc52c84cc1dbf72bbeefb53958abe3c328",
+      "method": "beam_bayes",
+      "tier": "large"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "7486c25492fc20e2a5fde37290e949bc52c84cc1dbf72bbeefb53958abe3c328",
+      "method": "beam_bayes",
+      "tier": "small"
+    },
+    {
+      "empirical_nondominated": true,
+      "instance_hash": "7486c25492fc20e2a5fde37290e949bc52c84cc1dbf72bbeefb53958abe3c328",
+      "method": "channel_cover",
+      "tier": "large"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "7486c25492fc20e2a5fde37290e949bc52c84cc1dbf72bbeefb53958abe3c328",
+      "method": "channel_cover",
+      "tier": "small"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "7486c25492fc20e2a5fde37290e949bc52c84cc1dbf72bbeefb53958abe3c328",
+      "method": "one_step_voi",
+      "tier": "large"
+    },
+    {
+      "empirical_nondominated": true,
+      "instance_hash": "7486c25492fc20e2a5fde37290e949bc52c84cc1dbf72bbeefb53958abe3c328",
+      "method": "one_step_voi",
+      "tier": "small"
+    },
+    {
+      "empirical_nondominated": true,
+      "instance_hash": "7486c25492fc20e2a5fde37290e949bc52c84cc1dbf72bbeefb53958abe3c328",
+      "method": "posterior_sampling",
+      "tier": "large"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "7486c25492fc20e2a5fde37290e949bc52c84cc1dbf72bbeefb53958abe3c328",
+      "method": "posterior_sampling",
+      "tier": "small"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "976af1e276eb47df1ed6628ab20cc136a4c1a93e8bac90afdf5bb1b8418387f5",
+      "method": "beam_bayes",
+      "tier": "large"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "976af1e276eb47df1ed6628ab20cc136a4c1a93e8bac90afdf5bb1b8418387f5",
+      "method": "beam_bayes",
+      "tier": "small"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "976af1e276eb47df1ed6628ab20cc136a4c1a93e8bac90afdf5bb1b8418387f5",
+      "method": "channel_cover",
+      "tier": "large"
+    },
+    {
+      "empirical_nondominated": true,
+      "instance_hash": "976af1e276eb47df1ed6628ab20cc136a4c1a93e8bac90afdf5bb1b8418387f5",
+      "method": "channel_cover",
+      "tier": "small"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "976af1e276eb47df1ed6628ab20cc136a4c1a93e8bac90afdf5bb1b8418387f5",
+      "method": "one_step_voi",
+      "tier": "large"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "976af1e276eb47df1ed6628ab20cc136a4c1a93e8bac90afdf5bb1b8418387f5",
+      "method": "one_step_voi",
+      "tier": "small"
+    },
+    {
+      "empirical_nondominated": true,
+      "instance_hash": "976af1e276eb47df1ed6628ab20cc136a4c1a93e8bac90afdf5bb1b8418387f5",
+      "method": "posterior_sampling",
+      "tier": "large"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "976af1e276eb47df1ed6628ab20cc136a4c1a93e8bac90afdf5bb1b8418387f5",
+      "method": "posterior_sampling",
+      "tier": "small"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "c8f1750bbbcaf75bb8e031e47dae9b9ff74d0c4ba4ee69e6216486895fdb2807",
+      "method": "beam_bayes",
+      "tier": "large"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "c8f1750bbbcaf75bb8e031e47dae9b9ff74d0c4ba4ee69e6216486895fdb2807",
+      "method": "beam_bayes",
+      "tier": "small"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "c8f1750bbbcaf75bb8e031e47dae9b9ff74d0c4ba4ee69e6216486895fdb2807",
+      "method": "channel_cover",
+      "tier": "large"
+    },
+    {
+      "empirical_nondominated": true,
+      "instance_hash": "c8f1750bbbcaf75bb8e031e47dae9b9ff74d0c4ba4ee69e6216486895fdb2807",
+      "method": "channel_cover",
+      "tier": "small"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "c8f1750bbbcaf75bb8e031e47dae9b9ff74d0c4ba4ee69e6216486895fdb2807",
+      "method": "one_step_voi",
+      "tier": "large"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "c8f1750bbbcaf75bb8e031e47dae9b9ff74d0c4ba4ee69e6216486895fdb2807",
+      "method": "one_step_voi",
+      "tier": "small"
+    },
+    {
+      "empirical_nondominated": true,
+      "instance_hash": "c8f1750bbbcaf75bb8e031e47dae9b9ff74d0c4ba4ee69e6216486895fdb2807",
+      "method": "posterior_sampling",
+      "tier": "large"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "c8f1750bbbcaf75bb8e031e47dae9b9ff74d0c4ba4ee69e6216486895fdb2807",
+      "method": "posterior_sampling",
+      "tier": "small"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "e15e0ffc4d85199bd2e056ad306110cfd59d17944b944855dbaddf911fa9d8b6",
+      "method": "beam_bayes",
+      "tier": "large"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "e15e0ffc4d85199bd2e056ad306110cfd59d17944b944855dbaddf911fa9d8b6",
+      "method": "beam_bayes",
+      "tier": "small"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "e15e0ffc4d85199bd2e056ad306110cfd59d17944b944855dbaddf911fa9d8b6",
+      "method": "channel_cover",
+      "tier": "large"
+    },
+    {
+      "empirical_nondominated": true,
+      "instance_hash": "e15e0ffc4d85199bd2e056ad306110cfd59d17944b944855dbaddf911fa9d8b6",
+      "method": "channel_cover",
+      "tier": "small"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "e15e0ffc4d85199bd2e056ad306110cfd59d17944b944855dbaddf911fa9d8b6",
+      "method": "one_step_voi",
+      "tier": "large"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "e15e0ffc4d85199bd2e056ad306110cfd59d17944b944855dbaddf911fa9d8b6",
+      "method": "one_step_voi",
+      "tier": "small"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "e15e0ffc4d85199bd2e056ad306110cfd59d17944b944855dbaddf911fa9d8b6",
+      "method": "posterior_sampling",
+      "tier": "large"
+    },
+    {
+      "empirical_nondominated": true,
+      "instance_hash": "e15e0ffc4d85199bd2e056ad306110cfd59d17944b944855dbaddf911fa9d8b6",
+      "method": "posterior_sampling",
+      "tier": "small"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "e19582907542c2955c18e51122da93dafbd3b0fd8b7b069c9c4691286d930869",
+      "method": "beam_bayes",
+      "tier": "large"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "e19582907542c2955c18e51122da93dafbd3b0fd8b7b069c9c4691286d930869",
+      "method": "beam_bayes",
+      "tier": "small"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "e19582907542c2955c18e51122da93dafbd3b0fd8b7b069c9c4691286d930869",
+      "method": "channel_cover",
+      "tier": "large"
+    },
+    {
+      "empirical_nondominated": true,
+      "instance_hash": "e19582907542c2955c18e51122da93dafbd3b0fd8b7b069c9c4691286d930869",
+      "method": "channel_cover",
+      "tier": "small"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "e19582907542c2955c18e51122da93dafbd3b0fd8b7b069c9c4691286d930869",
+      "method": "one_step_voi",
+      "tier": "large"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "e19582907542c2955c18e51122da93dafbd3b0fd8b7b069c9c4691286d930869",
+      "method": "one_step_voi",
+      "tier": "small"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "e19582907542c2955c18e51122da93dafbd3b0fd8b7b069c9c4691286d930869",
+      "method": "posterior_sampling",
+      "tier": "large"
+    },
+    {
+      "empirical_nondominated": true,
+      "instance_hash": "e19582907542c2955c18e51122da93dafbd3b0fd8b7b069c9c4691286d930869",
+      "method": "posterior_sampling",
+      "tier": "small"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "e5c57dfd528180eccd9b8a9a7daf5b54c19b527a3949e1acaa8d5c05dc2ee140",
+      "method": "beam_bayes",
+      "tier": "large"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "e5c57dfd528180eccd9b8a9a7daf5b54c19b527a3949e1acaa8d5c05dc2ee140",
+      "method": "beam_bayes",
+      "tier": "small"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "e5c57dfd528180eccd9b8a9a7daf5b54c19b527a3949e1acaa8d5c05dc2ee140",
+      "method": "channel_cover",
+      "tier": "large"
+    },
+    {
+      "empirical_nondominated": true,
+      "instance_hash": "e5c57dfd528180eccd9b8a9a7daf5b54c19b527a3949e1acaa8d5c05dc2ee140",
+      "method": "channel_cover",
+      "tier": "small"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "e5c57dfd528180eccd9b8a9a7daf5b54c19b527a3949e1acaa8d5c05dc2ee140",
+      "method": "one_step_voi",
+      "tier": "large"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "e5c57dfd528180eccd9b8a9a7daf5b54c19b527a3949e1acaa8d5c05dc2ee140",
+      "method": "one_step_voi",
+      "tier": "small"
+    },
+    {
+      "empirical_nondominated": true,
+      "instance_hash": "e5c57dfd528180eccd9b8a9a7daf5b54c19b527a3949e1acaa8d5c05dc2ee140",
+      "method": "posterior_sampling",
+      "tier": "large"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "e5c57dfd528180eccd9b8a9a7daf5b54c19b527a3949e1acaa8d5c05dc2ee140",
+      "method": "posterior_sampling",
+      "tier": "small"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "f8f11ac80d4bdcde93f643dd8beb542ce9e2fae98ff96a2137745e5bbb605498",
+      "method": "beam_bayes",
+      "tier": "large"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "f8f11ac80d4bdcde93f643dd8beb542ce9e2fae98ff96a2137745e5bbb605498",
+      "method": "beam_bayes",
+      "tier": "small"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "f8f11ac80d4bdcde93f643dd8beb542ce9e2fae98ff96a2137745e5bbb605498",
+      "method": "channel_cover",
+      "tier": "large"
+    },
+    {
+      "empirical_nondominated": true,
+      "instance_hash": "f8f11ac80d4bdcde93f643dd8beb542ce9e2fae98ff96a2137745e5bbb605498",
+      "method": "channel_cover",
+      "tier": "small"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "f8f11ac80d4bdcde93f643dd8beb542ce9e2fae98ff96a2137745e5bbb605498",
+      "method": "one_step_voi",
+      "tier": "large"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "f8f11ac80d4bdcde93f643dd8beb542ce9e2fae98ff96a2137745e5bbb605498",
+      "method": "one_step_voi",
+      "tier": "small"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "f8f11ac80d4bdcde93f643dd8beb542ce9e2fae98ff96a2137745e5bbb605498",
+      "method": "posterior_sampling",
+      "tier": "large"
+    },
+    {
+      "empirical_nondominated": true,
+      "instance_hash": "f8f11ac80d4bdcde93f643dd8beb542ce9e2fae98ff96a2137745e5bbb605498",
+      "method": "posterior_sampling",
+      "tier": "small"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "f95fb13d852faa2d81ff74a4d92326c30ebbf15933058931ff97df7173bd9a03",
+      "method": "beam_bayes",
+      "tier": "large"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "f95fb13d852faa2d81ff74a4d92326c30ebbf15933058931ff97df7173bd9a03",
+      "method": "beam_bayes",
+      "tier": "small"
+    },
+    {
+      "empirical_nondominated": true,
+      "instance_hash": "f95fb13d852faa2d81ff74a4d92326c30ebbf15933058931ff97df7173bd9a03",
+      "method": "channel_cover",
+      "tier": "large"
+    },
+    {
+      "empirical_nondominated": true,
+      "instance_hash": "f95fb13d852faa2d81ff74a4d92326c30ebbf15933058931ff97df7173bd9a03",
+      "method": "channel_cover",
+      "tier": "small"
+    },
+    {
+      "empirical_nondominated": true,
+      "instance_hash": "f95fb13d852faa2d81ff74a4d92326c30ebbf15933058931ff97df7173bd9a03",
+      "method": "one_step_voi",
+      "tier": "large"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "f95fb13d852faa2d81ff74a4d92326c30ebbf15933058931ff97df7173bd9a03",
+      "method": "one_step_voi",
+      "tier": "small"
+    },
+    {
+      "empirical_nondominated": true,
+      "instance_hash": "f95fb13d852faa2d81ff74a4d92326c30ebbf15933058931ff97df7173bd9a03",
+      "method": "posterior_sampling",
+      "tier": "large"
+    },
+    {
+      "empirical_nondominated": false,
+      "instance_hash": "f95fb13d852faa2d81ff74a4d92326c30ebbf15933058931ff97df7173bd9a03",
+      "method": "posterior_sampling",
+      "tier": "small"
+    }
+  ],
+  "episode_rows": 1920,
+  "episodes_sha256": "33827045796e6514c6192cda4517b5de97de145b16e7c797c5498baad488ea72",
+  "limitations": [
+    "DEV only; no neural training; no final-test access",
+    "Root graph is the sampling unit. Capacity/horizon variants are repeated conditions.",
+    "Four noise replicates and two fixed policy seeds: descriptive pilot, not population significance.",
+    "Worst-hypothesis risk is max of estimated means; finite-replicate upward selection bias remains.",
+    "MC SE is conditional on fixed policy seeds and task, not an instance-generalization interval.",
+    "Reference-unresolved cells remain visible; compare Bayes gaps only on explicitly solved subsets.",
+    "Empirical Pareto status is noise/timing dependent; wall limits are cooperative."
+  ],
+  "paired_to_bayes": [
+    {
+      "group_id": "iid-dev-1",
+      "instance_hash": "03a03cb71b1557608d9f3ef6d4316e77e85b20b3519c168acb244aed0de473a1",
+      "method": "beam_bayes",
+      "paired_mc_bayes_gap": 0.0,
+      "tier": "large"
+    },
+    {
+      "group_id": "iid-dev-1",
+      "instance_hash": "03a03cb71b1557608d9f3ef6d4316e77e85b20b3519c168acb244aed0de473a1",
+      "method": "beam_bayes",
+      "paired_mc_bayes_gap": 0.0,
+      "tier": "small"
+    },
+    {
+      "group_id": "iid-dev-1",
+      "instance_hash": "03a03cb71b1557608d9f3ef6d4316e77e85b20b3519c168acb244aed0de473a1",
+      "method": "channel_cover",
+      "paired_mc_bayes_gap": 2.0,
+      "tier": "large"
+    },
+    {
+      "group_id": "iid-dev-1",
+      "instance_hash": "03a03cb71b1557608d9f3ef6d4316e77e85b20b3519c168acb244aed0de473a1",
+      "method": "channel_cover",
+      "paired_mc_bayes_gap": 2.0,
+      "tier": "small"
+    },
+    {
+      "group_id": "iid-dev-1",
+      "instance_hash": "03a03cb71b1557608d9f3ef6d4316e77e85b20b3519c168acb244aed0de473a1",
+      "method": "one_step_voi",
+      "paired_mc_bayes_gap": 0.0,
+      "tier": "large"
+    },
+    {
+      "group_id": "iid-dev-1",
+      "instance_hash": "03a03cb71b1557608d9f3ef6d4316e77e85b20b3519c168acb244aed0de473a1",
+      "method": "one_step_voi",
+      "paired_mc_bayes_gap": 0.0,
+      "tier": "small"
+    },
+    {
+      "group_id": "iid-dev-1",
+      "instance_hash": "03a03cb71b1557608d9f3ef6d4316e77e85b20b3519c168acb244aed0de473a1",
+      "method": "posterior_sampling",
+      "paired_mc_bayes_gap": 0.0,
+      "tier": "large"
+    },
+    {
+      "group_id": "iid-dev-1",
+      "instance_hash": "03a03cb71b1557608d9f3ef6d4316e77e85b20b3519c168acb244aed0de473a1",
+      "method": "posterior_sampling",
+      "paired_mc_bayes_gap": 0.0,
+      "tier": "small"
+    },
+    {
+      "group_id": "iid-dev-1",
+      "instance_hash": "0987ca174b89af264c26a76eb6d6830a30b281e19d460296115c7aab6520c3d9",
+      "method": "beam_bayes",
+      "paired_mc_bayes_gap": 0.375,
+      "tier": "large"
+    },
+    {
+      "group_id": "iid-dev-1",
+      "instance_hash": "0987ca174b89af264c26a76eb6d6830a30b281e19d460296115c7aab6520c3d9",
+      "method": "beam_bayes",
+      "paired_mc_bayes_gap": 0.375,
+      "tier": "small"
+    },
+    {
+      "group_id": "iid-dev-1",
+      "instance_hash": "0987ca174b89af264c26a76eb6d6830a30b281e19d460296115c7aab6520c3d9",
+      "method": "channel_cover",
+      "paired_mc_bayes_gap": 0.875,
+      "tier": "large"
+    },
+    {
+      "group_id": "iid-dev-1",
+      "instance_hash": "0987ca174b89af264c26a76eb6d6830a30b281e19d460296115c7aab6520c3d9",
+      "method": "channel_cover",
+      "paired_mc_bayes_gap": 0.875,
+      "tier": "small"
+    },
+    {
+      "group_id": "iid-dev-1",
+      "instance_hash": "0987ca174b89af264c26a76eb6d6830a30b281e19d460296115c7aab6520c3d9",
+      "method": "one_step_voi",
+      "paired_mc_bayes_gap": 0.375,
+      "tier": "large"
+    },
+    {
+      "group_id": "iid-dev-1",
+      "instance_hash": "0987ca174b89af264c26a76eb6d6830a30b281e19d460296115c7aab6520c3d9",
+      "method": "one_step_voi",
+      "paired_mc_bayes_gap": 0.375,
+      "tier": "small"
+    },
+    {
+      "group_id": "iid-dev-1",
+      "instance_hash": "0987ca174b89af264c26a76eb6d6830a30b281e19d460296115c7aab6520c3d9",
+      "method": "posterior_sampling",
+      "paired_mc_bayes_gap": 0.375,
+      "tier": "large"
+    },
+    {
+      "group_id": "iid-dev-1",
+      "instance_hash": "0987ca174b89af264c26a76eb6d6830a30b281e19d460296115c7aab6520c3d9",
+      "method": "posterior_sampling",
+      "paired_mc_bayes_gap": 0.375,
+      "tier": "small"
+    },
+    {
+      "group_id": "iid-dev-0",
+      "instance_hash": "276747e0dfaf515f2826aba23140cabd992bfe4940e2c405cf1d6e0d6c50596b",
+      "method": "beam_bayes",
+      "paired_mc_bayes_gap": 0.0,
+      "tier": "large"
+    },
+    {
+      "group_id": "iid-dev-0",
+      "instance_hash": "276747e0dfaf515f2826aba23140cabd992bfe4940e2c405cf1d6e0d6c50596b",
+      "method": "beam_bayes",
+      "paired_mc_bayes_gap": 0.375,
+      "tier": "small"
+    },
+    {
+      "group_id": "iid-dev-0",
+      "instance_hash": "276747e0dfaf515f2826aba23140cabd992bfe4940e2c405cf1d6e0d6c50596b",
+      "method": "channel_cover",
+      "paired_mc_bayes_gap": 2.625,
+      "tier": "large"
+    },
+    {
+      "group_id": "iid-dev-0",
+      "instance_hash": "276747e0dfaf515f2826aba23140cabd992bfe4940e2c405cf1d6e0d6c50596b",
+      "method": "channel_cover",
+      "paired_mc_bayes_gap": 2.625,
+      "tier": "small"
+    },
+    {
+      "group_id": "iid-dev-0",
+      "instance_hash": "276747e0dfaf515f2826aba23140cabd992bfe4940e2c405cf1d6e0d6c50596b",
+      "method": "one_step_voi",
+      "paired_mc_bayes_gap": 0.0,
+      "tier": "large"
+    },
+    {
+      "group_id": "iid-dev-0",
+      "instance_hash": "276747e0dfaf515f2826aba23140cabd992bfe4940e2c405cf1d6e0d6c50596b",
+      "method": "one_step_voi",
+      "paired_mc_bayes_gap": 0.0,
+      "tier": "small"
+    },
+    {
+      "group_id": "iid-dev-0",
+      "instance_hash": "276747e0dfaf515f2826aba23140cabd992bfe4940e2c405cf1d6e0d6c50596b",
+      "method": "posterior_sampling",
+      "paired_mc_bayes_gap": 0.375,
+      "tier": "large"
+    },
+    {
+      "group_id": "iid-dev-0",
+      "instance_hash": "276747e0dfaf515f2826aba23140cabd992bfe4940e2c405cf1d6e0d6c50596b",
+      "method": "posterior_sampling",
+      "paired_mc_bayes_gap": 0.375,
+      "tier": "small"
+    },
+    {
+      "group_id": "scale-sparse-dev-0",
+      "instance_hash": "485129b0b17ffa2d3cb2616296e97df8a4baf09b3679c4bbbb86a1bd1568e4d3",
+      "method": "beam_bayes",
+      "paired_mc_bayes_gap": 0.0,
+      "tier": "large"
+    },
+    {
+      "group_id": "scale-sparse-dev-0",
+      "instance_hash": "485129b0b17ffa2d3cb2616296e97df8a4baf09b3679c4bbbb86a1bd1568e4d3",
+      "method": "beam_bayes",
+      "paired_mc_bayes_gap": 3.0,
+      "tier": "small"
+    },
+    {
+      "group_id": "scale-sparse-dev-0",
+      "instance_hash": "485129b0b17ffa2d3cb2616296e97df8a4baf09b3679c4bbbb86a1bd1568e4d3",
+      "method": "channel_cover",
+      "paired_mc_bayes_gap": 7.25,
+      "tier": "large"
+    },
+    {
+      "group_id": "scale-sparse-dev-0",
+      "instance_hash": "485129b0b17ffa2d3cb2616296e97df8a4baf09b3679c4bbbb86a1bd1568e4d3",
+      "method": "channel_cover",
+      "paired_mc_bayes_gap": 7.25,
+      "tier": "small"
+    },
+    {
+      "group_id": "scale-sparse-dev-0",
+      "instance_hash": "485129b0b17ffa2d3cb2616296e97df8a4baf09b3679c4bbbb86a1bd1568e4d3",
+      "method": "one_step_voi",
+      "paired_mc_bayes_gap": 0.0,
+      "tier": "large"
+    },
+    {
+      "group_id": "scale-sparse-dev-0",
+      "instance_hash": "485129b0b17ffa2d3cb2616296e97df8a4baf09b3679c4bbbb86a1bd1568e4d3",
+      "method": "one_step_voi",
+      "paired_mc_bayes_gap": 3.0,
+      "tier": "small"
+    },
+    {
+      "group_id": "scale-sparse-dev-0",
+      "instance_hash": "485129b0b17ffa2d3cb2616296e97df8a4baf09b3679c4bbbb86a1bd1568e4d3",
+      "method": "posterior_sampling",
+      "paired_mc_bayes_gap": 3.0,
+      "tier": "large"
+    },
+    {
+      "group_id": "scale-sparse-dev-0",
+      "instance_hash": "485129b0b17ffa2d3cb2616296e97df8a4baf09b3679c4bbbb86a1bd1568e4d3",
+      "method": "posterior_sampling",
+      "paired_mc_bayes_gap": 3.0,
+      "tier": "small"
+    },
+    {
+      "group_id": "iid-dev-0",
+      "instance_hash": "7486c25492fc20e2a5fde37290e949bc52c84cc1dbf72bbeefb53958abe3c328",
+      "method": "beam_bayes",
+      "paired_mc_bayes_gap": 0.0,
+      "tier": "large"
+    },
+    {
+      "group_id": "iid-dev-0",
+      "instance_hash": "7486c25492fc20e2a5fde37290e949bc52c84cc1dbf72bbeefb53958abe3c328",
+      "method": "beam_bayes",
+      "paired_mc_bayes_gap": 0.375,
+      "tier": "small"
+    },
+    {
+      "group_id": "iid-dev-0",
+      "instance_hash": "7486c25492fc20e2a5fde37290e949bc52c84cc1dbf72bbeefb53958abe3c328",
+      "method": "channel_cover",
+      "paired_mc_bayes_gap": 1.75,
+      "tier": "large"
+    },
+    {
+      "group_id": "iid-dev-0",
+      "instance_hash": "7486c25492fc20e2a5fde37290e949bc52c84cc1dbf72bbeefb53958abe3c328",
+      "method": "channel_cover",
+      "paired_mc_bayes_gap": 1.75,
+      "tier": "small"
+    },
+    {
+      "group_id": "iid-dev-0",
+      "instance_hash": "7486c25492fc20e2a5fde37290e949bc52c84cc1dbf72bbeefb53958abe3c328",
+      "method": "one_step_voi",
+      "paired_mc_bayes_gap": 0.0,
+      "tier": "large"
+    },
+    {
+      "group_id": "iid-dev-0",
+      "instance_hash": "7486c25492fc20e2a5fde37290e949bc52c84cc1dbf72bbeefb53958abe3c328",
+      "method": "one_step_voi",
+      "paired_mc_bayes_gap": 0.0,
+      "tier": "small"
+    },
+    {
+      "group_id": "iid-dev-0",
+      "instance_hash": "7486c25492fc20e2a5fde37290e949bc52c84cc1dbf72bbeefb53958abe3c328",
+      "method": "posterior_sampling",
+      "paired_mc_bayes_gap": 0.375,
+      "tier": "large"
+    },
+    {
+      "group_id": "iid-dev-0",
+      "instance_hash": "7486c25492fc20e2a5fde37290e949bc52c84cc1dbf72bbeefb53958abe3c328",
+      "method": "posterior_sampling",
+      "paired_mc_bayes_gap": 0.375,
+      "tier": "small"
+    },
+    {
+      "group_id": "iid-dev-1",
+      "instance_hash": "976af1e276eb47df1ed6628ab20cc136a4c1a93e8bac90afdf5bb1b8418387f5",
+      "method": "beam_bayes",
+      "paired_mc_bayes_gap": 0.375,
+      "tier": "large"
+    },
+    {
+      "group_id": "iid-dev-1",
+      "instance_hash": "976af1e276eb47df1ed6628ab20cc136a4c1a93e8bac90afdf5bb1b8418387f5",
+      "method": "beam_bayes",
+      "paired_mc_bayes_gap": 0.375,
+      "tier": "small"
+    },
+    {
+      "group_id": "iid-dev-1",
+      "instance_hash": "976af1e276eb47df1ed6628ab20cc136a4c1a93e8bac90afdf5bb1b8418387f5",
+      "method": "channel_cover",
+      "paired_mc_bayes_gap": 2.625,
+      "tier": "large"
+    },
+    {
+      "group_id": "iid-dev-1",
+      "instance_hash": "976af1e276eb47df1ed6628ab20cc136a4c1a93e8bac90afdf5bb1b8418387f5",
+      "method": "channel_cover",
+      "paired_mc_bayes_gap": 2.625,
+      "tier": "small"
+    },
+    {
+      "group_id": "iid-dev-1",
+      "instance_hash": "976af1e276eb47df1ed6628ab20cc136a4c1a93e8bac90afdf5bb1b8418387f5",
+      "method": "one_step_voi",
+      "paired_mc_bayes_gap": 0.375,
+      "tier": "large"
+    },
+    {
+      "group_id": "iid-dev-1",
+      "instance_hash": "976af1e276eb47df1ed6628ab20cc136a4c1a93e8bac90afdf5bb1b8418387f5",
+      "method": "one_step_voi",
+      "paired_mc_bayes_gap": 0.375,
+      "tier": "small"
+    },
+    {
+      "group_id": "iid-dev-1",
+      "instance_hash": "976af1e276eb47df1ed6628ab20cc136a4c1a93e8bac90afdf5bb1b8418387f5",
+      "method": "posterior_sampling",
+      "paired_mc_bayes_gap": 0.375,
+      "tier": "large"
+    },
+    {
+      "group_id": "iid-dev-1",
+      "instance_hash": "976af1e276eb47df1ed6628ab20cc136a4c1a93e8bac90afdf5bb1b8418387f5",
+      "method": "posterior_sampling",
+      "paired_mc_bayes_gap": 0.375,
+      "tier": "small"
+    },
+    {
+      "group_id": "iid-dev-1",
+      "instance_hash": "c8f1750bbbcaf75bb8e031e47dae9b9ff74d0c4ba4ee69e6216486895fdb2807",
+      "method": "beam_bayes",
+      "paired_mc_bayes_gap": 0.0,
+      "tier": "large"
+    },
+    {
+      "group_id": "iid-dev-1",
+      "instance_hash": "c8f1750bbbcaf75bb8e031e47dae9b9ff74d0c4ba4ee69e6216486895fdb2807",
+      "method": "beam_bayes",
+      "paired_mc_bayes_gap": 0.0,
+      "tier": "small"
+    },
+    {
+      "group_id": "iid-dev-1",
+      "instance_hash": "c8f1750bbbcaf75bb8e031e47dae9b9ff74d0c4ba4ee69e6216486895fdb2807",
+      "method": "channel_cover",
+      "paired_mc_bayes_gap": 1.75,
+      "tier": "large"
+    },
+    {
+      "group_id": "iid-dev-1",
+      "instance_hash": "c8f1750bbbcaf75bb8e031e47dae9b9ff74d0c4ba4ee69e6216486895fdb2807",
+      "method": "channel_cover",
+      "paired_mc_bayes_gap": 1.75,
+      "tier": "small"
+    },
+    {
+      "group_id": "iid-dev-1",
+      "instance_hash": "c8f1750bbbcaf75bb8e031e47dae9b9ff74d0c4ba4ee69e6216486895fdb2807",
+      "method": "one_step_voi",
+      "paired_mc_bayes_gap": 0.0,
+      "tier": "large"
+    },
+    {
+      "group_id": "iid-dev-1",
+      "instance_hash": "c8f1750bbbcaf75bb8e031e47dae9b9ff74d0c4ba4ee69e6216486895fdb2807",
+      "method": "one_step_voi",
+      "paired_mc_bayes_gap": 0.0,
+      "tier": "small"
+    },
+    {
+      "group_id": "iid-dev-1",
+      "instance_hash": "c8f1750bbbcaf75bb8e031e47dae9b9ff74d0c4ba4ee69e6216486895fdb2807",
+      "method": "posterior_sampling",
+      "paired_mc_bayes_gap": 0.0,
+      "tier": "large"
+    },
+    {
+      "group_id": "iid-dev-1",
+      "instance_hash": "c8f1750bbbcaf75bb8e031e47dae9b9ff74d0c4ba4ee69e6216486895fdb2807",
+      "method": "posterior_sampling",
+      "paired_mc_bayes_gap": 0.0,
+      "tier": "small"
+    },
+    {
+      "group_id": "iid-dev-0",
+      "instance_hash": "e15e0ffc4d85199bd2e056ad306110cfd59d17944b944855dbaddf911fa9d8b6",
+      "method": "beam_bayes",
+      "paired_mc_bayes_gap": 0.0,
+      "tier": "large"
+    },
+    {
+      "group_id": "iid-dev-0",
+      "instance_hash": "e15e0ffc4d85199bd2e056ad306110cfd59d17944b944855dbaddf911fa9d8b6",
+      "method": "beam_bayes",
+      "paired_mc_bayes_gap": 0.0,
+      "tier": "small"
+    },
+    {
+      "group_id": "iid-dev-0",
+      "instance_hash": "e15e0ffc4d85199bd2e056ad306110cfd59d17944b944855dbaddf911fa9d8b6",
+      "method": "channel_cover",
+      "paired_mc_bayes_gap": 1.5,
+      "tier": "large"
+    },
+    {
+      "group_id": "iid-dev-0",
+      "instance_hash": "e15e0ffc4d85199bd2e056ad306110cfd59d17944b944855dbaddf911fa9d8b6",
+      "method": "channel_cover",
+      "paired_mc_bayes_gap": 1.5,
+      "tier": "small"
+    },
+    {
+      "group_id": "iid-dev-0",
+      "instance_hash": "e15e0ffc4d85199bd2e056ad306110cfd59d17944b944855dbaddf911fa9d8b6",
+      "method": "one_step_voi",
+      "paired_mc_bayes_gap": 0.0,
+      "tier": "large"
+    },
+    {
+      "group_id": "iid-dev-0",
+      "instance_hash": "e15e0ffc4d85199bd2e056ad306110cfd59d17944b944855dbaddf911fa9d8b6",
+      "method": "one_step_voi",
+      "paired_mc_bayes_gap": 0.0,
+      "tier": "small"
+    },
+    {
+      "group_id": "iid-dev-0",
+      "instance_hash": "e15e0ffc4d85199bd2e056ad306110cfd59d17944b944855dbaddf911fa9d8b6",
+      "method": "posterior_sampling",
+      "paired_mc_bayes_gap": 0.0,
+      "tier": "large"
+    },
+    {
+      "group_id": "iid-dev-0",
+      "instance_hash": "e15e0ffc4d85199bd2e056ad306110cfd59d17944b944855dbaddf911fa9d8b6",
+      "method": "posterior_sampling",
+      "paired_mc_bayes_gap": 0.0,
+      "tier": "small"
+    },
+    {
+      "group_id": "scale-dense-dev-0",
+      "instance_hash": "e19582907542c2955c18e51122da93dafbd3b0fd8b7b069c9c4691286d930869",
+      "method": "beam_bayes",
+      "paired_mc_bayes_gap": 0.375,
+      "tier": "large"
+    },
+    {
+      "group_id": "scale-dense-dev-0",
+      "instance_hash": "e19582907542c2955c18e51122da93dafbd3b0fd8b7b069c9c4691286d930869",
+      "method": "beam_bayes",
+      "paired_mc_bayes_gap": 0.375,
+      "tier": "small"
+    },
+    {
+      "group_id": "scale-dense-dev-0",
+      "instance_hash": "e19582907542c2955c18e51122da93dafbd3b0fd8b7b069c9c4691286d930869",
+      "method": "channel_cover",
+      "paired_mc_bayes_gap": 3.5,
+      "tier": "large"
+    },
+    {
+      "group_id": "scale-dense-dev-0",
+      "instance_hash": "e19582907542c2955c18e51122da93dafbd3b0fd8b7b069c9c4691286d930869",
+      "method": "channel_cover",
+      "paired_mc_bayes_gap": 2.375,
+      "tier": "small"
+    },
+    {
+      "group_id": "scale-dense-dev-0",
+      "instance_hash": "e19582907542c2955c18e51122da93dafbd3b0fd8b7b069c9c4691286d930869",
+      "method": "one_step_voi",
+      "paired_mc_bayes_gap": 0.375,
+      "tier": "large"
+    },
+    {
+      "group_id": "scale-dense-dev-0",
+      "instance_hash": "e19582907542c2955c18e51122da93dafbd3b0fd8b7b069c9c4691286d930869",
+      "method": "one_step_voi",
+      "paired_mc_bayes_gap": 0.375,
+      "tier": "small"
+    },
+    {
+      "group_id": "scale-dense-dev-0",
+      "instance_hash": "e19582907542c2955c18e51122da93dafbd3b0fd8b7b069c9c4691286d930869",
+      "method": "posterior_sampling",
+      "paired_mc_bayes_gap": 0.375,
+      "tier": "large"
+    },
+    {
+      "group_id": "scale-dense-dev-0",
+      "instance_hash": "e19582907542c2955c18e51122da93dafbd3b0fd8b7b069c9c4691286d930869",
+      "method": "posterior_sampling",
+      "paired_mc_bayes_gap": 0.375,
+      "tier": "small"
+    },
+    {
+      "group_id": "scale-sparse-dev-0",
+      "instance_hash": "e5c57dfd528180eccd9b8a9a7daf5b54c19b527a3949e1acaa8d5c05dc2ee140",
+      "method": "beam_bayes",
+      "paired_mc_bayes_gap": 0.0,
+      "tier": "large"
+    },
+    {
+      "group_id": "scale-sparse-dev-0",
+      "instance_hash": "e5c57dfd528180eccd9b8a9a7daf5b54c19b527a3949e1acaa8d5c05dc2ee140",
+      "method": "beam_bayes",
+      "paired_mc_bayes_gap": 0.0,
+      "tier": "small"
+    },
+    {
+      "group_id": "scale-sparse-dev-0",
+      "instance_hash": "e5c57dfd528180eccd9b8a9a7daf5b54c19b527a3949e1acaa8d5c05dc2ee140",
+      "method": "channel_cover",
+      "paired_mc_bayes_gap": 3.125,
+      "tier": "large"
+    },
+    {
+      "group_id": "scale-sparse-dev-0",
+      "instance_hash": "e5c57dfd528180eccd9b8a9a7daf5b54c19b527a3949e1acaa8d5c05dc2ee140",
+      "method": "channel_cover",
+      "paired_mc_bayes_gap": 3.125,
+      "tier": "small"
+    },
+    {
+      "group_id": "scale-sparse-dev-0",
+      "instance_hash": "e5c57dfd528180eccd9b8a9a7daf5b54c19b527a3949e1acaa8d5c05dc2ee140",
+      "method": "one_step_voi",
+      "paired_mc_bayes_gap": 0.0,
+      "tier": "large"
+    },
+    {
+      "group_id": "scale-sparse-dev-0",
+      "instance_hash": "e5c57dfd528180eccd9b8a9a7daf5b54c19b527a3949e1acaa8d5c05dc2ee140",
+      "method": "one_step_voi",
+      "paired_mc_bayes_gap": 0.0,
+      "tier": "small"
+    },
+    {
+      "group_id": "scale-sparse-dev-0",
+      "instance_hash": "e5c57dfd528180eccd9b8a9a7daf5b54c19b527a3949e1acaa8d5c05dc2ee140",
+      "method": "posterior_sampling",
+      "paired_mc_bayes_gap": 0.0,
+      "tier": "large"
+    },
+    {
+      "group_id": "scale-sparse-dev-0",
+      "instance_hash": "e5c57dfd528180eccd9b8a9a7daf5b54c19b527a3949e1acaa8d5c05dc2ee140",
+      "method": "posterior_sampling",
+      "paired_mc_bayes_gap": 0.0,
+      "tier": "small"
+    },
+    {
+      "group_id": "iid-dev-0",
+      "instance_hash": "f8f11ac80d4bdcde93f643dd8beb542ce9e2fae98ff96a2137745e5bbb605498",
+      "method": "beam_bayes",
+      "paired_mc_bayes_gap": 0.0,
+      "tier": "large"
+    },
+    {
+      "group_id": "iid-dev-0",
+      "instance_hash": "f8f11ac80d4bdcde93f643dd8beb542ce9e2fae98ff96a2137745e5bbb605498",
+      "method": "beam_bayes",
+      "paired_mc_bayes_gap": 0.0,
+      "tier": "small"
+    },
+    {
+      "group_id": "iid-dev-0",
+      "instance_hash": "f8f11ac80d4bdcde93f643dd8beb542ce9e2fae98ff96a2137745e5bbb605498",
+      "method": "channel_cover",
+      "paired_mc_bayes_gap": 2.0,
+      "tier": "large"
+    },
+    {
+      "group_id": "iid-dev-0",
+      "instance_hash": "f8f11ac80d4bdcde93f643dd8beb542ce9e2fae98ff96a2137745e5bbb605498",
+      "method": "channel_cover",
+      "paired_mc_bayes_gap": 2.0,
+      "tier": "small"
+    },
+    {
+      "group_id": "iid-dev-0",
+      "instance_hash": "f8f11ac80d4bdcde93f643dd8beb542ce9e2fae98ff96a2137745e5bbb605498",
+      "method": "one_step_voi",
+      "paired_mc_bayes_gap": 0.0,
+      "tier": "large"
+    },
+    {
+      "group_id": "iid-dev-0",
+      "instance_hash": "f8f11ac80d4bdcde93f643dd8beb542ce9e2fae98ff96a2137745e5bbb605498",
+      "method": "one_step_voi",
+      "paired_mc_bayes_gap": 0.0,
+      "tier": "small"
+    },
+    {
+      "group_id": "iid-dev-0",
+      "instance_hash": "f8f11ac80d4bdcde93f643dd8beb542ce9e2fae98ff96a2137745e5bbb605498",
+      "method": "posterior_sampling",
+      "paired_mc_bayes_gap": 0.0,
+      "tier": "large"
+    },
+    {
+      "group_id": "iid-dev-0",
+      "instance_hash": "f8f11ac80d4bdcde93f643dd8beb542ce9e2fae98ff96a2137745e5bbb605498",
+      "method": "posterior_sampling",
+      "paired_mc_bayes_gap": 0.0,
+      "tier": "small"
+    }
+  ],
+  "references": {
+    "03a03cb71b1557608d9f3ef6d4316e77e85b20b3519c168acb244aed0de473a1": {
+      "certified_minimax": {
+        "compute": {
+          "expansions": 282,
+          "model_calls": 432,
+          "seconds": 0.02207910100059962
+        },
+        "least_favorable_prior": [
+          "1/2",
+          "1/2"
+        ],
+        "risks": [
+          "2",
+          "2"
+        ],
+        "stats": {
+          "expansions": 282,
+          "lp_candidates": 407,
+          "model_calls": 432,
+          "seconds": 0.022063907999836374,
+          "tree_combinations": 84
+        },
+        "status": "exact",
+        "value": "2"
+      },
+      "exact_bayes": {
+        "compute": {
+          "expansions": 70,
+          "likelihood_branches": 47,
+          "model_calls": 238,
+          "seconds": 0.000684420000652608,
+          "states": 17
+        },
+        "status": "exact",
+        "value": "2"
+      },
+      "oracle": [
+        "4",
+        "4"
+      ],
+      "oracle_compute": {
+        "expansions": 128,
+        "model_calls": 116,
+        "seconds": 0.0004098609997527092
+      },
+      "oracle_status": "exact",
+      "total_offline_seconds": 0.023183046999292856
+    },
+    "0987ca174b89af264c26a76eb6d6830a30b281e19d460296115c7aab6520c3d9": {
+      "certified_minimax": {
+        "compute": {
+          "expansions": 1278,
+          "model_calls": 430,
+          "seconds": 0.012362741999822902
+        },
+        "reason": "minimax unique-vector limit; unresolved",
+        "status": "unresolved"
+      },
+      "exact_bayes": {
+        "compute": {
+          "expansions": 166,
+          "likelihood_branches": 715,
+          "model_calls": 4054,
+          "seconds": 0.008386783999412728,
+          "states": 86
+        },
+        "status": "exact",
+        "value": "4"
+      },
+      "oracle": [
+        "8",
+        "8"
+      ],
+      "oracle_compute": {
+        "expansions": 240,
+        "model_calls": 156,
+        "seconds": 0.0005917680000493419
+      },
+      "oracle_status": "exact",
+      "total_offline_seconds": 0.02135640000051353
+    },
+    "276747e0dfaf515f2826aba23140cabd992bfe4940e2c405cf1d6e0d6c50596b": {
+      "certified_minimax": {
+        "compute": {
+          "expansions": 1219,
+          "model_calls": 302,
+          "seconds": 0.00549035600033676
+        },
+        "reason": "minimax unique-vector limit; unresolved",
+        "status": "unresolved"
+      },
+      "exact_bayes": {
+        "compute": {
+          "expansions": 162,
+          "likelihood_branches": 351,
+          "model_calls": 1650,
+          "seconds": 0.004499681000197597,
+          "states": 105
+        },
+        "status": "exact",
+        "value": "9/2"
+      },
+      "oracle": [
+        "8",
+        "8"
+      ],
+      "oracle_compute": {
+        "expansions": 142,
+        "model_calls": 52,
+        "seconds": 0.0003043219994651736
+      },
+      "oracle_status": "exact",
+      "total_offline_seconds": 0.010306258999662532
+    },
+    "485129b0b17ffa2d3cb2616296e97df8a4baf09b3679c4bbbb86a1bd1568e4d3": {
+      "certified_minimax": {
+        "compute": {
+          "expansions": 620,
+          "model_calls": 328,
+          "seconds": 0.003576520000024175
+        },
+        "reason": "minimax unique-vector limit; unresolved",
+        "status": "unresolved"
+      },
+      "exact_bayes": {
+        "compute": {
+          "expansions": 187,
+          "likelihood_branches": 5385,
+          "model_calls": 26916,
+          "seconds": 0.0671576320000895,
+          "states": 847
+        },
+        "status": "exact",
+        "value": "27/4"
+      },
+      "oracle": [
+        "12",
+        "12"
+      ],
+      "oracle_compute": {
+        "expansions": 248,
+        "model_calls": 92,
+        "seconds": 0.0004262019992893329
+      },
+      "oracle_status": "exact",
+      "total_offline_seconds": 0.07117205200029275
+    },
+    "7486c25492fc20e2a5fde37290e949bc52c84cc1dbf72bbeefb53958abe3c328": {
+      "certified_minimax": {
+        "compute": {
+          "expansions": 583,
+          "model_calls": 430,
+          "seconds": 0.004959110000527289
+        },
+        "reason": "minimax unique-vector limit; unresolved",
+        "status": "unresolved"
+      },
+      "exact_bayes": {
+        "compute": {
+          "expansions": 197,
+          "likelihood_branches": 1441,
+          "model_calls": 7990,
+          "seconds": 0.017780112000764348,
+          "states": 266
+        },
+        "status": "exact",
+        "value": "9/2"
+      },
+      "oracle": [
+        "8",
+        "8"
+      ],
+      "oracle_compute": {
+        "expansions": 268,
+        "model_calls": 176,
+        "seconds": 0.0005741369996030699
+      },
+      "oracle_status": "exact",
+      "total_offline_seconds": 0.02332326599935186
+    },
+    "976af1e276eb47df1ed6628ab20cc136a4c1a93e8bac90afdf5bb1b8418387f5": {
+      "certified_minimax": {
+        "compute": {
+          "expansions": 1357,
+          "model_calls": 302,
+          "seconds": 0.006216074999429111
+        },
+        "reason": "minimax unique-vector limit; unresolved",
+        "status": "unresolved"
+      },
+      "exact_bayes": {
+        "compute": {
+          "expansions": 156,
+          "likelihood_branches": 227,
+          "model_calls": 1078,
+          "seconds": 0.0028355169997666962,
+          "states": 57
+        },
+        "status": "exact",
+        "value": "4"
+      },
+      "oracle": [
+        "8",
+        "8"
+      ],
+      "oracle_compute": {
+        "expansions": 140,
+        "model_calls": 52,
+        "seconds": 0.00029909800014138455
+      },
+      "oracle_status": "exact",
+      "total_offline_seconds": 0.009359282999866991
+    },
+    "c8f1750bbbcaf75bb8e031e47dae9b9ff74d0c4ba4ee69e6216486895fdb2807": {
+      "certified_minimax": {
+        "compute": {
+          "expansions": 240,
+          "model_calls": 208,
+          "seconds": 0.021224056999926688
+        },
+        "least_favorable_prior": [
+          "1/2",
+          "1/2"
+        ],
+        "risks": [
+          "2",
+          "2"
+        ],
+        "stats": {
+          "expansions": 240,
+          "lp_candidates": 407,
+          "model_calls": 208,
+          "seconds": 0.021206487999734236,
+          "tree_combinations": 80
+        },
+        "status": "exact",
+        "value": "2"
+      },
+      "exact_bayes": {
+        "compute": {
+          "expansions": 68,
+          "likelihood_branches": 31,
+          "model_calls": 142,
+          "seconds": 0.00047016600001370534,
+          "states": 13
+        },
+        "status": "exact",
+        "value": "2"
+      },
+      "oracle": [
+        "4",
+        "4"
+      ],
+      "oracle_compute": {
+        "expansions": 92,
+        "model_calls": 52,
+        "seconds": 0.0002653679994182312
+      },
+      "oracle_status": "exact",
+      "total_offline_seconds": 0.021968560999994224
+    },
+    "e15e0ffc4d85199bd2e056ad306110cfd59d17944b944855dbaddf911fa9d8b6": {
+      "certified_minimax": {
+        "compute": {
+          "expansions": 244,
+          "model_calls": 208,
+          "seconds": 0.023437568000190367
+        },
+        "least_favorable_prior": [
+          "1/2",
+          "1/2"
+        ],
+        "risks": [
+          "2",
+          "2"
+        ],
+        "stats": {
+          "expansions": 244,
+          "lp_candidates": 437,
+          "model_calls": 208,
+          "seconds": 0.02342125700033648,
+          "tree_combinations": 80
+        },
+        "status": "exact",
+        "value": "2"
+      },
+      "exact_bayes": {
+        "compute": {
+          "expansions": 70,
+          "likelihood_branches": 35,
+          "model_calls": 158,
+          "seconds": 0.0007375779996436904,
+          "states": 17
+        },
+        "status": "exact",
+        "value": "2"
+      },
+      "oracle": [
+        "4",
+        "4"
+      ],
+      "oracle_compute": {
+        "expansions": 94,
+        "model_calls": 52,
+        "seconds": 0.00025626000024203677
+      },
+      "oracle_status": "exact",
+      "total_offline_seconds": 0.0244399949997387
+    },
+    "e19582907542c2955c18e51122da93dafbd3b0fd8b7b069c9c4691286d930869": {
+      "certified_minimax": {
+        "compute": {
+          "expansions": 1703,
+          "model_calls": 1422,
+          "seconds": 0.00650004299950524
+        },
+        "reason": "minimax unique-vector limit; unresolved",
+        "status": "unresolved"
+      },
+      "exact_bayes": {
+        "compute": {
+          "expansions": 2132,
+          "likelihood_branches": 14026,
+          "model_calls": 99396,
+          "seconds": 0.16352278900012607,
+          "states": 1008
+        },
+        "status": "exact",
+        "value": "4"
+      },
+      "oracle": [
+        "8",
+        "8"
+      ],
+      "oracle_compute": {
+        "expansions": 3028,
+        "model_calls": 2868,
+        "seconds": 0.005443809000098554
+      },
+      "oracle_status": "exact",
+      "total_offline_seconds": 0.17547878400000627
+    },
+    "e5c57dfd528180eccd9b8a9a7daf5b54c19b527a3949e1acaa8d5c05dc2ee140": {
+      "certified_minimax": {
+        "compute": {
+          "expansions": 588,
+          "model_calls": 328,
+          "seconds": 0.003316090000225813
+        },
+        "reason": "minimax unique-vector limit; unresolved",
+        "status": "unresolved"
+      },
+      "exact_bayes": {
+        "compute": {
+          "expansions": 123,
+          "likelihood_branches": 814,
+          "model_calls": 3984,
+          "seconds": 0.010058904999823426,
+          "states": 194
+        },
+        "status": "exact",
+        "value": "4"
+      },
+      "oracle": [
+        "8",
+        "8"
+      ],
+      "oracle_compute": {
+        "expansions": 176,
+        "model_calls": 92,
+        "seconds": 0.0003750080004465417
+      },
+      "oracle_status": "exact",
+      "total_offline_seconds": 0.013758889999735402
+    },
+    "f8f11ac80d4bdcde93f643dd8beb542ce9e2fae98ff96a2137745e5bbb605498": {
+      "certified_minimax": {
+        "compute": {
+          "expansions": 301,
+          "model_calls": 432,
+          "seconds": 0.023758211999847845
+        },
+        "least_favorable_prior": [
+          "1/2",
+          "1/2"
+        ],
+        "risks": [
+          "2",
+          "2"
+        ],
+        "stats": {
+          "expansions": 301,
+          "lp_candidates": 437,
+          "model_calls": 432,
+          "seconds": 0.023745125999994343,
+          "tree_combinations": 84
+        },
+        "status": "exact",
+        "value": "2"
+      },
+      "exact_bayes": {
+        "compute": {
+          "expansions": 77,
+          "likelihood_branches": 51,
+          "model_calls": 254,
+          "seconds": 0.0007396349992632167,
+          "states": 29
+        },
+        "status": "exact",
+        "value": "2"
+      },
+      "oracle": [
+        "4",
+        "4"
+      ],
+      "oracle_compute": {
+        "expansions": 140,
+        "model_calls": 116,
+        "seconds": 0.00037943400002404815
+      },
+      "oracle_status": "exact",
+      "total_offline_seconds": 0.024886576999961108
+    },
+    "f95fb13d852faa2d81ff74a4d92326c30ebbf15933058931ff97df7173bd9a03": {
+      "certified_minimax": {
+        "compute": {
+          "expansions": 2667,
+          "model_calls": 1422,
+          "seconds": 0.007559276000392856
+        },
+        "reason": "minimax unique-vector limit; unresolved",
+        "status": "unresolved"
+      },
+      "exact_bayes": {
+        "compute": {
+          "expansions": 3096,
+          "likelihood_branches": 33247,
+          "model_calls": 229830,
+          "seconds": 0.3796310550005728,
+          "states": 2000
+        },
+        "reason": "Bayes solver state/time limit; optimum unresolved",
+        "status": "unresolved"
+      },
+      "oracle": [
+        "12",
+        "12"
+      ],
+      "oracle_compute": {
+        "expansions": 4060,
+        "model_calls": 2868,
+        "seconds": 0.00618884000050457
+      },
+      "oracle_status": "exact",
+      "total_offline_seconds": 0.3933997530002671
+    }
+  },
+  "root_aggregates": [
+    {
+      "bayes_risk": 2.8125,
+      "conditions": 4,
+      "expansions": 1770,
+      "group_id": "iid-dev-0",
+      "method": "beam_bayes",
+      "model_calls": 7123.5,
+      "planning_seconds": 0.014364153140789426,
+      "tier": "large"
+    },
+    {
+      "bayes_risk": 3.0,
+      "conditions": 4,
+      "expansions": 1041,
+      "group_id": "iid-dev-0",
+      "method": "beam_bayes",
+      "model_calls": 4700.5,
+      "planning_seconds": 0.009057921140694702,
+      "tier": "small"
+    },
+    {
+      "bayes_risk": 2.0,
+      "conditions": 2,
+      "expansions": 0,
+      "group_id": "iid-dev-0",
+      "method": "certified_minimax",
+      "model_calls": 0,
+      "planning_seconds": 1.7970937477684856e-05,
+      "tier": "offline_reference"
+    },
+    {
+      "bayes_risk": 4.78125,
+      "conditions": 4,
+      "expansions": 55.75,
+      "group_id": "iid-dev-0",
+      "method": "channel_cover",
+      "model_calls": 86,
+      "planning_seconds": 0.0002596877188096869,
+      "tier": "large"
+    },
+    {
+      "bayes_risk": 4.78125,
+      "conditions": 4,
+      "expansions": 55.75,
+      "group_id": "iid-dev-0",
+      "method": "channel_cover",
+      "model_calls": 86,
+      "planning_seconds": 0.0002606552811670326,
+      "tier": "small"
+    },
+    {
+      "bayes_risk": 2.8125,
+      "conditions": 4,
+      "expansions": 0,
+      "group_id": "iid-dev-0",
+      "method": "exact_bayes",
+      "model_calls": 0,
+      "planning_seconds": 2.400846886985164e-05,
+      "tier": "offline_reference"
+    },
+    {
+      "bayes_risk": 2.8125,
+      "conditions": 4,
+      "expansions": 757.5,
+      "group_id": "iid-dev-0",
+      "method": "one_step_voi",
+      "model_calls": 2551,
+      "planning_seconds": 0.005182877640564243,
+      "tier": "large"
+    },
+    {
+      "bayes_risk": 2.8125,
+      "conditions": 4,
+      "expansions": 520.25,
+      "group_id": "iid-dev-0",
+      "method": "one_step_voi",
+      "model_calls": 1696,
+      "planning_seconds": 0.0035254592500706394,
+      "tier": "small"
+    },
+    {
+      "bayes_risk": 3.0,
+      "conditions": 4,
+      "expansions": 135.5,
+      "group_id": "iid-dev-0",
+      "method": "posterior_sampling",
+      "model_calls": 875,
+      "planning_seconds": 0.0016160004062157896,
+      "tier": "large"
+    },
+    {
+      "bayes_risk": 3.0,
+      "conditions": 4,
+      "expansions": 135.5,
+      "group_id": "iid-dev-0",
+      "method": "posterior_sampling",
+      "model_calls": 875,
+      "planning_seconds": 0.0016261500937986284,
+      "tier": "small"
+    },
+    {
+      "bayes_risk": 3.0,
+      "conditions": 4,
+      "expansions": 2815.75,
+      "group_id": "iid-dev-1",
+      "method": "beam_bayes",
+      "model_calls": 11710,
+      "planning_seconds": 0.023247892874863396,
+      "tier": "large"
+    },
+    {
+      "bayes_risk": 3.0,
+      "conditions": 4,
+      "expansions": 1019,
+      "group_id": "iid-dev-1",
+      "method": "beam_bayes",
+      "model_calls": 4730,
+      "planning_seconds": 0.00907945332821214,
+      "tier": "small"
+    },
+    {
+      "bayes_risk": 2.0,
+      "conditions": 2,
+      "expansions": 0,
+      "group_id": "iid-dev-1",
+      "method": "certified_minimax",
+      "model_calls": 0,
+      "planning_seconds": 1.921350008160516e-05,
+      "tier": "offline_reference"
+    },
+    {
+      "bayes_risk": 4.625,
+      "conditions": 4,
+      "expansions": 58.25,
+      "group_id": "iid-dev-1",
+      "method": "channel_cover",
+      "model_calls": 99.5,
+      "planning_seconds": 0.00028463317188709425,
+      "tier": "large"
+    },
+    {
+      "bayes_risk": 4.625,
+      "conditions": 4,
+      "expansions": 58.25,
+      "group_id": "iid-dev-1",
+      "method": "channel_cover",
+      "model_calls": 99.5,
+      "planning_seconds": 0.00028235501559947807,
+      "tier": "small"
+    },
+    {
+      "bayes_risk": 2.8125,
+      "conditions": 4,
+      "expansions": 0,
+      "group_id": "iid-dev-1",
+      "method": "exact_bayes",
+      "model_calls": 0,
+      "planning_seconds": 2.233554688757522e-05,
+      "tier": "offline_reference"
+    },
+    {
+      "bayes_risk": 3.0,
+      "conditions": 4,
+      "expansions": 1094.5,
+      "group_id": "iid-dev-1",
+      "method": "one_step_voi",
+      "model_calls": 3922.5,
+      "planning_seconds": 0.007594725999908292,
+      "tier": "large"
+    },
+    {
+      "bayes_risk": 3.0,
+      "conditions": 4,
+      "expansions": 795,
+      "group_id": "iid-dev-1",
+      "method": "one_step_voi",
+      "model_calls": 2749.5,
+      "planning_seconds": 0.005460355140641582,
+      "tier": "small"
+    },
+    {
+      "bayes_risk": 3.0,
+      "conditions": 4,
+      "expansions": 124,
+      "group_id": "iid-dev-1",
+      "method": "posterior_sampling",
+      "model_calls": 823,
+      "planning_seconds": 0.0015527397345778127,
+      "tier": "large"
+    },
+    {
+      "bayes_risk": 3.0,
+      "conditions": 4,
+      "expansions": 124,
+      "group_id": "iid-dev-1",
+      "method": "posterior_sampling",
+      "model_calls": 823,
+      "planning_seconds": 0.0015521183124889149,
+      "tier": "small"
+    },
+    {
+      "bayes_risk": 5.0,
+      "conditions": 2,
+      "expansions": 13800.5,
+      "group_id": "scale-dense-dev-0",
+      "method": "beam_bayes",
+      "model_calls": 113631,
+      "planning_seconds": 0.17700027550006325,
+      "tier": "large"
+    },
+    {
+      "bayes_risk": 5.0,
+      "conditions": 2,
+      "expansions": 2054,
+      "group_id": "scale-dense-dev-0",
+      "method": "beam_bayes",
+      "model_calls": 19572,
+      "planning_seconds": 0.030203949406285346,
+      "tier": "small"
+    },
+    {
+      "bayes_risk": 7.375,
+      "conditions": 2,
+      "expansions": 836,
+      "group_id": "scale-dense-dev-0",
+      "method": "channel_cover",
+      "model_calls": 1806,
+      "planning_seconds": 0.0034250100624433344,
+      "tier": "large"
+    },
+    {
+      "bayes_risk": 7.0,
+      "conditions": 2,
+      "expansions": 2000,
+      "group_id": "scale-dense-dev-0",
+      "method": "channel_cover",
+      "model_calls": 160,
+      "planning_seconds": 0.002163555625003255,
+      "tier": "small"
+    },
+    {
+      "bayes_risk": 3.625,
+      "conditions": 1,
+      "expansions": 0,
+      "group_id": "scale-dense-dev-0",
+      "method": "exact_bayes",
+      "model_calls": 0,
+      "planning_seconds": 3.2393499793670344e-05,
+      "tier": "offline_reference"
+    },
+    {
+      "bayes_risk": 4.5,
+      "conditions": 2,
+      "expansions": 7139.5,
+      "group_id": "scale-dense-dev-0",
+      "method": "one_step_voi",
+      "model_calls": 44508,
+      "planning_seconds": 0.0724642181561137,
+      "tier": "large"
+    },
+    {
+      "bayes_risk": 5.0,
+      "conditions": 2,
+      "expansions": 1907,
+      "group_id": "scale-dense-dev-0",
+      "method": "one_step_voi",
+      "model_calls": 18870,
+      "planning_seconds": 0.02896430762487512,
+      "tier": "small"
+    },
+    {
+      "bayes_risk": 5.0,
+      "conditions": 2,
+      "expansions": 1032,
+      "group_id": "scale-dense-dev-0",
+      "method": "posterior_sampling",
+      "model_calls": 12920,
+      "planning_seconds": 0.01867019315633911,
+      "tier": "large"
+    },
+    {
+      "bayes_risk": 5.0,
+      "conditions": 2,
+      "expansions": 1032,
+      "group_id": "scale-dense-dev-0",
+      "method": "posterior_sampling",
+      "model_calls": 12920,
+      "planning_seconds": 0.01889103162511674,
+      "tier": "small"
+    },
+    {
+      "bayes_risk": 3.5,
+      "conditions": 2,
+      "expansions": 7864,
+      "group_id": "scale-sparse-dev-0",
+      "method": "beam_bayes",
+      "model_calls": 46846,
+      "planning_seconds": 0.09519545168748778,
+      "tier": "large"
+    },
+    {
+      "bayes_risk": 5.0,
+      "conditions": 2,
+      "expansions": 2282,
+      "group_id": "scale-sparse-dev-0",
+      "method": "beam_bayes",
+      "model_calls": 15076,
+      "planning_seconds": 0.029578052781431552,
+      "tier": "small"
+    },
+    {
+      "bayes_risk": 8.6875,
+      "conditions": 2,
+      "expansions": 64.5,
+      "group_id": "scale-sparse-dev-0",
+      "method": "channel_cover",
+      "model_calls": 163,
+      "planning_seconds": 0.0004047962497395474,
+      "tier": "large"
+    },
+    {
+      "bayes_risk": 8.6875,
+      "conditions": 2,
+      "expansions": 64.5,
+      "group_id": "scale-sparse-dev-0",
+      "method": "channel_cover",
+      "model_calls": 163,
+      "planning_seconds": 0.0004166939377228118,
+      "tier": "small"
+    },
+    {
+      "bayes_risk": 3.5,
+      "conditions": 2,
+      "expansions": 0,
+      "group_id": "scale-sparse-dev-0",
+      "method": "exact_bayes",
+      "model_calls": 0,
+      "planning_seconds": 3.569759374499881e-05,
+      "tier": "offline_reference"
+    },
+    {
+      "bayes_risk": 3.5,
+      "conditions": 2,
+      "expansions": 3695,
+      "group_id": "scale-sparse-dev-0",
+      "method": "one_step_voi",
+      "model_calls": 10504,
+      "planning_seconds": 0.022285700406172282,
+      "tier": "large"
+    },
+    {
+      "bayes_risk": 5.0,
+      "conditions": 2,
+      "expansions": 2101,
+      "group_id": "scale-sparse-dev-0",
+      "method": "one_step_voi",
+      "model_calls": 6357,
+      "planning_seconds": 0.01360833228153524,
+      "tier": "small"
+    },
+    {
+      "bayes_risk": 5.0,
+      "conditions": 2,
+      "expansions": 172,
+      "group_id": "scale-sparse-dev-0",
+      "method": "posterior_sampling",
+      "model_calls": 1326,
+      "planning_seconds": 0.002650512468648003,
+      "tier": "large"
+    },
+    {
+      "bayes_risk": 5.0,
+      "conditions": 2,
+      "expansions": 172,
+      "group_id": "scale-sparse-dev-0",
+      "method": "posterior_sampling",
+      "model_calls": 1326,
+      "planning_seconds": 0.002657154530908201,
+      "tier": "small"
+    }
+  ],
+  "root_groups": 4,
+  "schema": "fpl-dev-analysis-v1"
+}
