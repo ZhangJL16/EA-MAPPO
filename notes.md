@@ -1,5 +1,22 @@
 # Current research notes
 
+## 2026-09-19 novelty kill test: theory-paper story CLOSED
+
+Explicit reduction, not lack of search hits, resolves the novelty gate.
+Prop. 1 = Wald + renewal ratio monotonicity + maximal safe prefix.
+Prop. 3 = differential advantage verification; G_B = Q_B(C)-Q_B(R).
+Prop. 4 = cycle PDL + stop_mass_pi <= visit_mass_B + positive duration lower bound.
+Overhead threshold = cancellation of the shared fixed time + scalar inequality.
+No irreducible technical step identified; user's frozen theory KILL criterion is met.
+Correctness/supporting insight retained; no standalone ICML novelty claim.
+Important qualifications: domination is per-cycle, not normalized stationary occupancy;
+Neely observes task type before mode selection; Murthy 2023 analyzes approximate PI;
+our certificate reads counterfactual immediate-R branch costs, not only VB trajectories.
+Breiman original chapter was not read; modern primary paper supplies the exact pointer.
+Audit: `docs/VIABILITY_BOUNDARY_NOVELTY_AUDIT_20260919.md`.
+Original derivation SHA256 unchanged; no simulator/training/theory expansion this turn.
+No automatic continuation to model-free certification or other proposed new routes.
+
 ## 2026-09-19 main learning story KILLED; conditional theory derived
 
 User confirmed frozen >=.98 kill: VB/Oracle=.991342277482, interval entirely above

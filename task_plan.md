@@ -1,5 +1,20 @@
 # Current task plan
 
+## Novelty audit complete: current theory-paper story KILLED (2026-09-19)
+
+- [x] Read the six specified papers' relevant primary text; verify Wald source.
+- [x] Locate ICML 2021 Lemma 1 / Eq. (4); distinguish NeurIPS 2023 approximate PI.
+- [x] Reduce Prop. 1/3/4 and overhead threshold without extending the theory package.
+- [x] Separate cycle prefix mass from normalized stationary occupancy.
+- [x] Identify counterfactual return-cost inputs: certificate is not behavior-only/model-free.
+- [x] Apply user criterion: elementary reductions suffice, so current theory novelty FAIL / KILL.
+- [x] Preserve DERIVATION_PACKAGE.md, runtime, frozen SAC and P0–P2 evidence unchanged.
+
+Report: `docs/VIABILITY_BOUNDARY_NOVELTY_AUDIT_20260919.md`.
+Source ledger: `research/regenerative_control/evidence/vb_novelty_20260919/sources.json`.
+No new experiments, training, propositions, or automatic promotion to another pivot.
+Historical pending/active statuses below are superseded by this outcome.
+
 ## Confirmed KILL; Pivot A theory-only package (2026-09-19)
 
 - [x] P2-A2 COMPLETE:36 cycle +10 candidate nodes; VB/Oracle99.1342%.

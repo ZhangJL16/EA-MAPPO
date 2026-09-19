@@ -1,0 +1,16 @@
+{
+  "audited_revision": "217be6d77a26e713412583d6b60c41c178ba29c3",
+  "derivation_sha256": "7f27a3465c7f92e03013011ff2076d670e8573f6013b51e5f015a458f34fd416",
+  "derivation_unchanged": true,
+  "existing_tracked_changes_only_current_status_docs": true,
+  "source_records": 8,
+  "primary_relevant_full_text_records": 7,
+  "indirect_original_not_read_records": 1,
+  "downloaded_pdf_hashes": 6,
+  "audit_relative_links_resolve": true,
+  "new_theorems": 0,
+  "new_simulator_runs": 0,
+  "new_training_runs": 0,
+  "verdict": "KILL_CURRENT_THEORY_PAPER_STORY",
+  "validation_scope": "Document/source/reduction audit; no runtime code changed, no experiment tests required."
+}

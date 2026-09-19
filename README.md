@@ -1,5 +1,14 @@
 # EA-MAPPO research workspace
 
+Latest (2026-09-19): [theorem-reduction novelty audit: KILL](docs/VIABILITY_BOUNDARY_NOVELTY_AUDIT_20260919.md).
+**Both the regenerative-learning and current standalone theory-paper stories are CLOSED.**
+Prop. 1 reduces to Wald/renewal monotonicity; Prop. 3 to differential advantage
+verification; Prop. 4 to cycle performance difference plus prefix-mass domination.
+No irreducible new technical step was found under the user's novelty kill test.
+The derivation and all evidence remain unchanged as supporting analysis.
+No new theorems, UAV experiments, training, or automatic statistical-certificate pivot.
+Earlier theory-novelty-pending statements below are historical and now resolved.
+
 Latest (2026-09-19): [confirmed KILL and theory-only Pivot A](docs/VIABILITY_BOUNDARY_THEORY_20260919.md).
 **The high-level regenerative-learning main story is CLOSED.** Completed safe-tree
 VB/Oracle = 0.9913422775 >= .98; one distinct early-return physical state.

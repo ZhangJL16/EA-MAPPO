@@ -1,0 +1,106 @@
+{
+  "audit_date": "2026-09-19",
+  "audited_commit": "217be6d7",
+  "workflow": "bounded theorem-reduction novelty audit",
+  "scope": "six user-listed papers plus Wald teaching source; Breiman indirect",
+  "sources": [
+    {
+      "id": "W",
+      "authors": "Gallager",
+      "title": "6.262 Lecture 15: The last renewal",
+      "year": "2011",
+      "url": "https://ocw.mit.edu/courses/6-262-discrete-stochastic-processes-spring-2011/61c15adb62248b208b3cf78fdf5c1b08_MIT6_262S11_lec15.pdf",
+      "locator": "PDF pp.4-5: Wald equality; pp.2-3: renewal example",
+      "scope": "Classical identity; vector-filtration reduction written in audit.",
+      "status": "verified_relevant_primary_full_text",
+      "pdf_sha256": "def129607e28b5afb8e3bdd904510642a2f5bf140df167b100c3aa6a38555e02",
+      "pdf_pages": 11
+    },
+    {
+      "id": "N",
+      "authors": "Michael J. Neely",
+      "title": "Fast Learning for Renewal Optimization in Online Task Scheduling",
+      "year": "2021",
+      "url": "https://jmlr.org/papers/volume22/20-813/20-813.pdf",
+      "locator": "JMLR 22(279):1-44; section 3.3, Lemma 1, Eq.(22), p.12; section 1",
+      "scope": "Task observed before mode choice; not direct VB optimality theorem.",
+      "status": "verified_relevant_primary_full_text",
+      "pdf_sha256": "acecdc31e9387670382d64598faf7e1758267aac5da4c7ab75e7419f33e9e0b4",
+      "pdf_pages": 44
+    },
+    {
+      "id": "Z",
+      "authors": "Yiming Zhang; Keith W. Ross",
+      "title": "On-Policy Deep Reinforcement Learning for the Average-Reward Criterion",
+      "year": "2021",
+      "url": "https://proceedings.mlr.press/v139/zhang21q/zhang21q.pdf",
+      "locator": "PMLR 139:12535-12545; PDF p.4, Lemma 1 Eq.(4); PDF p.2, Assumptions 1-2",
+      "scope": "Unit-time aperiodic-unichain PDL; audit handles SMDP via finite-cycle telescoping.",
+      "status": "verified_relevant_primary_full_text",
+      "pdf_sha256": "0d3c369f0beb8036b2a075654a3f1fc39e27aa66fa8b5303fa66eaa4d05fa61a",
+      "pdf_pages": 11
+    },
+    {
+      "id": "M",
+      "authors": "Yashaswini Murthy; Mehrdad Moharrami; R. Srikant",
+      "title": "Performance Bounds for Policy-Based Average Reward Reinforcement Learning Algorithms",
+      "year": "2023",
+      "url": "https://papers.neurips.cc/paper_files/paper/2023/file/3da8e709fa1a7d9e23bee89d3c25b5b4-Paper-Conference.pdf",
+      "locator": "NeurIPS 36; PDF p.5 Assumption 3.1; p.6 Theorem 3.3 and Corollary 3.4",
+      "scope": "Conference version pinned; do not substitute same-title later paper or preprint numbering. Approximate PI error bound, not our exact certificate.",
+      "status": "verified_relevant_primary_full_text",
+      "pdf_sha256": "8419f9e8e5ffb05197b50bca8cd011ec5fb27127678c53b44a490c90321da298",
+      "pdf_pages": 11
+    },
+    {
+      "id": "S",
+      "authors": "Damien Busatto-Gaston; Debraj Chakraborty; Anirban Majumdar; Sayan Mukherjee; Guillermo A. Perez; Jean-Francois Raskin",
+      "title": "Bi-Objective Lexicographic Optimization in Markov Decision Processes with Related Objectives",
+      "year": "2023",
+      "url": "https://arxiv.org/pdf/2305.09634",
+      "locator": "arXiv v2; section 5, Theorems 2-3; Theorem 3 PDF p.18",
+      "scope": "Safety probability priority plus conditional mean payoff; background only, not identical robust safe set.",
+      "status": "verified_relevant_primary_full_text",
+      "pdf_sha256": "8f19466a62033be06f0385f91bc924618856ab08f7afc37dbcbd57ab9c39a3d4",
+      "pdf_pages": 25
+    },
+    {
+      "id": "V",
+      "authors": "Asia La Rocca; Matteo Saveriano; Andrea Del Prete",
+      "title": "VBOC: Learning the Viability Boundary of a Robot Manipulator using Optimal Control",
+      "year": "2023",
+      "url": "https://arxiv.org/pdf/2305.07535",
+      "locator": "arXiv v2, accepted preprint September 2023; Abstract and sections II-III",
+      "scope": "Viability computation background; not average-reward certificate prior.",
+      "status": "verified_relevant_primary_full_text",
+      "pdf_sha256": "bf5f277d48a22a4cc60990549426be1849be74186480378bd9dfcbe912fd2d8d",
+      "pdf_pages": 8
+    },
+    {
+      "id": "I",
+      "authors": "Nicky D. Van Foreest; Onur A. Kilic",
+      "title": "An intuitive approach to inventory control with optimal stopping",
+      "year": "2023",
+      "url": "https://pure.rug.nl/ws/portalfiles/portal/781978779/1-s2.0-S0377221723004204-main.pdf",
+      "locator": "EJOR 311(3):921-924; section 3 p.922; Lemmas 4.3-4.4 p.923; Eq.(6) p.922; references p.924",
+      "scope": "Primary full text read via web PDF reader; direct local download 403; no local PDF hash. Cost K is not our time overhead beta.",
+      "status": "verified_relevant_primary_full_text"
+    },
+    {
+      "id": "B",
+      "authors": "Leo Breiman",
+      "title": "Stopping-rule problems",
+      "year": "1964",
+      "url": null,
+      "locator": "Applied Combinatorial Mathematics, chapter 10 pp.284-319; sections 10.13-10.14/Theorem 10.5, as cited by I",
+      "scope": "Indirect bibliographic/theorem pointer only; original chapter not read. Does not bear the reduction verdict alone.",
+      "status": "indirect_original_not_read"
+    }
+  ],
+  "access_notes": [
+    "academic-search MCP unavailable; used official web/primary PDF sources",
+    "ScienceDirect and research.rug.nl direct access failed; pure.rug.nl web reader succeeded",
+    "pdftotext unavailable; downloaded primary PDFs parsed using installed pypdf",
+    "Full third-party texts are not vendored"
+  ]
+}
