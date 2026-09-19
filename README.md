@@ -1,5 +1,14 @@
 # EA-MAPPO research workspace
 
+Latest (2026-09-19): [P2-A1 reachable-state branching](docs/REGENERATIVE_CONTROL_P2A1_20260919.md).
+P1/P1.1 passed user review. Bounded census: 885 natural D observations, 65 distinct
+physical keys (target 200 not reached), 260 exact task-type/R branches. No RNG
+peeking or new training. No systematic comparable-state local sign reversal found;
+only 4–5 comparable pairs, 48.44% exact D-successor closure, sparse abstraction
+support and residual navigation timeouts prevent a scientific conclusion.
+**Stop at P2-A1; no full oracle/learning promotion.** Earlier P2-hold statements
+below are historical; this limited census alone was authorized.
+
 Latest (2026-09-19): [P1.1 post-delivery C/R](docs/REGENERATIVE_CONTROL_P11_20260919.md).
 P1 passed user review. P1.1 removes task screening: task-free D decisions;
 C draws then executes a job, R draws/discards nothing, and charged H forces its

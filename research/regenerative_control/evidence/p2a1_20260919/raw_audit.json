@@ -1,0 +1,16 @@
+{
+  "states": 65,
+  "core_branches": 260,
+  "core_rng_draw_violations": 0,
+  "diagnostic_missions": 98,
+  "diagnostic_successes": 85,
+  "diagnostic_navigation_timeouts": 13,
+  "diagnostic_depletions": 0,
+  "pass_invariants": true,
+  "checkpoint_unchanged": true,
+  "neural_updates": 0,
+  "actual_battery_interventions": 0,
+  "diagnostic_capacity_correction": true,
+  "navigation_depletion_raw_energy_overrun_max": 0.013650860609752069,
+  "depletion_accounting_note": "Frozen physics logs full final integration-step demand but clips battery at zero; no new dynamics correction."
+}

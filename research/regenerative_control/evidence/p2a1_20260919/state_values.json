@@ -1,0 +1,1822 @@
+[
+  {
+    "state_id": "a258464cab7ae15aa1e35378994c66b3b935ac866356b2db6bd6d458c443a57a",
+    "trajectory_id": "r00_after_1",
+    "energy": 38.26562145910014,
+    "position": [
+      2276.84228515625,
+      2596.649658203125,
+      199.0926513671875
+    ],
+    "velocity": [
+      10.608101844787598,
+      9.338726043701172,
+      -1.5761678218841553
+    ],
+    "previous_task_type": 2,
+    "source_policy": "after_1",
+    "previous_contact": false,
+    "home_distance": 848.4048956076231,
+    "mission_energy_mean": 22.074548699305723,
+    "mission_energy_max": 28.072840893878038,
+    "m_mean": 16.191072759794416,
+    "m_max": 10.192780565222101,
+    "local_delta": 0.46563388175013753,
+    "all_cycle_alternatives_viable": true,
+    "R_viable": true,
+    "local_action": "C",
+    "energy_interventions": 0
+  },
+  {
+    "state_id": "8089e74d5975d804653fdfcf8409044c5399dd75e835659525f1d1da1093cfc9",
+    "trajectory_id": "r00_after_1",
+    "energy": 56.02057186867138,
+    "position": [
+      2776.06640625,
+      2098.117919921875,
+      201.87245178222656
+    ],
+    "velocity": [
+      8.158943176269531,
+      6.594839572906494,
+      -5.0
+    ],
+    "previous_task_type": 0,
+    "source_policy": "after_1",
+    "previous_contact": false,
+    "home_distance": 142.94343005280894,
+    "mission_energy_mean": 17.023552855368777,
+    "mission_energy_max": 27.721838600431617,
+    "m_mean": 38.997019013302605,
+    "m_max": 28.298733268239765,
+    "local_delta": 0.31312455057672506,
+    "all_cycle_alternatives_viable": true,
+    "R_viable": true,
+    "local_action": "C",
+    "energy_interventions": 0
+  },
+  {
+    "state_id": "56e820659a0039e5decdd25cd5b6551e1f813ab92b3e7aa1d359d1ed64569470",
+    "trajectory_id": "r00_after_1",
+    "energy": 51.126016381511135,
+    "position": [
+      2577.10791015625,
+      2296.4052734375,
+      201.00489807128906
+    ],
+    "velocity": [
+      7.44551944732666,
+      6.129767417907715,
+      -5.0
+    ],
+    "previous_task_type": 1,
+    "source_policy": "after_1",
+    "previous_contact": false,
+    "home_distance": 423.7932444383784,
+    "mission_energy_mean": null,
+    "mission_energy_max": null,
+    "m_mean": null,
+    "m_max": null,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": true,
+    "local_action": "R",
+    "energy_interventions": 1
+  },
+  {
+    "state_id": "63f508e96a8ba28cc65f25fdda13c314c19098ac8efec1833bc2a87132e8eb03",
+    "trajectory_id": "r00_after_2",
+    "energy": 25.768138590987892,
+    "position": [
+      2777.632568359375,
+      2095.957275390625,
+      199.20315551757812
+    ],
+    "velocity": [
+      8.624123573303223,
+      10.002552032470703,
+      -3.3307878971099854
+    ],
+    "previous_task_type": 0,
+    "source_policy": "after_2",
+    "previous_contact": false,
+    "home_distance": 140.31224010120943,
+    "mission_energy_mean": 17.765021678031328,
+    "mission_energy_max": 29.381086339895887,
+    "m_mean": 8.003116912956564,
+    "m_max": -3.6129477489079953,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": true,
+    "local_action": "R",
+    "energy_interventions": 1
+  },
+  {
+    "state_id": "944d8d7d1ee111624fb630194422af2e6f5a5697d2ffdc4df9bdc3eb3600f569",
+    "trajectory_id": "r00_after_2",
+    "energy": 20.443287479208642,
+    "position": [
+      2276.885986328125,
+      2596.664794921875,
+      199.0995330810547
+    ],
+    "velocity": [
+      10.536737442016602,
+      9.429817199707031,
+      -1.5533262491226196
+    ],
+    "previous_task_type": 2,
+    "source_policy": "after_2",
+    "previous_contact": false,
+    "home_distance": 848.384465809714,
+    "mission_energy_mean": 22.05278956340777,
+    "mission_energy_max": 28.002483120484897,
+    "m_mean": -1.6095020841991285,
+    "m_max": -7.559195641276254,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": true,
+    "local_action": "R",
+    "energy_interventions": 2
+  },
+  {
+    "state_id": "85cfa29c5010fa1ed888e1d5d8c0d34440a6e67624cddf37921393bff488d87f",
+    "trajectory_id": "r00_soc20",
+    "energy": 38.585936551575166,
+    "position": [
+      2277.87646484375,
+      2596.210205078125,
+      199.34007263183594
+    ],
+    "velocity": [
+      9.542155265808105,
+      9.921605110168457,
+      -1.7409881353378296
+    ],
+    "previous_task_type": 2,
+    "source_policy": "soc20",
+    "previous_contact": false,
+    "home_distance": 847.3604874741865,
+    "mission_energy_mean": 22.39113483393774,
+    "mission_energy_max": 28.156019729238665,
+    "m_mean": 16.194801717637425,
+    "m_max": 10.429916822336502,
+    "local_delta": 0.44221376454846084,
+    "all_cycle_alternatives_viable": true,
+    "R_viable": true,
+    "local_action": "C",
+    "energy_interventions": 0
+  },
+  {
+    "state_id": "3a0e20cdf37a84b3b68bc651cdaeab4dd3665d65a4c60a9788d88e50b8b16e76",
+    "trajectory_id": "r00_soc20",
+    "energy": 25.988181831037892,
+    "position": [
+      2777.52880859375,
+      2095.8076171875,
+      199.24923706054688
+    ],
+    "velocity": [
+      8.599265098571777,
+      10.279417037963867,
+      -3.2452006340026855
+    ],
+    "previous_task_type": 0,
+    "source_policy": "soc20",
+    "previous_contact": false,
+    "home_distance": 140.2854526469303,
+    "mission_energy_mean": 17.467746295245124,
+    "mission_energy_max": 28.46651810606881,
+    "m_mean": 8.520435535792767,
+    "m_max": -2.4783362750309195,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": true,
+    "local_action": "R",
+    "energy_interventions": 1
+  },
+  {
+    "state_id": "f072469a85d53d23588d37d1c635e5c4173722eb38cf318775a3cba6da05df04",
+    "trajectory_id": "r00_soc20",
+    "energy": 16.516178621025055,
+    "position": [
+      2576.660400390625,
+      2296.82373046875,
+      201.48594665527344
+    ],
+    "velocity": [
+      6.722902297973633,
+      5.889846324920654,
+      -5.0
+    ],
+    "previous_task_type": 1,
+    "source_policy": "soc20",
+    "previous_contact": false,
+    "home_distance": 424.40717206242334,
+    "mission_energy_mean": 23.52625743255491,
+    "mission_energy_max": 42.29782614954444,
+    "m_mean": -7.010078811529855,
+    "m_max": -25.781647528519386,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": true,
+    "local_action": "R",
+    "energy_interventions": 2
+  },
+  {
+    "state_id": "72d1aa0fede8d0192296929a447540aebd8055c89bb38b80ca139dbe39a2209b",
+    "trajectory_id": "r00_soc20",
+    "energy": 6.656883151240859,
+    "position": [
+      2277.31640625,
+      2596.620361328125,
+      199.1244659423828
+    ],
+    "velocity": [
+      10.11259937286377,
+      9.681848526000977,
+      -1.691996455192566
+    ],
+    "previous_task_type": 2,
+    "source_policy": "soc20",
+    "previous_contact": false,
+    "home_distance": 848.0472488526824,
+    "mission_energy_mean": 22.228271416199238,
+    "mission_energy_max": 28.268893979373573,
+    "m_mean": -15.57138826495838,
+    "m_max": -21.612010828132714,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": false,
+    "local_action": null,
+    "energy_interventions": 3
+  },
+  {
+    "state_id": "12e2d12efb247146c0e571e926032e9852808106192fa9f7eadc0ec60d84a09d",
+    "trajectory_id": "r00_soc30",
+    "energy": 39.62563326081998,
+    "position": [
+      2576.766357421875,
+      2296.774169921875,
+      201.40408325195312
+    ],
+    "velocity": [
+      6.584818363189697,
+      5.822319030761719,
+      -5.0
+    ],
+    "previous_task_type": 1,
+    "source_policy": "soc30",
+    "previous_contact": false,
+    "home_distance": 424.29650172231493,
+    "mission_energy_mean": null,
+    "mission_energy_max": null,
+    "m_mean": null,
+    "m_max": null,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": true,
+    "local_action": "R",
+    "energy_interventions": 1
+  },
+  {
+    "state_id": "7d2318dcc7908d9ab351011f7106f8514da5ca539a4ce34adf230f0868e2b565",
+    "trajectory_id": "r00_soc30",
+    "energy": 28.152920014730647,
+    "position": [
+      2576.687255859375,
+      2297.313232421875,
+      201.87586975097656
+    ],
+    "velocity": [
+      5.5718994140625,
+      6.0627546310424805,
+      -5.0
+    ],
+    "previous_task_type": 1,
+    "source_policy": "soc30",
+    "previous_contact": false,
+    "home_distance": 424.73203060115765,
+    "mission_energy_mean": null,
+    "mission_energy_max": null,
+    "m_mean": null,
+    "m_max": null,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": true,
+    "local_action": "R",
+    "energy_interventions": 1
+  },
+  {
+    "state_id": "e5352ba4f4a9a467a1ba50cbf4b747ba522fdf1cacad4be12d036f02d62d300a",
+    "trajectory_id": "r00_soc30",
+    "energy": 46.71806780007332,
+    "position": [
+      2576.73779296875,
+      2296.91064453125,
+      201.43507385253906
+    ],
+    "velocity": [
+      6.772209644317627,
+      5.8519134521484375,
+      -5.0
+    ],
+    "previous_task_type": 1,
+    "source_policy": "soc30",
+    "previous_contact": false,
+    "home_distance": 424.4124838955486,
+    "mission_energy_mean": 23.518081766983585,
+    "mission_energy_max": 42.36085616540814,
+    "m_mean": 23.199986033089736,
+    "m_max": 4.357211634665184,
+    "local_delta": -0.0019135877626927922,
+    "all_cycle_alternatives_viable": true,
+    "R_viable": true,
+    "local_action": "R",
+    "energy_interventions": 0
+  },
+  {
+    "state_id": "ead853fb7d8d93ebad7fbf16b813d24bb2efe44cbe089d9df2b8a661bbb5e839",
+    "trajectory_id": "r00_soc30",
+    "energy": 35.304142864592954,
+    "position": [
+      2576.518798828125,
+      2297.366943359375,
+      202.29200744628906
+    ],
+    "velocity": [
+      5.087061405181885,
+      6.059299468994141,
+      -5.0
+    ],
+    "previous_task_type": 1,
+    "source_policy": "soc30",
+    "previous_contact": false,
+    "home_distance": 424.8919765843498,
+    "mission_energy_mean": null,
+    "mission_energy_max": null,
+    "m_mean": null,
+    "m_max": null,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": true,
+    "local_action": "R",
+    "energy_interventions": 1
+  },
+  {
+    "state_id": "c6937d509db7b0ef3d253fc37c4d7c1b335bb0957fe32772b00461e750a65ef2",
+    "trajectory_id": "r00_soc30",
+    "energy": 24.207135581901504,
+    "position": [
+      2577.425537109375,
+      2295.974853515625,
+      200.7521514892578
+    ],
+    "velocity": [
+      7.203250408172607,
+      6.731531143188477,
+      -5.0
+    ],
+    "previous_task_type": 1,
+    "source_policy": "soc30",
+    "previous_contact": false,
+    "home_distance": 423.26467516083676,
+    "mission_energy_mean": 23.03621833484368,
+    "mission_energy_max": 40.78058255681805,
+    "m_mean": 1.1709172470578224,
+    "m_max": -16.573446974916543,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": true,
+    "local_action": "R",
+    "energy_interventions": 1
+  },
+  {
+    "state_id": "63a39e1b4497f8bdb0ef42c3c18f554644e9cc50159f81e77bbaec93d3f33509",
+    "trajectory_id": "r00_aggressive",
+    "energy": 20.679097173146097,
+    "position": [
+      2277.0537109375,
+      2596.803466796875,
+      199.0760040283203
+    ],
+    "velocity": [
+      10.557709693908691,
+      9.406362533569336,
+      -1.5248063802719116
+    ],
+    "previous_task_type": 2,
+    "source_policy": "aggressive",
+    "previous_contact": false,
+    "home_distance": 848.36281109179,
+    "mission_energy_mean": 22.04730079656805,
+    "mission_energy_max": 28.029901201048276,
+    "m_mean": -1.3682036234219517,
+    "m_max": -7.3508040279021785,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": true,
+    "local_action": "R",
+    "energy_interventions": 2
+  },
+  {
+    "state_id": "25ab6ada38855a5cc8da4890504896242c855161c6380b93ef9181ba10268a6b",
+    "trajectory_id": "r00_aggressive",
+    "energy": 4.087564274811884,
+    "position": [
+      2577.85595703125,
+      2296.1474609375,
+      199.43832397460938
+    ],
+    "velocity": [
+      9.145123481750488,
+      9.770952224731445,
+      -1.501534342765808
+    ],
+    "previous_task_type": 1,
+    "source_policy": "aggressive",
+    "previous_contact": false,
+    "home_distance": 423.07760139386653,
+    "mission_energy_mean": null,
+    "mission_energy_max": null,
+    "m_mean": null,
+    "m_max": null,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": false,
+    "local_action": null,
+    "energy_interventions": 3
+  },
+  {
+    "state_id": "a7040b6a94951775c0a5e46c48fb88f0c7d2afffe953ee755d0acbc5a7d15d27",
+    "trajectory_id": "r01_after_2",
+    "energy": 21.62986624355716,
+    "position": [
+      2577.893310546875,
+      2296.07568359375,
+      199.45314025878906
+    ],
+    "velocity": [
+      8.905011177062988,
+      9.623323440551758,
+      -1.334105372428894
+    ],
+    "previous_task_type": 1,
+    "source_policy": "after_2",
+    "previous_contact": false,
+    "home_distance": 423.0006634550469,
+    "mission_energy_mean": null,
+    "mission_energy_max": null,
+    "m_mean": null,
+    "m_max": null,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": true,
+    "local_action": "R",
+    "energy_interventions": 1
+  },
+  {
+    "state_id": "2356d3ccd7d795f5ff1a29a9926d2def8b395ae0c3715eb7261ad22ec57024d5",
+    "trajectory_id": "r01_after_2",
+    "energy": 43.08604749297858,
+    "position": [
+      2777.834716796875,
+      2096.175537109375,
+      199.13206481933594
+    ],
+    "velocity": [
+      8.65625,
+      10.12979793548584,
+      -3.2251076698303223
+    ],
+    "previous_task_type": 0,
+    "source_policy": "after_2",
+    "previous_contact": false,
+    "home_distance": 140.3147616672221,
+    "mission_energy_mean": 17.4212409446048,
+    "mission_energy_max": 28.303066623554315,
+    "m_mean": 25.66480654837378,
+    "m_max": 14.782980869424264,
+    "local_delta": 0.31644702324470597,
+    "all_cycle_alternatives_viable": true,
+    "R_viable": true,
+    "local_action": "C",
+    "energy_interventions": 0
+  },
+  {
+    "state_id": "93f3a99312133ada68807deb60c282f12bb663122abc6c04fda8fa33af622985",
+    "trajectory_id": "r01_after_2",
+    "energy": 50.69378843511013,
+    "position": [
+      2777.76611328125,
+      2096.09521484375,
+      199.1772918701172
+    ],
+    "velocity": [
+      8.799264907836914,
+      10.262345314025879,
+      -2.88289213180542
+    ],
+    "previous_task_type": 0,
+    "source_policy": "after_2",
+    "previous_contact": false,
+    "home_distance": 140.30942505104798,
+    "mission_energy_mean": 17.920471131136765,
+    "mission_energy_max": 29.7272690091973,
+    "m_mean": 32.773317303973364,
+    "m_max": 20.96651942591283,
+    "local_delta": 0.2942652962715261,
+    "all_cycle_alternatives_viable": true,
+    "R_viable": true,
+    "local_action": "C",
+    "energy_interventions": 0
+  },
+  {
+    "state_id": "abc114515409df1258fd7202013759a8f74695f5ae7ef8820a46a0a58ef957d8",
+    "trajectory_id": "r01_soc30",
+    "energy": 31.611873823150418,
+    "position": [
+      2777.702880859375,
+      2096.015380859375,
+      199.18463134765625
+    ],
+    "velocity": [
+      8.618383407592773,
+      10.217084884643555,
+      -3.2597150802612305
+    ],
+    "previous_task_type": 0,
+    "source_policy": "soc30",
+    "previous_contact": false,
+    "home_distance": 140.30081529371554,
+    "mission_energy_mean": 17.486701615117507,
+    "mission_energy_max": 28.462491802973034,
+    "m_mean": 14.125172208032911,
+    "m_max": 3.1493820201773843,
+    "local_delta": 0.31118032640768234,
+    "all_cycle_alternatives_viable": true,
+    "R_viable": true,
+    "local_action": "C",
+    "energy_interventions": 0
+  },
+  {
+    "state_id": "91883f1c0c5e433e1bb1ce9c5b6f7616100b9cb1c9a9229c532af5a679211e79",
+    "trajectory_id": "r01_soc30",
+    "energy": 13.44119489920013,
+    "position": [
+      2277.521484375,
+      2595.822021484375,
+      199.42994689941406
+    ],
+    "velocity": [
+      9.350889205932617,
+      9.948674201965332,
+      -1.8087403774261475
+    ],
+    "previous_task_type": 2,
+    "source_policy": "soc30",
+    "previous_contact": false,
+    "home_distance": 847.339700495597,
+    "mission_energy_mean": 22.297184524652284,
+    "mission_energy_max": 28.487919659397278,
+    "m_mean": -8.855989625452153,
+    "m_max": -15.046724760197147,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": true,
+    "local_action": "R",
+    "energy_interventions": 3
+  },
+  {
+    "state_id": "52037695f0aa1effec557c7e4f8d7025fe07e28de72e5311efe4fa678d7bc1c3",
+    "trajectory_id": "r01_soc40",
+    "energy": 14.601036012692278,
+    "position": [
+      2276.796142578125,
+      2596.608154296875,
+      199.0986328125
+    ],
+    "velocity": [
+      10.614747047424316,
+      9.340664863586426,
+      -1.5846540927886963
+    ],
+    "previous_task_type": 2,
+    "source_policy": "soc40",
+    "previous_contact": false,
+    "home_distance": 848.4085076453207,
+    "mission_energy_mean": 21.851367167490167,
+    "mission_energy_max": 28.129597519061726,
+    "m_mean": -7.250331154797889,
+    "m_max": -13.528561506369448,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": true,
+    "local_action": "R",
+    "energy_interventions": 3
+  },
+  {
+    "state_id": "9b905e19c17bc289a6a978e2c7a310f454cf82d2fc10fc61fecc577b3ae0a8d6",
+    "trajectory_id": "r01_aggressive",
+    "energy": 20.253271681938173,
+    "position": [
+      2777.852294921875,
+      2096.231689453125,
+      199.1327667236328
+    ],
+    "velocity": [
+      8.788036346435547,
+      10.28683853149414,
+      -2.9539151191711426
+    ],
+    "previous_task_type": 0,
+    "source_policy": "aggressive",
+    "previous_contact": false,
+    "home_distance": 140.34045675173618,
+    "mission_energy_mean": 17.735912879020535,
+    "mission_energy_max": 29.266982747077854,
+    "m_mean": 2.517358802917638,
+    "m_max": -9.013711065139681,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": true,
+    "local_action": "R",
+    "energy_interventions": 1
+  },
+  {
+    "state_id": "9d68908ade7695c58b19c331cfa186651512124923f0c7034ec66b80e6c14589",
+    "trajectory_id": "r01_aggressive",
+    "energy": 14.533911093080054,
+    "position": [
+      2777.66943359375,
+      2095.91943359375,
+      199.23574829101562
+    ],
+    "velocity": [
+      8.81808853149414,
+      10.234400749206543,
+      -2.7852790355682373
+    ],
+    "previous_task_type": 0,
+    "source_policy": "aggressive",
+    "previous_contact": false,
+    "home_distance": 140.25928362373895,
+    "mission_energy_mean": 17.798428423484808,
+    "mission_energy_max": 29.38700564884475,
+    "m_mean": -3.264517330404754,
+    "m_max": -14.853094555764695,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": true,
+    "local_action": "R",
+    "energy_interventions": 2
+  },
+  {
+    "state_id": "5ab8f7720599dda5d475e8a4731d802c745e7b0d378883f1fdd53148cfda2b38",
+    "trajectory_id": "r01_aggressive",
+    "energy": 5.003044938945976,
+    "position": [
+      2576.749755859375,
+      2297.27099609375,
+      201.6898956298828
+    ],
+    "velocity": [
+      5.900130271911621,
+      6.050304412841797,
+      -5.0
+    ],
+    "previous_task_type": 1,
+    "source_policy": "aggressive",
+    "previous_contact": false,
+    "home_distance": 424.6570515570875,
+    "mission_energy_mean": null,
+    "mission_energy_max": null,
+    "m_mean": null,
+    "m_max": null,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": false,
+    "local_action": null,
+    "energy_interventions": 3
+  },
+  {
+    "state_id": "c81e8f38c243a7af54df20bb720109e6e8227c0c0f5db865a5deb29cf760d714",
+    "trajectory_id": "r02_aggressive",
+    "energy": 3.8186558620263904,
+    "position": [
+      2577.8056640625,
+      2296.131591796875,
+      199.43650817871094
+    ],
+    "velocity": [
+      9.21433162689209,
+      9.80073356628418,
+      -1.5447044372558594
+    ],
+    "previous_task_type": 1,
+    "source_policy": "aggressive",
+    "previous_contact": false,
+    "home_distance": 423.10241532741253,
+    "mission_energy_mean": 23.50387087482854,
+    "mission_energy_max": 41.94163011069573,
+    "m_mean": -19.68521501280215,
+    "m_max": -38.122974248669344,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": false,
+    "local_action": null,
+    "energy_interventions": 3
+  },
+  {
+    "state_id": "2cc73b945166ddf08da37870e6002be2d9b4c53070cd018e5a56be0f3b212623",
+    "trajectory_id": "r03_soc20",
+    "energy": 38.701519125558136,
+    "position": [
+      2777.69482421875,
+      2096.0107421875,
+      199.18771362304688
+    ],
+    "velocity": [
+      8.616317749023438,
+      10.222146987915039,
+      -3.2723307609558105
+    ],
+    "previous_task_type": 0,
+    "source_policy": "soc20",
+    "previous_contact": false,
+    "home_distance": 140.30349751943191,
+    "mission_energy_mean": 17.440294033437812,
+    "mission_energy_max": 28.30911226931016,
+    "m_mean": 21.261225092120323,
+    "m_max": 10.392406856247977,
+    "local_delta": 0.31263392386777855,
+    "all_cycle_alternatives_viable": true,
+    "R_viable": true,
+    "local_action": "C",
+    "energy_interventions": 0
+  },
+  {
+    "state_id": "f55a01f1755c89ba4d10eb30860abe2190db11dc1ab4f97762c39ef6d4a9c299",
+    "trajectory_id": "r03_soc20",
+    "energy": 32.963487845862645,
+    "position": [
+      2777.77880859375,
+      2096.294189453125,
+      199.12510681152344
+    ],
+    "velocity": [
+      8.827256202697754,
+      10.26237678527832,
+      -3.4697694778442383
+    ],
+    "previous_task_type": 0,
+    "source_policy": "soc20",
+    "previous_contact": false,
+    "home_distance": 140.4368482024528,
+    "mission_energy_mean": 17.352889168859523,
+    "mission_energy_max": 28.036798381276242,
+    "m_mean": 15.610598677003122,
+    "m_max": 4.926689464586403,
+    "local_delta": 0.318340273740774,
+    "all_cycle_alternatives_viable": true,
+    "R_viable": true,
+    "local_action": "C",
+    "energy_interventions": 0
+  },
+  {
+    "state_id": "4fb140dc99b9239b7d4a6a97b34ee65d261fd1898991d63715fdbd5550c4171a",
+    "trajectory_id": "r03_soc20",
+    "energy": 15.213992816207934,
+    "position": [
+      2277.87744140625,
+      2596.2080078125,
+      199.33201599121094
+    ],
+    "velocity": [
+      9.563314437866211,
+      9.917081832885742,
+      -1.7551569938659668
+    ],
+    "previous_task_type": 2,
+    "source_policy": "soc20",
+    "previous_contact": false,
+    "home_distance": 847.3582538394667,
+    "mission_energy_mean": 22.439175553416522,
+    "mission_energy_max": 28.876650403206725,
+    "m_mean": -7.225182737208588,
+    "m_max": -13.66265758699879,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": true,
+    "local_action": "R",
+    "energy_interventions": 3
+  },
+  {
+    "state_id": "7fa1af45d37d4b101810cf4da2e9091c65ecfadb27eeeb94df802dcfc46616cb",
+    "trajectory_id": "r03_soc20",
+    "energy": 20.682696743017303,
+    "position": [
+      2277.656982421875,
+      2595.990234375,
+      199.4134063720703
+    ],
+    "velocity": [
+      9.409720420837402,
+      9.949129104614258,
+      -1.6880888938903809
+    ],
+    "previous_task_type": 2,
+    "source_policy": "soc20",
+    "previous_contact": false,
+    "home_distance": 847.3616786163823,
+    "mission_energy_mean": 22.378011395734948,
+    "mission_energy_max": 28.769123804794447,
+    "m_mean": -1.695314652717645,
+    "m_max": -8.086427061777144,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": true,
+    "local_action": "R",
+    "energy_interventions": 2
+  },
+  {
+    "state_id": "e401d63d9a675eeb06f495365ac5e9e8bffe134ea2f7e2b19d01db7c94e01b69",
+    "trajectory_id": "r03_soc20",
+    "energy": 3.8164884005803787,
+    "position": [
+      2577.6728515625,
+      2295.734130859375,
+      199.9779815673828
+    ],
+    "velocity": [
+      6.987868309020996,
+      8.161643028259277,
+      -4.738046646118164
+    ],
+    "previous_task_type": 1,
+    "source_policy": "soc20",
+    "previous_contact": false,
+    "home_distance": 422.91888267410275,
+    "mission_energy_mean": 23.290631424833595,
+    "mission_energy_max": 41.60875315741296,
+    "m_mean": -19.474143024253216,
+    "m_max": -37.79226475683259,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": false,
+    "local_action": null,
+    "energy_interventions": 3
+  },
+  {
+    "state_id": "f49dcc1c932947c8f059ae3504382e6bb291b811cbc0c2c2cec75561a0b4aaa7",
+    "trajectory_id": "r03_aggressive",
+    "energy": 27.252072007659486,
+    "position": [
+      2777.839599609375,
+      2096.158203125,
+      199.13531494140625
+    ],
+    "velocity": [
+      8.639650344848633,
+      10.128251075744629,
+      -3.179340124130249
+    ],
+    "previous_task_type": 0,
+    "source_policy": "aggressive",
+    "previous_contact": false,
+    "home_distance": 140.29930547387656,
+    "mission_energy_mean": 17.547840327486444,
+    "mission_energy_max": 28.727638635564304,
+    "m_mean": 9.704231680173041,
+    "m_max": -1.4755666279048185,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": true,
+    "local_action": "R",
+    "energy_interventions": 1
+  },
+  {
+    "state_id": "738e2b15d2224d434da9335daad1c38e1095939fe884bf892235d84a28cfad3e",
+    "trajectory_id": "r03_aggressive",
+    "energy": 8.776454535549133,
+    "position": [
+      2276.672119140625,
+      2596.423583984375,
+      199.13023376464844
+    ],
+    "velocity": [
+      10.554619789123535,
+      9.442856788635254,
+      -1.6138544082641602
+    ],
+    "previous_task_type": 2,
+    "source_policy": "aggressive",
+    "previous_contact": false,
+    "home_distance": 848.3668898821636,
+    "mission_energy_mean": 21.809935345533404,
+    "mission_energy_max": 28.072387189671964,
+    "m_mean": -13.03348080998427,
+    "m_max": -19.29593265412283,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": false,
+    "local_action": null,
+    "energy_interventions": 3
+  },
+  {
+    "state_id": "ec9407b45b67a8a60a48831612b521598f266ff8e40497fab94cb5da0b6ee51d",
+    "trajectory_id": "r04_soc20",
+    "energy": 2.9010518410591293,
+    "position": [
+      2276.9208984375,
+      2596.56005859375,
+      199.11476135253906
+    ],
+    "velocity": [
+      10.686767578125,
+      9.519001007080078,
+      -1.5437393188476562
+    ],
+    "previous_task_type": 2,
+    "source_policy": "soc20",
+    "previous_contact": false,
+    "home_distance": 848.2859717679372,
+    "mission_energy_mean": 22.645350121894364,
+    "mission_energy_max": 28.185471597516425,
+    "m_mean": -19.744298280835235,
+    "m_max": -25.284419756457297,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": false,
+    "local_action": null,
+    "energy_interventions": 3
+  },
+  {
+    "state_id": "c122a43b8823e5bac0a384b961f43c1c89c88e43d7f5cb85161f6816ab13308c",
+    "trajectory_id": "r04_soc30",
+    "energy": 41.15847637735263,
+    "position": [
+      2576.69677734375,
+      2297.159423828125,
+      201.66236877441406
+    ],
+    "velocity": [
+      6.095312118530273,
+      6.025109767913818,
+      -5.0
+    ],
+    "previous_task_type": 1,
+    "source_policy": "soc30",
+    "previous_contact": false,
+    "home_distance": 424.6166877472812,
+    "mission_energy_mean": null,
+    "mission_energy_max": null,
+    "m_mean": null,
+    "m_max": null,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": true,
+    "local_action": "R",
+    "energy_interventions": 1
+  },
+  {
+    "state_id": "f28492be5d60d040d62b4922b50c88cffa2a945b7b1d09935fd54ce1de351790",
+    "trajectory_id": "r04_soc40",
+    "energy": 37.37710943714985,
+    "position": [
+      2777.665283203125,
+      2096.16162109375,
+      199.18130493164062
+    ],
+    "velocity": [
+      8.75456714630127,
+      10.040924072265625,
+      -3.612905740737915
+    ],
+    "previous_task_type": 0,
+    "source_policy": "soc40",
+    "previous_contact": false,
+    "home_distance": 140.42835146397437,
+    "mission_energy_mean": 17.353028810908494,
+    "mission_energy_max": 28.079083157984464,
+    "m_mean": 20.024080626241354,
+    "m_max": 9.298026279165384,
+    "local_delta": 0.31702182890910335,
+    "all_cycle_alternatives_viable": true,
+    "R_viable": true,
+    "local_action": "C",
+    "energy_interventions": 0
+  },
+  {
+    "state_id": "e91ce9bea99acdeaa0f465f1f2a0d0a1748cff9083f4d82e23f996e85e6514ba",
+    "trajectory_id": "r04_soc40",
+    "energy": 33.12259870866854,
+    "position": [
+      2777.74365234375,
+      2096.06298828125,
+      199.16879272460938
+    ],
+    "velocity": [
+      8.628702163696289,
+      10.192060470581055,
+      -3.247006416320801
+    ],
+    "previous_task_type": 0,
+    "source_policy": "soc40",
+    "previous_contact": false,
+    "home_distance": 140.30377492802575,
+    "mission_energy_mean": 17.391386962650586,
+    "mission_energy_max": 28.23220495926401,
+    "m_mean": 15.731211746017955,
+    "m_max": 4.890393749404531,
+    "local_delta": 0.3133653867304471,
+    "all_cycle_alternatives_viable": true,
+    "R_viable": true,
+    "local_action": "C",
+    "energy_interventions": 0
+  },
+  {
+    "state_id": "e22b63de2339a1210d6d6bd375b8195707745251014fed640ae214b7745e47f3",
+    "trajectory_id": "r04_aggressive",
+    "energy": 8.171513439937746,
+    "position": [
+      2777.8515625,
+      2096.2138671875,
+      199.12181091308594
+    ],
+    "velocity": [
+      8.66882038116455,
+      10.119697570800781,
+      -3.261066436767578
+    ],
+    "previous_task_type": 0,
+    "source_policy": "aggressive",
+    "previous_contact": false,
+    "home_distance": 140.32883787353785,
+    "mission_energy_mean": 17.372506113747445,
+    "mission_energy_max": 28.161733222400017,
+    "m_mean": -9.200992673809699,
+    "m_max": -19.99021978246227,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": true,
+    "local_action": "R",
+    "energy_interventions": 3
+  },
+  {
+    "state_id": "e6d0288d4433d69d1e07a488cd87f2df4b332da742452eeab1db1303bf3a5e7d",
+    "trajectory_id": "r05_soc20",
+    "energy": 13.046476018177364,
+    "position": [
+      2777.90771484375,
+      2095.9541015625,
+      199.63241577148438
+    ],
+    "velocity": [
+      7.2095136642456055,
+      8.772921562194824,
+      -4.369661808013916
+    ],
+    "previous_task_type": 0,
+    "source_policy": "soc20",
+    "previous_contact": false,
+    "home_distance": 140.1076707866371,
+    "mission_energy_mean": 17.08204420624401,
+    "mission_energy_max": 27.865996001374448,
+    "m_mean": -4.035568188066646,
+    "m_max": -14.819519983197084,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": true,
+    "local_action": "R",
+    "energy_interventions": 2
+  },
+  {
+    "state_id": "2ca82d331a406221210689b4ea1c379e8d7c14f597c77fe404b6b5de4e260990",
+    "trajectory_id": "r05_soc20",
+    "energy": 2.6800642951081874,
+    "position": [
+      2277.056884765625,
+      2596.794677734375,
+      199.0684814453125
+    ],
+    "velocity": [
+      10.699803352355957,
+      9.308350563049316,
+      -1.5319054126739502
+    ],
+    "previous_task_type": 2,
+    "source_policy": "soc20",
+    "previous_contact": false,
+    "home_distance": 848.3543807321485,
+    "mission_energy_mean": 22.511641849652523,
+    "mission_energy_max": 27.862245603434843,
+    "m_mean": -19.831577554544335,
+    "m_max": -25.182181308326655,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": false,
+    "local_action": null,
+    "energy_interventions": 3
+  },
+  {
+    "state_id": "dba324758d6c1c90831196b212cdfc38cd78cd2f2f9daafbb75bc467425ef650",
+    "trajectory_id": "r05_soc30",
+    "energy": 23.63404728552545,
+    "position": [
+      2576.751953125,
+      2297.31982421875,
+      201.71182250976562
+    ],
+    "velocity": [
+      5.978360176086426,
+      6.015851974487305,
+      -5.0
+    ],
+    "previous_task_type": 1,
+    "source_policy": "soc30",
+    "previous_contact": false,
+    "home_distance": 424.6897528117149,
+    "mission_energy_mean": null,
+    "mission_energy_max": null,
+    "m_mean": null,
+    "m_max": null,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": true,
+    "local_action": "R",
+    "energy_interventions": 1
+  },
+  {
+    "state_id": "d3a60c37434cbb5a20969c3decac229a9d3e14feeb8fbd2544e1c498fc9e84d2",
+    "trajectory_id": "r05_soc40",
+    "energy": 44.950081075295735,
+    "position": [
+      2777.816162109375,
+      2096.25390625,
+      199.12063598632812
+    ],
+    "velocity": [
+      8.761524200439453,
+      10.277121543884277,
+      -3.117767810821533
+    ],
+    "previous_task_type": 0,
+    "source_policy": "soc40",
+    "previous_contact": false,
+    "home_distance": 140.38206607508616,
+    "mission_energy_mean": 17.504079531779364,
+    "mission_energy_max": 28.50784952075597,
+    "m_mean": 27.44600154351637,
+    "m_max": 16.442231554539767,
+    "local_delta": 0.3118467410651382,
+    "all_cycle_alternatives_viable": true,
+    "R_viable": true,
+    "local_action": "C",
+    "energy_interventions": 0
+  },
+  {
+    "state_id": "c40c354c98252ad2f90b791fd97fe6d646aeed2e6c005ec1ecc7ce921a52df90",
+    "trajectory_id": "r05_soc40",
+    "energy": 26.731924663209096,
+    "position": [
+      2277.575439453125,
+      2595.889404296875,
+      199.43536376953125
+    ],
+    "velocity": [
+      9.363192558288574,
+      9.937151908874512,
+      -1.6917475461959839
+    ],
+    "previous_task_type": 2,
+    "source_policy": "soc40",
+    "previous_contact": false,
+    "home_distance": 847.3487193106819,
+    "mission_energy_mean": 22.285452598853652,
+    "mission_energy_max": 28.49553579694887,
+    "m_mean": 4.446472064355444,
+    "m_max": -1.7636111337397757,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": true,
+    "local_action": "R",
+    "energy_interventions": 1
+  },
+  {
+    "state_id": "dcf5567bb537b5b7527cdde71e21b15feffb85a63d1fb30423239c4da54af77c",
+    "trajectory_id": "r06_aggressive",
+    "energy": 16.343677400421182,
+    "position": [
+      2576.64501953125,
+      2296.939453125,
+      201.5801544189453
+    ],
+    "velocity": [
+      6.396141529083252,
+      5.954068183898926,
+      -5.0
+    ],
+    "previous_task_type": 1,
+    "source_policy": "aggressive",
+    "previous_contact": false,
+    "home_distance": 424.4994462721447,
+    "mission_energy_mean": 23.255502059311407,
+    "mission_energy_max": 41.49871970474793,
+    "m_mean": -6.911824658890225,
+    "m_max": -25.155042304326745,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": true,
+    "local_action": "R",
+    "energy_interventions": 2
+  },
+  {
+    "state_id": "e7cb6db63d62a05c06411fa147612cfbf40918a374adb52e640ab793afa4e31a",
+    "trajectory_id": "r08_soc20",
+    "energy": 7.9320910823927075,
+    "position": [
+      2777.68896484375,
+      2096.033935546875,
+      199.18600463867188
+    ],
+    "velocity": [
+      8.626374244689941,
+      10.225447654724121,
+      -3.3245773315429688
+    ],
+    "previous_task_type": 0,
+    "source_policy": "soc20",
+    "previous_contact": false,
+    "home_distance": 140.3236518902392,
+    "mission_energy_mean": 17.385063368207813,
+    "mission_energy_max": 28.16055622438308,
+    "m_mean": -9.452972285815106,
+    "m_max": -20.22846514199037,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": true,
+    "local_action": "R",
+    "energy_interventions": 3
+  },
+  {
+    "state_id": "ca099008d9ac9a5e19cf905d4c6a542227cbe87e0d98eaa6bc66aba5fbaf2e56",
+    "trajectory_id": "r08_soc20",
+    "energy": 19.58757519629068,
+    "position": [
+      2277.5732421875,
+      2595.896728515625,
+      199.3985595703125
+    ],
+    "velocity": [
+      9.461758613586426,
+      9.93014907836914,
+      -1.8235609531402588
+    ],
+    "previous_task_type": 2,
+    "source_policy": "soc20",
+    "previous_contact": false,
+    "home_distance": 847.3554574761972,
+    "mission_energy_mean": 22.15610141095652,
+    "mission_energy_max": 28.183639633629127,
+    "m_mean": -2.568526214665841,
+    "m_max": -8.596064437338448,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": true,
+    "local_action": "R",
+    "energy_interventions": 2
+  },
+  {
+    "state_id": "6b111ac129a88f85c6acc32554d416951371b64c4b7b997a368b1cc9ffe1719d",
+    "trajectory_id": "r08_soc30",
+    "energy": 25.071963005696933,
+    "position": [
+      2277.712890625,
+      2596.038818359375,
+      199.3794403076172
+    ],
+    "velocity": [
+      9.436572074890137,
+      9.919591903686523,
+      -1.7820069789886475
+    ],
+    "previous_task_type": 2,
+    "source_policy": "soc30",
+    "previous_contact": false,
+    "home_distance": 847.356135402857,
+    "mission_energy_mean": 22.156479097865212,
+    "mission_energy_max": 28.38510688615665,
+    "m_mean": 2.915483907831721,
+    "m_max": -3.313143880459716,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": true,
+    "local_action": "R",
+    "energy_interventions": 1
+  },
+  {
+    "state_id": "adf400836b8d67249312292f351f45c4b1ea0745753e6189843b7231174dbccc",
+    "trajectory_id": "r08_aggressive",
+    "energy": 29.683771868216322,
+    "position": [
+      2576.660888671875,
+      2297.0517578125,
+      201.7323455810547
+    ],
+    "velocity": [
+      5.839992046356201,
+      6.020780563354492,
+      -5.0
+    ],
+    "previous_task_type": 1,
+    "source_policy": "aggressive",
+    "previous_contact": false,
+    "home_distance": 424.56726711093137,
+    "mission_energy_mean": 23.112323372842543,
+    "mission_energy_max": 41.42970919287411,
+    "m_mean": 6.5714484953737795,
+    "m_max": -11.745937324657785,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": true,
+    "local_action": "R",
+    "energy_interventions": 1
+  },
+  {
+    "state_id": "1c4767a4de0e74e1e3d2bf29bd55c96c16faf719af0f04b287149b9428e1e2e4",
+    "trajectory_id": "r08_aggressive",
+    "energy": 18.60886201552058,
+    "position": [
+      2577.682861328125,
+      2296.063720703125,
+      200.62608337402344
+    ],
+    "velocity": [
+      7.0462822914123535,
+      6.762452125549316,
+      -5.0
+    ],
+    "previous_task_type": 1,
+    "source_policy": "aggressive",
+    "previous_contact": false,
+    "home_distance": 423.1427312760068,
+    "mission_energy_mean": 24.08204609383384,
+    "mission_energy_max": 43.91573156335692,
+    "m_mean": -5.47318407831326,
+    "m_max": -25.306869547836342,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": true,
+    "local_action": "R",
+    "energy_interventions": 1
+  },
+  {
+    "state_id": "44a5dbdc8e5d7628b349fd6476382a91be620c5f0ae1ca5f326e932ec267e800",
+    "trajectory_id": "r10_soc20",
+    "energy": 27.85286460355938,
+    "position": [
+      2576.5966796875,
+      2296.812255859375,
+      201.56011962890625
+    ],
+    "velocity": [
+      6.616133213043213,
+      5.917795181274414,
+      -5.0
+    ],
+    "previous_task_type": 1,
+    "source_policy": "soc20",
+    "previous_contact": false,
+    "home_distance": 424.44495989260736,
+    "mission_energy_mean": null,
+    "mission_energy_max": null,
+    "m_mean": null,
+    "m_max": null,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": true,
+    "local_action": "R",
+    "energy_interventions": 1
+  },
+  {
+    "state_id": "eeca78c80a89fba9f8003b755a3919b7d76a2ef243077c8855d94c2c808bc40c",
+    "trajectory_id": "r10_soc30",
+    "energy": 31.708297887506223,
+    "position": [
+      2777.59228515625,
+      2096.071044921875,
+      199.20358276367188
+    ],
+    "velocity": [
+      8.690509796142578,
+      10.174452781677246,
+      -3.5236222743988037
+    ],
+    "previous_task_type": 0,
+    "source_policy": "soc30",
+    "previous_contact": false,
+    "home_distance": 140.4194431420167,
+    "mission_energy_mean": 17.338091077001508,
+    "mission_energy_max": 28.05451662774739,
+    "m_mean": 14.370206810504715,
+    "m_max": 3.6537812597588335,
+    "local_delta": 0.31494611948975215,
+    "all_cycle_alternatives_viable": true,
+    "R_viable": true,
+    "local_action": "C",
+    "energy_interventions": 0
+  },
+  {
+    "state_id": "54701b1877784828e4052491b6fa9317968e13e03b58e0af09af52cb9da91378",
+    "trajectory_id": "r10_soc30",
+    "energy": 13.942566968940373,
+    "position": [
+      2277.760498046875,
+      2596.092041015625,
+      199.36016845703125
+    ],
+    "velocity": [
+      9.532686233520508,
+      9.951746940612793,
+      -1.7622454166412354
+    ],
+    "previous_task_type": 2,
+    "source_policy": "soc30",
+    "previous_contact": false,
+    "home_distance": 847.3597514983379,
+    "mission_energy_mean": 22.22144107937227,
+    "mission_energy_max": 28.255874613944556,
+    "m_mean": -8.278874110431897,
+    "m_max": -14.313307645004183,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": true,
+    "local_action": "R",
+    "energy_interventions": 3
+  },
+  {
+    "state_id": "219450eb8ce979b67eb84a125fb3131e5c62e39fd7dc6c375c824e4cf79d995e",
+    "trajectory_id": "r10_aggressive",
+    "energy": 7.812139465697654,
+    "position": [
+      2277.49853515625,
+      2595.796875,
+      199.44522094726562
+    ],
+    "velocity": [
+      9.307663917541504,
+      9.920300483703613,
+      -1.7761703729629517
+    ],
+    "previous_task_type": 2,
+    "source_policy": "aggressive",
+    "previous_contact": false,
+    "home_distance": 847.3383262773067,
+    "mission_energy_mean": 22.002683998022246,
+    "mission_energy_max": 28.275509882772255,
+    "m_mean": -14.19054453232459,
+    "m_max": -20.4633704170746,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": false,
+    "local_action": null,
+    "energy_interventions": 3
+  },
+  {
+    "state_id": "43b1138e2273f0018a0064a2f2c697fb329fb705aba022aec2a2832675436766",
+    "trajectory_id": "r11_soc20",
+    "energy": 12.709829166042866,
+    "position": [
+      2576.7607421875,
+      2297.278076171875,
+      201.66920471191406
+    ],
+    "velocity": [
+      5.9425883293151855,
+      6.032061576843262,
+      -5.0
+    ],
+    "previous_task_type": 1,
+    "source_policy": "soc20",
+    "previous_contact": false,
+    "home_distance": 424.6540807474917,
+    "mission_energy_mean": null,
+    "mission_energy_max": null,
+    "m_mean": null,
+    "m_max": null,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": true,
+    "local_action": "R",
+    "energy_interventions": 2
+  },
+  {
+    "state_id": "94136a4f5ab5a9e16ae4a5c7a7527cff77065eb19486f86e9112c3fd317a6b63",
+    "trajectory_id": "r12_soc20",
+    "energy": 29.20322809384795,
+    "position": [
+      2576.658447265625,
+      2296.86962890625,
+      201.53054809570312
+    ],
+    "velocity": [
+      6.551847457885742,
+      5.893959045410156,
+      -5.0
+    ],
+    "previous_task_type": 1,
+    "source_policy": "soc20",
+    "previous_contact": false,
+    "home_distance": 424.4408283373661,
+    "mission_energy_mean": 24.038100006674963,
+    "mission_energy_max": 44.32777908451796,
+    "m_mean": 5.165128087172988,
+    "m_max": -15.124550990670006,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": true,
+    "local_action": "R",
+    "energy_interventions": 1
+  },
+  {
+    "state_id": "3250e362de3f42f65b5536415dc9d6c80a02034fdb609491bc878bce9c3e2830",
+    "trajectory_id": "r12_soc30",
+    "energy": 25.88672557152983,
+    "position": [
+      2777.372802734375,
+      2095.8251953125,
+      199.29208374023438
+    ],
+    "velocity": [
+      8.686136245727539,
+      10.225522994995117,
+      -3.6390461921691895
+    ],
+    "previous_task_type": 0,
+    "source_policy": "soc30",
+    "previous_contact": false,
+    "home_distance": 140.41122042310977,
+    "mission_energy_mean": 17.339379982619533,
+    "mission_energy_max": 28.013952854665945,
+    "m_mean": 8.547345588910296,
+    "m_max": -2.127227283136115,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": true,
+    "local_action": "R",
+    "energy_interventions": 1
+  },
+  {
+    "state_id": "17c3a492e79b12ec1fb813ced8406048e6261e18ae5f8169edf6eadcbd70b842",
+    "trajectory_id": "r12_soc40",
+    "energy": 33.63245834075189,
+    "position": [
+      2576.743408203125,
+      2297.152099609375,
+      201.5613555908203
+    ],
+    "velocity": [
+      6.325315475463867,
+      5.964036464691162,
+      -5.0
+    ],
+    "previous_task_type": 1,
+    "source_policy": "soc40",
+    "previous_contact": false,
+    "home_distance": 424.5778710693686,
+    "mission_energy_mean": 22.661601667236425,
+    "mission_energy_max": 39.68063596101247,
+    "m_mean": 10.970856673515463,
+    "m_max": -6.0481776202605815,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": true,
+    "local_action": "R",
+    "energy_interventions": 1
+  },
+  {
+    "state_id": "ba8a126b54ed17036086c59fd5c05b7d415881ec4e02a052668806342ce4301c",
+    "trajectory_id": "r13_aggressive",
+    "energy": 9.867005216918416,
+    "position": [
+      2577.6630859375,
+      2295.746826171875,
+      200.03457641601562
+    ],
+    "velocity": [
+      6.908635139465332,
+      8.032115936279297,
+      -4.826930999755859
+    ],
+    "previous_task_type": 1,
+    "source_policy": "aggressive",
+    "previous_contact": false,
+    "home_distance": 422.9347420005849,
+    "mission_energy_mean": null,
+    "mission_energy_max": null,
+    "m_mean": null,
+    "m_max": null,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": true,
+    "local_action": "R",
+    "energy_interventions": 3
+  },
+  {
+    "state_id": "356f2e583e7741648400910765cf388c4e84ae56d2d8213d27d724fab46dfba9",
+    "trajectory_id": "r13_aggressive",
+    "energy": 1.7027651322385537,
+    "position": [
+      2777.70849609375,
+      2096.03076171875,
+      199.1827392578125
+    ],
+    "velocity": [
+      8.614672660827637,
+      10.21315860748291,
+      -3.2855563163757324
+    ],
+    "previous_task_type": 0,
+    "source_policy": "aggressive",
+    "previous_contact": false,
+    "home_distance": 140.30725883861612,
+    "mission_energy_mean": 17.44649888439859,
+    "mission_energy_max": 28.31209845082691,
+    "m_mean": -15.743733752160036,
+    "m_max": -26.609333318588355,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": false,
+    "local_action": null,
+    "energy_interventions": 3
+  },
+  {
+    "state_id": "9f69540d8fca58dedd130a3131e21823d368edba3ca4dfeba9562eab66414c13",
+    "trajectory_id": "r14_aggressive",
+    "energy": 39.232652014610856,
+    "position": [
+      2777.58642578125,
+      2095.911376953125,
+      199.22833251953125
+    ],
+    "velocity": [
+      8.881634712219238,
+      10.422470092773438,
+      -3.0081357955932617
+    ],
+    "previous_task_type": 0,
+    "source_policy": "aggressive",
+    "previous_contact": false,
+    "home_distance": 140.31438944030032,
+    "mission_energy_mean": 17.7138676148176,
+    "mission_energy_max": 29.229360555023117,
+    "m_mean": 21.518784399793255,
+    "m_max": 10.00329145958774,
+    "local_delta": 0.3037116669299922,
+    "all_cycle_alternatives_viable": true,
+    "R_viable": true,
+    "local_action": "C",
+    "energy_interventions": 0
+  },
+  {
+    "state_id": "4f1a091ccd3d4878d46afe1e969c89da97476ceba7c3d906f3d0267076ad81f0",
+    "trajectory_id": "r14_aggressive",
+    "energy": 20.240426749603962,
+    "position": [
+      2277.12353515625,
+      2596.8681640625,
+      199.05296325683594
+    ],
+    "velocity": [
+      10.694962501525879,
+      9.266149520874023,
+      -1.5139728784561157
+    ],
+    "previous_task_type": 2,
+    "source_policy": "aggressive",
+    "previous_contact": false,
+    "home_distance": 848.358729555151,
+    "mission_energy_mean": 21.84679123289074,
+    "mission_energy_max": 28.060965674131936,
+    "m_mean": -1.6063644832867787,
+    "m_max": -7.820538924527973,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": true,
+    "local_action": "R",
+    "energy_interventions": 2
+  },
+  {
+    "state_id": "fd020d03c39bdec4445f37e8e7bca4dc830aa9949f7701522b198272bfd660d1",
+    "trajectory_id": "r14_aggressive",
+    "energy": 2.424384313479939,
+    "position": [
+      2276.766357421875,
+      2596.544189453125,
+      199.1075439453125
+    ],
+    "velocity": [
+      10.697953224182129,
+      9.388650894165039,
+      -1.595184564590454
+    ],
+    "previous_task_type": 2,
+    "source_policy": "aggressive",
+    "previous_contact": false,
+    "home_distance": 848.384696930684,
+    "mission_energy_mean": 21.813191812209777,
+    "mission_energy_max": 28.069724468045727,
+    "m_mean": -19.388807498729836,
+    "m_max": -25.645340154565787,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": false,
+    "local_action": null,
+    "energy_interventions": 3
+  },
+  {
+    "state_id": "7e24fc4d489b1577b5f668d1393ffd9c9173d2df0fd3f31c5e10f49427394875",
+    "trajectory_id": "r15_soc40",
+    "energy": 31.21727924622857,
+    "position": [
+      2276.792724609375,
+      2596.623291015625,
+      199.09593200683594
+    ],
+    "velocity": [
+      10.571621894836426,
+      9.40752124786377,
+      -1.5849463939666748
+    ],
+    "previous_task_type": 2,
+    "source_policy": "soc40",
+    "previous_contact": false,
+    "home_distance": 848.4215849478564,
+    "mission_energy_mean": 21.798155337711716,
+    "mission_energy_max": 28.023794635645174,
+    "m_mean": 9.419123908516855,
+    "m_max": 3.193484610583397,
+    "local_delta": 0.4703792314941162,
+    "all_cycle_alternatives_viable": true,
+    "R_viable": true,
+    "local_action": "C",
+    "energy_interventions": 0
+  },
+  {
+    "state_id": "b8bc7a9c7ec928e2bd852f89a16d2fa166d99bfdd2cba97cba08a1fa18ca30e5",
+    "trajectory_id": "r16_soc20",
+    "energy": 9.876237616022765,
+    "position": [
+      2576.77392578125,
+      2297.1220703125,
+      201.56724548339844
+    ],
+    "velocity": [
+      6.155535697937012,
+      5.923673152923584,
+      -5.0
+    ],
+    "previous_task_type": 1,
+    "source_policy": "soc20",
+    "previous_contact": false,
+    "home_distance": 424.5350786581791,
+    "mission_energy_mean": 23.707091872831512,
+    "mission_energy_max": 42.831855238630176,
+    "m_mean": -13.830854256808747,
+    "m_max": -32.95561762260741,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": true,
+    "local_action": "R",
+    "energy_interventions": 3
+  },
+  {
+    "state_id": "4550abd199f52d9168b9c0dfbae014e6d5fdbd69e21a2acf2b038c9c90d34af7",
+    "trajectory_id": "r19_soc30",
+    "energy": 35.41878648620699,
+    "position": [
+      2576.481689453125,
+      2297.177490234375,
+      202.0519256591797
+    ],
+    "velocity": [
+      5.579126358032227,
+      6.188760280609131,
+      -5.0
+    ],
+    "previous_task_type": 1,
+    "source_policy": "soc30",
+    "previous_contact": false,
+    "home_distance": 424.78469362506706,
+    "mission_energy_mean": null,
+    "mission_energy_max": null,
+    "m_mean": null,
+    "m_max": null,
+    "local_delta": null,
+    "all_cycle_alternatives_viable": false,
+    "R_viable": true,
+    "local_action": "R",
+    "energy_interventions": 1
+  }
+]

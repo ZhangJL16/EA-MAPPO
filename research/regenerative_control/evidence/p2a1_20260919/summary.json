@@ -1,0 +1,245 @@
+{
+  "n_states": 65,
+  "n_occupancy_occurrences": 885,
+  "n_source_trajectories": 120,
+  "energy_range": [
+    1.7027651322385537,
+    56.02057186867138
+  ],
+  "position_min": [
+    2276.672119140625,
+    2095.8076171875,
+    199.05296325683594
+  ],
+  "position_max": [
+    2777.90771484375,
+    2596.8681640625,
+    202.29200744628906
+  ],
+  "speed_range": [
+    9.359129435745814,
+    14.394495910806027
+  ],
+  "velocity_min": [
+    5.087061405181885,
+    5.822319030761719,
+    -5.0
+  ],
+  "velocity_max": [
+    10.699803352355957,
+    10.422470092773438,
+    -1.334105372428894
+  ],
+  "policies": {
+    "after_1": 3,
+    "after_2": 5,
+    "aggressive": 18,
+    "soc20": 18,
+    "soc30": 14,
+    "soc40": 7
+  },
+  "source_failure_trajectories": 70,
+  "branch_table": [
+    {
+      "branch": "C100",
+      "attempted": 65,
+      "success": 54,
+      "failure": 11,
+      "censored": 0,
+      "collision": 0,
+      "energy_depletion": 11,
+      "navigation_timeout": 0
+    },
+    {
+      "branch": "C300",
+      "attempted": 65,
+      "success": 46,
+      "failure": 19,
+      "censored": 0,
+      "collision": 0,
+      "energy_depletion": 19,
+      "navigation_timeout": 0
+    },
+    {
+      "branch": "C600",
+      "attempted": 65,
+      "success": 28,
+      "failure": 37,
+      "censored": 0,
+      "collision": 0,
+      "energy_depletion": 37,
+      "navigation_timeout": 0
+    },
+    {
+      "branch": "R",
+      "attempted": 65,
+      "success": 54,
+      "failure": 11,
+      "censored": 0,
+      "collision": 0,
+      "energy_depletion": 11,
+      "navigation_timeout": 0
+    }
+  ],
+  "closure": {
+    "successful_D_successors": 128,
+    "represented_D_successors": 62,
+    "canonical_H": 54,
+    "failure_absorbing": 78,
+    "closure_rate_D": 0.484375,
+    "H_forced_pose_velocity_energy_support": [
+      true,
+      true,
+      true
+    ]
+  },
+  "rho_after1": 0.008812095179922685,
+  "common_viable_states": 15,
+  "undefined_local_delta": 50,
+  "local_delta_range": [
+    -0.0019135877626927922,
+    0.4703792314941162
+  ],
+  "mission_interventions": 98,
+  "abstraction": [
+    {
+      "abstraction": "z0_e",
+      "total_bins": 25,
+      "tested_bins": 12,
+      "tested_states": 47,
+      "coverage": 0.7230769230769231,
+      "stable_states": 0,
+      "stable_fraction_among_tested": 0.0,
+      "mixed_success_bins": 8,
+      "adequate_support": false,
+      "stable_at_declared_tolerances": false
+    },
+    {
+      "abstraction": "z1_e_distance",
+      "total_bins": 44,
+      "tested_bins": 4,
+      "tested_states": 13,
+      "coverage": 0.2,
+      "stable_states": 3,
+      "stable_fraction_among_tested": 0.23076923076923078,
+      "mixed_success_bins": 0,
+      "adequate_support": false,
+      "stable_at_declared_tolerances": false
+    },
+    {
+      "abstraction": "z2_e_distance_speed",
+      "total_bins": 53,
+      "tested_bins": 3,
+      "tested_states": 9,
+      "coverage": 0.13846153846153847,
+      "stable_states": 6,
+      "stable_fraction_among_tested": 0.6666666666666666,
+      "mixed_success_bins": 0,
+      "adequate_support": false,
+      "stable_at_declared_tolerances": false
+    },
+    {
+      "abstraction": "z3_e_position_velocity",
+      "total_bins": 52,
+      "tested_bins": 3,
+      "tested_states": 9,
+      "coverage": 0.13846153846153847,
+      "stable_states": 6,
+      "stable_fraction_among_tested": 0.6666666666666666,
+      "mixed_success_bins": 0,
+      "adequate_support": false,
+      "stable_at_declared_tolerances": false
+    }
+  ],
+  "fits": {
+    "energy": {
+      "common_viable": {
+        "n": 15,
+        "accuracy": 0.9333333333333333,
+        "threshold": "-inf",
+        "positive": 14,
+        "negative": 1,
+        "constant_accuracy": 0.9333333333333333,
+        "fixed_zero_accuracy": 0.9333333333333333,
+        "resubstitution_only": true
+      },
+      "viability_constrained": {
+        "n": 43,
+        "accuracy": 0.9534883720930233,
+        "threshold": 29.683771868216322,
+        "positive": 14,
+        "negative": 29,
+        "constant_accuracy": 0.6744186046511628,
+        "fixed_zero_accuracy": 0.32558139534883723,
+        "resubstitution_only": true
+      }
+    },
+    "m_mean": {
+      "common_viable": {
+        "n": 15,
+        "accuracy": 0.9333333333333333,
+        "threshold": "-inf",
+        "positive": 14,
+        "negative": 1,
+        "constant_accuracy": 0.9333333333333333,
+        "fixed_zero_accuracy": 0.9333333333333333,
+        "resubstitution_only": true
+      },
+      "viability_constrained": {
+        "n": 43,
+        "accuracy": 0.9534883720930233,
+        "threshold": 10.970856673515463,
+        "positive": 14,
+        "negative": 29,
+        "constant_accuracy": 0.6744186046511628,
+        "fixed_zero_accuracy": 0.7209302325581395,
+        "resubstitution_only": true
+      }
+    },
+    "m_max": {
+      "common_viable": {
+        "n": 15,
+        "accuracy": 0.9333333333333333,
+        "threshold": "-inf",
+        "positive": 14,
+        "negative": 1,
+        "constant_accuracy": 0.9333333333333333,
+        "fixed_zero_accuracy": 0.9333333333333333,
+        "resubstitution_only": true
+      },
+      "viability_constrained": {
+        "n": 43,
+        "accuracy": 0.9767441860465116,
+        "threshold": -1.4755666279048185,
+        "positive": 14,
+        "negative": 29,
+        "constant_accuracy": 0.6744186046511628,
+        "fixed_zero_accuracy": 0.9767441860465116,
+        "resubstitution_only": true
+      }
+    }
+  },
+  "sign_pairs": {
+    "m_mean": {
+      "comparable_pairs": 4,
+      "opposite_sign_pairs": 0,
+      "velocity_matched_pairs": 3,
+      "velocity_matched_opposite": 0,
+      "fraction": 0.0,
+      "opposite_pairs": [],
+      "pairs_not_independent": true
+    },
+    "m_max": {
+      "comparable_pairs": 5,
+      "opposite_sign_pairs": 0,
+      "velocity_matched_pairs": 3,
+      "velocity_matched_opposite": 0,
+      "fraction": 0.0,
+      "opposite_pairs": [],
+      "pairs_not_independent": true
+    }
+  },
+  "oracle_solved": false,
+  "rho_star": null,
+  "neural_updates": 0
+}

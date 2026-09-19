@@ -1,0 +1,9 @@
+{
+  "focused_tests": 5,
+  "focused_tests_passed": 5,
+  "test_command": "PYTHONPATH=. .venv/bin/pytest -q tests/test_regenerative_p2a1.py",
+  "raw_audit": "pass",
+  "figure_visual_qa": "all three final PNGs inspected; labels, legends and zero line readable; one small negative contrast explicitly reported in text",
+  "training_updates": 0,
+  "background_run_remaining": false
+}

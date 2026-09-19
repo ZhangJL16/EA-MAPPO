@@ -1,5 +1,20 @@
 # Current task plan
 
+## P2-A1 only — bounded census complete, hypothesis unresolved (2026-09-19)
+
+- [x] User P1.1 PASS; frozen SAC and post-delivery semantics retained.
+- [x] Fixed six collectors, 20 rounds: 885 observations / 65 distinct physical keys.
+- [ ] 200 distinct-state target NOT reached; no unapproved budget expansion.
+- [x] All 260 exact C100/C300/C600/R branches; RNG access prohibited.
+- [x] Actual failures retained; separate labelled energy/capacity diagnostics.
+- [x] Raw audit, five tests, closure/abstraction analysis, three local-Delta plots.
+- [ ] No sufficient abstraction: sparse bins; exact D closure only 48.44%.
+- [ ] No systematic matched-state sign reversal: 0/4 mean, 0/5 max pairs.
+- [ ] Full oracle / high-level training: NOT STARTED; stop for user review.
+
+Report: `docs/REGENERATIVE_CONTROL_P2A1_20260919.md`. No rho-star or 98% policy-value
+kill decision is claimed. Historical plans below do not authorize extra work.
+
 ## P1.1 only — remove task-screening confound (2026-09-19)
 
 - [x] Accept user P1 PASS; preserve historical P1 source/evidence.

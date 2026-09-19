@@ -1,0 +1,245 @@
+"""Bounded reachable-state census and explicit task branching. No solver/learner."""
+from __future__ import annotations
+import argparse
+import copy
+from dataclasses import replace
+import hashlib
+import json
+import os
+from pathlib import Path
+import pickle
+from concurrent.futures import ProcessPoolExecutor
+import multiprocessing as mp
+
+import cloudpickle
+import numpy as np
+import torch
+
+from research.regenerative_control.continuing import Config
+from research.regenerative_control.continuing_p11 import PostDeliveryUAV
+from research.regenerative_control.qualify import ROOT, MODEL, EXPECTED, sha, atomic, actor_for
+
+POLICIES=('after_1','after_2','soc20','soc30','soc40','aggressive')
+ACTOR=None
+
+
+def digest(value):
+    return hashlib.sha256(json.dumps(value,sort_keys=True,allow_nan=False).encode()).hexdigest()
+
+
+def physical(e):
+    a=e.base.agent
+    return dict(energy=float(a.energy),position=a.pos.tolist(),velocity=a.vel.tolist(),
+        prev_pos=a.prev_pos.tolist(),last_pos=a.last_pos.tolist(),
+        previous_contact=bool(a.collided),prev_collided=bool(a.prev_collided),
+        goal=a.goal.tolist(),phase=e.phase,map_id=e.map_hash)
+
+
+def compact(e):
+    """Remove logging-only history from a COPY, never reset physical state/RNG."""
+    c=copy.copy(e); c.base=copy.copy(e.base)
+    c.events=e.events[-1:]; c.cycles=[]
+    c.base.trajectory_log=[]
+    c.base.agent_paths=[[e.base.agent.pos.copy()]]
+    c.base.completed_goal_records=[]
+    return cloudpickle.dumps(c)
+
+
+class ForbiddenRNG:
+    def __getattr__(self,name):
+        raise RuntimeError('task RNG access forbidden in enumeration')
+    def __getstate__(self): return {}
+    def __setstate__(self,state): pass
+
+
+class EnumeratedUAV(PostDeliveryUAV):
+    def state(self, *, full=False):
+        # No task_rng or future-process tape in decision/outcome features.
+        result=super().state(full=False)
+        if full: result.update(map=self.base.static_obstacle_layout(),reset_calls=self.base.reset_calls)
+        return result
+
+    def _draw_task(self):
+        if self.task is not None or self.forced_type not in (100,300,600):
+            raise RuntimeError('exact branch requires one explicit task type')
+        d=self.forced_type; self.forced_type=None
+        h=self.base.charger_position
+        self.task=dict(index=(100,300,600).index(d),value=1.,pickup=(h-[d,0,0]).tolist(),
+                       dropoff=(h+[-d,d,0]).tolist())
+        self.task_draw_count+=1; self.phase='task_execution'; self._event('task_draw')
+
+
+def enumerated(payload,d=None,energy_intervention=False):
+    e=pickle.loads(payload)
+    e.__class__=EnumeratedUAV
+    e.task_rng=ForbiddenRNG()
+    e.forced_type=d
+    # Observation window is not part of the continuing dynamics. Each branch
+    # gets > three maximum-length navigation legs, without changing clocks.
+    e.config=replace(e.config,cutoff=e.time+10000.)
+    if energy_intervention:
+        e.base.agent.energy=10000.  # separately labelled cost diagnostic only
+    return e
+
+
+def init_worker():
+    global ACTOR
+    torch.set_num_threads(1)
+    e=PostDeliveryUAV(Config(obstacles=24),layout_seed=319190002)
+    ACTOR=actor_for(e); e.close()
+
+
+def choose(e,policy):
+    if policy.startswith('after_'):
+        return 'R' if e.completed-e.cycle_start_tasks>=int(policy[-1]) else 'C'
+    if policy.startswith('soc'):
+        return 'R' if e.energy<=int(policy[3:]) else 'C'
+    return 'C'  # deliberate collector, stops at real depletion; never rescue
+
+
+def rollout_source(job):
+    root,round_id,pidx=job
+    policy=POLICIES[pidx]; name=f'r{round_id:02d}_{policy}'
+    directory=Path(root)/'sources'/name
+    directory.mkdir(parents=True,exist_ok=True)
+    receipt=directory/'trajectory.json'
+    if receipt.exists(): return json.loads(receipt.read_text())
+    e=PostDeliveryUAV(Config(cutoff=1500.,obstacles=24),layout_seed=319190002,
+                     stream_seed=819190001+round_id*len(POLICIES)+pidx)
+    states=[]; records=[]
+    while not (e.failed or e.truncated) and len(states)<12:
+        r=e.advance_home(ACTOR) if e.phase=='home' else e.execute(choose(e,policy),ACTOR)
+        records.append(r)
+        if e.phase=='decision' and not (e.failed or e.truncated):
+            raw=compact(e); path=directory/f'd{len(states):02d}.pkl'
+            temp=path.with_suffix('.tmp'); temp.write_bytes(raw); os.replace(temp,path)
+            state=physical(e)
+            states.append(dict(state_id=digest(state),state=state,trajectory_id=name,
+                cycle_id=len(e.cycles),occupancy_source_policy=policy,time=e.time,
+                previous_task_type=e.events[-1]['delivered_task']['index'],
+                snapshot=str(path.relative_to(Path(root))),snapshot_sha256=hashlib.sha256(raw).hexdigest(),
+                natural_occupancy=True))
+    result=dict(trajectory_id=name,policy=policy,states=states,audit=e.audit(),records=records)
+    atomic(receipt,result); e.close()
+    return result
+
+
+def branch_state(job):
+    root,meta=job; root=Path(root); target=root/'branches'/f"{meta['state_id']}.json"
+    if target.exists():
+        envelope=json.loads(target.read_text()); row=envelope['row']
+        if digest(row)!=envelope['sha256']: raise RuntimeError('branch corruption')
+        return meta['state_id']
+    raw=(root/meta['snapshot']).read_bytes()
+    assert hashlib.sha256(raw).hexdigest()==meta['snapshot_sha256']
+    branches={}; mission={}
+    for d in (100,300,600):
+        e=enumerated(raw,d)
+        c=e.execute('C',ACTOR)
+        end=physical(e)
+        branches[f'C{d}']=dict(row=c,end_physical=end)
+        r=None
+        if c['success']: r=e.execute('R',ACTOR)
+        actual_success=bool(c['success'] and r is not None and r['success'])
+        actual=dict(task=c,return_after_task=r,success=actual_success)
+        if actual_success:
+            requirement=dict(energy=c['energy_used']+r['energy_used'],
+                time=c['elapsed_time']+r['elapsed_time'],counterfactual_energy_intervention=False)
+            diagnostic=None
+        else:
+            # Preserve all actual-energy failure rows. Full requirement is a
+            # separate intervention, never recategorized as reachable occupancy.
+            u=enumerated(raw,d,energy_intervention=True)
+            uc=u.execute('C',ACTOR); ur=u.execute('R',ACTOR) if uc['success'] else None
+            ok=bool(uc['success'] and ur and ur['success'])
+            requirement=dict(energy=uc['energy_used']+ur['energy_used'] if ok else None,
+                time=uc['elapsed_time']+ur['elapsed_time'] if ok else None,
+                counterfactual_energy_intervention=True)
+            diagnostic=dict(initial_energy=10000.,natural_occupancy=False,task=uc,return_after_task=ur)
+            u.close()
+        mission[str(d)]=dict(actual=actual,requirement=requirement,diagnostic=diagnostic)
+        e.close()
+    e=enumerated(raw)
+    r=e.execute('R',ACTOR); branches['R']=dict(row=r,end_physical=physical(e)); e.close()
+    row=dict(state=meta,branches=branches,missions=mission,task_probabilities=[1/3]*3,
+             task_rng_read=False)
+    atomic(target,dict(row=row,sha256=digest(row)))
+    return meta['state_id']
+
+
+def reference(root):
+    path=root/'after1_reference.json'
+    if path.exists(): return
+    e=PostDeliveryUAV(Config(obstacles=24),layout_seed=319190002)
+    raw=compact(e); results=[]
+    for d in (100,300,600):
+        b=enumerated(raw,d); c=b.advance_home(ACTOR); r=b.execute('R',ACTOR) if c['success'] else None
+        if not c['success'] or not r or not r['success']: raise RuntimeError('after-1 reference fails')
+        results.append(dict(task_type=d,probability=1/3,task=c,return_home=r,
+                            cycle_time=c['elapsed_time']+r['elapsed_time']))
+        b.close()
+    atomic(path,dict(rho_after1=1/float(np.mean([r['cycle_time'] for r in results])),
+        type='fixed after-1 renewal rate, NOT optimum',branches=results))
+    e.close()
+
+
+def make_contract():
+    files=[ROOT/'envs/UAVEnergyDeliverySAC.py']
+    for folder in ['experiments/directional_navigation','experiments/jacobian_energy_bridge',
+                   'runtime_support/review_bundle']:
+        files+=sorted((ROOT/folder).rglob('*.py'))
+    files += [ROOT/'research/regenerative_control'/n for n in
+              ['continuing.py','continuing_p11.py','qualify.py','census_p2a1.py']]
+    return dict(version='P2-A1-v1',checkpoint_sha256=EXPECTED,target_unique_states=200,
+        maximum_rounds=20,max_D_per_trajectory=12,source_policies=POLICIES,
+        source_cutoff=1500,layout_seed=319190002,task_distribution={str(d):1/3 for d in (100,300,600)},
+        selection='first 200 distinct exact physical keys in round/policy/D order; all source failures retained',
+        branch_rng='replaced by object that raises on every access; explicit task enumeration',
+        local_delta='1-rho_after1*(mean time[C_d then R]-time[R]); only when all four cycle alternatives reach H',
+        local_label='viability first: R when R viable and any C_d then R fails; otherwise sign(local_delta); not Q*',
+        energy_intervention='10000 units only for separate failed-mission cost diagnostic; never occupancy or actual branch',
+        abstraction_bins=dict(energy=2.,home_distance=10.,speed=1.,position=10.,velocity=1.),
+        stability=dict(energy_range=1.,time_range=5.,minimum_group_size=3,minimum_state_coverage=.5,minimum_bins=20),
+        comparable_pairs=dict(energy=2.,mission_margin=1.,home_distance=10.,distinct_trajectory=True,delta_tie=1e-6),
+        micro_kill='report >98% local threshold fit; do not equate safety-label tautology or single-class accuracy with rho_simple/rho_star',
+        source_hashes={str(p.relative_to(ROOT)):sha(p) for p in files})
+
+
+def main():
+    p=argparse.ArgumentParser();p.add_argument('--output',type=Path,required=True)
+    p.add_argument('--phase',choices=['collect','branch'],required=True)
+    p.add_argument('--workers',type=int,default=4);p.add_argument('--limit',type=int)
+    args=p.parse_args();root=args.output;root.mkdir(parents=True,exist_ok=True)
+    contract=make_contract();contract=json.loads(json.dumps(contract))
+    dest=root/'contract.json'
+    if dest.exists():
+        if json.loads(dest.read_text())!=contract: raise RuntimeError('source/contract changed')
+    else: atomic(dest,contract)
+    assert sha(MODEL)==EXPECTED
+    with ProcessPoolExecutor(max_workers=args.workers,mp_context=mp.get_context('spawn'),initializer=init_worker) as pool:
+        if args.phase=='collect':
+            unique={};trajectories=[];occurrences=0
+            for round_id in range(contract['maximum_rounds']):
+                jobs=[(str(root),round_id,i) for i in range(len(POLICIES))]
+                for result in pool.map(rollout_source,jobs):
+                    trajectories.append({k:v for k,v in result.items() if k not in ['records','states']})
+                    for meta in result['states']:
+                        occurrences+=1
+                        if len(unique)<200: unique.setdefault(meta['state_id'],meta)
+                atomic(root/'census.json',dict(states=list(unique.values()),occurrences=occurrences,
+                    trajectories=trajectories,target=200,selection_complete=len(unique)>=200))
+                print(f'round {round_id}: {len(unique)} unique / {occurrences} occupancy states',flush=True)
+                if len(unique)>=200 or (args.limit is not None and round_id+1>=args.limit): break
+        else:
+            init_worker();reference(root)
+            states=json.loads((root/'census.json').read_text())['states']
+            (root/'branches').mkdir(exist_ok=True)
+            if args.limit is not None: states=states[:args.limit]
+            for i,sid in enumerate(pool.map(branch_state,[(str(root),s) for s in states])):
+                atomic(root/'startup_health.json',dict(completed_in_call=i+1,last_state=sid,
+                    checkpoint_unchanged=sha(MODEL)==EXPECTED,neural_updates=0))
+                if (i+1)%10==0: print(f'branches {i+1}/{len(states)}',flush=True)
+    assert sha(MODEL)==EXPECTED
+
+
+if __name__=='__main__':main()

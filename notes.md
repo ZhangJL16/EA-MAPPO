@@ -1,5 +1,21 @@
 # Current research notes
 
+## 2026-09-19 P2-A1: insufficient coverage, no sign-flip finding
+
+User authorized reachable D-state census and exact branching only. Frozen budget
+produced 885 natural observations / 65 distinct physical keys, below target200.
+All 260 core branches finished, no contact; failures terminate at depletion.
+However 13/98 higher-energy diagnostic missions still navigation-timeout, so
+resource-only attribution is not valid. No actor/physics changes or training.
+Only 15 common-viable states yield the fixed-after1 local contrast (not Q*).
+Comparable flips: mean0/4, max0/5; no sufficiency/insufficiency conclusion.
+Exact D successor support62/128; no abstraction has adequate support. Max margin
+fits42/43 viability-first local labels (97.67%), not a long-run value comparison.
+Original collector source/receipts retained; a diagnostic-only capacity correction
+prevents negative recharge duration. Five focused tests and raw audit pass.
+Report: `docs/REGENERATIVE_CONTROL_P2A1_20260919.md`; portable evidence:
+`research/regenerative_control/evidence/p2a1_20260919`. Full oracle and learning stop.
+
 ## 2026-09-19 P1.1: task screening removed
 
 P1 passed user review. This bounded correction moves C/R to task-free post-delivery

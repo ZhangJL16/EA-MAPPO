@@ -1,0 +1,6 @@
+{
+  "collection_root": "artifacts/regenerative_p2a1_20260919",
+  "contract_sha256": "7ffdcccbb793af6bbf7a9b6c3904a4967391520bb1694daaf3fb67d0ad03308a",
+  "collector_source_sha256": "69fd15a9ee19ecd7b11bc314160310b5c27ae727ed78394ba5d0cccf5c7e6891",
+  "change": "Only separate counterfactual diagnostic capacity changed from 60 to 10000 to keep recharge time positive. Natural collector, actual branching and frozen dynamics unchanged."
+}
