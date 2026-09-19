@@ -1,5 +1,21 @@
 # Current research notes
 
+## 2026-09-19 main learning story KILLED; conditional theory derived
+
+User confirmed frozen >=.98 kill: VB/Oracle=.991342277482, interval entirely above
+threshold. Completed tree36 cycle+10 candidate; only one distinct physical
+safe-but-return-optimal state, visited1/9. Candidate duplicates it exactly.
+Completed evidence archived; no new UAV runs, neural training or benchmark expansion.
+Theory-only Pivot A: `DERIVATION_PACKAGE.md`. For heterogeneous correlated IID
+(r,time,energy) marks with pre-draw stopping and affine recharge, Wald identities
+imply VB optimality. Nonnegative nonlinear recharge residual gives an explicit
+near-optimality bound. General state-dependent tree uses VB tail excess rather
+than assuming IID realized navigation costs. Existing36-node algebra gives
+98.6185% lower bound without oracle input; unique bad tail rate=.00974045.
+This is mathematically coherent, but standard Wald/stopping machinery does not
+establish new-paper novelty. Theory originality remains unresolved; no auto-promotion.
+Closure report: `docs/VIABILITY_BOUNDARY_THEORY_20260919.md`.
+
 ## 2026-09-19 P2-A2: exact safe-tree runner started, no result claim
 
 User accepted P2-A1 and replaced random census with a safe-set optimal-stopping

@@ -1,0 +1,27 @@
+{
+  "existing_result_complete": true,
+  "KILL_confirmed": true,
+  "physical_candidate_duplicate": true,
+  "oracle_free_bound_consistent_with_exact_result": true,
+  "tail_gap_identity_pass": true,
+  "analytic_heterogeneous_nonlinear_example": [
+    {
+      "beta": "0",
+      "rho_VB": "8/17",
+      "rho_after1": "8/15"
+    },
+    {
+      "beta": "3/2",
+      "rho_VB": "8/21",
+      "rho_after1": "8/21"
+    },
+    {
+      "beta": "2",
+      "rho_VB": "24/67",
+      "rho_after1": "8/23"
+    }
+  ],
+  "new_UAV_runs": 0,
+  "new_training_updates": 0,
+  "scope": "existing-receipt algebra and exact rational closed-form checks only"
+}

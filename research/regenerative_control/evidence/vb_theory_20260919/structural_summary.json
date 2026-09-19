@@ -1,0 +1,84 @@
+{
+  "decision": "KILL",
+  "rho_star": 0.01087467102903482,
+  "rho_VB": 0.010780521144793172,
+  "VB_over_oracle": 0.9913422774822086,
+  "ratio_interval": [
+    0.9913422765706018,
+    0.9913422783938154
+  ],
+  "counts": {
+    "total_nodes": 46,
+    "cycle_nodes": 36,
+    "candidate_nodes": 10,
+    "safe_C": 14,
+    "causes": {
+      "energy": 40,
+      "navigation": 0,
+      "both": 10
+    }
+  },
+  "safe_return_optimal_cycle_prefixes": 1,
+  "distinct_physical_early_return_states": 1,
+  "early_return_nodes_reached_by_optimal": 1,
+  "optimal_probability_of_early_return_per_cycle": 0.1111111111111111,
+  "VB_expected_visits_to_early_return_states": 0.1111111111111111,
+  "VB_excess_loss": 0.01868861445652582,
+  "independent_loss_identity_residual": 1.214306433183765e-16,
+  "largest_single_prefix_loss_fraction": 1.0,
+  "early_return_states": [
+    {
+      "node": "682737b1c9a070b288def53ce07e0e3781e1f6132ff89f05e3414814e101d772",
+      "sequence": [
+        100,
+        300
+      ],
+      "state": {
+        "energy": 46.71806780007332,
+        "position": [
+          2576.73779296875,
+          2296.91064453125,
+          201.43507385253906
+        ],
+        "velocity": [
+          6.772209644317627,
+          5.8519134521484375,
+          -5.0
+        ],
+        "prev_pos": [
+          2576.73779296875,
+          2296.91064453125,
+          201.43507385253906
+        ],
+        "last_pos": [
+          2576.399169921875,
+          2296.6181640625,
+          201.68507385253906
+        ],
+        "previous_contact": false,
+        "prev_collided": false,
+        "goal": [
+          2580.0,
+          2300.0,
+          200.0
+        ],
+        "phase": "decision",
+        "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760"
+      },
+      "delta_Q": -0.1681975301087324,
+      "optimal_visit_probability": 0.1111111111111111,
+      "VB_visit_probability": 0.1111111111111111,
+      "VB_excess_loss": 0.01868861445652582,
+      "fraction_of_excess_loss": 1.0
+    }
+  ],
+  "candidate": {
+    "node": "af15dbc3f833f890f20fa847a1b6901da6ed5d08304404cb0ed432ce991fca3a",
+    "action": "R",
+    "safe_C": true,
+    "delta_Q": -0.16819753010911465,
+    "candidate_only": true
+  },
+  "scope": "exact ratio solution of fully enumerated frozen deterministic task-sequence tree under declared robust immediate-return safe set",
+  "promotion": "No automatic promotion. KILL stops main story; a gap still needs mechanism and non-pathology review."
+}

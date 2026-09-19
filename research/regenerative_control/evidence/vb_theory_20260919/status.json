@@ -1,0 +1,8 @@
+{
+  "status": "COMPLETE",
+  "completed_nodes": 46,
+  "frontier": 0,
+  "decision": "KILL",
+  "rho_star": 0.01087467102903482,
+  "VB_over_oracle": 0.9913422774822086
+}

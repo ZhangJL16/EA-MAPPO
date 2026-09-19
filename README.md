@@ -1,5 +1,15 @@
 # EA-MAPPO research workspace
 
+Latest (2026-09-19): [confirmed KILL and theory-only Pivot A](docs/VIABILITY_BOUNDARY_THEORY_20260919.md).
+**The high-level regenerative-learning main story is CLOSED.** Completed safe-tree
+VB/Oracle = 0.9913422775 >= .98; one distinct early-return physical state.
+No neural training, new UAV runs, random census, altered task distribution,
+uncertainty or multi-agent rescue. All P0–P2 assets/evidence are retained.
+[Theory derivation](DERIVATION_PACKAGE.md) gives conditional VB optimality and
+near-optimality proofs; existing-tree VB-only certificate >=98.6185%.
+Mathematical coherence is established under stated assumptions; novelty remains
+unverified. Older startup/pending statements below are historical and resolved.
+
 Latest (2026-09-19): [P2-A2 safe-set stopping kill-test startup](docs/REGENERATIVE_CONTROL_P2A2_20260919.md).
 P2-A1 passed diagnostic review. Exact task-prefix enumeration and renewal-ratio DP
 are implemented; VB is the sole baseline, with the fixed >=.98 kill criterion.

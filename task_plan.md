@@ -1,5 +1,22 @@
 # Current task plan
 
+## Confirmed KILL; Pivot A theory-only package (2026-09-19)
+
+- [x] P2-A2 COMPLETE:36 cycle +10 candidate nodes; VB/Oracle99.1342%.
+- [x] User-confirmed KILL; one distinct early-return state, not two.
+- [x] Preserve all frozen navigation/environment/P0–P2 evidence; archive completed tree.
+- [x] Derive heterogeneous IID-mark affine-recharge exact VB optimality.
+- [x] Derive nonlinear-residual and general-tree near-optimality certificates.
+- [x] Explain unique counterexample through VB tail rate / opportunity cost.
+- [x] Existing-tree-only algebra certificate: VB >=98.6185% optimum, no oracle input.
+- [x] Document assumptions, proofs, analytic example and standard-theory boundaries.
+- [ ] Theory originality / scalable structural contribution: NOT ESTABLISHED.
+
+**Do not train high-level RL or launch new UAV/task-distribution/uncertainty/multi-agent
+experiments to rescue the closed main story.** No new experiments in this turn.
+Deliverable: `DERIVATION_PACKAGE.md`; closure report:
+`docs/VIABILITY_BOUNDARY_THEORY_20260919.md`. No automatic next phase.
+
 ## P2-A2 — authorized exact safe-tree kill test, startup handoff (2026-09-19)
 
 - [x] P2-A1 PASS accepted; no further random census.

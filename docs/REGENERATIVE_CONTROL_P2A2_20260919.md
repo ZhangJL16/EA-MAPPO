@@ -1,5 +1,9 @@
 # P2-A2 safe-set regenerative optimal-stopping kill test — startup
 
+> Superseded startup status: P2-A2 completed; user confirmed KILL. See
+> [completed result and theory-only closure](VIABILITY_BOUNDARY_THEORY_20260919.md).
+> The startup observation below is retained history, not a live run status.
+
 **P2-A1 passed user review. P2-A2 is implemented and running; no kill result is
 available in this startup handoff.** At the startup-health observation, 13 nodes
 were checkpointed and 12 remained on the frontier. No further progress monitoring

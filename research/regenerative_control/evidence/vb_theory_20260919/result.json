@@ -1,0 +1,2139 @@
+{
+  "rho_star": 0.01087467102903482,
+  "rho_VB": 0.010780521144793172,
+  "VB_over_oracle": 0.9913422774822086,
+  "ratio_interval": [
+    0.9913422765706018,
+    0.9913422783938154
+  ],
+  "decision": "KILL",
+  "oracle_tasks_per_cycle": 1.979423868312757,
+  "oracle_time_per_cycle": 182.0214940781009,
+  "VB_tasks_per_cycle": 2.1399176954732506,
+  "VB_time_per_cycle": 198.49853886765004,
+  "root_excess": 2.220446049250313e-16,
+  "rho_bracket": [
+    0.01087467101903482,
+    0.010874671039034821
+  ],
+  "bracket_excess": [
+    1.8202153118096476e-09,
+    -1.8202148677204377e-09
+  ],
+  "iterations": [
+    {
+      "iteration": 0,
+      "rho": 0.0,
+      "tasks": 2.1399176954732506,
+      "time": 198.49853886765004,
+      "excess": 2.1399176954732506
+    },
+    {
+      "iteration": 1,
+      "rho": 0.010780521144793172,
+      "tasks": 1.979423868312757,
+      "time": 182.0214940781009,
+      "excess": 0.017137302596945236
+    },
+    {
+      "iteration": 2,
+      "rho": 0.01087467102903482,
+      "tasks": 1.979423868312757,
+      "time": 182.0214940781009,
+      "excess": 2.220446049250313e-16
+    }
+  ],
+  "actions": {
+    "92d8ae194d735f9ddec43912673d90c93ddd8f411f8ca2dc38025fcffb4275bb": "R",
+    "9ebc23f32441e5946c5a8b133675fb5615bab519e9e7b63697daca038fe2675e": "R",
+    "13a32ae9bd08d80aa63a19186259aba776aca9f5347a9dc0a6c207731288bea9": "R",
+    "01d016ec99ea4713f02304751c4e468da56cdfa8f1622d4ebb2009bd69e84603": "C",
+    "37164fbff73977c88553501d9bf32e18914c8141cdca0d7383c8141c573310a7": "R",
+    "561816bbef84ae69c3f4c03ce519aab519b3305df7332ddbae8e15daa4f11c03": "R",
+    "e0d1069d01363e2e6f5875d3443212dd17652862dcd1aaf1aaacce90b718f50a": "C",
+    "d3ba2ce4806ec9703f9d249da52a2b68a4fb7826c290997d50e58e8163caa968": "R",
+    "d3c4d93d3892ca9fbac86e770a729416155dbbc2048922b969a5d90ca2a7bb1b": "R",
+    "adf6a843cb33eb4e47d10c1c64ffc588f56d7c2e89efde8de111d003e9c50c74": "C",
+    "d913f1dcd3301ba47e99da615abe87b8874d19a9c7503563c5cb1d4bc4114181": "R",
+    "4eb5b77a8280dc97ff0ff29e8a9b65b134df41ad2ea4ba8a12c07d64df23dc52": "R",
+    "29e17dbf761fe35467ed27323a8db34701ef774f1956f97bbde7cd739b58067c": "R",
+    "5bbe822c15fb42821979a1c0430937262521176102c7a8925c23de454b849ee6": "R",
+    "6c17dbc9e604269c0f2f1a6c995b1a26f52732b5aeda776413cda2151ee329a3": "C",
+    "0d4dba0e27ac68c4135913eee46e0bfb74a23deeb7cd1e553d8a048bd9c07324": "C",
+    "dbab2c98226c2b272844bc26265bddf1b86f808d13a9f13d45e8928cafb25274": "R",
+    "744b12226df3a0e638e9b5fa66c61bd287e471bdbcf0beacad40b6e97dec6a1a": "R",
+    "845e14a91f18ea3af47ca91984fd4c4871969e207a44e550677bd4cbf93cf318": "R",
+    "e9e948fd1d0111ef550d3ba01472e1d998b806ab1624b245019bb9e44cd43160": "C",
+    "d53355a5572c9a9e53e13267f57dbb791d94d06c3a1bec0c03c6184b7a8af38c": "R",
+    "991f7a11c617080d5ea1acc2f0913d4e5813a350732a36b8f73fd1c86b9ed406": "R",
+    "504b63607096d07dbbf4b91f652f38bf05effe4932e712ea13474c87a6cf4f0b": "C",
+    "5d7ef0fbeb7ffe3252eb315dfcb530b7def345d4d3a8899262d0565555cd2d6e": "R",
+    "45908312e7fe4eb43f2e7026db1b4a8caa5022fc965272ad22cccf311baf6635": "R",
+    "682737b1c9a070b288def53ce07e0e3781e1f6132ff89f05e3414814e101d772": "R",
+    "88b92c0cec409f7462b2d73af3150cca1065fff731c9ee144ec0460024af56bf": "R",
+    "63e834cb2d560f01b62d40502b38bca3ce214fb32fc9c04e9aa516d9c12afbc3": "R",
+    "ceaa118f4ee196115b2c34dda5833776fe4caa693a9b28586974df3c01dd72c0": "R",
+    "d4240d676beb284d14765776950c824ac3986052219d8feadea7145d9cea96ac": "C",
+    "db1b1beb3a9e4226d0b3b175c2c91a1566350bffe74b13afd5e54904aa100af0": "C",
+    "59e55028ca09014434e7ce7caa5e93889a4a870a4d84b9ead6bdd966f617ca19": "R",
+    "1c87668531d20738555a2cab7f53066cc7b18863124240b352c01bc6254bfde3": "R",
+    "a765bc006d998ee78d62cdfbffebc8c0befd552ab1fe9404d0da6f0e5dec6a30": "R",
+    "4f56bf7a67ed4722bdbeb04c315e3eca8d18f40131225e224a49ed986a52ec09": "R",
+    "324d308858d5d679dd3ad8c4726bf4c0d9605057060105840fe6f2e055ccd051": "C",
+    "a3c2312ccd6bfd6b706e5eca7a03a4397ec9eb4967c8aee78e7cee37918cbd79": "R",
+    "1d463be1f213db8a55ee6d541b365400ae6ab14d5e81d74194cc68db72640758": "R",
+    "c45458414e380b47d088e22062ed53e40035f8764ea31bb1132d2eb322eac421": "R",
+    "7282252182fd5740e1a3c8bce733be842ece3d99fdfb7cfe3725e4887e75d748": "C",
+    "be09d8eb73f6ed7e9a67524c1b4ead21a4acbadbb3cd834ee03fc4adfa09acc1": "R",
+    "facae0dbe00857ef3b04d2c483ab5981546731c3e494f8f1665b235423df712f": "R",
+    "d2516460d985458a8dd1fe3b2c6d1f5da4b1d80cdc216b7c830f147d6501c390": "C",
+    "48a70bb1ab445c11e21ceda0a436640ee28f9f7017dbbcaa1986854a54ded9bc": "R",
+    "3cfb0622a0eccfaa6b1d58cf965ece46317dd1098a1b4a4e9a85de8bbd70c8bc": "R",
+    "af15dbc3f833f890f20fa847a1b6901da6ed5d08304404cb0ed432ce991fca3a": "R"
+  },
+  "VB_actions": {
+    "92d8ae194d735f9ddec43912673d90c93ddd8f411f8ca2dc38025fcffb4275bb": "R",
+    "9ebc23f32441e5946c5a8b133675fb5615bab519e9e7b63697daca038fe2675e": "R",
+    "13a32ae9bd08d80aa63a19186259aba776aca9f5347a9dc0a6c207731288bea9": "R",
+    "01d016ec99ea4713f02304751c4e468da56cdfa8f1622d4ebb2009bd69e84603": "C",
+    "37164fbff73977c88553501d9bf32e18914c8141cdca0d7383c8141c573310a7": "R",
+    "561816bbef84ae69c3f4c03ce519aab519b3305df7332ddbae8e15daa4f11c03": "R",
+    "e0d1069d01363e2e6f5875d3443212dd17652862dcd1aaf1aaacce90b718f50a": "C",
+    "d3ba2ce4806ec9703f9d249da52a2b68a4fb7826c290997d50e58e8163caa968": "R",
+    "d3c4d93d3892ca9fbac86e770a729416155dbbc2048922b969a5d90ca2a7bb1b": "R",
+    "adf6a843cb33eb4e47d10c1c64ffc588f56d7c2e89efde8de111d003e9c50c74": "C",
+    "d913f1dcd3301ba47e99da615abe87b8874d19a9c7503563c5cb1d4bc4114181": "R",
+    "4eb5b77a8280dc97ff0ff29e8a9b65b134df41ad2ea4ba8a12c07d64df23dc52": "R",
+    "29e17dbf761fe35467ed27323a8db34701ef774f1956f97bbde7cd739b58067c": "R",
+    "5bbe822c15fb42821979a1c0430937262521176102c7a8925c23de454b849ee6": "R",
+    "6c17dbc9e604269c0f2f1a6c995b1a26f52732b5aeda776413cda2151ee329a3": "C",
+    "0d4dba0e27ac68c4135913eee46e0bfb74a23deeb7cd1e553d8a048bd9c07324": "C",
+    "dbab2c98226c2b272844bc26265bddf1b86f808d13a9f13d45e8928cafb25274": "R",
+    "744b12226df3a0e638e9b5fa66c61bd287e471bdbcf0beacad40b6e97dec6a1a": "R",
+    "845e14a91f18ea3af47ca91984fd4c4871969e207a44e550677bd4cbf93cf318": "R",
+    "e9e948fd1d0111ef550d3ba01472e1d998b806ab1624b245019bb9e44cd43160": "C",
+    "d53355a5572c9a9e53e13267f57dbb791d94d06c3a1bec0c03c6184b7a8af38c": "R",
+    "991f7a11c617080d5ea1acc2f0913d4e5813a350732a36b8f73fd1c86b9ed406": "R",
+    "504b63607096d07dbbf4b91f652f38bf05effe4932e712ea13474c87a6cf4f0b": "C",
+    "5d7ef0fbeb7ffe3252eb315dfcb530b7def345d4d3a8899262d0565555cd2d6e": "R",
+    "45908312e7fe4eb43f2e7026db1b4a8caa5022fc965272ad22cccf311baf6635": "R",
+    "682737b1c9a070b288def53ce07e0e3781e1f6132ff89f05e3414814e101d772": "C",
+    "88b92c0cec409f7462b2d73af3150cca1065fff731c9ee144ec0460024af56bf": "R",
+    "63e834cb2d560f01b62d40502b38bca3ce214fb32fc9c04e9aa516d9c12afbc3": "R",
+    "ceaa118f4ee196115b2c34dda5833776fe4caa693a9b28586974df3c01dd72c0": "R",
+    "d4240d676beb284d14765776950c824ac3986052219d8feadea7145d9cea96ac": "C",
+    "db1b1beb3a9e4226d0b3b175c2c91a1566350bffe74b13afd5e54904aa100af0": "C",
+    "59e55028ca09014434e7ce7caa5e93889a4a870a4d84b9ead6bdd966f617ca19": "R",
+    "1c87668531d20738555a2cab7f53066cc7b18863124240b352c01bc6254bfde3": "R",
+    "a765bc006d998ee78d62cdfbffebc8c0befd552ab1fe9404d0da6f0e5dec6a30": "R",
+    "4f56bf7a67ed4722bdbeb04c315e3eca8d18f40131225e224a49ed986a52ec09": "R",
+    "324d308858d5d679dd3ad8c4726bf4c0d9605057060105840fe6f2e055ccd051": "C",
+    "a3c2312ccd6bfd6b706e5eca7a03a4397ec9eb4967c8aee78e7cee37918cbd79": "R",
+    "1d463be1f213db8a55ee6d541b365400ae6ab14d5e81d74194cc68db72640758": "R",
+    "c45458414e380b47d088e22062ed53e40035f8764ea31bb1132d2eb322eac421": "R",
+    "7282252182fd5740e1a3c8bce733be842ece3d99fdfb7cfe3725e4887e75d748": "C",
+    "be09d8eb73f6ed7e9a67524c1b4ead21a4acbadbb3cd834ee03fc4adfa09acc1": "R",
+    "facae0dbe00857ef3b04d2c483ab5981546731c3e494f8f1665b235423df712f": "R",
+    "d2516460d985458a8dd1fe3b2c6d1f5da4b1d80cdc216b7c830f147d6501c390": "C",
+    "48a70bb1ab445c11e21ceda0a436640ee28f9f7017dbbcaa1986854a54ded9bc": "R",
+    "3cfb0622a0eccfaa6b1d58cf965ece46317dd1098a1b4a4e9a85de8bbd70c8bc": "R",
+    "af15dbc3f833f890f20fa847a1b6901da6ed5d08304404cb0ed432ce991fca3a": "C"
+  },
+  "delta_Q": {
+    "92d8ae194d735f9ddec43912673d90c93ddd8f411f8ca2dc38025fcffb4275bb": null,
+    "9ebc23f32441e5946c5a8b133675fb5615bab519e9e7b63697daca038fe2675e": null,
+    "13a32ae9bd08d80aa63a19186259aba776aca9f5347a9dc0a6c207731288bea9": null,
+    "01d016ec99ea4713f02304751c4e468da56cdfa8f1622d4ebb2009bd69e84603": 0.15431717551257185,
+    "37164fbff73977c88553501d9bf32e18914c8141cdca0d7383c8141c573310a7": null,
+    "561816bbef84ae69c3f4c03ce519aab519b3305df7332ddbae8e15daa4f11c03": null,
+    "e0d1069d01363e2e6f5875d3443212dd17652862dcd1aaf1aaacce90b718f50a": 0.192176146689216,
+    "d3ba2ce4806ec9703f9d249da52a2b68a4fb7826c290997d50e58e8163caa968": null,
+    "d3c4d93d3892ca9fbac86e770a729416155dbbc2048922b969a5d90ca2a7bb1b": null,
+    "adf6a843cb33eb4e47d10c1c64ffc588f56d7c2e89efde8de111d003e9c50c74": 0.21483498889210734,
+    "d913f1dcd3301ba47e99da615abe87b8874d19a9c7503563c5cb1d4bc4114181": null,
+    "4eb5b77a8280dc97ff0ff29e8a9b65b134df41ad2ea4ba8a12c07d64df23dc52": null,
+    "29e17dbf761fe35467ed27323a8db34701ef774f1956f97bbde7cd739b58067c": null,
+    "5bbe822c15fb42821979a1c0430937262521176102c7a8925c23de454b849ee6": null,
+    "6c17dbc9e604269c0f2f1a6c995b1a26f52732b5aeda776413cda2151ee329a3": 0.34641518162819596,
+    "0d4dba0e27ac68c4135913eee46e0bfb74a23deeb7cd1e553d8a048bd9c07324": 0.3161630721195874,
+    "dbab2c98226c2b272844bc26265bddf1b86f808d13a9f13d45e8928cafb25274": null,
+    "744b12226df3a0e638e9b5fa66c61bd287e471bdbcf0beacad40b6e97dec6a1a": null,
+    "845e14a91f18ea3af47ca91984fd4c4871969e207a44e550677bd4cbf93cf318": null,
+    "e9e948fd1d0111ef550d3ba01472e1d998b806ab1624b245019bb9e44cd43160": 0.1587896946800763,
+    "d53355a5572c9a9e53e13267f57dbb791d94d06c3a1bec0c03c6184b7a8af38c": null,
+    "991f7a11c617080d5ea1acc2f0913d4e5813a350732a36b8f73fd1c86b9ed406": null,
+    "504b63607096d07dbbf4b91f652f38bf05effe4932e712ea13474c87a6cf4f0b": 0.20467760387032274,
+    "5d7ef0fbeb7ffe3252eb315dfcb530b7def345d4d3a8899262d0565555cd2d6e": null,
+    "45908312e7fe4eb43f2e7026db1b4a8caa5022fc965272ad22cccf311baf6635": null,
+    "682737b1c9a070b288def53ce07e0e3781e1f6132ff89f05e3414814e101d772": -0.1681975301087324,
+    "88b92c0cec409f7462b2d73af3150cca1065fff731c9ee144ec0460024af56bf": null,
+    "63e834cb2d560f01b62d40502b38bca3ce214fb32fc9c04e9aa516d9c12afbc3": null,
+    "ceaa118f4ee196115b2c34dda5833776fe4caa693a9b28586974df3c01dd72c0": null,
+    "d4240d676beb284d14765776950c824ac3986052219d8feadea7145d9cea96ac": 0.31165725162849767,
+    "db1b1beb3a9e4226d0b3b175c2c91a1566350bffe74b13afd5e54904aa100af0": 0.3616266106275807,
+    "59e55028ca09014434e7ce7caa5e93889a4a870a4d84b9ead6bdd966f617ca19": null,
+    "1c87668531d20738555a2cab7f53066cc7b18863124240b352c01bc6254bfde3": null,
+    "a765bc006d998ee78d62cdfbffebc8c0befd552ab1fe9404d0da6f0e5dec6a30": null,
+    "4f56bf7a67ed4722bdbeb04c315e3eca8d18f40131225e224a49ed986a52ec09": null,
+    "324d308858d5d679dd3ad8c4726bf4c0d9605057060105840fe6f2e055ccd051": 0.34055912624850304,
+    "a3c2312ccd6bfd6b706e5eca7a03a4397ec9eb4967c8aee78e7cee37918cbd79": null,
+    "1d463be1f213db8a55ee6d541b365400ae6ab14d5e81d74194cc68db72640758": null,
+    "c45458414e380b47d088e22062ed53e40035f8764ea31bb1132d2eb322eac421": null,
+    "7282252182fd5740e1a3c8bce733be842ece3d99fdfb7cfe3725e4887e75d748": 0.1587896946798788,
+    "be09d8eb73f6ed7e9a67524c1b4ead21a4acbadbb3cd834ee03fc4adfa09acc1": null,
+    "facae0dbe00857ef3b04d2c483ab5981546731c3e494f8f1665b235423df712f": null,
+    "d2516460d985458a8dd1fe3b2c6d1f5da4b1d80cdc216b7c830f147d6501c390": 0.20467760387006462,
+    "48a70bb1ab445c11e21ceda0a436640ee28f9f7017dbbcaa1986854a54ded9bc": null,
+    "3cfb0622a0eccfaa6b1d58cf965ece46317dd1098a1b4a4e9a85de8bbd70c8bc": null,
+    "af15dbc3f833f890f20fa847a1b6901da6ed5d08304404cb0ed432ce991fca3a": -0.16819753010911465
+  },
+  "optimal_occupancy": {
+    "db1b1beb3a9e4226d0b3b175c2c91a1566350bffe74b13afd5e54904aa100af0": 0.3333333333333333,
+    "0d4dba0e27ac68c4135913eee46e0bfb74a23deeb7cd1e553d8a048bd9c07324": 0.1111111111111111,
+    "adf6a843cb33eb4e47d10c1c64ffc588f56d7c2e89efde8de111d003e9c50c74": 0.037037037037037035,
+    "e0d1069d01363e2e6f5875d3443212dd17652862dcd1aaf1aaacce90b718f50a": 0.012345679012345678,
+    "01d016ec99ea4713f02304751c4e468da56cdfa8f1622d4ebb2009bd69e84603": 0.004115226337448559,
+    "92d8ae194d735f9ddec43912673d90c93ddd8f411f8ca2dc38025fcffb4275bb": 0.001371742112482853,
+    "9ebc23f32441e5946c5a8b133675fb5615bab519e9e7b63697daca038fe2675e": 0.001371742112482853,
+    "13a32ae9bd08d80aa63a19186259aba776aca9f5347a9dc0a6c207731288bea9": 0.001371742112482853,
+    "37164fbff73977c88553501d9bf32e18914c8141cdca0d7383c8141c573310a7": 0.004115226337448559,
+    "561816bbef84ae69c3f4c03ce519aab519b3305df7332ddbae8e15daa4f11c03": 0.004115226337448559,
+    "d3ba2ce4806ec9703f9d249da52a2b68a4fb7826c290997d50e58e8163caa968": 0.012345679012345678,
+    "d3c4d93d3892ca9fbac86e770a729416155dbbc2048922b969a5d90ca2a7bb1b": 0.012345679012345678,
+    "d913f1dcd3301ba47e99da615abe87b8874d19a9c7503563c5cb1d4bc4114181": 0.037037037037037035,
+    "6c17dbc9e604269c0f2f1a6c995b1a26f52732b5aeda776413cda2151ee329a3": 0.037037037037037035,
+    "4eb5b77a8280dc97ff0ff29e8a9b65b134df41ad2ea4ba8a12c07d64df23dc52": 0.012345679012345678,
+    "29e17dbf761fe35467ed27323a8db34701ef774f1956f97bbde7cd739b58067c": 0.012345679012345678,
+    "5bbe822c15fb42821979a1c0430937262521176102c7a8925c23de454b849ee6": 0.012345679012345678,
+    "682737b1c9a070b288def53ce07e0e3781e1f6132ff89f05e3414814e101d772": 0.1111111111111111,
+    "d4240d676beb284d14765776950c824ac3986052219d8feadea7145d9cea96ac": 0.1111111111111111,
+    "88b92c0cec409f7462b2d73af3150cca1065fff731c9ee144ec0460024af56bf": 0.037037037037037035,
+    "63e834cb2d560f01b62d40502b38bca3ce214fb32fc9c04e9aa516d9c12afbc3": 0.037037037037037035,
+    "ceaa118f4ee196115b2c34dda5833776fe4caa693a9b28586974df3c01dd72c0": 0.037037037037037035,
+    "59e55028ca09014434e7ce7caa5e93889a4a870a4d84b9ead6bdd966f617ca19": 0.3333333333333333,
+    "324d308858d5d679dd3ad8c4726bf4c0d9605057060105840fe6f2e055ccd051": 0.3333333333333333,
+    "1c87668531d20738555a2cab7f53066cc7b18863124240b352c01bc6254bfde3": 0.1111111111111111,
+    "a765bc006d998ee78d62cdfbffebc8c0befd552ab1fe9404d0da6f0e5dec6a30": 0.1111111111111111,
+    "4f56bf7a67ed4722bdbeb04c315e3eca8d18f40131225e224a49ed986a52ec09": 0.1111111111111111
+  },
+  "VB_occupancy": {
+    "db1b1beb3a9e4226d0b3b175c2c91a1566350bffe74b13afd5e54904aa100af0": 0.3333333333333333,
+    "0d4dba0e27ac68c4135913eee46e0bfb74a23deeb7cd1e553d8a048bd9c07324": 0.1111111111111111,
+    "adf6a843cb33eb4e47d10c1c64ffc588f56d7c2e89efde8de111d003e9c50c74": 0.037037037037037035,
+    "e0d1069d01363e2e6f5875d3443212dd17652862dcd1aaf1aaacce90b718f50a": 0.012345679012345678,
+    "01d016ec99ea4713f02304751c4e468da56cdfa8f1622d4ebb2009bd69e84603": 0.004115226337448559,
+    "92d8ae194d735f9ddec43912673d90c93ddd8f411f8ca2dc38025fcffb4275bb": 0.001371742112482853,
+    "9ebc23f32441e5946c5a8b133675fb5615bab519e9e7b63697daca038fe2675e": 0.001371742112482853,
+    "13a32ae9bd08d80aa63a19186259aba776aca9f5347a9dc0a6c207731288bea9": 0.001371742112482853,
+    "37164fbff73977c88553501d9bf32e18914c8141cdca0d7383c8141c573310a7": 0.004115226337448559,
+    "561816bbef84ae69c3f4c03ce519aab519b3305df7332ddbae8e15daa4f11c03": 0.004115226337448559,
+    "d3ba2ce4806ec9703f9d249da52a2b68a4fb7826c290997d50e58e8163caa968": 0.012345679012345678,
+    "d3c4d93d3892ca9fbac86e770a729416155dbbc2048922b969a5d90ca2a7bb1b": 0.012345679012345678,
+    "d913f1dcd3301ba47e99da615abe87b8874d19a9c7503563c5cb1d4bc4114181": 0.037037037037037035,
+    "6c17dbc9e604269c0f2f1a6c995b1a26f52732b5aeda776413cda2151ee329a3": 0.037037037037037035,
+    "4eb5b77a8280dc97ff0ff29e8a9b65b134df41ad2ea4ba8a12c07d64df23dc52": 0.012345679012345678,
+    "29e17dbf761fe35467ed27323a8db34701ef774f1956f97bbde7cd739b58067c": 0.012345679012345678,
+    "5bbe822c15fb42821979a1c0430937262521176102c7a8925c23de454b849ee6": 0.012345679012345678,
+    "682737b1c9a070b288def53ce07e0e3781e1f6132ff89f05e3414814e101d772": 0.1111111111111111,
+    "504b63607096d07dbbf4b91f652f38bf05effe4932e712ea13474c87a6cf4f0b": 0.037037037037037035,
+    "e9e948fd1d0111ef550d3ba01472e1d998b806ab1624b245019bb9e44cd43160": 0.012345679012345678,
+    "dbab2c98226c2b272844bc26265bddf1b86f808d13a9f13d45e8928cafb25274": 0.004115226337448559,
+    "744b12226df3a0e638e9b5fa66c61bd287e471bdbcf0beacad40b6e97dec6a1a": 0.004115226337448559,
+    "845e14a91f18ea3af47ca91984fd4c4871969e207a44e550677bd4cbf93cf318": 0.004115226337448559,
+    "d53355a5572c9a9e53e13267f57dbb791d94d06c3a1bec0c03c6184b7a8af38c": 0.012345679012345678,
+    "991f7a11c617080d5ea1acc2f0913d4e5813a350732a36b8f73fd1c86b9ed406": 0.012345679012345678,
+    "5d7ef0fbeb7ffe3252eb315dfcb530b7def345d4d3a8899262d0565555cd2d6e": 0.037037037037037035,
+    "45908312e7fe4eb43f2e7026db1b4a8caa5022fc965272ad22cccf311baf6635": 0.037037037037037035,
+    "d4240d676beb284d14765776950c824ac3986052219d8feadea7145d9cea96ac": 0.1111111111111111,
+    "88b92c0cec409f7462b2d73af3150cca1065fff731c9ee144ec0460024af56bf": 0.037037037037037035,
+    "63e834cb2d560f01b62d40502b38bca3ce214fb32fc9c04e9aa516d9c12afbc3": 0.037037037037037035,
+    "ceaa118f4ee196115b2c34dda5833776fe4caa693a9b28586974df3c01dd72c0": 0.037037037037037035,
+    "59e55028ca09014434e7ce7caa5e93889a4a870a4d84b9ead6bdd966f617ca19": 0.3333333333333333,
+    "324d308858d5d679dd3ad8c4726bf4c0d9605057060105840fe6f2e055ccd051": 0.3333333333333333,
+    "1c87668531d20738555a2cab7f53066cc7b18863124240b352c01bc6254bfde3": 0.1111111111111111,
+    "a765bc006d998ee78d62cdfbffebc8c0befd552ab1fe9404d0da6f0e5dec6a30": 0.1111111111111111,
+    "4f56bf7a67ed4722bdbeb04c315e3eca8d18f40131225e224a49ed986a52ec09": 0.1111111111111111
+  },
+  "safe_return_optimal_nodes": [
+    {
+      "node": "682737b1c9a070b288def53ce07e0e3781e1f6132ff89f05e3414814e101d772",
+      "delta": -0.1681975301087324,
+      "optimal_cycle_visit_mass": 0.1111111111111111,
+      "vb_cycle_visit_mass": 0.1111111111111111
+    },
+    {
+      "node": "af15dbc3f833f890f20fa847a1b6901da6ed5d08304404cb0ed432ce991fca3a",
+      "delta": -0.16819753010911465,
+      "optimal_cycle_visit_mass": 0.0,
+      "vb_cycle_visit_mass": 0.0
+    }
+  ],
+  "candidate": {
+    "node": "af15dbc3f833f890f20fa847a1b6901da6ed5d08304404cb0ed432ce991fca3a",
+    "action": "R",
+    "safe_C": true,
+    "delta_Q": -0.16819753010911465,
+    "candidate_only": true
+  },
+  "scope": "exact ratio solution of fully enumerated frozen deterministic task-sequence tree under declared robust immediate-return safe set",
+  "node_metadata": {
+    "db1b1beb3a9e4226d0b3b175c2c91a1566350bffe74b13afd5e54904aa100af0": {
+      "origin": "cycle",
+      "sequence": [
+        100
+      ],
+      "state": {
+        "energy": 56.02057186867138,
+        "position": [
+          2776.06640625,
+          2098.117919921875,
+          201.87245178222656
+        ],
+        "velocity": [
+          8.158943176269531,
+          6.594839572906494,
+          -5.0
+        ],
+        "prev_pos": [
+          2776.06640625,
+          2098.117919921875,
+          201.87245178222656
+        ],
+        "last_pos": [
+          2775.658447265625,
+          2097.7880859375,
+          202.12245178222656
+        ],
+        "previous_contact": false,
+        "prev_collided": false,
+        "goal": [
+          2780.0,
+          2100.0,
+          200.0
+        ],
+        "phase": "decision",
+        "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760"
+      }
+    },
+    "59e55028ca09014434e7ce7caa5e93889a4a870a4d84b9ead6bdd966f617ca19": {
+      "origin": "cycle",
+      "sequence": [
+        300
+      ],
+      "state": {
+        "energy": 51.126016381511135,
+        "position": [
+          2577.10791015625,
+          2296.4052734375,
+          201.00489807128906
+        ],
+        "velocity": [
+          7.44551944732666,
+          6.129767417907715,
+          -5.0
+        ],
+        "prev_pos": [
+          2577.10791015625,
+          2296.4052734375,
+          201.00489807128906
+        ],
+        "last_pos": [
+          2576.735595703125,
+          2296.098876953125,
+          201.25489807128906
+        ],
+        "previous_contact": false,
+        "prev_collided": false,
+        "goal": [
+          2580.0,
+          2300.0,
+          200.0
+        ],
+        "phase": "decision",
+        "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760"
+      }
+    },
+    "324d308858d5d679dd3ad8c4726bf4c0d9605057060105840fe6f2e055ccd051": {
+      "origin": "cycle",
+      "sequence": [
+        600
+      ],
+      "state": {
+        "energy": 38.26562145910014,
+        "position": [
+          2276.84228515625,
+          2596.649658203125,
+          199.0926513671875
+        ],
+        "velocity": [
+          10.608101844787598,
+          9.338726043701172,
+          -1.5761678218841553
+        ],
+        "prev_pos": [
+          2276.84228515625,
+          2596.649658203125,
+          199.0926513671875
+        ],
+        "last_pos": [
+          2276.311767578125,
+          2596.1826171875,
+          199.1714630126953
+        ],
+        "previous_contact": false,
+        "prev_collided": false,
+        "goal": [
+          2280.0,
+          2600.0,
+          200.0
+        ],
+        "phase": "decision",
+        "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760"
+      }
+    },
+    "af15dbc3f833f890f20fa847a1b6901da6ed5d08304404cb0ed432ce991fca3a": {
+      "origin": "candidate",
+      "sequence": [],
+      "state": {
+        "energy": 46.71806780007332,
+        "position": [
+          2576.73779296875,
+          2296.91064453125,
+          201.43507385253906
+        ],
+        "velocity": [
+          6.772209644317627,
+          5.8519134521484375,
+          -5.0
+        ],
+        "prev_pos": [
+          2576.73779296875,
+          2296.91064453125,
+          201.43507385253906
+        ],
+        "last_pos": [
+          2576.399169921875,
+          2296.6181640625,
+          201.68507385253906
+        ],
+        "previous_contact": false,
+        "prev_collided": false,
+        "goal": [
+          2580.0,
+          2300.0,
+          200.0
+        ],
+        "phase": "decision",
+        "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760"
+      }
+    },
+    "0d4dba0e27ac68c4135913eee46e0bfb74a23deeb7cd1e553d8a048bd9c07324": {
+      "origin": "cycle",
+      "sequence": [
+        100,
+        100
+      ],
+      "state": {
+        "energy": 50.69378843511013,
+        "position": [
+          2777.76611328125,
+          2096.09521484375,
+          199.1772918701172
+        ],
+        "velocity": [
+          8.799264907836914,
+          10.262345314025879,
+          -2.88289213180542
+        ],
+        "prev_pos": [
+          2777.76611328125,
+          2096.09521484375,
+          199.1772918701172
+        ],
+        "last_pos": [
+          2777.326171875,
+          2095.58203125,
+          199.32144165039062
+        ],
+        "previous_contact": false,
+        "prev_collided": false,
+        "goal": [
+          2780.0,
+          2100.0,
+          200.0
+        ],
+        "phase": "decision",
+        "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760"
+      }
+    },
+    "682737b1c9a070b288def53ce07e0e3781e1f6132ff89f05e3414814e101d772": {
+      "origin": "cycle",
+      "sequence": [
+        100,
+        300
+      ],
+      "state": {
+        "energy": 46.71806780007332,
+        "position": [
+          2576.73779296875,
+          2296.91064453125,
+          201.43507385253906
+        ],
+        "velocity": [
+          6.772209644317627,
+          5.8519134521484375,
+          -5.0
+        ],
+        "prev_pos": [
+          2576.73779296875,
+          2296.91064453125,
+          201.43507385253906
+        ],
+        "last_pos": [
+          2576.399169921875,
+          2296.6181640625,
+          201.68507385253906
+        ],
+        "previous_contact": false,
+        "prev_collided": false,
+        "goal": [
+          2580.0,
+          2300.0,
+          200.0
+        ],
+        "phase": "decision",
+        "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760"
+      }
+    },
+    "d4240d676beb284d14765776950c824ac3986052219d8feadea7145d9cea96ac": {
+      "origin": "cycle",
+      "sequence": [
+        100,
+        600
+      ],
+      "state": {
+        "energy": 38.585936551575166,
+        "position": [
+          2277.87646484375,
+          2596.210205078125,
+          199.34007263183594
+        ],
+        "velocity": [
+          9.542155265808105,
+          9.921605110168457,
+          -1.7409881353378296
+        ],
+        "prev_pos": [
+          2277.87646484375,
+          2596.210205078125,
+          199.34007263183594
+        ],
+        "last_pos": [
+          2277.3994140625,
+          2595.714111328125,
+          199.4271240234375
+        ],
+        "previous_contact": false,
+        "prev_collided": false,
+        "goal": [
+          2280.0,
+          2600.0,
+          200.0
+        ],
+        "phase": "decision",
+        "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760"
+      }
+    },
+    "1c87668531d20738555a2cab7f53066cc7b18863124240b352c01bc6254bfde3": {
+      "origin": "cycle",
+      "sequence": [
+        600,
+        100
+      ],
+      "state": {
+        "energy": 25.768138590987892,
+        "position": [
+          2777.632568359375,
+          2095.957275390625,
+          199.20315551757812
+        ],
+        "velocity": [
+          8.624123573303223,
+          10.002552032470703,
+          -3.3307878971099854
+        ],
+        "prev_pos": [
+          2777.632568359375,
+          2095.957275390625,
+          199.20315551757812
+        ],
+        "last_pos": [
+          2777.201416015625,
+          2095.45703125,
+          199.36968994140625
+        ],
+        "previous_contact": false,
+        "prev_collided": false,
+        "goal": [
+          2780.0,
+          2100.0,
+          200.0
+        ],
+        "phase": "decision",
+        "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760"
+      }
+    },
+    "a765bc006d998ee78d62cdfbffebc8c0befd552ab1fe9404d0da6f0e5dec6a30": {
+      "origin": "cycle",
+      "sequence": [
+        600,
+        300
+      ],
+      "state": {
+        "energy": 21.62986624355716,
+        "position": [
+          2577.893310546875,
+          2296.07568359375,
+          199.45314025878906
+        ],
+        "velocity": [
+          8.905011177062988,
+          9.623323440551758,
+          -1.334105372428894
+        ],
+        "prev_pos": [
+          2577.893310546875,
+          2296.07568359375,
+          199.45314025878906
+        ],
+        "last_pos": [
+          2577.447998046875,
+          2295.594482421875,
+          199.5198516845703
+        ],
+        "previous_contact": false,
+        "prev_collided": false,
+        "goal": [
+          2580.0,
+          2300.0,
+          200.0
+        ],
+        "phase": "decision",
+        "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760"
+      }
+    },
+    "4f56bf7a67ed4722bdbeb04c315e3eca8d18f40131225e224a49ed986a52ec09": {
+      "origin": "cycle",
+      "sequence": [
+        600,
+        600
+      ],
+      "state": {
+        "energy": 20.443287479208642,
+        "position": [
+          2276.885986328125,
+          2596.664794921875,
+          199.0995330810547
+        ],
+        "velocity": [
+          10.536737442016602,
+          9.429817199707031,
+          -1.5533262491226196
+        ],
+        "prev_pos": [
+          2276.885986328125,
+          2596.664794921875,
+          199.0995330810547
+        ],
+        "last_pos": [
+          2276.359130859375,
+          2596.193359375,
+          199.1772003173828
+        ],
+        "previous_contact": false,
+        "prev_collided": false,
+        "goal": [
+          2280.0,
+          2600.0,
+          200.0
+        ],
+        "phase": "decision",
+        "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760"
+      }
+    },
+    "d2516460d985458a8dd1fe3b2c6d1f5da4b1d80cdc216b7c830f147d6501c390": {
+      "origin": "candidate",
+      "sequence": [
+        100
+      ],
+      "state": {
+        "energy": 38.701519125558136,
+        "position": [
+          2777.69482421875,
+          2096.0107421875,
+          199.18771362304688
+        ],
+        "velocity": [
+          8.616317749023438,
+          10.222146987915039,
+          -3.2723307609558105
+        ],
+        "prev_pos": [
+          2777.69482421875,
+          2096.0107421875,
+          199.18771362304688
+        ],
+        "last_pos": [
+          2777.263916015625,
+          2095.499755859375,
+          199.35133361816406
+        ],
+        "previous_contact": false,
+        "prev_collided": false,
+        "goal": [
+          2780.0,
+          2100.0,
+          200.0
+        ],
+        "phase": "decision",
+        "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760"
+      }
+    },
+    "48a70bb1ab445c11e21ceda0a436640ee28f9f7017dbbcaa1986854a54ded9bc": {
+      "origin": "candidate",
+      "sequence": [
+        300
+      ],
+      "state": {
+        "energy": 35.304142864592954,
+        "position": [
+          2576.518798828125,
+          2297.366943359375,
+          202.29200744628906
+        ],
+        "velocity": [
+          5.087061405181885,
+          6.059299468994141,
+          -5.0
+        ],
+        "prev_pos": [
+          2576.518798828125,
+          2297.366943359375,
+          202.29200744628906
+        ],
+        "last_pos": [
+          2576.264404296875,
+          2297.06396484375,
+          202.54200744628906
+        ],
+        "previous_contact": false,
+        "prev_collided": false,
+        "goal": [
+          2580.0,
+          2300.0,
+          200.0
+        ],
+        "phase": "decision",
+        "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760"
+      }
+    },
+    "3cfb0622a0eccfaa6b1d58cf965ece46317dd1098a1b4a4e9a85de8bbd70c8bc": {
+      "origin": "candidate",
+      "sequence": [
+        600
+      ],
+      "state": {
+        "energy": 14.601036012692278,
+        "position": [
+          2276.796142578125,
+          2596.608154296875,
+          199.0986328125
+        ],
+        "velocity": [
+          10.614747047424316,
+          9.340664863586426,
+          -1.5846540927886963
+        ],
+        "prev_pos": [
+          2276.796142578125,
+          2596.608154296875,
+          199.0986328125
+        ],
+        "last_pos": [
+          2276.265380859375,
+          2596.14111328125,
+          199.17787170410156
+        ],
+        "previous_contact": false,
+        "prev_collided": false,
+        "goal": [
+          2280.0,
+          2600.0,
+          200.0
+        ],
+        "phase": "decision",
+        "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760"
+      }
+    },
+    "adf6a843cb33eb4e47d10c1c64ffc588f56d7c2e89efde8de111d003e9c50c74": {
+      "origin": "cycle",
+      "sequence": [
+        100,
+        100,
+        100
+      ],
+      "state": {
+        "energy": 44.950081075295735,
+        "position": [
+          2777.816162109375,
+          2096.25390625,
+          199.12063598632812
+        ],
+        "velocity": [
+          8.761524200439453,
+          10.277121543884277,
+          -3.117767810821533
+        ],
+        "prev_pos": [
+          2777.816162109375,
+          2096.25390625,
+          199.12063598632812
+        ],
+        "last_pos": [
+          2777.378173828125,
+          2095.739990234375,
+          199.27651977539062
+        ],
+        "previous_contact": false,
+        "prev_collided": false,
+        "goal": [
+          2780.0,
+          2100.0,
+          200.0
+        ],
+        "phase": "decision",
+        "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760"
+      }
+    },
+    "d913f1dcd3301ba47e99da615abe87b8874d19a9c7503563c5cb1d4bc4114181": {
+      "origin": "cycle",
+      "sequence": [
+        100,
+        100,
+        300
+      ],
+      "state": {
+        "energy": 41.15847637735263,
+        "position": [
+          2576.69677734375,
+          2297.159423828125,
+          201.66236877441406
+        ],
+        "velocity": [
+          6.095312118530273,
+          6.025109767913818,
+          -5.0
+        ],
+        "prev_pos": [
+          2576.69677734375,
+          2297.159423828125,
+          201.66236877441406
+        ],
+        "last_pos": [
+          2576.39208984375,
+          2296.858154296875,
+          201.91236877441406
+        ],
+        "previous_contact": false,
+        "prev_collided": false,
+        "goal": [
+          2580.0,
+          2300.0,
+          200.0
+        ],
+        "phase": "decision",
+        "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760"
+      }
+    },
+    "6c17dbc9e604269c0f2f1a6c995b1a26f52732b5aeda776413cda2151ee329a3": {
+      "origin": "cycle",
+      "sequence": [
+        100,
+        100,
+        600
+      ],
+      "state": {
+        "energy": 31.21727924622857,
+        "position": [
+          2276.792724609375,
+          2596.623291015625,
+          199.09593200683594
+        ],
+        "velocity": [
+          10.571621894836426,
+          9.40752124786377,
+          -1.5849463939666748
+        ],
+        "prev_pos": [
+          2276.792724609375,
+          2596.623291015625,
+          199.09593200683594
+        ],
+        "last_pos": [
+          2276.26416015625,
+          2596.15283203125,
+          199.17518615722656
+        ],
+        "previous_contact": false,
+        "prev_collided": false,
+        "goal": [
+          2280.0,
+          2600.0,
+          200.0
+        ],
+        "phase": "decision",
+        "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760"
+      }
+    },
+    "504b63607096d07dbbf4b91f652f38bf05effe4932e712ea13474c87a6cf4f0b": {
+      "origin": "cycle",
+      "sequence": [
+        100,
+        300,
+        100
+      ],
+      "state": {
+        "energy": 38.701519125558136,
+        "position": [
+          2777.69482421875,
+          2096.0107421875,
+          199.18771362304688
+        ],
+        "velocity": [
+          8.616317749023438,
+          10.222146987915039,
+          -3.2723307609558105
+        ],
+        "prev_pos": [
+          2777.69482421875,
+          2096.0107421875,
+          199.18771362304688
+        ],
+        "last_pos": [
+          2777.263916015625,
+          2095.499755859375,
+          199.35133361816406
+        ],
+        "previous_contact": false,
+        "prev_collided": false,
+        "goal": [
+          2780.0,
+          2100.0,
+          200.0
+        ],
+        "phase": "decision",
+        "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760"
+      }
+    },
+    "5d7ef0fbeb7ffe3252eb315dfcb530b7def345d4d3a8899262d0565555cd2d6e": {
+      "origin": "cycle",
+      "sequence": [
+        100,
+        300,
+        300
+      ],
+      "state": {
+        "energy": 35.304142864592954,
+        "position": [
+          2576.518798828125,
+          2297.366943359375,
+          202.29200744628906
+        ],
+        "velocity": [
+          5.087061405181885,
+          6.059299468994141,
+          -5.0
+        ],
+        "prev_pos": [
+          2576.518798828125,
+          2297.366943359375,
+          202.29200744628906
+        ],
+        "last_pos": [
+          2576.264404296875,
+          2297.06396484375,
+          202.54200744628906
+        ],
+        "previous_contact": false,
+        "prev_collided": false,
+        "goal": [
+          2580.0,
+          2300.0,
+          200.0
+        ],
+        "phase": "decision",
+        "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760"
+      }
+    },
+    "45908312e7fe4eb43f2e7026db1b4a8caa5022fc965272ad22cccf311baf6635": {
+      "origin": "cycle",
+      "sequence": [
+        100,
+        300,
+        600
+      ],
+      "state": {
+        "energy": 14.601036012692278,
+        "position": [
+          2276.796142578125,
+          2596.608154296875,
+          199.0986328125
+        ],
+        "velocity": [
+          10.614747047424316,
+          9.340664863586426,
+          -1.5846540927886963
+        ],
+        "prev_pos": [
+          2276.796142578125,
+          2596.608154296875,
+          199.0986328125
+        ],
+        "last_pos": [
+          2276.265380859375,
+          2596.14111328125,
+          199.17787170410156
+        ],
+        "previous_contact": false,
+        "prev_collided": false,
+        "goal": [
+          2280.0,
+          2600.0,
+          200.0
+        ],
+        "phase": "decision",
+        "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760"
+      }
+    },
+    "88b92c0cec409f7462b2d73af3150cca1065fff731c9ee144ec0460024af56bf": {
+      "origin": "cycle",
+      "sequence": [
+        100,
+        600,
+        100
+      ],
+      "state": {
+        "energy": 25.988181831037892,
+        "position": [
+          2777.52880859375,
+          2095.8076171875,
+          199.24923706054688
+        ],
+        "velocity": [
+          8.599265098571777,
+          10.279417037963867,
+          -3.2452006340026855
+        ],
+        "prev_pos": [
+          2777.52880859375,
+          2095.8076171875,
+          199.24923706054688
+        ],
+        "last_pos": [
+          2777.098876953125,
+          2095.293701171875,
+          199.4114990234375
+        ],
+        "previous_contact": false,
+        "prev_collided": false,
+        "goal": [
+          2780.0,
+          2100.0,
+          200.0
+        ],
+        "phase": "decision",
+        "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760"
+      }
+    },
+    "63e834cb2d560f01b62d40502b38bca3ce214fb32fc9c04e9aa516d9c12afbc3": {
+      "origin": "cycle",
+      "sequence": [
+        100,
+        600,
+        300
+      ],
+      "state": {
+        "energy": 21.044213885548313,
+        "position": [
+          2577.619873046875,
+          2295.744384765625,
+          200.16419982910156
+        ],
+        "velocity": [
+          6.970069408416748,
+          7.814610481262207,
+          -4.867905139923096
+        ],
+        "prev_pos": [
+          2577.619873046875,
+          2295.744384765625,
+          200.16419982910156
+        ],
+        "last_pos": [
+          2577.271484375,
+          2295.353759765625,
+          200.4075927734375
+        ],
+        "previous_contact": false,
+        "prev_collided": false,
+        "goal": [
+          2580.0,
+          2300.0,
+          200.0
+        ],
+        "phase": "decision",
+        "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760"
+      }
+    },
+    "ceaa118f4ee196115b2c34dda5833776fe4caa693a9b28586974df3c01dd72c0": {
+      "origin": "cycle",
+      "sequence": [
+        100,
+        600,
+        600
+      ],
+      "state": {
+        "energy": 20.679097173146097,
+        "position": [
+          2277.0537109375,
+          2596.803466796875,
+          199.0760040283203
+        ],
+        "velocity": [
+          10.557709693908691,
+          9.406362533569336,
+          -1.5248063802719116
+        ],
+        "prev_pos": [
+          2277.0537109375,
+          2596.803466796875,
+          199.0760040283203
+        ],
+        "last_pos": [
+          2276.52587890625,
+          2596.333251953125,
+          199.15223693847656
+        ],
+        "previous_contact": false,
+        "prev_collided": false,
+        "goal": [
+          2280.0,
+          2600.0,
+          200.0
+        ],
+        "phase": "decision",
+        "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760"
+      }
+    },
+    "7282252182fd5740e1a3c8bce733be842ece3d99fdfb7cfe3725e4887e75d748": {
+      "origin": "candidate",
+      "sequence": [
+        100,
+        100
+      ],
+      "state": {
+        "energy": 32.963487845862645,
+        "position": [
+          2777.77880859375,
+          2096.294189453125,
+          199.12510681152344
+        ],
+        "velocity": [
+          8.827256202697754,
+          10.26237678527832,
+          -3.4697694778442383
+        ],
+        "prev_pos": [
+          2777.77880859375,
+          2096.294189453125,
+          199.12510681152344
+        ],
+        "last_pos": [
+          2777.33740234375,
+          2095.781005859375,
+          199.29859924316406
+        ],
+        "previous_contact": false,
+        "prev_collided": false,
+        "goal": [
+          2780.0,
+          2100.0,
+          200.0
+        ],
+        "phase": "decision",
+        "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760"
+      }
+    },
+    "be09d8eb73f6ed7e9a67524c1b4ead21a4acbadbb3cd834ee03fc4adfa09acc1": {
+      "origin": "candidate",
+      "sequence": [
+        100,
+        300
+      ],
+      "state": {
+        "energy": 29.20322809384795,
+        "position": [
+          2576.658447265625,
+          2296.86962890625,
+          201.53054809570312
+        ],
+        "velocity": [
+          6.551847457885742,
+          5.893959045410156,
+          -5.0
+        ],
+        "prev_pos": [
+          2576.658447265625,
+          2296.86962890625,
+          201.53054809570312
+        ],
+        "last_pos": [
+          2576.330810546875,
+          2296.574951171875,
+          201.78054809570312
+        ],
+        "previous_contact": false,
+        "prev_collided": false,
+        "goal": [
+          2580.0,
+          2300.0,
+          200.0
+        ],
+        "phase": "decision",
+        "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760"
+      }
+    },
+    "facae0dbe00857ef3b04d2c483ab5981546731c3e494f8f1665b235423df712f": {
+      "origin": "candidate",
+      "sequence": [
+        100,
+        600
+      ],
+      "state": {
+        "energy": 20.682696743017303,
+        "position": [
+          2277.656982421875,
+          2595.990234375,
+          199.4134063720703
+        ],
+        "velocity": [
+          9.409720420837402,
+          9.949129104614258,
+          -1.6880888938903809
+        ],
+        "prev_pos": [
+          2277.656982421875,
+          2595.990234375,
+          199.4134063720703
+        ],
+        "last_pos": [
+          2277.1865234375,
+          2595.49267578125,
+          199.49781799316406
+        ],
+        "previous_contact": false,
+        "prev_collided": false,
+        "goal": [
+          2280.0,
+          2600.0,
+          200.0
+        ],
+        "phase": "decision",
+        "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760"
+      }
+    },
+    "e0d1069d01363e2e6f5875d3443212dd17652862dcd1aaf1aaacce90b718f50a": {
+      "origin": "cycle",
+      "sequence": [
+        100,
+        100,
+        100,
+        100
+      ],
+      "state": {
+        "energy": 39.232652014610856,
+        "position": [
+          2777.58642578125,
+          2095.911376953125,
+          199.22833251953125
+        ],
+        "velocity": [
+          8.881634712219238,
+          10.422470092773438,
+          -3.0081357955932617
+        ],
+        "prev_pos": [
+          2777.58642578125,
+          2095.911376953125,
+          199.22833251953125
+        ],
+        "last_pos": [
+          2777.142333984375,
+          2095.39013671875,
+          199.3787384033203
+        ],
+        "previous_contact": false,
+        "prev_collided": false,
+        "goal": [
+          2780.0,
+          2100.0,
+          200.0
+        ],
+        "phase": "decision",
+        "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760"
+      }
+    },
+    "d3ba2ce4806ec9703f9d249da52a2b68a4fb7826c290997d50e58e8163caa968": {
+      "origin": "cycle",
+      "sequence": [
+        100,
+        100,
+        100,
+        300
+      ],
+      "state": {
+        "energy": 35.41878648620699,
+        "position": [
+          2576.481689453125,
+          2297.177490234375,
+          202.0519256591797
+        ],
+        "velocity": [
+          5.579126358032227,
+          6.188760280609131,
+          -5.0
+        ],
+        "prev_pos": [
+          2576.481689453125,
+          2297.177490234375,
+          202.0519256591797
+        ],
+        "last_pos": [
+          2576.20263671875,
+          2296.8681640625,
+          202.3019256591797
+        ],
+        "previous_contact": false,
+        "prev_collided": false,
+        "goal": [
+          2580.0,
+          2300.0,
+          200.0
+        ],
+        "phase": "decision",
+        "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760"
+      }
+    },
+    "d3c4d93d3892ca9fbac86e770a729416155dbbc2048922b969a5d90ca2a7bb1b": {
+      "origin": "cycle",
+      "sequence": [
+        100,
+        100,
+        100,
+        600
+      ],
+      "state": {
+        "energy": 26.731924663209096,
+        "position": [
+          2277.575439453125,
+          2595.889404296875,
+          199.43536376953125
+        ],
+        "velocity": [
+          9.363192558288574,
+          9.937151908874512,
+          -1.6917475461959839
+        ],
+        "prev_pos": [
+          2277.575439453125,
+          2595.889404296875,
+          199.43536376953125
+        ],
+        "last_pos": [
+          2277.107177734375,
+          2595.392578125,
+          199.51995849609375
+        ],
+        "previous_contact": false,
+        "prev_collided": false,
+        "goal": [
+          2280.0,
+          2600.0,
+          200.0
+        ],
+        "phase": "decision",
+        "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760"
+      }
+    },
+    "4eb5b77a8280dc97ff0ff29e8a9b65b134df41ad2ea4ba8a12c07d64df23dc52": {
+      "origin": "cycle",
+      "sequence": [
+        100,
+        100,
+        600,
+        100
+      ],
+      "state": {
+        "energy": 18.707686919682438,
+        "position": [
+          2777.830322265625,
+          2096.188232421875,
+          199.130126953125
+        ],
+        "velocity": [
+          8.661602973937988,
+          10.134904861450195,
+          -3.2646164894104004
+        ],
+        "prev_pos": [
+          2777.830322265625,
+          2096.188232421875,
+          199.130126953125
+        ],
+        "last_pos": [
+          2777.397216796875,
+          2095.681396484375,
+          199.29335021972656
+        ],
+        "previous_contact": false,
+        "prev_collided": false,
+        "goal": [
+          2780.0,
+          2100.0,
+          200.0
+        ],
+        "phase": "decision",
+        "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760"
+      }
+    },
+    "29e17dbf761fe35467ed27323a8db34701ef774f1956f97bbde7cd739b58067c": {
+      "origin": "cycle",
+      "sequence": [
+        100,
+        100,
+        600,
+        300
+      ],
+      "state": {
+        "energy": 15.366191072741373,
+        "position": [
+          2577.66015625,
+          2295.903564453125,
+          199.47824096679688
+        ],
+        "velocity": [
+          9.02569580078125,
+          9.673931121826172,
+          -1.4624271392822266
+        ],
+        "prev_pos": [
+          2577.66015625,
+          2295.903564453125,
+          199.47824096679688
+        ],
+        "last_pos": [
+          2577.208984375,
+          2295.419921875,
+          199.55136108398438
+        ],
+        "previous_contact": false,
+        "prev_collided": false,
+        "goal": [
+          2580.0,
+          2300.0,
+          200.0
+        ],
+        "phase": "decision",
+        "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760"
+      }
+    },
+    "5bbe822c15fb42821979a1c0430937262521176102c7a8925c23de454b849ee6": {
+      "origin": "cycle",
+      "sequence": [
+        100,
+        100,
+        600,
+        600
+      ],
+      "state": {
+        "energy": 13.437257066806408,
+        "position": [
+          2277.1005859375,
+          2596.760986328125,
+          199.08055114746094
+        ],
+        "velocity": [
+          10.765951156616211,
+          9.417863845825195,
+          -1.505537986755371
+        ],
+        "prev_pos": [
+          2277.1005859375,
+          2596.760986328125,
+          199.08055114746094
+        ],
+        "last_pos": [
+          2276.562255859375,
+          2596.2900390625,
+          199.15582275390625
+        ],
+        "previous_contact": false,
+        "prev_collided": false,
+        "goal": [
+          2280.0,
+          2600.0,
+          200.0
+        ],
+        "phase": "decision",
+        "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760"
+      }
+    },
+    "e9e948fd1d0111ef550d3ba01472e1d998b806ab1624b245019bb9e44cd43160": {
+      "origin": "cycle",
+      "sequence": [
+        100,
+        300,
+        100,
+        100
+      ],
+      "state": {
+        "energy": 32.963487845862645,
+        "position": [
+          2777.77880859375,
+          2096.294189453125,
+          199.12510681152344
+        ],
+        "velocity": [
+          8.827256202697754,
+          10.26237678527832,
+          -3.4697694778442383
+        ],
+        "prev_pos": [
+          2777.77880859375,
+          2096.294189453125,
+          199.12510681152344
+        ],
+        "last_pos": [
+          2777.33740234375,
+          2095.781005859375,
+          199.29859924316406
+        ],
+        "previous_contact": false,
+        "prev_collided": false,
+        "goal": [
+          2780.0,
+          2100.0,
+          200.0
+        ],
+        "phase": "decision",
+        "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760"
+      }
+    },
+    "d53355a5572c9a9e53e13267f57dbb791d94d06c3a1bec0c03c6184b7a8af38c": {
+      "origin": "cycle",
+      "sequence": [
+        100,
+        300,
+        100,
+        300
+      ],
+      "state": {
+        "energy": 29.20322809384795,
+        "position": [
+          2576.658447265625,
+          2296.86962890625,
+          201.53054809570312
+        ],
+        "velocity": [
+          6.551847457885742,
+          5.893959045410156,
+          -5.0
+        ],
+        "prev_pos": [
+          2576.658447265625,
+          2296.86962890625,
+          201.53054809570312
+        ],
+        "last_pos": [
+          2576.330810546875,
+          2296.574951171875,
+          201.78054809570312
+        ],
+        "previous_contact": false,
+        "prev_collided": false,
+        "goal": [
+          2580.0,
+          2300.0,
+          200.0
+        ],
+        "phase": "decision",
+        "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760"
+      }
+    },
+    "991f7a11c617080d5ea1acc2f0913d4e5813a350732a36b8f73fd1c86b9ed406": {
+      "origin": "cycle",
+      "sequence": [
+        100,
+        300,
+        100,
+        600
+      ],
+      "state": {
+        "energy": 20.682696743017303,
+        "position": [
+          2277.656982421875,
+          2595.990234375,
+          199.4134063720703
+        ],
+        "velocity": [
+          9.409720420837402,
+          9.949129104614258,
+          -1.6880888938903809
+        ],
+        "prev_pos": [
+          2277.656982421875,
+          2595.990234375,
+          199.4134063720703
+        ],
+        "last_pos": [
+          2277.1865234375,
+          2595.49267578125,
+          199.49781799316406
+        ],
+        "previous_contact": false,
+        "prev_collided": false,
+        "goal": [
+          2280.0,
+          2600.0,
+          200.0
+        ],
+        "phase": "decision",
+        "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760"
+      }
+    },
+    "a3c2312ccd6bfd6b706e5eca7a03a4397ec9eb4967c8aee78e7cee37918cbd79": {
+      "origin": "candidate",
+      "sequence": [
+        100,
+        100,
+        100
+      ],
+      "state": {
+        "energy": 27.23813191095897,
+        "position": [
+          2777.778076171875,
+          2096.294921875,
+          199.13311767578125
+        ],
+        "velocity": [
+          8.81092357635498,
+          10.013361930847168,
+          -3.551867723464966
+        ],
+        "prev_pos": [
+          2777.778076171875,
+          2096.294921875,
+          199.13311767578125
+        ],
+        "last_pos": [
+          2777.337646484375,
+          2095.794189453125,
+          199.3107147216797
+        ],
+        "previous_contact": false,
+        "prev_collided": false,
+        "goal": [
+          2780.0,
+          2100.0,
+          200.0
+        ],
+        "phase": "decision",
+        "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760"
+      }
+    },
+    "1d463be1f213db8a55ee6d541b365400ae6ab14d5e81d74194cc68db72640758": {
+      "origin": "candidate",
+      "sequence": [
+        100,
+        100,
+        300
+      ],
+      "state": {
+        "energy": 23.456383939016565,
+        "position": [
+          2576.673828125,
+          2297.475341796875,
+          202.0398406982422
+        ],
+        "velocity": [
+          5.372328758239746,
+          6.041562080383301,
+          -5.0
+        ],
+        "prev_pos": [
+          2576.673828125,
+          2297.475341796875,
+          202.0398406982422
+        ],
+        "last_pos": [
+          2576.4052734375,
+          2297.17333984375,
+          202.2898406982422
+        ],
+        "previous_contact": false,
+        "prev_collided": false,
+        "goal": [
+          2580.0,
+          2300.0,
+          200.0
+        ],
+        "phase": "decision",
+        "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760"
+      }
+    },
+    "c45458414e380b47d088e22062ed53e40035f8764ea31bb1132d2eb322eac421": {
+      "origin": "candidate",
+      "sequence": [
+        100,
+        100,
+        600
+      ],
+      "state": {
+        "energy": 15.213992816207934,
+        "position": [
+          2277.87744140625,
+          2596.2080078125,
+          199.33201599121094
+        ],
+        "velocity": [
+          9.563314437866211,
+          9.917081832885742,
+          -1.7551569938659668
+        ],
+        "prev_pos": [
+          2277.87744140625,
+          2596.2080078125,
+          199.33201599121094
+        ],
+        "last_pos": [
+          2277.399169921875,
+          2595.712158203125,
+          199.41976928710938
+        ],
+        "previous_contact": false,
+        "prev_collided": false,
+        "goal": [
+          2280.0,
+          2600.0,
+          200.0
+        ],
+        "phase": "decision",
+        "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760"
+      }
+    },
+    "01d016ec99ea4713f02304751c4e468da56cdfa8f1622d4ebb2009bd69e84603": {
+      "origin": "cycle",
+      "sequence": [
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "state": {
+        "energy": 33.48834960852606,
+        "position": [
+          2777.510498046875,
+          2095.849609375,
+          199.24232482910156
+        ],
+        "velocity": [
+          8.857108116149902,
+          10.452556610107422,
+          -3.109726905822754
+        ],
+        "prev_pos": [
+          2777.510498046875,
+          2095.849609375,
+          199.24232482910156
+        ],
+        "last_pos": [
+          2777.067626953125,
+          2095.326904296875,
+          199.39781188964844
+        ],
+        "previous_contact": false,
+        "prev_collided": false,
+        "goal": [
+          2780.0,
+          2100.0,
+          200.0
+        ],
+        "phase": "decision",
+        "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760"
+      }
+    },
+    "37164fbff73977c88553501d9bf32e18914c8141cdca0d7383c8141c573310a7": {
+      "origin": "cycle",
+      "sequence": [
+        100,
+        100,
+        100,
+        100,
+        300
+      ],
+      "state": {
+        "energy": 29.820706841123236,
+        "position": [
+          2576.64208984375,
+          2297.36376953125,
+          201.9558868408203
+        ],
+        "velocity": [
+          5.595885276794434,
+          6.092373371124268,
+          -5.0
+        ],
+        "prev_pos": [
+          2576.64208984375,
+          2297.36376953125,
+          201.9558868408203
+        ],
+        "last_pos": [
+          2576.3623046875,
+          2297.05908203125,
+          202.2058868408203
+        ],
+        "previous_contact": false,
+        "prev_collided": false,
+        "goal": [
+          2580.0,
+          2300.0,
+          200.0
+        ],
+        "phase": "decision",
+        "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760"
+      }
+    },
+    "561816bbef84ae69c3f4c03ce519aab519b3305df7332ddbae8e15daa4f11c03": {
+      "origin": "cycle",
+      "sequence": [
+        100,
+        100,
+        100,
+        100,
+        600
+      ],
+      "state": {
+        "energy": 20.240426749603962,
+        "position": [
+          2277.12353515625,
+          2596.8681640625,
+          199.05296325683594
+        ],
+        "velocity": [
+          10.694962501525879,
+          9.266149520874023,
+          -1.5139728784561157
+        ],
+        "prev_pos": [
+          2277.12353515625,
+          2596.8681640625,
+          199.05296325683594
+        ],
+        "last_pos": [
+          2276.5888671875,
+          2596.40478515625,
+          199.128662109375
+        ],
+        "previous_contact": false,
+        "prev_collided": false,
+        "goal": [
+          2280.0,
+          2600.0,
+          200.0
+        ],
+        "phase": "decision",
+        "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760"
+      }
+    },
+    "dbab2c98226c2b272844bc26265bddf1b86f808d13a9f13d45e8928cafb25274": {
+      "origin": "cycle",
+      "sequence": [
+        100,
+        300,
+        100,
+        100,
+        100
+      ],
+      "state": {
+        "energy": 27.23813191095897,
+        "position": [
+          2777.778076171875,
+          2096.294921875,
+          199.13311767578125
+        ],
+        "velocity": [
+          8.81092357635498,
+          10.013361930847168,
+          -3.551867723464966
+        ],
+        "prev_pos": [
+          2777.778076171875,
+          2096.294921875,
+          199.13311767578125
+        ],
+        "last_pos": [
+          2777.337646484375,
+          2095.794189453125,
+          199.3107147216797
+        ],
+        "previous_contact": false,
+        "prev_collided": false,
+        "goal": [
+          2780.0,
+          2100.0,
+          200.0
+        ],
+        "phase": "decision",
+        "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760"
+      }
+    },
+    "744b12226df3a0e638e9b5fa66c61bd287e471bdbcf0beacad40b6e97dec6a1a": {
+      "origin": "cycle",
+      "sequence": [
+        100,
+        300,
+        100,
+        100,
+        300
+      ],
+      "state": {
+        "energy": 23.456383939016565,
+        "position": [
+          2576.673828125,
+          2297.475341796875,
+          202.0398406982422
+        ],
+        "velocity": [
+          5.372328758239746,
+          6.041562080383301,
+          -5.0
+        ],
+        "prev_pos": [
+          2576.673828125,
+          2297.475341796875,
+          202.0398406982422
+        ],
+        "last_pos": [
+          2576.4052734375,
+          2297.17333984375,
+          202.2898406982422
+        ],
+        "previous_contact": false,
+        "prev_collided": false,
+        "goal": [
+          2580.0,
+          2300.0,
+          200.0
+        ],
+        "phase": "decision",
+        "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760"
+      }
+    },
+    "845e14a91f18ea3af47ca91984fd4c4871969e207a44e550677bd4cbf93cf318": {
+      "origin": "cycle",
+      "sequence": [
+        100,
+        300,
+        100,
+        100,
+        600
+      ],
+      "state": {
+        "energy": 15.213992816207934,
+        "position": [
+          2277.87744140625,
+          2596.2080078125,
+          199.33201599121094
+        ],
+        "velocity": [
+          9.563314437866211,
+          9.917081832885742,
+          -1.7551569938659668
+        ],
+        "prev_pos": [
+          2277.87744140625,
+          2596.2080078125,
+          199.33201599121094
+        ],
+        "last_pos": [
+          2277.399169921875,
+          2595.712158203125,
+          199.41976928710938
+        ],
+        "previous_contact": false,
+        "prev_collided": false,
+        "goal": [
+          2280.0,
+          2600.0,
+          200.0
+        ],
+        "phase": "decision",
+        "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760"
+      }
+    },
+    "92d8ae194d735f9ddec43912673d90c93ddd8f411f8ca2dc38025fcffb4275bb": {
+      "origin": "cycle",
+      "sequence": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "state": {
+        "energy": 27.750928330605863,
+        "position": [
+          2777.630126953125,
+          2095.830078125,
+          199.26226806640625
+        ],
+        "velocity": [
+          8.823959350585938,
+          10.210412979125977,
+          -2.6897060871124268
+        ],
+        "prev_pos": [
+          2777.630126953125,
+          2095.830078125,
+          199.26226806640625
+        ],
+        "last_pos": [
+          2777.18896484375,
+          2095.319580078125,
+          199.39675903320312
+        ],
+        "previous_contact": false,
+        "prev_collided": false,
+        "goal": [
+          2780.0,
+          2100.0,
+          200.0
+        ],
+        "phase": "decision",
+        "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760"
+      }
+    },
+    "9ebc23f32441e5946c5a8b133675fb5615bab519e9e7b63697daca038fe2675e": {
+      "origin": "cycle",
+      "sequence": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        300
+      ],
+      "state": {
+        "energy": 24.028236945166597,
+        "position": [
+          2576.634521484375,
+          2297.28759765625,
+          201.8647003173828
+        ],
+        "velocity": [
+          5.755540370941162,
+          6.126965522766113,
+          -5.0
+        ],
+        "prev_pos": [
+          2576.634521484375,
+          2297.28759765625,
+          201.8647003173828
+        ],
+        "last_pos": [
+          2576.3466796875,
+          2296.981201171875,
+          202.1147003173828
+        ],
+        "previous_contact": false,
+        "prev_collided": false,
+        "goal": [
+          2580.0,
+          2300.0,
+          200.0
+        ],
+        "phase": "decision",
+        "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760"
+      }
+    },
+    "13a32ae9bd08d80aa63a19186259aba776aca9f5347a9dc0a6c207731288bea9": {
+      "origin": "cycle",
+      "sequence": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        600
+      ],
+      "state": {
+        "energy": 15.423359190859406,
+        "position": [
+          2277.548583984375,
+          2595.884033203125,
+          199.40802001953125
+        ],
+        "velocity": [
+          9.483036994934082,
+          9.977148056030273,
+          -1.7708936929702759
+        ],
+        "prev_pos": [
+          2277.548583984375,
+          2595.884033203125,
+          199.40802001953125
+        ],
+        "last_pos": [
+          2277.074462890625,
+          2595.38525390625,
+          199.49656677246094
+        ],
+        "previous_contact": false,
+        "prev_collided": false,
+        "goal": [
+          2280.0,
+          2600.0,
+          200.0
+        ],
+        "phase": "decision",
+        "map_id": "7cccfb94537b70f20c48405c9bcba37aedf01ed08131abdf60d5f809562be760"
+      }
+    }
+  },
+  "counts": {
+    "total_nodes": 46,
+    "cycle_nodes": 36,
+    "candidate_nodes": 10,
+    "safe_C": 14,
+    "causes": {
+      "energy": 40,
+      "navigation": 0,
+      "both": 10
+    }
+  },
+  "complete_tree": true,
+  "neural_updates": 0
+}
