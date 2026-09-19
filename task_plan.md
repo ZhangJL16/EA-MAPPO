@@ -1,5 +1,19 @@
 # Current task plan
 
+## T5.1c V2 sizing / decoder feasibility (completed, 2026-09-19)
+
+- [x] Implement frozen four-family V2 and independent RNG streams.
+- [x] Admit/freeze 32 unique groups, 128 variants and folds before labels.
+- [x] Complete only 8-group / 32-variant pilot: 591 exact, 0 unresolved.
+- [x] Catalogue-free joint return mask; 12,232 V1/V2 prefix checks, 0 mismatch.
+- [x] Full source/family/fold/work audit and portable raw evidence; 56 tests.
+- [x] Apply Case C: only one adaptive state in validation; train zero.
+- [ ] Remaining 24 groups: **stopped**, not authorized for automatic expansion.
+- [ ] AFPP training: **not started**; current teacher design is not ready.
+
+See `docs/FPL_T51C_V2_SIZING_20260919.md`. No DEV/test/CONFIRM use, runtime
+retry, limit changes or fold reassignment. Earlier sections are historical.
+
 ## T5.1b export / T5.1c design (2026-09-19)
 
 - [x] Derive exact prefix Q, advantages, optimal sets, normalized values without solves.

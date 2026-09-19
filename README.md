@@ -10,8 +10,11 @@ TRAIN-only exact teacher pipeline and resume instructions. Teacher V1 is now
 [complete and fully audited](docs/FPL_TEACHER_V1_COMPLETE_20260919.md): 273 exact
 labels, eight structures, limited non-prior sensing coverage. No neural FPL
 method has been trained. [T5.1b export and V2 design](docs/FPL_T51B_EXPORT_V2_DESIGN_20260919.md)
-are now available: exact prefix targets are derived without new solves; V2 is
-design-only and its data generation has not started.
+are available: exact prefix targets are derived without new solves.
+[T5.1c sizing and decoder-mask checks](docs/FPL_T51C_V2_SIZING_20260919.md)
+are now complete: 591 exact labels and zero mask mismatches, but only one
+post-feedback required-sensing state (validation; train zero). **Case C: stop
+V2 expansion and do not train AFPP.** Remaining 24 groups are admitted, not labeled.
 
 ## Historical PAI / PSPS entry (retained)
 

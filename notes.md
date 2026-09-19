@@ -1,5 +1,18 @@
 # Current research notes
 
+## 2026-09-19 V2 sizing: Case C, not a solver failure
+
+All 32 structural identities / 128 paired variants were admitted before labels;
+the authorized 8 groups / 32 variants yield 591 exact states, 358 non-prior,
+41 measurement-required, but only **one** non-prior required-sensing state,
+in validation (train zero). All 591 pooled states fit below the retention cap;
+the quota did not discard candidates. Information explorer adds 150 non-prior
+memberships and the sole adaptive state, yet does not fix continuation coverage.
+Nine Beam source collections hit episode caps; label solves had zero failures.
+Catalogue-free joint time/energy/count DP matches all 5,383 V1 and 6,849 V2
+prefixes. 56 tests pass. Stop full V2 expansion and AFPP training under Case C;
+do not retune frozen seeds/folds/caps. See `docs/FPL_T51C_V2_SIZING_20260919.md`.
+
 ## 2026-09-19 prefix supervision and V2 design freeze
 
 Pure audited-Q export yields 5,383 prefixes from 273 states, with 2,394 decision
