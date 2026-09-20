@@ -1,0 +1,102 @@
+{
+  "passed": true,
+  "workers": [
+    {
+      "worker": "worker_00",
+      "status": "running",
+      "steps": 3200,
+      "checkpoint_hash_ok": true
+    },
+    {
+      "worker": "worker_01",
+      "status": "running",
+      "steps": 3400,
+      "checkpoint_hash_ok": true
+    },
+    {
+      "worker": "worker_02",
+      "status": "running",
+      "steps": 900,
+      "checkpoint_hash_ok": true
+    },
+    {
+      "worker": "worker_03",
+      "status": "running",
+      "steps": 3400,
+      "checkpoint_hash_ok": true
+    },
+    {
+      "worker": "worker_04",
+      "status": "running",
+      "steps": 3400,
+      "checkpoint_hash_ok": true
+    },
+    {
+      "worker": "worker_05",
+      "status": "running",
+      "steps": 3300,
+      "checkpoint_hash_ok": true
+    },
+    {
+      "worker": "worker_06",
+      "status": "running",
+      "steps": 3500,
+      "checkpoint_hash_ok": true
+    },
+    {
+      "worker": "worker_07",
+      "status": "running",
+      "steps": 3500,
+      "checkpoint_hash_ok": true
+    },
+    {
+      "worker": "worker_08",
+      "status": "running",
+      "steps": 3400,
+      "checkpoint_hash_ok": true
+    },
+    {
+      "worker": "worker_09",
+      "status": "running",
+      "steps": 3300,
+      "checkpoint_hash_ok": true
+    },
+    {
+      "worker": "worker_10",
+      "status": "running",
+      "steps": 3400,
+      "checkpoint_hash_ok": true
+    },
+    {
+      "worker": "worker_11",
+      "status": "running",
+      "steps": 3500,
+      "checkpoint_hash_ok": true
+    },
+    {
+      "worker": "worker_12",
+      "status": "running",
+      "steps": 3400,
+      "checkpoint_hash_ok": true
+    },
+    {
+      "worker": "worker_13",
+      "status": "running",
+      "steps": 3601,
+      "checkpoint_hash_ok": true
+    },
+    {
+      "worker": "worker_14",
+      "status": "running",
+      "steps": 3500,
+      "checkpoint_hash_ok": true
+    },
+    {
+      "worker": "worker_15",
+      "status": "running",
+      "steps": 3100,
+      "checkpoint_hash_ok": true
+    }
+  ],
+  "training_updates": 0
+}

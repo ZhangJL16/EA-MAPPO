@@ -1,0 +1,3010 @@
+{
+  "battery": 39.28778762567276,
+  "battery_rule": "successful-mission energy quantile, linear interpolation; no algorithm outcomes used",
+  "manifest_sha256": "55923bb8589a5ba42624345e250aad043616a603a40c835b7d17d1b9d3f9056a",
+  "missions": [
+    {
+      "collision_count": 0,
+      "duration": 166.8999999999991,
+      "energy": 33.20034406948175,
+      "failure_phase": null,
+      "goal": [
+        3060.2353181293956,
+        1065.0276763416937,
+        193.88342286605737
+      ],
+      "mission_id": 0,
+      "policy_steps": 835,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 184.94999999999806,
+      "energy": 38.13796247093197,
+      "failure_phase": null,
+      "goal": [
+        1290.8849845588868,
+        2272.226764680918,
+        376.0743066004696
+      ],
+      "mission_id": 1,
+      "policy_steps": 926,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 3163,
+      "duration": 855.0500000000575,
+      "energy": 88.37401292487748,
+      "failure_phase": "return",
+      "goal": [
+        3615.1857752341916,
+        1831.0735875413952,
+        210.27446236632008
+      ],
+      "mission_id": 2,
+      "policy_steps": 4276,
+      "success": false,
+      "timeout": true
+    },
+    {
+      "collision_count": 0,
+      "duration": 218.19999999999618,
+      "energy": 43.04569412645605,
+      "failure_phase": null,
+      "goal": [
+        887.805046810506,
+        1500.594780197819,
+        260.76777251753754
+      ],
+      "mission_id": 3,
+      "policy_steps": 1092,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 203.199999999997,
+      "energy": 42.76171803668789,
+      "failure_phase": null,
+      "goal": [
+        1505.6289841503549,
+        653.0160968015721,
+        246.88040266783688
+      ],
+      "mission_id": 4,
+      "policy_steps": 1016,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 226.69999999999567,
+      "energy": 53.59453364641411,
+      "failure_phase": null,
+      "goal": [
+        1779.0153417488743,
+        3489.5527144270236,
+        221.21036666609666
+      ],
+      "mission_id": 5,
+      "policy_steps": 1135,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 152.79999999999987,
+      "energy": 31.969240387152738,
+      "failure_phase": null,
+      "goal": [
+        3496.751902711624,
+        3298.140667466887,
+        155.7105317434107
+      ],
+      "mission_id": 6,
+      "policy_steps": 764,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 141.45000000000053,
+      "energy": 29.84126176468783,
+      "failure_phase": null,
+      "goal": [
+        3795.8429845577043,
+        2934.3075279237523,
+        85.48408465557381
+      ],
+      "mission_id": 7,
+      "policy_steps": 708,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 118.50000000000114,
+      "energy": 23.305503020413237,
+      "failure_phase": null,
+      "goal": [
+        1816.0475208707448,
+        1797.890889424163,
+        56.00190794224219
+      ],
+      "mission_id": 8,
+      "policy_steps": 593,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 336.4499999999894,
+      "energy": 70.79208370934258,
+      "failure_phase": null,
+      "goal": [
+        121.84095376040311,
+        3442.749483283978,
+        196.42845989386785
+      ],
+      "mission_id": 9,
+      "policy_steps": 1683,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 153.54999999999984,
+      "energy": 31.642687664348138,
+      "failure_phase": null,
+      "goal": [
+        2994.6027006925187,
+        3408.9898041762854,
+        91.83262975263472
+      ],
+      "mission_id": 10,
+      "policy_steps": 768,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 226.2999999999957,
+      "energy": 46.72915259396388,
+      "failure_phase": null,
+      "goal": [
+        1758.929061569658,
+        270.8084129630851,
+        215.70654053141908
+      ],
+      "mission_id": 11,
+      "policy_steps": 1133,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 111.80000000000105,
+      "energy": 23.62939628298993,
+      "failure_phase": null,
+      "goal": [
+        2961.0045011187403,
+        976.0565587548451,
+        349.74715584764425
+      ],
+      "mission_id": 12,
+      "policy_steps": 560,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 191.59999999999766,
+      "energy": 40.3749662079743,
+      "failure_phase": null,
+      "goal": [
+        1505.730442585395,
+        794.6368277527058,
+        255.03578601375247
+      ],
+      "mission_id": 13,
+      "policy_steps": 958,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 54.90000000000024,
+      "energy": 11.113213091351655,
+      "failure_phase": null,
+      "goal": [
+        2955.3629572852456,
+        2468.853886379009,
+        163.1758922466009
+      ],
+      "mission_id": 14,
+      "policy_steps": 275,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 800.0000000000449,
+      "energy": 79.57810619609343,
+      "failure_phase": "outbound",
+      "goal": [
+        2500.322954488099,
+        3378.400896937893,
+        101.70703549606203
+      ],
+      "mission_id": 15,
+      "policy_steps": 4000,
+      "success": false,
+      "timeout": true
+    },
+    {
+      "collision_count": 0,
+      "duration": 207.84999999999673,
+      "energy": 45.6884424314029,
+      "failure_phase": null,
+      "goal": [
+        3408.282600800485,
+        345.72119170563917,
+        209.99353492385907
+      ],
+      "mission_id": 16,
+      "policy_steps": 1040,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 312.5999999999908,
+      "energy": 64.29560175194827,
+      "failure_phase": null,
+      "goal": [
+        133.9318129734194,
+        1071.690856883608,
+        157.7708935311661
+      ],
+      "mission_id": 17,
+      "policy_steps": 1564,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 102.95000000000091,
+      "energy": 21.922703015430507,
+      "failure_phase": null,
+      "goal": [
+        2450.3616810456906,
+        2841.44967175388,
+        87.66768334399733
+      ],
+      "mission_id": 18,
+      "policy_steps": 516,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 319.6999999999904,
+      "energy": 68.71999467129058,
+      "failure_phase": null,
+      "goal": [
+        289.5468761383465,
+        3346.4084214765903,
+        254.7562537113557
+      ],
+      "mission_id": 19,
+      "policy_steps": 1599,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 148.00000000000014,
+      "energy": 34.32552983062136,
+      "failure_phase": null,
+      "goal": [
+        3495.1911036954343,
+        948.2746728904876,
+        239.53060259121614
+      ],
+      "mission_id": 20,
+      "policy_steps": 741,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 112.35000000000105,
+      "energy": 24.578849582785434,
+      "failure_phase": null,
+      "goal": [
+        3758.3997635076225,
+        2518.186188274928,
+        367.43123333460153
+      ],
+      "mission_id": 21,
+      "policy_steps": 562,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 226.3499999999957,
+      "energy": 48.62684163936609,
+      "failure_phase": null,
+      "goal": [
+        1063.448365355338,
+        3053.9657911648383,
+        188.3308025342075
+      ],
+      "mission_id": 22,
+      "policy_steps": 1133,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 239.59999999999494,
+      "energy": 49.99240047933826,
+      "failure_phase": null,
+      "goal": [
+        1003.064607007156,
+        665.8448123508178,
+        99.2785058234571
+      ],
+      "mission_id": 23,
+      "policy_steps": 1198,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 197.29999999999734,
+      "energy": 43.661993233898,
+      "failure_phase": null,
+      "goal": [
+        3761.980365000586,
+        618.6842184492347,
+        318.4182218838857
+      ],
+      "mission_id": 24,
+      "policy_steps": 987,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 317.4999999999905,
+      "energy": 66.37987030433632,
+      "failure_phase": null,
+      "goal": [
+        893.2891038452516,
+        217.55160853185674,
+        284.1999513408572
+      ],
+      "mission_id": 25,
+      "policy_steps": 1588,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 178.8499999999984,
+      "energy": 35.13376708599001,
+      "failure_phase": null,
+      "goal": [
+        1310.6829856585064,
+        2456.4444829218414,
+        198.2647868748154
+      ],
+      "mission_id": 26,
+      "policy_steps": 895,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 288.49999999999216,
+      "energy": 54.217427952956825,
+      "failure_phase": null,
+      "goal": [
+        166.2995988423447,
+        1536.870845485201,
+        147.12919824686688
+      ],
+      "mission_id": 27,
+      "policy_steps": 1443,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 35.699999999999974,
+      "energy": 7.794655873706207,
+      "failure_phase": null,
+      "goal": [
+        3076.1979450747435,
+        2145.915907320271,
+        152.69806871010064
+      ],
+      "mission_id": 28,
+      "policy_steps": 179,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 187.1999999999979,
+      "energy": 38.735213410543295,
+      "failure_phase": null,
+      "goal": [
+        1365.8880376856634,
+        1084.5842061902588,
+        59.348144260103886
+      ],
+      "mission_id": 29,
+      "policy_steps": 937,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 160.24999999999946,
+      "energy": 33.979505928068235,
+      "failure_phase": null,
+      "goal": [
+        2251.950766215833,
+        3384.1548736371183,
+        70.72979660155929
+      ],
+      "mission_id": 30,
+      "policy_steps": 802,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 110.60000000000102,
+      "energy": 23.563953973539885,
+      "failure_phase": null,
+      "goal": [
+        3634.013144499501,
+        2697.4597554281445,
+        262.1097073635659
+      ],
+      "mission_id": 31,
+      "policy_steps": 554,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 130.35000000000113,
+      "energy": 26.88245799468062,
+      "failure_phase": null,
+      "goal": [
+        2639.2468368313353,
+        3188.205880462636,
+        149.94981807339394
+      ],
+      "mission_id": 32,
+      "policy_steps": 653,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 146.30000000000027,
+      "energy": 29.54744180494427,
+      "failure_phase": null,
+      "goal": [
+        1611.0551603530728,
+        2046.6538793688744,
+        308.5052682127707
+      ],
+      "mission_id": 33,
+      "policy_steps": 732,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 129.10000000000122,
+      "energy": 27.17590417752852,
+      "failure_phase": null,
+      "goal": [
+        1866.5487304898986,
+        1355.245686729795,
+        280.9300590251325
+      ],
+      "mission_id": 34,
+      "policy_steps": 646,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 73.9500000000005,
+      "energy": 17.825945047553795,
+      "failure_phase": null,
+      "goal": [
+        3426.190087739329,
+        2204.456929708638,
+        68.8949564688443
+      ],
+      "mission_id": 35,
+      "policy_steps": 370,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 297.3999999999917,
+      "energy": 64.49947512673273,
+      "failure_phase": null,
+      "goal": [
+        755.7013015127897,
+        3866.8757083059913,
+        197.15022280837528
+      ],
+      "mission_id": 36,
+      "policy_steps": 1488,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 278.09999999999275,
+      "energy": 55.75040444831844,
+      "failure_phase": null,
+      "goal": [
+        354.9158625222443,
+        2632.940244327818,
+        159.04349554048582
+      ],
+      "mission_id": 37,
+      "policy_steps": 1391,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 42.45000000000007,
+      "energy": 7.961855054147619,
+      "failure_phase": null,
+      "goal": [
+        2767.25963418087,
+        1770.9160065056526,
+        303.7320753546221
+      ],
+      "mission_id": 38,
+      "policy_steps": 213,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 175.74999999999858,
+      "energy": 37.647168815591314,
+      "failure_phase": null,
+      "goal": [
+        1984.470262584577,
+        636.7380138355594,
+        325.54036590320857
+      ],
+      "mission_id": 39,
+      "policy_steps": 880,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 222.24999999999594,
+      "energy": 46.72455908735008,
+      "failure_phase": null,
+      "goal": [
+        1387.7009620980432,
+        631.1308440604588,
+        22.3729240784894
+      ],
+      "mission_id": 40,
+      "policy_steps": 1112,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 166.8999999999991,
+      "energy": 36.292516324758324,
+      "failure_phase": null,
+      "goal": [
+        3399.2939425077334,
+        676.1770546796201,
+        322.1139078555316
+      ],
+      "mission_id": 41,
+      "policy_steps": 835,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 113.20000000000107,
+      "energy": 22.008729661642263,
+      "failure_phase": null,
+      "goal": [
+        1871.1959006746858,
+        1923.552580814904,
+        208.475330063806
+      ],
+      "mission_id": 42,
+      "policy_steps": 566,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 265.5999999999935,
+      "energy": 55.192949318816176,
+      "failure_phase": null,
+      "goal": [
+        662.1843925487501,
+        722.3544153635186,
+        189.8737381409677
+      ],
+      "mission_id": 43,
+      "policy_steps": 1328,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 117.70000000000113,
+      "energy": 26.57174579948453,
+      "failure_phase": null,
+      "goal": [
+        3231.517658643515,
+        2988.847198442327,
+        300.43942982104073
+      ],
+      "mission_id": 44,
+      "policy_steps": 589,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 109.300000000001,
+      "energy": 23.390074523629576,
+      "failure_phase": null,
+      "goal": [
+        2029.9216375846247,
+        1474.8932249571,
+        66.43924029411824
+      ],
+      "mission_id": 45,
+      "policy_steps": 547,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 144.65000000000035,
+      "energy": 31.598781764579385,
+      "failure_phase": null,
+      "goal": [
+        2326.1429619772625,
+        3250.8369585956875,
+        311.5144800461414
+      ],
+      "mission_id": 46,
+      "policy_steps": 724,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 176.9499999999985,
+      "energy": 38.447262527902595,
+      "failure_phase": null,
+      "goal": [
+        1466.3868551536775,
+        1154.2298868654766,
+        376.12095393158927
+      ],
+      "mission_id": 47,
+      "policy_steps": 885,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 160.14999999999947,
+      "energy": 34.09606996807603,
+      "failure_phase": null,
+      "goal": [
+        2358.427704968219,
+        3413.0185638032676,
+        250.54921686138812
+      ],
+      "mission_id": 48,
+      "policy_steps": 802,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 227.34999999999565,
+      "energy": 51.06283133278126,
+      "failure_phase": null,
+      "goal": [
+        1790.218436531819,
+        3711.1754228348823,
+        280.05297046481707
+      ],
+      "mission_id": 49,
+      "policy_steps": 1137,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 97.50000000000084,
+      "energy": 20.749048402492864,
+      "failure_phase": null,
+      "goal": [
+        2118.4809595473685,
+        1560.9086267266662,
+        97.80729584616563
+      ],
+      "mission_id": 50,
+      "policy_steps": 489,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 168.94999999999894,
+      "energy": 31.771657434361327,
+      "failure_phase": null,
+      "goal": [
+        1307.1684762444188,
+        1983.9340386216197,
+        33.13476962260012
+      ],
+      "mission_id": 51,
+      "policy_steps": 846,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 148.65000000000012,
+      "energy": 31.679615512242158,
+      "failure_phase": null,
+      "goal": [
+        1986.2694603661453,
+        959.1291139006846,
+        353.1246257932823
+      ],
+      "mission_id": 52,
+      "policy_steps": 744,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 238.09999999999502,
+      "energy": 48.2230793135801,
+      "failure_phase": null,
+      "goal": [
+        744.9725234431097,
+        2621.4547671576097,
+        105.55015047266791
+      ],
+      "mission_id": 53,
+      "policy_steps": 1191,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 133.250000000001,
+      "energy": 28.24812803816572,
+      "failure_phase": null,
+      "goal": [
+        2544.9104646856476,
+        818.1053658597165,
+        199.1444425276111
+      ],
+      "mission_id": 54,
+      "policy_steps": 667,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 95.80000000000082,
+      "energy": 20.456159167294658,
+      "failure_phase": null,
+      "goal": [
+        2112.063762134156,
+        1771.0629912951692,
+        345.4940882354057
+      ],
+      "mission_id": 55,
+      "policy_steps": 479,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 93.15000000000077,
+      "energy": 19.220287105064525,
+      "failure_phase": null,
+      "goal": [
+        2578.9342795477955,
+        2793.1707049652805,
+        133.04666002630557
+      ],
+      "mission_id": 56,
+      "policy_steps": 467,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 115.3500000000011,
+      "energy": 24.973953233085144,
+      "failure_phase": null,
+      "goal": [
+        3464.3142324959163,
+        1623.7315130899517,
+        296.13104271695715
+      ],
+      "mission_id": 57,
+      "policy_steps": 577,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 800.0000000000449,
+      "energy": 67.85200934420295,
+      "failure_phase": "outbound",
+      "goal": [
+        1672.4066628587484,
+        282.46950191354955,
+        98.37872143377449
+      ],
+      "mission_id": 58,
+      "policy_steps": 4000,
+      "success": false,
+      "timeout": true
+    },
+    {
+      "collision_count": 0,
+      "duration": 227.19999999999564,
+      "energy": 46.408949907001215,
+      "failure_phase": null,
+      "goal": [
+        935.379678083568,
+        1021.1039019732918,
+        94.47737953057936
+      ],
+      "mission_id": 59,
+      "policy_steps": 1137,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 94.3000000000008,
+      "energy": 19.24684635563565,
+      "failure_phase": null,
+      "goal": [
+        3700.8892698352206,
+        2200.4898797791943,
+        323.4840182443113
+      ],
+      "mission_id": 60,
+      "policy_steps": 472,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 61.250000000000334,
+      "energy": 10.68728575512139,
+      "failure_phase": null,
+      "goal": [
+        2936.922343750274,
+        2365.0047834012425,
+        48.82734994568855
+      ],
+      "mission_id": 61,
+      "policy_steps": 307,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 118.90000000000114,
+      "energy": 24.464668882541147,
+      "failure_phase": null,
+      "goal": [
+        2785.2555757332457,
+        3099.300625558944,
+        139.8044149052154
+      ],
+      "mission_id": 62,
+      "policy_steps": 596,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 252.9499999999942,
+      "energy": 50.7471374583693,
+      "failure_phase": null,
+      "goal": [
+        495.2583536123661,
+        1558.0936276338898,
+        309.41646240632207
+      ],
+      "mission_id": 63,
+      "policy_steps": 1265,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 271.59999999999314,
+      "energy": 56.93155721614888,
+      "failure_phase": null,
+      "goal": [
+        674.4016361256448,
+        3416.101450255205,
+        86.47058498339625
+      ],
+      "mission_id": 64,
+      "policy_steps": 1359,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 147.0500000000002,
+      "energy": 29.764033079433002,
+      "failure_phase": null,
+      "goal": [
+        1589.894887077213,
+        1499.956266379287,
+        93.01303211006416
+      ],
+      "mission_id": 65,
+      "policy_steps": 736,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 121.20000000000118,
+      "energy": 25.605546173295938,
+      "failure_phase": null,
+      "goal": [
+        2068.1399852634186,
+        1209.0578801181905,
+        175.67720248998484
+      ],
+      "mission_id": 66,
+      "policy_steps": 607,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 209.14999999999668,
+      "energy": 41.065368052670514,
+      "failure_phase": null,
+      "goal": [
+        995.7513574689992,
+        2267.9923000215435,
+        31.738633266229094
+      ],
+      "mission_id": 67,
+      "policy_steps": 1046,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 188.79999999999785,
+      "energy": 39.79751908681282,
+      "failure_phase": null,
+      "goal": [
+        1295.7750396794302,
+        2883.2363791872035,
+        145.09706255925863
+      ],
+      "mission_id": 68,
+      "policy_steps": 945,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 135.05000000000086,
+      "energy": 27.029891645297678,
+      "failure_phase": null,
+      "goal": [
+        1753.9518771444957,
+        2154.5027282022456,
+        281.92203596919126
+      ],
+      "mission_id": 69,
+      "policy_steps": 676,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 171.5999999999988,
+      "energy": 33.724509708908165,
+      "failure_phase": null,
+      "goal": [
+        2771.4015052826276,
+        3626.586446140066,
+        336.4712155057961
+      ],
+      "mission_id": 70,
+      "policy_steps": 859,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 198.6999999999973,
+      "energy": 40.91634341565133,
+      "failure_phase": null,
+      "goal": [
+        3124.3181657357713,
+        128.05158489835569,
+        304.1569891719743
+      ],
+      "mission_id": 71,
+      "policy_steps": 994,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 85.85000000000068,
+      "energy": 18.486462324815367,
+      "failure_phase": null,
+      "goal": [
+        2469.9064104252225,
+        2679.7593796556844,
+        194.93517602123242
+      ],
+      "mission_id": 72,
+      "policy_steps": 430,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 127.55000000000126,
+      "energy": 24.382259145683477,
+      "failure_phase": null,
+      "goal": [
+        1718.8265692124594,
+        1909.075352381255,
+        88.50009830601293
+      ],
+      "mission_id": 73,
+      "policy_steps": 638,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 250.34999999999434,
+      "energy": 47.90098161914816,
+      "failure_phase": null,
+      "goal": [
+        626.1470817591738,
+        2402.592173480606,
+        90.38307639365499
+      ],
+      "mission_id": 74,
+      "policy_steps": 1252,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 159.04999999999953,
+      "energy": 32.601987974721865,
+      "failure_phase": null,
+      "goal": [
+        1469.20960574136,
+        2547.577550764036,
+        110.14535864736028
+      ],
+      "mission_id": 75,
+      "policy_steps": 796,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 113.90000000000107,
+      "energy": 27.74196596613831,
+      "failure_phase": null,
+      "goal": [
+        3253.775790234615,
+        1235.1821746852845,
+        300.68768483952084
+      ],
+      "mission_id": 76,
+      "policy_steps": 570,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 170.3499999999989,
+      "energy": 34.31733714631017,
+      "failure_phase": null,
+      "goal": [
+        2803.719055069039,
+        3616.298017109829,
+        228.14571422549244
+      ],
+      "mission_id": 77,
+      "policy_steps": 852,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 172.94999999999874,
+      "energy": 37.27934883035704,
+      "failure_phase": null,
+      "goal": [
+        2017.3601388308218,
+        704.9932106733601,
+        237.28009872068242
+      ],
+      "mission_id": 78,
+      "policy_steps": 865,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 98.15000000000084,
+      "energy": 20.541784773124643,
+      "failure_phase": null,
+      "goal": [
+        3040.298845753393,
+        2838.747377054326,
+        120.44232886179006
+      ],
+      "mission_id": 79,
+      "policy_steps": 491,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 154.6999999999998,
+      "energy": 30.945878823331245,
+      "failure_phase": null,
+      "goal": [
+        3032.404218755691,
+        3451.134432795509,
+        287.20026057567725
+      ],
+      "mission_id": 80,
+      "policy_steps": 774,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 116.45000000000111,
+      "energy": 24.23772941975661,
+      "failure_phase": null,
+      "goal": [
+        2974.2270585613846,
+        1041.4466940786435,
+        191.62620935848344
+      ],
+      "mission_id": 81,
+      "policy_steps": 583,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 100.85000000000089,
+      "energy": 23.46473544206046,
+      "failure_phase": null,
+      "goal": [
+        3450.0347648100446,
+        1658.2546137877237,
+        280.5053970329813
+      ],
+      "mission_id": 82,
+      "policy_steps": 505,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 253.19999999999416,
+      "energy": 57.407333138379315,
+      "failure_phase": null,
+      "goal": [
+        1435.7151587173573,
+        3702.0277117701307,
+        242.35435548961874
+      ],
+      "mission_id": 83,
+      "policy_steps": 1266,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 189.4999999999978,
+      "energy": 40.34705926749727,
+      "failure_phase": null,
+      "goal": [
+        1875.7054959398292,
+        642.1103516828458,
+        182.50262156038775
+      ],
+      "mission_id": 84,
+      "policy_steps": 948,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 174.9999999999986,
+      "energy": 32.313086939914335,
+      "failure_phase": null,
+      "goal": [
+        1245.7789790092784,
+        2013.2490827045424,
+        68.18573802054512
+      ],
+      "mission_id": 85,
+      "policy_steps": 875,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 300.1999999999915,
+      "energy": 56.96670096095927,
+      "failure_phase": null,
+      "goal": [
+        434.98147659671133,
+        1957.2638011222525,
+        90.83431778486808
+      ],
+      "mission_id": 86,
+      "policy_steps": 1502,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 44.9000000000001,
+      "energy": 8.38788512891105,
+      "failure_phase": null,
+      "goal": [
+        2550.1715573314095,
+        1976.5473979553576,
+        116.13360271393061
+      ],
+      "mission_id": 87,
+      "policy_steps": 226,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 109.70000000000101,
+      "energy": 23.05282602752154,
+      "failure_phase": null,
+      "goal": [
+        2213.221374767524,
+        1240.0886862171367,
+        226.95053955438158
+      ],
+      "mission_id": 88,
+      "policy_steps": 549,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 23.349999999999948,
+      "energy": 5.544613229527633,
+      "failure_phase": null,
+      "goal": [
+        2800.3993169553214,
+        1845.7766005854771,
+        169.3298617391468
+      ],
+      "mission_id": 89,
+      "policy_steps": 117,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 153.39999999999984,
+      "energy": 32.40240234870505,
+      "failure_phase": null,
+      "goal": [
+        1768.2434314661036,
+        1065.131356880789,
+        175.60199012037333
+      ],
+      "mission_id": 90,
+      "policy_steps": 767,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 162.34999999999934,
+      "energy": 32.840894071538074,
+      "failure_phase": null,
+      "goal": [
+        3099.0101170933726,
+        3527.788902469657,
+        331.2910455389626
+      ],
+      "mission_id": 91,
+      "policy_steps": 813,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 296.7999999999917,
+      "energy": 59.87760892181379,
+      "failure_phase": null,
+      "goal": [
+        331.20452157312144,
+        3090.9626561486575,
+        65.7843550810635
+      ],
+      "mission_id": 92,
+      "policy_steps": 1484,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 174.6499999999986,
+      "energy": 37.34464225624234,
+      "failure_phase": null,
+      "goal": [
+        2653.4034391236382,
+        386.2856377267607,
+        129.68924239209488
+      ],
+      "mission_id": 93,
+      "policy_steps": 874,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 188.39999999999785,
+      "energy": 45.04904192134551,
+      "failure_phase": null,
+      "goal": [
+        1884.0829647988244,
+        3127.4276783583905,
+        123.89591826854978
+      ],
+      "mission_id": 94,
+      "policy_steps": 943,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 132.60000000000102,
+      "energy": 28.166854163138105,
+      "failure_phase": null,
+      "goal": [
+        2237.363550510075,
+        937.9037823436948,
+        166.89549697891783
+      ],
+      "mission_id": 95,
+      "policy_steps": 663,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 292.7499999999919,
+      "energy": 54.96332167963533,
+      "failure_phase": null,
+      "goal": [
+        129.62289170068388,
+        2284.4611580684905,
+        225.96642159541545
+      ],
+      "mission_id": 96,
+      "policy_steps": 1465,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 150.6,
+      "energy": 31.342672008726254,
+      "failure_phase": null,
+      "goal": [
+        2527.865355692497,
+        618.7396555859119,
+        262.00438837303466
+      ],
+      "mission_id": 97,
+      "policy_steps": 753,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 219.49999999999608,
+      "energy": 49.54203601244267,
+      "failure_phase": null,
+      "goal": [
+        1455.9433462592922,
+        3425.4124985725553,
+        63.92109626077368
+      ],
+      "mission_id": 98,
+      "policy_steps": 1098,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 253.89999999999412,
+      "energy": 52.67504411722094,
+      "failure_phase": null,
+      "goal": [
+        1896.7824893876216,
+        115.68969750442308,
+        137.09705524506646
+      ],
+      "mission_id": 99,
+      "policy_steps": 1270,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 256.44999999999396,
+      "energy": 54.58861813199422,
+      "failure_phase": null,
+      "goal": [
+        1367.1454459342328,
+        178.65855080147506,
+        223.78921877722271
+      ],
+      "mission_id": 100,
+      "policy_steps": 1283,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 317.7999999999905,
+      "energy": 68.39573858931045,
+      "failure_phase": null,
+      "goal": [
+        280.0228803108398,
+        3639.093141294227,
+        241.08484413172732
+      ],
+      "mission_id": 101,
+      "policy_steps": 1589,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 177.89999999999844,
+      "energy": 41.00405400785848,
+      "failure_phase": null,
+      "goal": [
+        3857.3812602169137,
+        871.4988845267229,
+        131.0342915417088
+      ],
+      "mission_id": 102,
+      "policy_steps": 891,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 106.35000000000097,
+      "energy": 22.457283588617642,
+      "failure_phase": null,
+      "goal": [
+        3454.481891414838,
+        2802.8305905360003,
+        256.69886407183014
+      ],
+      "mission_id": 103,
+      "policy_steps": 532,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 224.4999999999958,
+      "energy": 50.31524736593878,
+      "failure_phase": null,
+      "goal": [
+        1385.4060849408029,
+        3490.9428097417367,
+        25.423221671786802
+      ],
+      "mission_id": 104,
+      "policy_steps": 1123,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 251.44999999999425,
+      "energy": 53.56860733741502,
+      "failure_phase": null,
+      "goal": [
+        923.5355601688017,
+        2972.3544405055127,
+        202.5410265019916
+      ],
+      "mission_id": 105,
+      "policy_steps": 1258,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 122.30000000000119,
+      "energy": 27.094031745757455,
+      "failure_phase": null,
+      "goal": [
+        3712.803862386066,
+        1580.3396010914553,
+        211.6008320598298
+      ],
+      "mission_id": 106,
+      "policy_steps": 613,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 277.94999999999277,
+      "energy": 61.59765216077211,
+      "failure_phase": null,
+      "goal": [
+        1772.2113216680978,
+        3510.822136325431,
+        239.54229026753163
+      ],
+      "mission_id": 107,
+      "policy_steps": 1390,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 134.10000000000093,
+      "energy": 27.386005706921193,
+      "failure_phase": null,
+      "goal": [
+        1749.7969258597072,
+        2278.8912918174638,
+        302.6009704841746
+      ],
+      "mission_id": 108,
+      "policy_steps": 671,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 202.59999999999704,
+      "energy": 43.7427500252345,
+      "failure_phase": null,
+      "goal": [
+        1165.8053121209996,
+        1123.2038246774218,
+        352.5512058742939
+      ],
+      "mission_id": 109,
+      "policy_steps": 1014,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 90.20000000000074,
+      "energy": 18.745746078424023,
+      "failure_phase": null,
+      "goal": [
+        3654.3779494343426,
+        2197.7614715615414,
+        343.4041815390331
+      ],
+      "mission_id": 110,
+      "policy_steps": 451,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 159.69999999999948,
+      "energy": 35.12500439906456,
+      "failure_phase": null,
+      "goal": [
+        3340.4172088674018,
+        723.140038046557,
+        243.5583012559278
+      ],
+      "mission_id": 111,
+      "policy_steps": 799,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 211.44999999999655,
+      "energy": 44.459497260936786,
+      "failure_phase": null,
+      "goal": [
+        1460.4299567117234,
+        591.6196536540373,
+        258.16000978504206
+      ],
+      "mission_id": 112,
+      "policy_steps": 1058,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 105.95000000000095,
+      "energy": 23.065200613253854,
+      "failure_phase": null,
+      "goal": [
+        2126.8169514124975,
+        2587.967021733141,
+        213.6724982257932
+      ],
+      "mission_id": 113,
+      "policy_steps": 531,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 159.7999999999995,
+      "energy": 33.49997223884357,
+      "failure_phase": null,
+      "goal": [
+        2145.133870867473,
+        769.8969297751956,
+        150.9964834711015
+      ],
+      "mission_id": 114,
+      "policy_steps": 800,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 168.299999999999,
+      "energy": 35.58707189535435,
+      "failure_phase": null,
+      "goal": [
+        1637.761808916448,
+        999.7506746524831,
+        112.4470301846278
+      ],
+      "mission_id": 115,
+      "policy_steps": 842,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 115.30000000000109,
+      "energy": 27.841815006843607,
+      "failure_phase": null,
+      "goal": [
+        3574.269754259996,
+        1382.7508262228023,
+        121.55726359024004
+      ],
+      "mission_id": 116,
+      "policy_steps": 578,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 170.29999999999887,
+      "energy": 36.28586884527903,
+      "failure_phase": null,
+      "goal": [
+        2267.516193923976,
+        3502.4432070627827,
+        251.805138887975
+      ],
+      "mission_id": 117,
+      "policy_steps": 852,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 93.00000000000078,
+      "energy": 20.18467699974292,
+      "failure_phase": null,
+      "goal": [
+        2104.804737291367,
+        1688.9405008755357,
+        32.45561150276337
+      ],
+      "mission_id": 118,
+      "policy_steps": 466,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 314.5999999999907,
+      "energy": 62.76709937452224,
+      "failure_phase": null,
+      "goal": [
+        127.78706149379838,
+        1286.6099958540276,
+        131.96932500172346
+      ],
+      "mission_id": 119,
+      "policy_steps": 1574,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 155.39999999999972,
+      "energy": 31.028622540782546,
+      "failure_phase": null,
+      "goal": [
+        1485.4635344817948,
+        1598.3773492468138,
+        227.63497670604372
+      ],
+      "mission_id": 120,
+      "policy_steps": 778,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 29.44999999999993,
+      "energy": 6.299660167709606,
+      "failure_phase": null,
+      "goal": [
+        2681.9753631808962,
+        1904.0309002294096,
+        232.61712522557585
+      ],
+      "mission_id": 121,
+      "policy_steps": 148,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 238.89999999999498,
+      "energy": 50.35087456031148,
+      "failure_phase": null,
+      "goal": [
+        915.8929980233241,
+        3226.516569633415,
+        254.82279892375084
+      ],
+      "mission_id": 122,
+      "policy_steps": 1196,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 261.7999999999937,
+      "energy": 55.96064976880262,
+      "failure_phase": null,
+      "goal": [
+        838.6861436849845,
+        3499.062642578034,
+        207.4128025105947
+      ],
+      "mission_id": 123,
+      "policy_steps": 1310,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 271.54999999999313,
+      "energy": 56.576178920277314,
+      "failure_phase": null,
+      "goal": [
+        1048.0134949358844,
+        205.23703743829043,
+        216.0337295718867
+      ],
+      "mission_id": 124,
+      "policy_steps": 1359,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 142.25000000000048,
+      "energy": 29.381896454694537,
+      "failure_phase": null,
+      "goal": [
+        3553.5365463780854,
+        3075.1988063312238,
+        290.83646507085325
+      ],
+      "mission_id": 125,
+      "policy_steps": 712,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 207.99999999999673,
+      "energy": 48.13368359624294,
+      "failure_phase": null,
+      "goal": [
+        1560.2933234210789,
+        3346.5176885832893,
+        218.885985480183
+      ],
+      "mission_id": 126,
+      "policy_steps": 1041,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 133.65000000000094,
+      "energy": 28.252091777228028,
+      "failure_phase": null,
+      "goal": [
+        3801.611541693372,
+        2853.570114334373,
+        143.51914677851707
+      ],
+      "mission_id": 127,
+      "policy_steps": 669,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 139.70000000000064,
+      "energy": 29.171490155207042,
+      "failure_phase": null,
+      "goal": [
+        1772.450663087893,
+        1326.4971749348788,
+        84.37007909731214
+      ],
+      "mission_id": 128,
+      "policy_steps": 699,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 229.8999999999955,
+      "energy": 48.68408054602895,
+      "failure_phase": null,
+      "goal": [
+        1287.6354152564752,
+        509.23779430815017,
+        313.1341123162222
+      ],
+      "mission_id": 129,
+      "policy_steps": 1150,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 291.149999999992,
+      "energy": 62.09774410248015,
+      "failure_phase": null,
+      "goal": [
+        617.8968348297948,
+        3664.000939521085,
+        225.5164459480174
+      ],
+      "mission_id": 130,
+      "policy_steps": 1457,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 142.95000000000044,
+      "energy": 30.955059106425534,
+      "failure_phase": null,
+      "goal": [
+        2736.601755923625,
+        726.867574248269,
+        101.09814061707087
+      ],
+      "mission_id": 131,
+      "policy_steps": 716,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 326.24999999999,
+      "energy": 65.93275704693745,
+      "failure_phase": null,
+      "goal": [
+        391.1365944244307,
+        1047.7185405383348,
+        79.5792465593554
+      ],
+      "mission_id": 132,
+      "policy_steps": 1632,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 98.05000000000085,
+      "energy": 19.968496572744616,
+      "failure_phase": null,
+      "goal": [
+        2043.6306551343048,
+        2361.5208431071555,
+        220.3296234488942
+      ],
+      "mission_id": 133,
+      "policy_steps": 491,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 136.1500000000008,
+      "energy": 26.173544336126607,
+      "failure_phase": null,
+      "goal": [
+        2911.2566029912205,
+        3281.322026297491,
+        253.77622224515258
+      ],
+      "mission_id": 134,
+      "policy_steps": 682,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 142.65000000000046,
+      "energy": 32.899620860533766,
+      "failure_phase": null,
+      "goal": [
+        3771.218102873973,
+        1313.3924091633442,
+        246.19107587177322
+      ],
+      "mission_id": 135,
+      "policy_steps": 714,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 221.49999999999596,
+      "energy": 45.2147207968544,
+      "failure_phase": null,
+      "goal": [
+        1037.3204195946996,
+        962.2724625606576,
+        191.2973697631222
+      ],
+      "mission_id": 136,
+      "policy_steps": 1108,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 149.60000000000005,
+      "energy": 30.776153446239714,
+      "failure_phase": null,
+      "goal": [
+        1947.9990851789312,
+        1700.1667672085773,
+        327.36163054597273
+      ],
+      "mission_id": 137,
+      "policy_steps": 749,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 204.29999999999694,
+      "energy": 44.84714592830463,
+      "failure_phase": null,
+      "goal": [
+        2476.3468892533647,
+        3807.486526058236,
+        25.16723255137951
+      ],
+      "mission_id": 138,
+      "policy_steps": 1022,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 137.40000000000074,
+      "energy": 28.775174010738017,
+      "failure_phase": null,
+      "goal": [
+        1870.1653477266445,
+        1202.246557996161,
+        207.2913383839099
+      ],
+      "mission_id": 139,
+      "policy_steps": 688,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 256.84999999999394,
+      "energy": 54.6719236406149,
+      "failure_phase": null,
+      "goal": [
+        971.8943379316797,
+        444.7660781081233,
+        336.6141095540306
+      ],
+      "mission_id": 140,
+      "policy_steps": 1285,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 245.5499999999946,
+      "energy": 51.78853727228327,
+      "failure_phase": null,
+      "goal": [
+        1248.4305753534434,
+        357.87464368125933,
+        277.11958304754205
+      ],
+      "mission_id": 141,
+      "policy_steps": 1228,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 75.05000000000052,
+      "energy": 14.483442549953981,
+      "failure_phase": null,
+      "goal": [
+        2254.213252667544,
+        2012.013332918794,
+        103.56150999882423
+      ],
+      "mission_id": 142,
+      "policy_steps": 376,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 90.65000000000074,
+      "energy": 19.45580319308439,
+      "failure_phase": null,
+      "goal": [
+        2357.9229462910153,
+        1346.3442454238561,
+        125.84467638284265
+      ],
+      "mission_id": 143,
+      "policy_steps": 454,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 301.2999999999915,
+      "energy": 63.200040597361,
+      "failure_phase": null,
+      "goal": [
+        631.5970053580377,
+        148.32463909508888,
+        141.16335085694374
+      ],
+      "mission_id": 144,
+      "policy_steps": 1507,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 329.5499999999899,
+      "energy": 67.71540326466508,
+      "failure_phase": null,
+      "goal": [
+        174.91554304450287,
+        319.91408312544434,
+        166.8833269676949
+      ],
+      "mission_id": 145,
+      "policy_steps": 1649,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 800.0000000000449,
+      "energy": 78.1179806154613,
+      "failure_phase": "outbound",
+      "goal": [
+        1676.0571103979892,
+        1766.9166141920741,
+        341.77056209993987
+      ],
+      "mission_id": 146,
+      "policy_steps": 4000,
+      "success": false,
+      "timeout": true
+    },
+    {
+      "collision_count": 0,
+      "duration": 178.09999999999843,
+      "energy": 37.70417469700175,
+      "failure_phase": null,
+      "goal": [
+        2024.7806136634072,
+        665.4397648843276,
+        210.62036079153512
+      ],
+      "mission_id": 147,
+      "policy_steps": 891,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 136.0500000000008,
+      "energy": 31.6202485834771,
+      "failure_phase": null,
+      "goal": [
+        3715.8865047909426,
+        1375.026891304964,
+        344.194308031976
+      ],
+      "mission_id": 148,
+      "policy_steps": 681,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 109.45000000000101,
+      "energy": 22.16466500764017,
+      "failure_phase": null,
+      "goal": [
+        1934.7053109980639,
+        1653.2563899452018,
+        170.8918714982445
+      ],
+      "mission_id": 149,
+      "policy_steps": 548,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 227.19999999999564,
+      "energy": 46.313212977340235,
+      "failure_phase": null,
+      "goal": [
+        3703.343847300083,
+        3878.227412712702,
+        218.9067590642595
+      ],
+      "mission_id": 150,
+      "policy_steps": 1136,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 310.7999999999909,
+      "energy": 67.27366066096333,
+      "failure_phase": null,
+      "goal": [
+        595.6697622414847,
+        3858.85940112148,
+        107.2306285465303
+      ],
+      "mission_id": 151,
+      "policy_steps": 1554,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 277.74999999999284,
+      "energy": 57.15357627245253,
+      "failure_phase": null,
+      "goal": [
+        518.5720011862884,
+        2914.2168538708074,
+        372.95536786406603
+      ],
+      "mission_id": 152,
+      "policy_steps": 1390,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 79.60000000000058,
+      "energy": 19.437587719132477,
+      "failure_phase": null,
+      "goal": [
+        3465.122690667872,
+        2135.7826504249497,
+        106.18421146301876
+      ],
+      "mission_id": 153,
+      "policy_steps": 399,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 130.25000000000117,
+      "energy": 26.7016996189439,
+      "failure_phase": null,
+      "goal": [
+        2873.148818268456,
+        797.6040677042357,
+        216.89138180037003
+      ],
+      "mission_id": 154,
+      "policy_steps": 652,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 142.75000000000043,
+      "energy": 30.97179044672276,
+      "failure_phase": null,
+      "goal": [
+        1778.7548369983526,
+        2748.55654246409,
+        51.13981925649712
+      ],
+      "mission_id": 155,
+      "policy_steps": 715,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 98.00000000000084,
+      "energy": 23.61578580639659,
+      "failure_phase": null,
+      "goal": [
+        3282.7974170634184,
+        1466.7747513533395,
+        356.1631215642526
+      ],
+      "mission_id": 156,
+      "policy_steps": 491,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 121.50000000000118,
+      "energy": 24.581103373451054,
+      "failure_phase": null,
+      "goal": [
+        1804.5062608681937,
+        1868.5908080505144,
+        238.0516616656147
+      ],
+      "mission_id": 157,
+      "policy_steps": 608,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 119.65000000000116,
+      "energy": 25.354244936422862,
+      "failure_phase": null,
+      "goal": [
+        2460.558771470201,
+        1052.1925459397837,
+        114.77665597631942
+      ],
+      "mission_id": 158,
+      "policy_steps": 599,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 132.50000000000102,
+      "energy": 29.23676374983211,
+      "failure_phase": null,
+      "goal": [
+        3075.2071656210737,
+        1080.8720324689953,
+        202.29841397629144
+      ],
+      "mission_id": 159,
+      "policy_steps": 664,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 318.49999999999045,
+      "energy": 66.70148808395355,
+      "failure_phase": null,
+      "goal": [
+        437.0742875890025,
+        110.90437711379555,
+        119.05053810050373
+      ],
+      "mission_id": 160,
+      "policy_steps": 1593,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 204.59999999999692,
+      "energy": 42.128124893611485,
+      "failure_phase": null,
+      "goal": [
+        2669.940767743125,
+        161.284801689709,
+        372.10610637347736
+      ],
+      "mission_id": 161,
+      "policy_steps": 1023,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 118.90000000000114,
+      "energy": 26.316129735389474,
+      "failure_phase": null,
+      "goal": [
+        2733.4529779513064,
+        1084.8173553535944,
+        43.07024520202798
+      ],
+      "mission_id": 162,
+      "policy_steps": 595,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 276.49999999999284,
+      "energy": 62.27487731454644,
+      "failure_phase": null,
+      "goal": [
+        1077.033028452774,
+        3819.1376673964637,
+        168.09118503911063
+      ],
+      "mission_id": 163,
+      "policy_steps": 1383,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 518.599999999981,
+      "energy": 53.92777366731115,
+      "failure_phase": null,
+      "goal": [
+        3784.6405373963607,
+        2285.6471371808475,
+        236.93548123765424
+      ],
+      "mission_id": 164,
+      "policy_steps": 2594,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 54.500000000000234,
+      "energy": 10.059354286837095,
+      "failure_phase": null,
+      "goal": [
+        2679.9048003098133,
+        1803.3756914271382,
+        337.44680992737835
+      ],
+      "mission_id": 165,
+      "policy_steps": 274,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 179.19999999999837,
+      "energy": 38.119914663459994,
+      "failure_phase": null,
+      "goal": [
+        3351.3356559212066,
+        591.1307993566274,
+        321.0654862943928
+      ],
+      "mission_id": 166,
+      "policy_steps": 897,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 220.24999999999605,
+      "energy": 44.43997323208151,
+      "failure_phase": null,
+      "goal": [
+        976.3846471625293,
+        1091.92051533337,
+        184.51315782469666
+      ],
+      "mission_id": 167,
+      "policy_steps": 1102,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 183.09999999999815,
+      "energy": 36.01851435055188,
+      "failure_phase": null,
+      "goal": [
+        1265.8366618285563,
+        2475.1459231132635,
+        155.2672954490603
+      ],
+      "mission_id": 168,
+      "policy_steps": 916,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 205.79999999999686,
+      "energy": 43.313984747849865,
+      "failure_phase": null,
+      "goal": [
+        2156.73812400439,
+        3817.373870877313,
+        237.84770091490032
+      ],
+      "mission_id": 169,
+      "policy_steps": 1030,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 141.20000000000056,
+      "energy": 30.0493878857366,
+      "failure_phase": null,
+      "goal": [
+        3880.6870893973273,
+        2875.3341952395167,
+        290.37842857760904
+      ],
+      "mission_id": 170,
+      "policy_steps": 707,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 170.0499999999989,
+      "energy": 38.7937245348775,
+      "failure_phase": null,
+      "goal": [
+        3469.0364232471666,
+        806.7190521780848,
+        97.38633509365748
+      ],
+      "mission_id": 171,
+      "policy_steps": 851,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 186.049999999998,
+      "energy": 39.169698075909004,
+      "failure_phase": null,
+      "goal": [
+        3778.917871983688,
+        3262.1684990549343,
+        351.75316400439925
+      ],
+      "mission_id": 172,
+      "policy_steps": 931,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 125.65000000000124,
+      "energy": 28.023080779964033,
+      "failure_phase": null,
+      "goal": [
+        2567.910924531113,
+        909.9318390892023,
+        344.7373786228898
+      ],
+      "mission_id": 173,
+      "policy_steps": 629,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 74.85000000000052,
+      "energy": 16.181188423991173,
+      "failure_phase": null,
+      "goal": [
+        3395.3479093447804,
+        2434.579878135337,
+        239.76714530979268
+      ],
+      "mission_id": 174,
+      "policy_steps": 375,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 137.50000000000074,
+      "energy": 31.558577852977216,
+      "failure_phase": null,
+      "goal": [
+        1967.115109131626,
+        2861.2711468868756,
+        82.05088774599047
+      ],
+      "mission_id": 175,
+      "policy_steps": 689,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 290.79999999999205,
+      "energy": 60.78860613950652,
+      "failure_phase": null,
+      "goal": [
+        363.7808691253185,
+        2874.466867397938,
+        285.8909701497273
+      ],
+      "mission_id": 176,
+      "policy_steps": 1454,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 240.29999999999492,
+      "energy": 49.7494585246347,
+      "failure_phase": null,
+      "goal": [
+        1330.090690651131,
+        391.71288764786675,
+        149.40623972474924
+      ],
+      "mission_id": 177,
+      "policy_steps": 1202,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 185.29999999999805,
+      "energy": 38.46681209726317,
+      "failure_phase": null,
+      "goal": [
+        2728.7603032395396,
+        273.66355817173223,
+        199.59327653019815
+      ],
+      "mission_id": 178,
+      "policy_steps": 927,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 897,
+      "duration": 800.0000000000449,
+      "energy": 150.78695620232875,
+      "failure_phase": "outbound",
+      "goal": [
+        3843.844957799155,
+        1931.6148953616657,
+        189.22391325475667
+      ],
+      "mission_id": 179,
+      "policy_steps": 4000,
+      "success": false,
+      "timeout": true
+    },
+    {
+      "collision_count": 0,
+      "duration": 251.74999999999423,
+      "energy": 46.041466273784,
+      "failure_phase": null,
+      "goal": [
+        483.1876444410607,
+        2224.18326284749,
+        99.28704935262746
+      ],
+      "mission_id": 180,
+      "policy_steps": 1260,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 122.30000000000119,
+      "energy": 23.156874477507095,
+      "failure_phase": null,
+      "goal": [
+        1836.8402655178681,
+        2259.7855750767717,
+        181.74780188244753
+      ],
+      "mission_id": 181,
+      "policy_steps": 612,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 110.40000000000101,
+      "energy": 25.695756714079657,
+      "failure_phase": null,
+      "goal": [
+        3168.2308816892883,
+        1231.595752287497,
+        304.40615693715824
+      ],
+      "mission_id": 182,
+      "policy_steps": 553,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 95.90000000000082,
+      "energy": 20.371071744539318,
+      "failure_phase": null,
+      "goal": [
+        2145.515553399995,
+        2499.2652519618264,
+        261.74802944713434
+      ],
+      "mission_id": 183,
+      "policy_steps": 480,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 117.05000000000112,
+      "energy": 23.53386705109705,
+      "failure_phase": null,
+      "goal": [
+        1845.4552946637484,
+        1774.6100564437304,
+        30.937968653552158
+      ],
+      "mission_id": 184,
+      "policy_steps": 586,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 249.3999999999944,
+      "energy": 52.69447577894731,
+      "failure_phase": null,
+      "goal": [
+        809.2836905502242,
+        3246.730772224837,
+        273.9224310916902
+      ],
+      "mission_id": 185,
+      "policy_steps": 1248,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 203.34999999999698,
+      "energy": 42.339367781841716,
+      "failure_phase": null,
+      "goal": [
+        1299.2439639651338,
+        877.9103562505265,
+        225.4622449904812
+      ],
+      "mission_id": 186,
+      "policy_steps": 1018,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 121.30000000000118,
+      "energy": 26.359472376737013,
+      "failure_phase": null,
+      "goal": [
+        2153.2966138372417,
+        2883.2355227708854,
+        197.10725103018675
+      ],
+      "mission_id": 187,
+      "policy_steps": 607,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 191.59999999999766,
+      "energy": 39.464921950318406,
+      "failure_phase": null,
+      "goal": [
+        3023.460598332653,
+        188.9084976653182,
+        200.76447579448643
+      ],
+      "mission_id": 188,
+      "policy_steps": 959,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 207.64999999999677,
+      "energy": 42.54678725062026,
+      "failure_phase": null,
+      "goal": [
+        1618.4323724729006,
+        579.3805989623227,
+        134.7924013497344
+      ],
+      "mission_id": 189,
+      "policy_steps": 1039,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 183.49999999999815,
+      "energy": 38.09431153391811,
+      "failure_phase": null,
+      "goal": [
+        1701.6571548213049,
+        773.0650472102764,
+        140.24128399384176
+      ],
+      "mission_id": 190,
+      "policy_steps": 918,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 141.8500000000005,
+      "energy": 33.32409036734264,
+      "failure_phase": null,
+      "goal": [
+        3726.8904167115907,
+        1250.3986067167732,
+        245.14636116506804
+      ],
+      "mission_id": 191,
+      "policy_steps": 710,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 132.05000000000106,
+      "energy": 27.84033581782229,
+      "failure_phase": null,
+      "goal": [
+        2837.9930016401518,
+        767.2393994199468,
+        157.10068354726548
+      ],
+      "mission_id": 192,
+      "policy_steps": 661,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 223.14999999999588,
+      "energy": 47.77235604970283,
+      "failure_phase": null,
+      "goal": [
+        3372.2786073781153,
+        151.71314162825482,
+        191.8153559815357
+      ],
+      "mission_id": 193,
+      "policy_steps": 1116,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 288.29999999999217,
+      "energy": 55.02999817136322,
+      "failure_phase": null,
+      "goal": [
+        200.15611418612838,
+        2447.8626414399196,
+        303.66833817378017
+      ],
+      "mission_id": 194,
+      "policy_steps": 1442,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 187.7499999999979,
+      "energy": 39.943894982336644,
+      "failure_phase": null,
+      "goal": [
+        3414.9070708987197,
+        3654.6755991047667,
+        187.50452351773092
+      ],
+      "mission_id": 195,
+      "policy_steps": 940,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 257.8499999999939,
+      "energy": 48.024266930854836,
+      "failure_phase": null,
+      "goal": [
+        421.9123861184954,
+        2210.8184680088725,
+        261.1480182768652
+      ],
+      "mission_id": 196,
+      "policy_steps": 1290,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 108.000000000001,
+      "energy": 24.10340558024559,
+      "failure_phase": null,
+      "goal": [
+        3225.1089559279612,
+        2850.3364959625296,
+        365.05602965092027
+      ],
+      "mission_id": 197,
+      "policy_steps": 540,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 99.10000000000086,
+      "energy": 20.667140917702632,
+      "failure_phase": null,
+      "goal": [
+        2709.8689501843646,
+        1113.999026491088,
+        248.34100327059727
+      ],
+      "mission_id": 198,
+      "policy_steps": 497,
+      "success": true,
+      "timeout": false
+    },
+    {
+      "collision_count": 0,
+      "duration": 216.54999999999626,
+      "energy": 40.14184853783177,
+      "failure_phase": null,
+      "goal": [
+        844.6737216382284,
+        1802.53681671754,
+        105.02684580051482
+      ],
+      "mission_id": 199,
+      "policy_steps": 1083,
+      "success": true,
+      "timeout": false
+    }
+  ],
+  "recharge_rate": 0.36027315566870943,
+  "successes": 195,
+  "timeouts": 5
+}

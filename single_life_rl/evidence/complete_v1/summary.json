@@ -1,0 +1,402 @@
+[
+  {
+    "catastrophe_rate": 0.0,
+    "catastrophe_wilson95": [
+      1.0842021724855044e-19,
+      0.001917047281252934
+    ],
+    "catastrophes": 0,
+    "certification_fraction": 1.0,
+    "certified": 2000,
+    "mean_certified_time": 0.0,
+    "mean_cycles": 20000.0,
+    "mean_exploration_time": 0.0,
+    "mean_regret": 0.0,
+    "mean_unlocked": 0.0,
+    "method": "Oracle",
+    "restricted_mean_certification_time": 0.0,
+    "runs": 2000,
+    "suite": "binary",
+    "true_model_eliminations": 0
+  },
+  {
+    "catastrophe_rate": 0.0,
+    "catastrophe_wilson95": [
+      1.0842021724855044e-19,
+      0.001917047281252934
+    ],
+    "catastrophes": 0,
+    "certification_fraction": 0.0,
+    "certified": 0,
+    "mean_certified_time": null,
+    "mean_cycles": 20000.0,
+    "mean_exploration_time": 0.0,
+    "mean_regret": 16000.0,
+    "mean_unlocked": 0.0,
+    "method": "RobustOnly",
+    "restricted_mean_certification_time": 20000.0,
+    "runs": 2000,
+    "suite": "binary",
+    "true_model_eliminations": 0
+  },
+  {
+    "catastrophe_rate": 0.029,
+    "catastrophe_wilson95": [
+      0.022500401616129873,
+      0.03730545692281039
+    ],
+    "catastrophes": 58,
+    "certification_fraction": 0.8,
+    "certified": 1600,
+    "mean_certified_time": 297.7825,
+    "mean_cycles": 19428.877,
+    "mean_exploration_time": 238.226,
+    "mean_regret": 3961.7328000000007,
+    "mean_unlocked": 0.0,
+    "method": "SafeRefine",
+    "restricted_mean_certification_time": 4238.226,
+    "runs": 2000,
+    "suite": "binary",
+    "true_model_eliminations": 58
+  },
+  {
+    "catastrophe_rate": 0.029,
+    "catastrophe_wilson95": [
+      0.022500401616129873,
+      0.03730545692281039
+    ],
+    "catastrophes": 58,
+    "certification_fraction": 0.8,
+    "certified": 1600,
+    "mean_certified_time": 297.7825,
+    "mean_cycles": 19428.877,
+    "mean_exploration_time": 238.226,
+    "mean_regret": 3961.7328000000007,
+    "mean_unlocked": 0.0,
+    "method": "StaticSafeID",
+    "restricted_mean_certification_time": 4238.226,
+    "runs": 2000,
+    "suite": "binary",
+    "true_model_eliminations": 58
+  },
+  {
+    "catastrophe_rate": 0.5,
+    "catastrophe_wilson95": [
+      0.4781079507511692,
+      0.5218920492488308
+    ],
+    "catastrophes": 1000,
+    "certification_fraction": 0.0,
+    "certified": 0,
+    "mean_certified_time": null,
+    "mean_cycles": 10000.5,
+    "mean_exploration_time": 0.0,
+    "mean_regret": 10000.0,
+    "mean_unlocked": 0.0,
+    "method": "UnsafeMLE",
+    "restricted_mean_certification_time": 20000.0,
+    "runs": 2000,
+    "suite": "binary",
+    "true_model_eliminations": 0
+  },
+  {
+    "catastrophe_rate": 0.03,
+    "catastrophe_wilson95": [
+      0.018263213197913384,
+      0.04890366683594573
+    ],
+    "catastrophes": 15,
+    "certification_fraction": 0.99,
+    "certified": 495,
+    "mean_certified_time": 172.3030303030303,
+    "mean_cycles": 48534.35,
+    "mean_exploration_time": 1889.022,
+    "mean_regret": 2976.8895999999845,
+    "mean_unlocked": 1.0,
+    "method": "FullModelID",
+    "restricted_mean_certification_time": 670.58,
+    "runs": 500,
+    "suite": "nuisance",
+    "true_model_eliminations": 17
+  },
+  {
+    "catastrophe_rate": 0.03,
+    "catastrophe_wilson95": [
+      0.018263213197913384,
+      0.04890366683594573
+    ],
+    "catastrophes": 15,
+    "certification_fraction": 0.99,
+    "certified": 495,
+    "mean_certified_time": 172.3030303030303,
+    "mean_cycles": 48504.39,
+    "mean_exploration_time": 170.79,
+    "mean_regret": 1632.2639999999997,
+    "mean_unlocked": 1.0,
+    "method": "SafeRefine",
+    "restricted_mean_certification_time": 670.58,
+    "runs": 500,
+    "suite": "nuisance",
+    "true_model_eliminations": 15
+  },
+  {
+    "catastrophe_rate": 0.033,
+    "catastrophe_wilson95": [
+      0.028395990126238967,
+      0.0383210434904444
+    ],
+    "catastrophes": 165,
+    "certification_fraction": 0.9726,
+    "certified": 4863,
+    "mean_certified_time": 1000.8595517170471,
+    "mean_cycles": 28367.8552,
+    "mean_exploration_time": 982.9464,
+    "mean_regret": 1891.7379599999997,
+    "mean_unlocked": 1.9746,
+    "method": "FullModelID",
+    "restricted_mean_certification_time": 1795.436,
+    "runs": 5000,
+    "suite": "random",
+    "true_model_eliminations": 165
+  },
+  {
+    "catastrophe_rate": 0.0,
+    "catastrophe_wilson95": [
+      0.0,
+      0.0007677019450571244
+    ],
+    "catastrophes": 0,
+    "certification_fraction": 1.0,
+    "certified": 5000,
+    "mean_certified_time": 0.0,
+    "mean_cycles": 30000.0,
+    "mean_exploration_time": 0.0,
+    "mean_regret": 0.0,
+    "mean_unlocked": 0.0,
+    "method": "Oracle",
+    "restricted_mean_certification_time": 0.0,
+    "runs": 5000,
+    "suite": "random",
+    "true_model_eliminations": 0
+  },
+  {
+    "catastrophe_rate": 0.033,
+    "catastrophe_wilson95": [
+      0.028395990126238967,
+      0.0383210434904444
+    ],
+    "catastrophes": 165,
+    "certification_fraction": 0.9726,
+    "certified": 4863,
+    "mean_certified_time": 1000.8595517170471,
+    "mean_cycles": 28367.8552,
+    "mean_exploration_time": 982.9464,
+    "mean_regret": 1891.7379599999997,
+    "mean_unlocked": 1.9746,
+    "method": "SafeRefine",
+    "restricted_mean_certification_time": 1795.436,
+    "runs": 5000,
+    "suite": "random",
+    "true_model_eliminations": 165
+  },
+  {
+    "catastrophe_rate": 0.0,
+    "catastrophe_wilson95": [
+      0.0,
+      0.0007677019450571244
+    ],
+    "catastrophes": 0,
+    "certification_fraction": 0.0,
+    "certified": 0,
+    "mean_certified_time": null,
+    "mean_cycles": 29828.7032,
+    "mean_exploration_time": 255.7692,
+    "mean_regret": 24034.259360000004,
+    "mean_unlocked": 0.0,
+    "method": "StaticSafeID",
+    "restricted_mean_certification_time": 30000.0,
+    "runs": 5000,
+    "suite": "random",
+    "true_model_eliminations": 127
+  },
+  {
+    "catastrophe_rate": 0.0,
+    "catastrophe_wilson95": [
+      2.168404344971009e-19,
+      0.0023951611922532253
+    ],
+    "catastrophes": 0,
+    "certification_fraction": 1.0,
+    "certified": 1600,
+    "mean_certified_time": 0.0,
+    "mean_cycles": 30000.0,
+    "mean_exploration_time": 0.0,
+    "mean_regret": 0.0,
+    "mean_unlocked": 0.0,
+    "method": "Oracle",
+    "restricted_mean_certification_time": 0.0,
+    "runs": 1600,
+    "suite": "recursive",
+    "true_model_eliminations": 0
+  },
+  {
+    "catastrophe_rate": 0.0,
+    "catastrophe_wilson95": [
+      2.168404344971009e-19,
+      0.0023951611922532253
+    ],
+    "catastrophes": 0,
+    "certification_fraction": 0.0,
+    "certified": 0,
+    "mean_certified_time": null,
+    "mean_cycles": 30000.0,
+    "mean_exploration_time": 0.0,
+    "mean_regret": 24000.0,
+    "mean_unlocked": 0.0,
+    "method": "RobustOnly",
+    "restricted_mean_certification_time": 30000.0,
+    "runs": 1600,
+    "suite": "recursive",
+    "true_model_eliminations": 0
+  },
+  {
+    "catastrophe_rate": 0.0325,
+    "catastrophe_wilson95": [
+      0.02486949999728803,
+      0.04236997571746874
+    ],
+    "catastrophes": 52,
+    "certification_fraction": 0.98,
+    "certified": 1568,
+    "mean_certified_time": 390.2066326530612,
+    "mean_cycles": 29034.7725,
+    "mean_exploration_time": 385.8625,
+    "mean_regret": 1273.934,
+    "mean_unlocked": 1.0,
+    "method": "SafeRefine",
+    "restricted_mean_certification_time": 982.4025,
+    "runs": 1600,
+    "suite": "recursive",
+    "true_model_eliminations": 52
+  },
+  {
+    "catastrophe_rate": 0.0,
+    "catastrophe_wilson95": [
+      2.168404344971009e-19,
+      0.0023951611922532253
+    ],
+    "catastrophes": 0,
+    "certification_fraction": 0.0,
+    "certified": 0,
+    "mean_certified_time": null,
+    "mean_cycles": 30000.0,
+    "mean_exploration_time": 180.42,
+    "mean_regret": 24000.0,
+    "mean_unlocked": 0.0,
+    "method": "StaticSafeID",
+    "restricted_mean_certification_time": 30000.0,
+    "runs": 1600,
+    "suite": "recursive",
+    "true_model_eliminations": 32
+  },
+  {
+    "catastrophe_rate": 0.75,
+    "catastrophe_wilson95": [
+      0.7282009438222706,
+      0.7706014755816027
+    ],
+    "catastrophes": 1200,
+    "certification_fraction": 0.0,
+    "certified": 0,
+    "mean_certified_time": null,
+    "mean_cycles": 7500.75,
+    "mean_exploration_time": 0.0,
+    "mean_regret": 22500.0,
+    "mean_unlocked": 0.0,
+    "method": "UnsafeMLE",
+    "restricted_mean_certification_time": 30000.0,
+    "runs": 1600,
+    "suite": "recursive",
+    "true_model_eliminations": 0
+  },
+  {
+    "catastrophe_rate": 0.0,
+    "catastrophe_wilson95": [
+      4.336808689942018e-19,
+      0.007624340461552241
+    ],
+    "catastrophes": 0,
+    "certification_fraction": 0.0,
+    "certified": 0,
+    "mean_certified_time": null,
+    "mean_cycles": 516.8,
+    "mean_exploration_time": 0.0,
+    "mean_regret": 0.38129434073085805,
+    "mean_unlocked": 20.6,
+    "method": "CertaintyEquivalent",
+    "restricted_mean_certification_time": 20000.0,
+    "runs": 500,
+    "suite": "uav",
+    "true_model_eliminations": 0
+  },
+  {
+    "catastrophe_rate": 0.0,
+    "catastrophe_wilson95": [
+      4.336808689942018e-19,
+      0.007624340461552241
+    ],
+    "catastrophes": 0,
+    "certification_fraction": 1.0,
+    "certified": 500,
+    "mean_certified_time": 0.0,
+    "mean_cycles": 516.8,
+    "mean_exploration_time": 0.0,
+    "mean_regret": 0.38129434073085805,
+    "mean_unlocked": 0.0,
+    "method": "Oracle",
+    "restricted_mean_certification_time": 0.0,
+    "runs": 500,
+    "suite": "uav",
+    "true_model_eliminations": 0
+  },
+  {
+    "catastrophe_rate": 0.0,
+    "catastrophe_wilson95": [
+      4.336808689942018e-19,
+      0.007624340461552241
+    ],
+    "catastrophes": 0,
+    "certification_fraction": 1.0,
+    "certified": 500,
+    "mean_certified_time": 0.0,
+    "mean_cycles": 516.8,
+    "mean_exploration_time": 0.0,
+    "mean_regret": 0.38129434073085805,
+    "mean_unlocked": 0.0,
+    "method": "SafeRefine",
+    "restricted_mean_certification_time": 0.0,
+    "runs": 500,
+    "suite": "uav",
+    "true_model_eliminations": 0
+  },
+  {
+    "catastrophe_rate": 0.0,
+    "catastrophe_wilson95": [
+      4.336808689942018e-19,
+      0.007624340461552241
+    ],
+    "catastrophes": 0,
+    "certification_fraction": 0.0,
+    "certified": 0,
+    "mean_certified_time": null,
+    "mean_cycles": 516.8,
+    "mean_exploration_time": 0.0,
+    "mean_regret": 0.38129434073085805,
+    "mean_unlocked": 0.0,
+    "method": "WorstCaseRobust",
+    "restricted_mean_certification_time": 20000.0,
+    "runs": 500,
+    "suite": "uav",
+    "true_model_eliminations": 0
+  }
+]
