@@ -1,5 +1,9 @@
 # PersistentUAVThroughput-v1
 
+最新授权：只做 [Oracle Recoverability Census](ORACLE_RECOVERABILITY_CENSUS.md)，
+固定 205 个历史 failure-predecessor 状态、561 个有界分支；先精确回放恢复完整 simulator state，
+再检查 task+immediate-return 或合法的 immediate-return。不运行完整 OracleSafe policy、MPC 或训练。
+
 最新离线分析：[Stranding Decomposition](evidence/stranding_decomposition_20260920/README.md)。
 166 次返航耗尽分为 67 次 predicted-infeasible fallback、37 次任务低估余量翻转、
 40 次任务完成后等待造成的余量翻转、22 次返航预测 false-safe；另有 53 次任务耗尽和 8 次等待耗尽。

@@ -1,5 +1,18 @@
 # PersistentUAVThroughput-v1
 
+Latest user review after a7f298f authorizes only an Oracle Recoverability Census:
+- 205 fixed predecessor states: A=67 fallback; B=40 waiting-margin-loss + 8 waiting
+  depletion; C=37 task-error margin flips + 53 task depletion. B is evaluated before idle.
+- Reconstruct full simulator states by exact historical B5 replay because per-decision
+  snapshots were not retained. Reject mismatching states; do not branch from observations.
+- Branch every queued task followed by immediate return, plus legal direct return;
+  561 fixed branches. No full OracleSafe policy, training, MPC, tuning or kill test.
+- Preserve original horizon/physics/actor/action legality; censoring remains unknown,
+  navigation timeout separate from energy depletion. No successful branch does not
+  prove global viability or regime infeasibility.
+- Focused tests, one small real replay/clone/resume smoke, then first resumable
+  checkpoints and hand back. No monitoring to completion or automatic next stage.
+
 Latest user review after f15de33 authorizes offline Stranding Decomposition only:
 - Use the existing 270 B5 runs; no new simulations or policies, including OracleSafe.
 - Decompose pre-task to post-task reserve using measured task cost and the return
