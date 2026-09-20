@@ -1,5 +1,12 @@
 # 当前项目结论
 
+2026-09-20 后续整理：将父目录剩余 6 个 FPL/旧版 budget-reading 目录及 8 个
+散落记录文件，归档到 `/home/zjl/research_archive_20260920/remaining_research_records.tar.gz`。
+216 个文件逐项 SHA256 核对后移除原路径，33.40 MiB 原始内容压缩为 5.61 MiB。
+归档含私有 seed-custody 记录，目录 0700、压缩包 0600；不作公开分享包。
+恢复映射见 `docs/cleanup_20260920/remaining_parent_archive.json`。
+独立 article 项目、control_adaptation checkpoint、参考源码与全部依赖仍保留。
+
 2026-09-20 父目录清理：经逐文件 SHA256 核对，删除 11 个 FPL 目录和
 corrected budget-reading 副本（共 608 个文件、约 50.84 MiB），全部内容在仓库
 tracked evidence 文件或 ZIP 成员中保留；空 Downloads 一并移除。
