@@ -1,0 +1,173 @@
+{
+  "runs": 270,
+  "completed_tasks": 3945,
+  "total_return_decisions": 1085,
+  "depletion": 227,
+  "navigation_failure": 42,
+  "horizon_survivors": 1,
+  "flight_depletion": 219,
+  "depletion_phase_counts": {
+    "return": 166,
+    "task": 53,
+    "waiting": 8
+  },
+  "mutually_exclusive_depletion_categories": {
+    "fallback_predicted_infeasible_before_task": 67,
+    "post_task_waiting_margin_loss": 40,
+    "return_prediction_false_safe": 22,
+    "task_prediction_false_safe": 53,
+    "task_underestimation_sufficient_for_margin_flip": 37,
+    "waiting_depletion": 8
+  },
+  "denominator_notes": "Categories partition observed depletions; not causal fractions or full-policy counterfactuals.",
+  "return_decomposition": {
+    "n": 166,
+    "preceding_task_fallback": 67,
+    "accepted_task_positive_pre_margin": 99,
+    "task_error_sufficient_positive_to_nonpositive_post": 37,
+    "endpoint_only_or_joint_flip": 0,
+    "positive_post_to_nonpositive_departure": 42,
+    "wait_flip_preceded_by_fallback": 2,
+    "nonpositive_return_departure": 144,
+    "positive_return_departure_false_safe": 22,
+    "idle_between_task_and_return": 50,
+    "max_abs_task_identity_error": 7.105427357601002e-15,
+    "max_abs_return_identity_error": 0.0
+  },
+  "subgroup_statistics": {
+    "all_completed_task_energy_error": {
+      "n": 3945,
+      "min": -6.544699060119655,
+      "median": -0.6480513360198881,
+      "mean": -0.09438918505123965,
+      "q95": 3.9882349316324985,
+      "max": 57.12965092950619
+    },
+    "preceding_task_error_return_failures": {
+      "n": 166,
+      "min": -6.266052894181051,
+      "median": 1.515216069575727,
+      "mean": 3.50718103656122,
+      "q95": 15.34848344474765,
+      "max": 57.12965092950619
+    },
+    "endpoint_shift_return_failures": {
+      "n": 166,
+      "min": -0.07032160507454321,
+      "median": -0.0179643500034814,
+      "mean": -0.014761743811345863,
+      "q95": 0.04918737047782784,
+      "max": 0.07766149225395225
+    },
+    "task_flip_pre_margin": {
+      "n": 37,
+      "min": 0.03571274662542123,
+      "median": 1.8950427185289804,
+      "mean": 7.6739546883479965,
+      "q95": 50.85547083102697,
+      "max": 50.85547083102697
+    },
+    "task_flip_task_error": {
+      "n": 37,
+      "min": 0.26800959753816755,
+      "median": 6.903389630493647,
+      "mean": 13.4083515947528,
+      "q95": 57.12965092950619,
+      "max": 57.12965092950619
+    },
+    "task_flip_endpoint_shift": {
+      "n": 37,
+      "min": -0.06005653282934276,
+      "median": -0.00526250368110226,
+      "mean": -0.011917154024847906,
+      "q95": 0.03928015658266509,
+      "max": 0.06545450469162262
+    },
+    "wait_flip_energy_loss": {
+      "n": 42,
+      "min": 4.404,
+      "median": 23.403000000000006,
+      "mean": 27.31564285714286,
+      "q95": 51.666000000000004,
+      "max": 78.22500000000001
+    },
+    "wait_flip_task_error": {
+      "n": 42,
+      "min": -6.266052894181051,
+      "median": -1.1965619252158115,
+      "mean": -1.0373181156740887,
+      "q95": 2.8614696057774873,
+      "max": 4.733518737847994
+    },
+    "positive_return_false_safe_margin": {
+      "n": 22,
+      "min": 0.0866443633876699,
+      "median": 2.6355313752628824,
+      "mean": 3.065193914601715,
+      "q95": 11.232279401068798,
+      "max": 11.751785017466048
+    },
+    "task_depletion_prediction_error_lower_bound": {
+      "n": 53,
+      "min": 13.416597678155116,
+      "median": 34.451704561835456,
+      "mean": 46.850256464206076,
+      "q95": 112.44168959182099,
+      "max": 123.06507871191029
+    },
+    "positive_return_false_safe_previous_task_error": {
+      "n": 22,
+      "min": -1.5080159323785587,
+      "median": 1.1851047709411713,
+      "mean": 1.2498454177848133,
+      "q95": 4.205641094358223,
+      "max": 4.917434791805945
+    }
+  },
+  "all_completed_task_transitions": {
+    "estimated_feasible": 3866,
+    "fallback": 79,
+    "positive_pre_to_nonpositive_post": 59,
+    "nonpositive_post": 135,
+    "positive_to_nonpositive_then_successful_return": 22,
+    "positive_to_nonpositive_then_return_depletion": 37
+  },
+  "observed_return_prediction_table": {
+    "positive_margin_arrival": 880,
+    "positive_margin_depletion": 22,
+    "nonpositive_margin_arrival": 39,
+    "nonpositive_margin_depletion": 144
+  },
+  "by_battery_tilde": {
+    "2.0": {
+      "runs": 90,
+      "depletion_categories": {
+        "fallback_predicted_infeasible_before_task": 67,
+        "task_prediction_false_safe": 9,
+        "return_prediction_false_safe": 7,
+        "task_underestimation_sufficient_for_margin_flip": 6,
+        "waiting_depletion": 1
+      }
+    },
+    "4.0": {
+      "runs": 90,
+      "depletion_categories": {
+        "task_underestimation_sufficient_for_margin_flip": 20,
+        "post_task_waiting_margin_loss": 23,
+        "task_prediction_false_safe": 21,
+        "waiting_depletion": 4,
+        "return_prediction_false_safe": 8
+      }
+    },
+    "6.0": {
+      "runs": 90,
+      "depletion_categories": {
+        "post_task_waiting_margin_loss": 17,
+        "waiting_depletion": 3,
+        "task_prediction_false_safe": 23,
+        "return_prediction_false_safe": 7,
+        "task_underestimation_sufficient_for_margin_flip": 11
+      }
+    }
+  }
+}

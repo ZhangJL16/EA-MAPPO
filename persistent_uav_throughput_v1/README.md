@@ -1,5 +1,11 @@
 # PersistentUAVThroughput-v1
 
+最新离线分析：[Stranding Decomposition](evidence/stranding_decomposition_20260920/README.md)。
+166 次返航耗尽分为 67 次 predicted-infeasible fallback、37 次任务低估余量翻转、
+40 次任务完成后等待造成的余量翻转、22 次返航预测 false-safe；另有 53 次任务耗尽和 8 次等待耗尽。
+仅分析已有日志，未启动新 simulation/policy。不能把所有失败归为估计误差，
+也不能把预测负余量等同于真实不可恢复。
+
 最新结果：**B5 reserve-SJF validation 已于 2026-09-20 20:59 完成全部 270 次**，
 27/27 个 regime 未满足经验耗尽率预算；总体 depletion 227/270、导航失败 42/270、
 补能失败 166/270，平均完成任务 14.61。见 [完整 B5 结果与原始诊断记录](evidence/b5_validation_complete_20260920/README.md)。

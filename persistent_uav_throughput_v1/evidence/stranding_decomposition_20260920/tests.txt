@@ -1,0 +1,12 @@
+test_depleted_leg_energy_is_censored_not_completed_cost (test_stranding.StrandingTests.test_depleted_leg_energy_is_censored_not_completed_cost) ... ok
+test_endpoint_only_and_joint_are_not_task_only (test_stranding.StrandingTests.test_endpoint_only_and_joint_are_not_task_only) ... ok
+test_fallback_precedence_keeps_overlapping_wait_visible (test_stranding.StrandingTests.test_fallback_precedence_keeps_overlapping_wait_visible) ... ok
+test_goal_radius_zero_estimate_boundary (test_stranding.StrandingTests.test_goal_radius_zero_estimate_boundary) ... ok
+test_return_false_safe_is_departure_specific (test_stranding.StrandingTests.test_return_false_safe_is_departure_specific) ... ok
+test_task_error_sufficient_and_both_identities (test_stranding.StrandingTests.test_task_error_sufficient_and_both_identities) ... ok
+test_waiting_loss_without_task_error (test_stranding.StrandingTests.test_waiting_loss_without_task_error) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.000s
+
+OK

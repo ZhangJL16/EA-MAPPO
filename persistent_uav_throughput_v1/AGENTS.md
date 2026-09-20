@@ -1,5 +1,16 @@
 # PersistentUAVThroughput-v1
 
+Latest user review after f15de33 authorizes offline Stranding Decomposition only:
+- Use the existing 270 B5 runs; no new simulations or policies, including OracleSafe.
+- Decompose pre-task to post-task reserve using measured task cost and the return
+  estimate at the actual endpoint. Separately account for any intervening idle cost.
+- Keep predicted-infeasible fallback, point-estimator false-safe, and waiting
+  mechanisms distinct. Failed-leg costs are censored, not complete energy labels.
+- Do not equate nonpositive predicted return margin with true irrecoverability.
+- New analysis: evidence/stranding_decomposition_20260920/. The 166 failed returns
+  partition into 67 fallback, 37 task-error margin flips, 40 non-fallback waiting
+  margin losses and 22 return false-safe cases. No new phase was launched.
+
 Latest user review after c158cc07 (2026-09-20) narrows the next stage:
 - B5 subsequently completed all 270 jobs at 20:59: 27/27 regimes fail empirical
   eligibility. Evidence: evidence/b5_validation_complete_20260920/. Do not rerun
