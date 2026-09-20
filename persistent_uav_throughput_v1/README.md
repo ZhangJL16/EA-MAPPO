@@ -1,5 +1,10 @@
 # PersistentUAVThroughput-v1
 
+最新授权（审阅 c158cc07 后）：只运行 **B5 reserve-SJF validation，27×10=270 次**。
+冻结估计器、参数及零额外 margin 不变；暂缓 B0–B3 与 evaluation，禁止训练及最终 kill test。
+新增逐决策预测和失败阶段日志，用于后续 feasibility / estimation / planning 分解。
+实现与运行入口见 [B5 validation 说明](B5_VALIDATION.md)。
+
 2026-09-20 ARM 最新结果：B4 validation 已完成全部 1080 次，27 个 regime 均无候选阈值满足预设耗尽率预算。完整结果、原始轨迹、校验和及迁移修复记录见 [ARM 验证结果](evidence/arm_validation_20260920/README.md)。尚未启动 evaluation 或训练；估计误差审计与估计/规划分解仍待完成。
 
 历史本地状态：本地B4在382/1080因等待网格浮点检查中断；v1.4已修复，34项测试及现场回放通过。

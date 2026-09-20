@@ -1,5 +1,19 @@
 # PersistentUAVThroughput-v1
 
+Latest user review after c158cc07 (2026-09-20) narrows the next stage:
+- B4 ARM validation is complete: none of the four preregistered candidates is
+  empirically eligible in any of 27 regimes; this does not exclude all SOC thresholds.
+- Only B5 reserve-SJF validation is GO: original 27 regimes × 10 validation seeds.
+- Preserve the frozen estimator, parameters, strict reserve test and zero added margin.
+- Log task/return predictions, starting battery, reserve margin and leg-specific
+  depletion/navigation outcomes; report throughput and all three failure rates together.
+- B0–B3 and evaluation are on hold. No training, MPC, Oracle or 98% kill test.
+- Feasibility of tight regimes is unresolved. Separate feasibility, estimation and
+  planning before interpreting B5 failure as a planning or learning opportunity.
+- Necessary focused tests, one tiny real smoke, then first-checkpoint startup health
+  and hand back. Do not monitor to completion or promote to another stage.
+- Workspace is now /mnt/workspace/zjl-exp; historical B4 path records stay immutable.
+
 Read README.md and MINIMAL_PERSISTENT_THROUGHPUT_SPEC.md first.
 This is separately scoped; the old regenerative-control project remains closed.
 Legacy flight physics/model are read-only dependencies. Preserve collision and

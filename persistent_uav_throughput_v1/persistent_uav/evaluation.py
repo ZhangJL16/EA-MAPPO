@@ -11,6 +11,7 @@ from .baselines import Scheduler
 from .config import Config, EVALUATION_SEEDS, METHODS, THRESHOLDS, VALIDATION_SEEDS
 from .environment import PersistentUAVThroughput
 from .estimates import EstimateModel
+from .diagnostics import audited_step, run_diagnostics
 from .navigation import FrozenNavigator
 from .provenance import provenance, verify_provenance
 from .storage import restore, sha, snapshot, write_json
@@ -182,12 +183,20 @@ def run(frozen_path, output, *, split, regime_ids, methods=None, threshold_file=
             scheduler = Scheduler(job['method'], model, job['threshold'])
             action = scheduler.choose(env.observe()) if env.decision_required else None
             before = env.nav.policy_steps
-            env.step(action)
+            if job['method'] == 'reserve_sjf':
+                audited_step(env, action, model)
+            else:
+                env.step(action)
             state['total_policy_steps'] += env.nav.policy_steps - before
             if env.done:
                 row = dict(**job, **env.summary())
+                artifact = dict(summary=row, events=env.events)
+                if job['method'] == 'reserve_sjf':
+                    flags, decisions = run_diagnostics(env.events, row)
+                    row.update(failure_phase=flags['failure_phase'], depletion_phase=flags['depletion_phase'])
+                    artifact['decision_diagnostics'] = decisions
                 state['rows'].append(row)
-                write_json(output / f"run_{len(state['rows'])-1:05d}.json", dict(summary=row, events=env.events))
+                write_json(output / f"run_{len(state['rows'])-1:05d}.json", artifact)
                 env.nav.close()
                 state['env'] = None
             if (state['total_policy_steps'] - previous_steps >= checkpoint_policy_steps
