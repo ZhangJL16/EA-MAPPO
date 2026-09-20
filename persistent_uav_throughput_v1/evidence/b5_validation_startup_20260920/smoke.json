@@ -1,0 +1,110 @@
+{
+  "kind": "ENGINEERING_ONLY_NOT_VALIDATION",
+  "passed": true,
+  "midflight_recovery_equal": true,
+  "finite_observation": true,
+  "training_updates": 0,
+  "summary": {
+    "completed": 0,
+    "evaluation_horizon": 1.0,
+    "simulation_time": 1.0,
+    "done": true,
+    "stream_sha256": "905c02707b9fd9b0a259af152312c5463ff610b18f419c1c139026cc772a372f",
+    "depletion": false,
+    "failure": null,
+    "failure_time": null,
+    "navigation_failure": false,
+    "recharge_failure": false,
+    "recharge_censored": false,
+    "terminal_residual_battery": 99.79032323790759,
+    "collision_count": 0,
+    "collision_free_completions": 0,
+    "arrivals": 0,
+    "accepted": 0,
+    "overflow": 0,
+    "overflow_rate": null,
+    "queue_time": [
+      0.0,
+      0.0,
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "empty_fraction": 0.0,
+    "time_by_mode": {
+      "flight": 1.0,
+      "charging": 0.0,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "recharge_attempts": 0,
+    "completed_recharges": 0,
+    "mean_completed_task_latency": null,
+    "estimate_infeasible_fallbacks": 0,
+    "physical_resets": 1,
+    "returnability": "not_an_admissibility_constraint; diagnostic_not_run"
+  },
+  "decision_diagnostics": [
+    {
+      "decision_index": 0,
+      "time": 0.0,
+      "action": {
+        "kind": "serve",
+        "task_id": 1,
+        "reason": "estimated_reserve_feasible"
+      },
+      "schema": "reserve_decision_v1",
+      "starting_battery": 100.0,
+      "candidates": [
+        {
+          "task_id": 0,
+          "predicted_task_time": 54.865931302136566,
+          "predicted_task_energy": 11.598662484082276,
+          "predicted_return_energy": 11.598662484082276,
+          "predicted_reserve_margin": 76.80267503183545,
+          "estimated_feasible": true
+        },
+        {
+          "task_id": 1,
+          "predicted_task_time": 21.948415256804314,
+          "predicted_task_energy": 4.578756308840627,
+          "predicted_return_energy": 4.578756308840627,
+          "predicted_reserve_margin": 90.84248738231875,
+          "estimated_feasible": true
+        },
+        {
+          "task_id": 2,
+          "predicted_task_time": 66.99328991549046,
+          "predicted_task_energy": 14.084627562286592,
+          "predicted_return_energy": 14.084627562286592,
+          "predicted_reserve_margin": 71.83074487542682,
+          "estimated_feasible": true
+        }
+      ],
+      "selected": {
+        "task_id": 1,
+        "predicted_task_time": 21.948415256804314,
+        "predicted_task_energy": 4.578756308840627,
+        "predicted_return_energy": 4.578756308840627,
+        "predicted_reserve_margin": 90.84248738231875,
+        "estimated_feasible": true
+      },
+      "predicted_direct_return_energy": 0.0,
+      "direct_return_margin": 100.0,
+      "margin_added": 0.0,
+      "strict_feasibility": true,
+      "run_outcome": {
+        "depletion": false,
+        "navigation_failure": false,
+        "recharge_failure": false,
+        "failure_phase": null,
+        "depletion_phase": null
+      },
+      "leg_outcome": "evaluation_cutoff",
+      "actual_leg_energy": null,
+      "leg_failure": null,
+      "leg_failure_phase": null
+    }
+  ]
+}

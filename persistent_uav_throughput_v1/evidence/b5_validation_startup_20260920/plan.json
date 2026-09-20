@@ -1,0 +1,1753 @@
+{
+  "kind": "B5_ONLY_VALIDATION",
+  "expected_jobs": [
+    {
+      "regime": 0,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260920
+    },
+    {
+      "regime": 0,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260921
+    },
+    {
+      "regime": 0,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260922
+    },
+    {
+      "regime": 0,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260923
+    },
+    {
+      "regime": 0,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260924
+    },
+    {
+      "regime": 0,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260925
+    },
+    {
+      "regime": 0,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260926
+    },
+    {
+      "regime": 0,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260927
+    },
+    {
+      "regime": 0,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260928
+    },
+    {
+      "regime": 0,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260929
+    },
+    {
+      "regime": 1,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260920
+    },
+    {
+      "regime": 1,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260921
+    },
+    {
+      "regime": 1,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260922
+    },
+    {
+      "regime": 1,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260923
+    },
+    {
+      "regime": 1,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260924
+    },
+    {
+      "regime": 1,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260925
+    },
+    {
+      "regime": 1,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260926
+    },
+    {
+      "regime": 1,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260927
+    },
+    {
+      "regime": 1,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260928
+    },
+    {
+      "regime": 1,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260929
+    },
+    {
+      "regime": 2,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260920
+    },
+    {
+      "regime": 2,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260921
+    },
+    {
+      "regime": 2,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260922
+    },
+    {
+      "regime": 2,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260923
+    },
+    {
+      "regime": 2,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260924
+    },
+    {
+      "regime": 2,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260925
+    },
+    {
+      "regime": 2,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260926
+    },
+    {
+      "regime": 2,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260927
+    },
+    {
+      "regime": 2,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260928
+    },
+    {
+      "regime": 2,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260929
+    },
+    {
+      "regime": 3,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260920
+    },
+    {
+      "regime": 3,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260921
+    },
+    {
+      "regime": 3,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260922
+    },
+    {
+      "regime": 3,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260923
+    },
+    {
+      "regime": 3,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260924
+    },
+    {
+      "regime": 3,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260925
+    },
+    {
+      "regime": 3,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260926
+    },
+    {
+      "regime": 3,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260927
+    },
+    {
+      "regime": 3,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260928
+    },
+    {
+      "regime": 3,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260929
+    },
+    {
+      "regime": 4,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260920
+    },
+    {
+      "regime": 4,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260921
+    },
+    {
+      "regime": 4,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260922
+    },
+    {
+      "regime": 4,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260923
+    },
+    {
+      "regime": 4,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260924
+    },
+    {
+      "regime": 4,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260925
+    },
+    {
+      "regime": 4,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260926
+    },
+    {
+      "regime": 4,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260927
+    },
+    {
+      "regime": 4,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260928
+    },
+    {
+      "regime": 4,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260929
+    },
+    {
+      "regime": 5,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260920
+    },
+    {
+      "regime": 5,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260921
+    },
+    {
+      "regime": 5,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260922
+    },
+    {
+      "regime": 5,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260923
+    },
+    {
+      "regime": 5,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260924
+    },
+    {
+      "regime": 5,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260925
+    },
+    {
+      "regime": 5,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260926
+    },
+    {
+      "regime": 5,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260927
+    },
+    {
+      "regime": 5,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260928
+    },
+    {
+      "regime": 5,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260929
+    },
+    {
+      "regime": 6,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260920
+    },
+    {
+      "regime": 6,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260921
+    },
+    {
+      "regime": 6,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260922
+    },
+    {
+      "regime": 6,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260923
+    },
+    {
+      "regime": 6,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260924
+    },
+    {
+      "regime": 6,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260925
+    },
+    {
+      "regime": 6,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260926
+    },
+    {
+      "regime": 6,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260927
+    },
+    {
+      "regime": 6,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260928
+    },
+    {
+      "regime": 6,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260929
+    },
+    {
+      "regime": 7,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260920
+    },
+    {
+      "regime": 7,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260921
+    },
+    {
+      "regime": 7,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260922
+    },
+    {
+      "regime": 7,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260923
+    },
+    {
+      "regime": 7,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260924
+    },
+    {
+      "regime": 7,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260925
+    },
+    {
+      "regime": 7,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260926
+    },
+    {
+      "regime": 7,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260927
+    },
+    {
+      "regime": 7,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260928
+    },
+    {
+      "regime": 7,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260929
+    },
+    {
+      "regime": 8,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260920
+    },
+    {
+      "regime": 8,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260921
+    },
+    {
+      "regime": 8,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260922
+    },
+    {
+      "regime": 8,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260923
+    },
+    {
+      "regime": 8,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260924
+    },
+    {
+      "regime": 8,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260925
+    },
+    {
+      "regime": 8,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260926
+    },
+    {
+      "regime": 8,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260927
+    },
+    {
+      "regime": 8,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260928
+    },
+    {
+      "regime": 8,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260929
+    },
+    {
+      "regime": 9,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260920
+    },
+    {
+      "regime": 9,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260921
+    },
+    {
+      "regime": 9,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260922
+    },
+    {
+      "regime": 9,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260923
+    },
+    {
+      "regime": 9,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260924
+    },
+    {
+      "regime": 9,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260925
+    },
+    {
+      "regime": 9,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260926
+    },
+    {
+      "regime": 9,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260927
+    },
+    {
+      "regime": 9,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260928
+    },
+    {
+      "regime": 9,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260929
+    },
+    {
+      "regime": 10,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260920
+    },
+    {
+      "regime": 10,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260921
+    },
+    {
+      "regime": 10,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260922
+    },
+    {
+      "regime": 10,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260923
+    },
+    {
+      "regime": 10,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260924
+    },
+    {
+      "regime": 10,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260925
+    },
+    {
+      "regime": 10,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260926
+    },
+    {
+      "regime": 10,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260927
+    },
+    {
+      "regime": 10,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260928
+    },
+    {
+      "regime": 10,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260929
+    },
+    {
+      "regime": 11,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260920
+    },
+    {
+      "regime": 11,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260921
+    },
+    {
+      "regime": 11,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260922
+    },
+    {
+      "regime": 11,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260923
+    },
+    {
+      "regime": 11,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260924
+    },
+    {
+      "regime": 11,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260925
+    },
+    {
+      "regime": 11,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260926
+    },
+    {
+      "regime": 11,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260927
+    },
+    {
+      "regime": 11,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260928
+    },
+    {
+      "regime": 11,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260929
+    },
+    {
+      "regime": 12,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260920
+    },
+    {
+      "regime": 12,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260921
+    },
+    {
+      "regime": 12,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260922
+    },
+    {
+      "regime": 12,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260923
+    },
+    {
+      "regime": 12,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260924
+    },
+    {
+      "regime": 12,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260925
+    },
+    {
+      "regime": 12,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260926
+    },
+    {
+      "regime": 12,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260927
+    },
+    {
+      "regime": 12,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260928
+    },
+    {
+      "regime": 12,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260929
+    },
+    {
+      "regime": 13,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260920
+    },
+    {
+      "regime": 13,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260921
+    },
+    {
+      "regime": 13,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260922
+    },
+    {
+      "regime": 13,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260923
+    },
+    {
+      "regime": 13,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260924
+    },
+    {
+      "regime": 13,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260925
+    },
+    {
+      "regime": 13,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260926
+    },
+    {
+      "regime": 13,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260927
+    },
+    {
+      "regime": 13,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260928
+    },
+    {
+      "regime": 13,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260929
+    },
+    {
+      "regime": 14,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260920
+    },
+    {
+      "regime": 14,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260921
+    },
+    {
+      "regime": 14,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260922
+    },
+    {
+      "regime": 14,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260923
+    },
+    {
+      "regime": 14,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260924
+    },
+    {
+      "regime": 14,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260925
+    },
+    {
+      "regime": 14,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260926
+    },
+    {
+      "regime": 14,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260927
+    },
+    {
+      "regime": 14,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260928
+    },
+    {
+      "regime": 14,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260929
+    },
+    {
+      "regime": 15,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260920
+    },
+    {
+      "regime": 15,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260921
+    },
+    {
+      "regime": 15,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260922
+    },
+    {
+      "regime": 15,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260923
+    },
+    {
+      "regime": 15,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260924
+    },
+    {
+      "regime": 15,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260925
+    },
+    {
+      "regime": 15,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260926
+    },
+    {
+      "regime": 15,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260927
+    },
+    {
+      "regime": 15,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260928
+    },
+    {
+      "regime": 15,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260929
+    },
+    {
+      "regime": 16,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260920
+    },
+    {
+      "regime": 16,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260921
+    },
+    {
+      "regime": 16,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260922
+    },
+    {
+      "regime": 16,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260923
+    },
+    {
+      "regime": 16,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260924
+    },
+    {
+      "regime": 16,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260925
+    },
+    {
+      "regime": 16,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260926
+    },
+    {
+      "regime": 16,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260927
+    },
+    {
+      "regime": 16,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260928
+    },
+    {
+      "regime": 16,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260929
+    },
+    {
+      "regime": 17,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260920
+    },
+    {
+      "regime": 17,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260921
+    },
+    {
+      "regime": 17,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260922
+    },
+    {
+      "regime": 17,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260923
+    },
+    {
+      "regime": 17,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260924
+    },
+    {
+      "regime": 17,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260925
+    },
+    {
+      "regime": 17,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260926
+    },
+    {
+      "regime": 17,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260927
+    },
+    {
+      "regime": 17,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260928
+    },
+    {
+      "regime": 17,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260929
+    },
+    {
+      "regime": 18,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260920
+    },
+    {
+      "regime": 18,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260921
+    },
+    {
+      "regime": 18,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260922
+    },
+    {
+      "regime": 18,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260923
+    },
+    {
+      "regime": 18,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260924
+    },
+    {
+      "regime": 18,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260925
+    },
+    {
+      "regime": 18,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260926
+    },
+    {
+      "regime": 18,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260927
+    },
+    {
+      "regime": 18,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260928
+    },
+    {
+      "regime": 18,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260929
+    },
+    {
+      "regime": 19,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260920
+    },
+    {
+      "regime": 19,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260921
+    },
+    {
+      "regime": 19,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260922
+    },
+    {
+      "regime": 19,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260923
+    },
+    {
+      "regime": 19,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260924
+    },
+    {
+      "regime": 19,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260925
+    },
+    {
+      "regime": 19,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260926
+    },
+    {
+      "regime": 19,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260927
+    },
+    {
+      "regime": 19,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260928
+    },
+    {
+      "regime": 19,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260929
+    },
+    {
+      "regime": 20,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260920
+    },
+    {
+      "regime": 20,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260921
+    },
+    {
+      "regime": 20,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260922
+    },
+    {
+      "regime": 20,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260923
+    },
+    {
+      "regime": 20,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260924
+    },
+    {
+      "regime": 20,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260925
+    },
+    {
+      "regime": 20,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260926
+    },
+    {
+      "regime": 20,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260927
+    },
+    {
+      "regime": 20,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260928
+    },
+    {
+      "regime": 20,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260929
+    },
+    {
+      "regime": 21,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260920
+    },
+    {
+      "regime": 21,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260921
+    },
+    {
+      "regime": 21,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260922
+    },
+    {
+      "regime": 21,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260923
+    },
+    {
+      "regime": 21,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260924
+    },
+    {
+      "regime": 21,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260925
+    },
+    {
+      "regime": 21,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260926
+    },
+    {
+      "regime": 21,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260927
+    },
+    {
+      "regime": 21,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260928
+    },
+    {
+      "regime": 21,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260929
+    },
+    {
+      "regime": 22,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260920
+    },
+    {
+      "regime": 22,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260921
+    },
+    {
+      "regime": 22,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260922
+    },
+    {
+      "regime": 22,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260923
+    },
+    {
+      "regime": 22,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260924
+    },
+    {
+      "regime": 22,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260925
+    },
+    {
+      "regime": 22,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260926
+    },
+    {
+      "regime": 22,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260927
+    },
+    {
+      "regime": 22,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260928
+    },
+    {
+      "regime": 22,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260929
+    },
+    {
+      "regime": 23,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260920
+    },
+    {
+      "regime": 23,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260921
+    },
+    {
+      "regime": 23,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260922
+    },
+    {
+      "regime": 23,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260923
+    },
+    {
+      "regime": 23,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260924
+    },
+    {
+      "regime": 23,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260925
+    },
+    {
+      "regime": 23,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260926
+    },
+    {
+      "regime": 23,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260927
+    },
+    {
+      "regime": 23,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260928
+    },
+    {
+      "regime": 23,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260929
+    },
+    {
+      "regime": 24,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260920
+    },
+    {
+      "regime": 24,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260921
+    },
+    {
+      "regime": 24,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260922
+    },
+    {
+      "regime": 24,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260923
+    },
+    {
+      "regime": 24,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260924
+    },
+    {
+      "regime": 24,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260925
+    },
+    {
+      "regime": 24,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260926
+    },
+    {
+      "regime": 24,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260927
+    },
+    {
+      "regime": 24,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260928
+    },
+    {
+      "regime": 24,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260929
+    },
+    {
+      "regime": 25,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260920
+    },
+    {
+      "regime": 25,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260921
+    },
+    {
+      "regime": 25,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260922
+    },
+    {
+      "regime": 25,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260923
+    },
+    {
+      "regime": 25,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260924
+    },
+    {
+      "regime": 25,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260925
+    },
+    {
+      "regime": 25,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260926
+    },
+    {
+      "regime": 25,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260927
+    },
+    {
+      "regime": 25,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260928
+    },
+    {
+      "regime": 25,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260929
+    },
+    {
+      "regime": 26,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260920
+    },
+    {
+      "regime": 26,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260921
+    },
+    {
+      "regime": 26,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260922
+    },
+    {
+      "regime": 26,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260923
+    },
+    {
+      "regime": 26,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260924
+    },
+    {
+      "regime": 26,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260925
+    },
+    {
+      "regime": 26,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260926
+    },
+    {
+      "regime": 26,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260927
+    },
+    {
+      "regime": 26,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260928
+    },
+    {
+      "regime": 26,
+      "method": "reserve_sjf",
+      "threshold": 0.25,
+      "seed": 920260929
+    }
+  ],
+  "workers": 16,
+  "estimator_margin": 0.0,
+  "empty_queue_soc_threshold": 0.25,
+  "frozen_sha256": "a2b74f9ff84c83377ea081d0cda9610b635b739e6e178a0132bc1106c85f9f19",
+  "compatibility": "/mnt/workspace/zjl-exp/migration_20260920/b5_validation/calibration_compatibility_b5.json",
+  "compatibility_sha256": "2b4564d37f0667373ef3c7d1937fbce5feccc625b81778a63eef52c8cb650069",
+  "launcher_sha256": "b6551d58d776b3f336bc769a32b7c98fe9a364e0ce936a18e16e677fc6ae146e",
+  "thread_environment": {
+    "OPENBLAS_NUM_THREADS": "1",
+    "OMP_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "NUMEXPR_NUM_THREADS": "1",
+    "VECLIB_MAXIMUM_THREADS": "1",
+    "BLIS_NUM_THREADS": "1",
+    "CUDA_VISIBLE_DEVICES": "",
+    "ASCEND_RT_VISIBLE_DEVICES": ""
+  },
+  "created_unix": 1789906516.4592223,
+  "interpretation": "Diagnostic only; no automatic evaluation, training or kill test",
+  "shards": [
+    {
+      "worker": 0,
+      "regimes": [
+        0,
+        16
+      ]
+    },
+    {
+      "worker": 1,
+      "regimes": [
+        1,
+        17
+      ]
+    },
+    {
+      "worker": 2,
+      "regimes": [
+        2,
+        18
+      ]
+    },
+    {
+      "worker": 3,
+      "regimes": [
+        3,
+        19
+      ]
+    },
+    {
+      "worker": 4,
+      "regimes": [
+        4,
+        20
+      ]
+    },
+    {
+      "worker": 5,
+      "regimes": [
+        5,
+        21
+      ]
+    },
+    {
+      "worker": 6,
+      "regimes": [
+        6,
+        22
+      ]
+    },
+    {
+      "worker": 7,
+      "regimes": [
+        7,
+        23
+      ]
+    },
+    {
+      "worker": 8,
+      "regimes": [
+        8,
+        24
+      ]
+    },
+    {
+      "worker": 9,
+      "regimes": [
+        9,
+        25
+      ]
+    },
+    {
+      "worker": 10,
+      "regimes": [
+        10,
+        26
+      ]
+    },
+    {
+      "worker": 11,
+      "regimes": [
+        11
+      ]
+    },
+    {
+      "worker": 12,
+      "regimes": [
+        12
+      ]
+    },
+    {
+      "worker": 13,
+      "regimes": [
+        13
+      ]
+    },
+    {
+      "worker": 14,
+      "regimes": [
+        14
+      ]
+    },
+    {
+      "worker": 15,
+      "regimes": [
+        15
+      ]
+    }
+  ]
+}

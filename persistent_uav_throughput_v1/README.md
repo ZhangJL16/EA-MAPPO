@@ -4,6 +4,8 @@
 冻结估计器、参数及零额外 margin 不变；暂缓 B0–B3 与 evaluation，禁止训练及最终 kill test。
 新增逐决策预测和失败阶段日志，用于后续 feasibility / estimation / planning 分解。
 实现与运行入口见 [B5 validation 说明](B5_VALIDATION.md)。
+16 个单线程 CPU 分片已启动，全部首检查点健康核验通过；见
+[B5 启动交接与证据](evidence/b5_validation_startup_20260920/README.md)。
 
 2026-09-20 ARM 最新结果：B4 validation 已完成全部 1080 次，27 个 regime 均无候选阈值满足预设耗尽率预算。完整结果、原始轨迹、校验和及迁移修复记录见 [ARM 验证结果](evidence/arm_validation_20260920/README.md)。尚未启动 evaluation 或训练；估计误差审计与估计/规划分解仍待完成。
 

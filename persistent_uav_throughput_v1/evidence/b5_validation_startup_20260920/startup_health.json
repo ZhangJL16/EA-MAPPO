@@ -1,0 +1,185 @@
+{
+  "passed": true,
+  "workers": [
+    {
+      "worker": 0,
+      "pid": 659947,
+      "threads": 1,
+      "manifest_sha256": "2a8d95d39b27fb8e9a37c9132f86292992c8ba15e19f18ac4de2c3f7714e81e5",
+      "policy_steps": 800,
+      "completed_runs": 0,
+      "checksum_and_provenance_valid": true,
+      "telemetry_present": true,
+      "checked_unix": 1789906528.5180974
+    },
+    {
+      "worker": 1,
+      "pid": 659948,
+      "threads": 1,
+      "manifest_sha256": "e0e254187ba6a8925c488faf3cc649b8243d6d5d895117c2433358f35d0fdef1",
+      "policy_steps": 800,
+      "completed_runs": 0,
+      "checksum_and_provenance_valid": true,
+      "telemetry_present": true,
+      "checked_unix": 1789906528.5585685
+    },
+    {
+      "worker": 2,
+      "pid": 659949,
+      "threads": 1,
+      "manifest_sha256": "7e0650870e181c642a1e4251443ca4f084b27fac7e58346a8160b00d1d81132b",
+      "policy_steps": 800,
+      "completed_runs": 0,
+      "checksum_and_provenance_valid": true,
+      "telemetry_present": true,
+      "checked_unix": 1789906528.5963278
+    },
+    {
+      "worker": 3,
+      "pid": 659950,
+      "threads": 1,
+      "manifest_sha256": "496efc3780fd9f37104ff793367e518d032cc82ac5b39b5b46d98e0dee025a69",
+      "policy_steps": 800,
+      "completed_runs": 0,
+      "checksum_and_provenance_valid": true,
+      "telemetry_present": true,
+      "checked_unix": 1789906528.6492853
+    },
+    {
+      "worker": 4,
+      "pid": 659951,
+      "threads": 1,
+      "manifest_sha256": "9b433aa58af0c3b5d47a89f6b1d6ddf7df3f71d3a07a63c28a6bde6ce263b971",
+      "policy_steps": 800,
+      "completed_runs": 0,
+      "checksum_and_provenance_valid": true,
+      "telemetry_present": true,
+      "checked_unix": 1789906528.6867635
+    },
+    {
+      "worker": 5,
+      "pid": 659952,
+      "threads": 1,
+      "manifest_sha256": "071fdd39b8733248c7b9f1f74b4a8fdcc4bda5dd010eec7e216a32ed717c2957",
+      "policy_steps": 800,
+      "completed_runs": 0,
+      "checksum_and_provenance_valid": true,
+      "telemetry_present": true,
+      "checked_unix": 1789906528.7248938
+    },
+    {
+      "worker": 6,
+      "pid": 659953,
+      "threads": 1,
+      "manifest_sha256": "a98e84fb640935b8df889226f08cacd9385bdb3038b6b6324e82d62ed60a2216",
+      "policy_steps": 800,
+      "completed_runs": 0,
+      "checksum_and_provenance_valid": true,
+      "telemetry_present": true,
+      "checked_unix": 1789906528.7645783
+    },
+    {
+      "worker": 7,
+      "pid": 659954,
+      "threads": 1,
+      "manifest_sha256": "30d37e1aad6176e7e54b5fe7f98ce08060ada073a48cf3c0faf19832ada4393f",
+      "policy_steps": 800,
+      "completed_runs": 0,
+      "checksum_and_provenance_valid": true,
+      "telemetry_present": true,
+      "checked_unix": 1789906528.802329
+    },
+    {
+      "worker": 8,
+      "pid": 659955,
+      "threads": 1,
+      "manifest_sha256": "2a9d455959ed3be3a0a35799ce234b79f7f5366d229cdbe332a023111919b2f9",
+      "policy_steps": 800,
+      "completed_runs": 0,
+      "checksum_and_provenance_valid": true,
+      "telemetry_present": true,
+      "checked_unix": 1789906528.840425
+    },
+    {
+      "worker": 9,
+      "pid": 659956,
+      "threads": 1,
+      "manifest_sha256": "0d05a1ff22e7b2db43905c0338c86fe16f66dd4e055750ee5bf4dce7f626e749",
+      "policy_steps": 900,
+      "completed_runs": 0,
+      "checksum_and_provenance_valid": true,
+      "telemetry_present": true,
+      "checked_unix": 1789906528.878077
+    },
+    {
+      "worker": 10,
+      "pid": 659957,
+      "threads": 1,
+      "manifest_sha256": "fcfb04cd901394596750dad9e9c990b7a55abd6cdbf370f60635f524f5cfa4a1",
+      "policy_steps": 800,
+      "completed_runs": 0,
+      "checksum_and_provenance_valid": true,
+      "telemetry_present": true,
+      "checked_unix": 1789906528.9156258
+    },
+    {
+      "worker": 11,
+      "pid": 659958,
+      "threads": 1,
+      "manifest_sha256": "82cd5e4e3e6c30372b8b978470b94c3eac3f5dcb0d03bdd4ea4e7ccdc9bb8101",
+      "policy_steps": 800,
+      "completed_runs": 0,
+      "checksum_and_provenance_valid": true,
+      "telemetry_present": true,
+      "checked_unix": 1789906528.9554026
+    },
+    {
+      "worker": 12,
+      "pid": 659959,
+      "threads": 1,
+      "manifest_sha256": "b26aa7705db772fc9c8717bf092125e825b9734872bebeb5a2fb6a96d3d66f4e",
+      "policy_steps": 800,
+      "completed_runs": 0,
+      "checksum_and_provenance_valid": true,
+      "telemetry_present": true,
+      "checked_unix": 1789906528.9935405
+    },
+    {
+      "worker": 13,
+      "pid": 659960,
+      "threads": 1,
+      "manifest_sha256": "14241f0ed4a997aa7ed3737a0deeaf0ebb0c81c118d36fc228a1ff344fb60e62",
+      "policy_steps": 800,
+      "completed_runs": 0,
+      "checksum_and_provenance_valid": true,
+      "telemetry_present": true,
+      "checked_unix": 1789906529.0309875
+    },
+    {
+      "worker": 14,
+      "pid": 659961,
+      "threads": 1,
+      "manifest_sha256": "46d30996e6e6b6b5869cf3036360b48b34d8d23b8d242360deea5bfac566eaec",
+      "policy_steps": 900,
+      "completed_runs": 0,
+      "checksum_and_provenance_valid": true,
+      "telemetry_present": true,
+      "checked_unix": 1789906529.069482
+    },
+    {
+      "worker": 15,
+      "pid": 659962,
+      "threads": 1,
+      "manifest_sha256": "5d9815879b7cae528a1e15bed3d2afec3d8a53f48576ff683337da1618771610",
+      "policy_steps": 900,
+      "completed_runs": 0,
+      "checksum_and_provenance_valid": true,
+      "telemetry_present": true,
+      "checked_unix": 1789906529.1067448
+    }
+  ],
+  "total_planned_runs": 270,
+  "training_updates": 0,
+  "oracle_calls": 0,
+  "note": "First-checkpoint health only; no completion monitoring."
+}
