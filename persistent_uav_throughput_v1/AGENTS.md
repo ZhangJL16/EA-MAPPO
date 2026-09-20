@@ -1,6 +1,9 @@
 # PersistentUAVThroughput-v1
 
 Latest user review after c158cc07 (2026-09-20) narrows the next stage:
+- B5 subsequently completed all 270 jobs at 20:59: 27/27 regimes fail empirical
+  eligibility. Evidence: evidence/b5_validation_complete_20260920/. Do not rerun
+  completed jobs or infer a new experiment authorization from the prior launch GO.
 - B4 ARM validation is complete: none of the four preregistered candidates is
   empirically eligible in any of 27 regimes; this does not exclude all SOC thresholds.
 - Only B5 reserve-SJF validation is GO: original 27 regimes × 10 validation seeds.

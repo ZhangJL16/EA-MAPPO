@@ -1,5 +1,9 @@
 # B5 reserve-SJF validation
 
+Completed 2026-09-20 at 20:59 Asia/Shanghai: 270/270 unique jobs; all 27 regimes
+fail empirical eligibility. [Final results and raw evidence](evidence/b5_validation_complete_20260920/README.md)
+include the initial descriptive failure audit. No subsequent stage was launched.
+
 User-authorized scope after review of c158cc07: 27 frozen regimes × 10 original
 validation seeds = 270 runs, only `reserve_sjf`. No B0–B3 sweep, evaluation,
 neural training, MPC/Oracle, or 98% kill test. B4's negative finding applies only

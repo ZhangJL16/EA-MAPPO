@@ -1,0 +1,461 @@
+[
+  {
+    "regime": 0,
+    "method": "reserve_sjf",
+    "threshold": 0.25,
+    "n": 10,
+    "mean_completed": 3.0,
+    "standard_error": 0.5163977794943222,
+    "depletion_rate": 1.0,
+    "depletion_wilson95": [
+      0.7224672001371107,
+      0.9999999999999999
+    ],
+    "recharge_failure_rate": 0.9,
+    "navigation_failure_rate": 0.0,
+    "overflow_rate": 0.8952772073921971,
+    "mean_residual_battery": 0.0
+  },
+  {
+    "regime": 1,
+    "method": "reserve_sjf",
+    "threshold": 0.25,
+    "n": 10,
+    "mean_completed": 5.8,
+    "standard_error": 1.533333333333333,
+    "depletion_rate": 1.0,
+    "depletion_wilson95": [
+      0.7224672001371107,
+      0.9999999999999999
+    ],
+    "recharge_failure_rate": 0.9,
+    "navigation_failure_rate": 0.0,
+    "overflow_rate": 0.912707182320442,
+    "mean_residual_battery": 0.0
+  },
+  {
+    "regime": 2,
+    "method": "reserve_sjf",
+    "threshold": 0.25,
+    "n": 10,
+    "mean_completed": 4.6,
+    "standard_error": 0.8459051693633013,
+    "depletion_rate": 1.0,
+    "depletion_wilson95": [
+      0.7224672001371107,
+      0.9999999999999999
+    ],
+    "recharge_failure_rate": 0.9,
+    "navigation_failure_rate": 0.0,
+    "overflow_rate": 0.9455284552845529,
+    "mean_residual_battery": 0.0
+  },
+  {
+    "regime": 3,
+    "method": "reserve_sjf",
+    "threshold": 0.25,
+    "n": 10,
+    "mean_completed": 3.2,
+    "standard_error": 0.5537749241945383,
+    "depletion_rate": 1.0,
+    "depletion_wilson95": [
+      0.7224672001371107,
+      0.9999999999999999
+    ],
+    "recharge_failure_rate": 0.9,
+    "navigation_failure_rate": 0.0,
+    "overflow_rate": 0.891170431211499,
+    "mean_residual_battery": 0.0
+  },
+  {
+    "regime": 4,
+    "method": "reserve_sjf",
+    "threshold": 0.25,
+    "n": 10,
+    "mean_completed": 5.6,
+    "standard_error": 1.203698005684519,
+    "depletion_rate": 1.0,
+    "depletion_wilson95": [
+      0.7224672001371107,
+      0.9999999999999999
+    ],
+    "recharge_failure_rate": 0.9,
+    "navigation_failure_rate": 0.0,
+    "overflow_rate": 0.9149171270718232,
+    "mean_residual_battery": 0.0
+  },
+  {
+    "regime": 5,
+    "method": "reserve_sjf",
+    "threshold": 0.25,
+    "n": 10,
+    "mean_completed": 5.5,
+    "standard_error": 1.0354816378006044,
+    "depletion_rate": 1.0,
+    "depletion_wilson95": [
+      0.7224672001371107,
+      0.9999999999999999
+    ],
+    "recharge_failure_rate": 0.9,
+    "navigation_failure_rate": 0.0,
+    "overflow_rate": 0.9382113821138212,
+    "mean_residual_battery": 0.0
+  },
+  {
+    "regime": 6,
+    "method": "reserve_sjf",
+    "threshold": 0.25,
+    "n": 10,
+    "mean_completed": 4.7,
+    "standard_error": 0.8439325934114775,
+    "depletion_rate": 1.0,
+    "depletion_wilson95": [
+      0.7224672001371107,
+      0.9999999999999999
+    ],
+    "recharge_failure_rate": 0.8,
+    "navigation_failure_rate": 0.0,
+    "overflow_rate": 0.8603696098562629,
+    "mean_residual_battery": 0.0
+  },
+  {
+    "regime": 7,
+    "method": "reserve_sjf",
+    "threshold": 0.25,
+    "n": 10,
+    "mean_completed": 5.3,
+    "standard_error": 0.9780933834080806,
+    "depletion_rate": 1.0,
+    "depletion_wilson95": [
+      0.7224672001371107,
+      0.9999999999999999
+    ],
+    "recharge_failure_rate": 0.9,
+    "navigation_failure_rate": 0.0,
+    "overflow_rate": 0.918232044198895,
+    "mean_residual_battery": 0.0
+  },
+  {
+    "regime": 8,
+    "method": "reserve_sjf",
+    "threshold": 0.25,
+    "n": 10,
+    "mean_completed": 4.6,
+    "standard_error": 0.77746025264604,
+    "depletion_rate": 1.0,
+    "depletion_wilson95": [
+      0.7224672001371107,
+      0.9999999999999999
+    ],
+    "recharge_failure_rate": 0.9,
+    "navigation_failure_rate": 0.0,
+    "overflow_rate": 0.9455284552845529,
+    "mean_residual_battery": 1.6417060113606276e-08
+  },
+  {
+    "regime": 9,
+    "method": "reserve_sjf",
+    "threshold": 0.25,
+    "n": 10,
+    "mean_completed": 11.2,
+    "standard_error": 4.5431266766402185,
+    "depletion_rate": 1.0,
+    "depletion_wilson95": [
+      0.7224672001371107,
+      0.9999999999999999
+    ],
+    "recharge_failure_rate": 0.6,
+    "navigation_failure_rate": 0.0,
+    "overflow_rate": 0.7227926078028748,
+    "mean_residual_battery": 0.0
+  },
+  {
+    "regime": 10,
+    "method": "reserve_sjf",
+    "threshold": 0.25,
+    "n": 10,
+    "mean_completed": 17.3,
+    "standard_error": 4.971138926063344,
+    "depletion_rate": 0.8,
+    "depletion_wilson95": [
+      0.49016247153664183,
+      0.9433178485456247
+    ],
+    "recharge_failure_rate": 0.6,
+    "navigation_failure_rate": 0.2,
+    "overflow_rate": 0.7834254143646409,
+    "mean_residual_battery": 2.448799396692294
+  },
+  {
+    "regime": 11,
+    "method": "reserve_sjf",
+    "threshold": 0.25,
+    "n": 10,
+    "mean_completed": 15.9,
+    "standard_error": 5.516540784062257,
+    "depletion_rate": 0.8,
+    "depletion_wilson95": [
+      0.49016247153664183,
+      0.9433178485456247
+    ],
+    "recharge_failure_rate": 0.4,
+    "navigation_failure_rate": 0.2,
+    "overflow_rate": 0.8495934959349594,
+    "mean_residual_battery": 6.020262369880354
+  },
+  {
+    "regime": 12,
+    "method": "reserve_sjf",
+    "threshold": 0.25,
+    "n": 10,
+    "mean_completed": 12.1,
+    "standard_error": 4.681998623569972,
+    "depletion_rate": 1.0,
+    "depletion_wilson95": [
+      0.7224672001371107,
+      0.9999999999999999
+    ],
+    "recharge_failure_rate": 0.7,
+    "navigation_failure_rate": 0.0,
+    "overflow_rate": 0.7063655030800822,
+    "mean_residual_battery": 0.0
+  },
+  {
+    "regime": 13,
+    "method": "reserve_sjf",
+    "threshold": 0.25,
+    "n": 10,
+    "mean_completed": 14.2,
+    "standard_error": 3.5175749222061117,
+    "depletion_rate": 0.9,
+    "depletion_wilson95": [
+      0.5958499732047615,
+      0.9821237869049271
+    ],
+    "recharge_failure_rate": 0.6,
+    "navigation_failure_rate": 0.1,
+    "overflow_rate": 0.8165745856353591,
+    "mean_residual_battery": 0.3173226762097924
+  },
+  {
+    "regime": 14,
+    "method": "reserve_sjf",
+    "threshold": 0.25,
+    "n": 10,
+    "mean_completed": 18.5,
+    "standard_error": 4.2694001660394605,
+    "depletion_rate": 0.8,
+    "depletion_wilson95": [
+      0.49016247153664183,
+      0.9433178485456247
+    ],
+    "recharge_failure_rate": 0.4,
+    "navigation_failure_rate": 0.2,
+    "overflow_rate": 0.8284552845528456,
+    "mean_residual_battery": 4.420680541618466
+  },
+  {
+    "regime": 15,
+    "method": "reserve_sjf",
+    "threshold": 0.25,
+    "n": 10,
+    "mean_completed": 13.5,
+    "standard_error": 4.074991479200362,
+    "depletion_rate": 0.9,
+    "depletion_wilson95": [
+      0.5958499732047615,
+      0.9821237869049271
+    ],
+    "recharge_failure_rate": 0.6,
+    "navigation_failure_rate": 0.1,
+    "overflow_rate": 0.675564681724846,
+    "mean_residual_battery": 1.0406211600994422
+  },
+  {
+    "regime": 16,
+    "method": "reserve_sjf",
+    "threshold": 0.25,
+    "n": 10,
+    "mean_completed": 19.1,
+    "standard_error": 4.031680101948124,
+    "depletion_rate": 0.8,
+    "depletion_wilson95": [
+      0.49016247153664183,
+      0.9433178485456247
+    ],
+    "recharge_failure_rate": 0.8,
+    "navigation_failure_rate": 0.2,
+    "overflow_rate": 0.7646408839779005,
+    "mean_residual_battery": 4.233822957254334
+  },
+  {
+    "regime": 17,
+    "method": "reserve_sjf",
+    "threshold": 0.25,
+    "n": 10,
+    "mean_completed": 20.5,
+    "standard_error": 4.531985093630482,
+    "depletion_rate": 0.6,
+    "depletion_wilson95": [
+      0.31267376973365824,
+      0.8318196702937638
+    ],
+    "recharge_failure_rate": 0.4,
+    "navigation_failure_rate": 0.4,
+    "overflow_rate": 0.8121951219512196,
+    "mean_residual_battery": 8.718755005081645
+  },
+  {
+    "regime": 18,
+    "method": "reserve_sjf",
+    "threshold": 0.25,
+    "n": 10,
+    "mean_completed": 17.4,
+    "standard_error": 5.346234396490882,
+    "depletion_rate": 0.9,
+    "depletion_wilson95": [
+      0.5958499732047615,
+      0.9821237869049271
+    ],
+    "recharge_failure_rate": 0.6,
+    "navigation_failure_rate": 0.1,
+    "overflow_rate": 0.5954825462012321,
+    "mean_residual_battery": 2.613965809934091
+  },
+  {
+    "regime": 19,
+    "method": "reserve_sjf",
+    "threshold": 0.25,
+    "n": 10,
+    "mean_completed": 29.9,
+    "standard_error": 7.42884767496129,
+    "depletion_rate": 0.5,
+    "depletion_wilson95": [
+      0.236593090512564,
+      0.7634069094874361
+    ],
+    "recharge_failure_rate": 0.1,
+    "navigation_failure_rate": 0.5,
+    "overflow_rate": 0.6375690607734806,
+    "mean_residual_battery": 26.626405535628656
+  },
+  {
+    "regime": 20,
+    "method": "reserve_sjf",
+    "threshold": 0.25,
+    "n": 10,
+    "mean_completed": 29.1,
+    "standard_error": 7.572538103788804,
+    "depletion_rate": 0.4,
+    "depletion_wilson95": [
+      0.16818032970623614,
+      0.6873262302663417
+    ],
+    "recharge_failure_rate": 0.3,
+    "navigation_failure_rate": 0.6,
+    "overflow_rate": 0.7414634146341463,
+    "mean_residual_battery": 28.399470257641433
+  },
+  {
+    "regime": 21,
+    "method": "reserve_sjf",
+    "threshold": 0.25,
+    "n": 10,
+    "mean_completed": 19.9,
+    "standard_error": 6.5514205414635915,
+    "depletion_rate": 1.0,
+    "depletion_wilson95": [
+      0.7224672001371107,
+      0.9999999999999999
+    ],
+    "recharge_failure_rate": 0.8,
+    "navigation_failure_rate": 0.0,
+    "overflow_rate": 0.5503080082135524,
+    "mean_residual_battery": 0.0
+  },
+  {
+    "regime": 22,
+    "method": "reserve_sjf",
+    "threshold": 0.25,
+    "n": 10,
+    "mean_completed": 17.7,
+    "standard_error": 2.917571288284525,
+    "depletion_rate": 0.8,
+    "depletion_wilson95": [
+      0.49016247153664183,
+      0.9433178485456247
+    ],
+    "recharge_failure_rate": 0.5,
+    "navigation_failure_rate": 0.2,
+    "overflow_rate": 0.7767955801104972,
+    "mean_residual_battery": 12.746513766570157
+  },
+  {
+    "regime": 23,
+    "method": "reserve_sjf",
+    "threshold": 0.25,
+    "n": 10,
+    "mean_completed": 25.2,
+    "standard_error": 4.1467524106890625,
+    "depletion_rate": 0.5,
+    "depletion_wilson95": [
+      0.236593090512564,
+      0.7634069094874361
+    ],
+    "recharge_failure_rate": 0.2,
+    "navigation_failure_rate": 0.5,
+    "overflow_rate": 0.7723577235772358,
+    "mean_residual_battery": 20.491049839342537
+  },
+  {
+    "regime": 24,
+    "method": "reserve_sjf",
+    "threshold": 0.25,
+    "n": 10,
+    "mean_completed": 16.2,
+    "standard_error": 5.345403009440292,
+    "depletion_rate": 0.9,
+    "depletion_wilson95": [
+      0.5958499732047615,
+      0.9821237869049271
+    ],
+    "recharge_failure_rate": 0.6,
+    "navigation_failure_rate": 0.1,
+    "overflow_rate": 0.62217659137577,
+    "mean_residual_battery": 4.46909876676529
+  },
+  {
+    "regime": 25,
+    "method": "reserve_sjf",
+    "threshold": 0.25,
+    "n": 10,
+    "mean_completed": 32.9,
+    "standard_error": 7.808044284938165,
+    "depletion_rate": 0.5,
+    "depletion_wilson95": [
+      0.236593090512564,
+      0.7634069094874361
+    ],
+    "recharge_failure_rate": 0.1,
+    "navigation_failure_rate": 0.4,
+    "overflow_rate": 0.6099447513812155,
+    "mean_residual_battery": 22.637708770836078
+  },
+  {
+    "regime": 26,
+    "method": "reserve_sjf",
+    "threshold": 0.25,
+    "n": 10,
+    "mean_completed": 21.6,
+    "standard_error": 3.5471428251794737,
+    "depletion_rate": 0.6,
+    "depletion_wilson95": [
+      0.31267376973365824,
+      0.8318196702937638
+    ],
+    "recharge_failure_rate": 0.3,
+    "navigation_failure_rate": 0.4,
+    "overflow_rate": 0.802439024390244,
+    "mean_residual_battery": 13.912182170008998
+  }
+]

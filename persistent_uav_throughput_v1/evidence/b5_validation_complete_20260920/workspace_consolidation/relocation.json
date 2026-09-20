@@ -1,0 +1,34 @@
+{
+  "time": 1789905685.9290135,
+  "old_root": "/mnt/workspace/persistent-uav",
+  "new_root": "/mnt/workspace/zjl-exp",
+  "old_root_removed": true,
+  "repo_is_real_directory": true,
+  "preserved_session": "/mnt/workspace/zjl-exp/.preserved_sessions/persistent-uav-codex-session",
+  "updated_venv_scripts": [
+    ".venv/bin/torchfrtrace",
+    ".venv/bin/activate.fish",
+    ".venv/bin/pyftsubset",
+    ".venv/bin/isympy",
+    ".venv/bin/ttx",
+    ".venv/bin/fonttools",
+    ".venv/bin/f2py",
+    ".venv/bin/pyftmerge",
+    ".venv/bin/activate.csh",
+    ".venv/bin/activate",
+    ".venv/bin/torchrun",
+    ".venv/bin/activate.nu",
+    ".venv/bin/activate.bat"
+  ],
+  "evidence_hashes_unchanged": {
+    "persistent_uav_throughput_v1/evidence/arm_validation_20260920/migration_and_repair.tar.gz": "d88932a5a2c6be3f2e9397a0f0a7f20c58a518aaada9ee8e73941cb617511076",
+    "persistent_uav_throughput_v1/evidence/arm_validation_20260920/validation_raw.tar.gz": "1c0b050630cacf3c22a7e4c366e430dbe3be8f647e0df531ed9ae8333cfe2b04",
+    "persistent_uav_throughput_v1/evidence/arm_validation_20260920/integrity.json": "4ead6173adbbb48b699fc2809b24b261f81447ea57e3e9a7ad0fbe903fa9b127",
+    "persistent_uav_throughput_v1/evidence/arm_validation_20260920/SHA256SUMS": "44e3b34b67b19a65326ead20560b3007b2a74ae091ed018accbaf629e8cd1939",
+    "persistent_uav_throughput_v1/evidence/arm_validation_20260920/archive_inventory.json": "b3ad599b07f3b320ed5cefe4c0d38c4df26b4eed82e44902a2b5d3caf702935f",
+    "persistent_uav_throughput_v1/evidence/arm_validation_20260920/thresholds.json": "67558f7b75b6e40e8201aa35c474c1410268da92dcef4ba041188811b6accfa5",
+    "persistent_uav_throughput_v1/evidence/arm_validation_20260920/README.md": "36f9894afec7264b71ae226f27777e7628af05d5764dfe62f966aacaa8d0f1b8",
+    "persistent_uav_throughput_v1/evidence/arm_validation_20260920/results.json": "6f11f698e9affe6d278af1ce7ca8e2135f43ecffadc8a37d071b17c2bfbcc624",
+    "persistent_uav_throughput_v1/evidence/arm_validation_20260920/summary.json": "80e3395c07c35ad0bd7d8d03cf904aa2e867afcc7d379683e811034bb3bc1358"
+  }
+}

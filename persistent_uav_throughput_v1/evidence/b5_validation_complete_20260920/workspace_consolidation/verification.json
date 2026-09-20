@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "source_model_dependencies_verified": true,
+  "all_final_checkpoints_deserialized": true,
+  "completed_runs": 1080,
+  "calibration_compatibility_verified": true,
+  "historical_manifests_unchanged": true,
+  "old_root_absent": true
+}

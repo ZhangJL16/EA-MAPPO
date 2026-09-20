@@ -1,0 +1,9 @@
+{
+  "counts": {
+    "return_depletion_positive_predicted_margin": 22,
+    "return_depletion_nonpositive_predicted_margin": 144,
+    "task_depletion_predicted_feasible": 53,
+    "task_depletion_fallback": 0
+  },
+  "note": "Descriptive linkage from recorded decision predictions to observed failed legs; not an oracle-feasibility audit or causal planning attribution."
+}
