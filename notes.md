@@ -1,5 +1,12 @@
 # 当前项目结论
 
+2026-09-20 父目录清理：经逐文件 SHA256 核对，删除 11 个 FPL 目录和
+corrected budget-reading 副本（共 608 个文件、约 50.84 MiB），全部内容在仓库
+tracked evidence 文件或 ZIP 成员中保留；空 Downloads 一并移除。
+恢复位置见 `docs/cleanup_20260920/parent_duplicates_manifest.json`。
+未删除有差异的历史结果、`.elan`、Python 环境或包管理缓存。
+原结项压缩包仍为 c1da2fe3 快照，不包含本次新增清理清单。
+
 研究已结束，详细交接见 [PROJECT_CLOSEOUT.md](PROJECT_CLOSEOUT.md)。
 
 1. 当前固定地图、IID 三任务、单机、paid-recharge 设置中，VB/Oracle = 0.9913422775。
