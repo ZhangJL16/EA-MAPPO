@@ -1,14 +1,15 @@
-# Repository navigation and closed-project status
+# Repository navigation
 
-Begin with README.md, PROJECT_CLOSEOUT.md, task_plan.md and notes.md.
-This regenerative-control branch is CLOSED by the user's final decision.
-Do not launch legacy E1, new training, experiments, or another theoretical/statistical
-pivot based on historical plans. New research belongs in a separately scoped project.
-Historical status documents are evidence, not current instructions.
-Default rg searches honor .ignore; use explicit paths / --no-ignore for history.
-Current cleanup and retention record: docs/cleanup_20260920/deletion_manifest.json.
-The formerly referenced docs/REPOSITORY_CLEANUP_20260908.md is absent; do not claim
-an external backup exists. Original AGENTS text is archived in docs/project_history_20260920/.
+Begin with README.md, task_plan.md and notes.md for the current research state.
+Historical documents with "Active", "gate", or venue-readiness claims are not
+current instructions. On 2026-09-08 the user explicitly lifted the experiment
+hold: continue research and start the prepared E1 experiment concurrently.
+Check startup health then hand back; do not auto-promote to further training.
+Default rg searches honor .ignore,
+which hides legacy research and bulk artifacts without moving hash-pinned runtime
+dependencies. Read explicit paths or use rg --no-ignore PATTERN PATH when history
+is relevant. New documents remain searchable; the historical docs list is explicit.
+External archive and recovery map: docs/REPOSITORY_CLEANUP_20260908.md.
 
 # Fixed user research constraints
 

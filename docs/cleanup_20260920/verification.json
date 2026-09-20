@@ -1,0 +1,10 @@
+{
+  "deleted_files_absent": 892,
+  "deleted_bytes": 590736199,
+  "existing_tree_certificate_recomputed_identically": true,
+  "derivation_unchanged": true,
+  "frozen_SAC_retained": true,
+  "dependencies_retained": true,
+  "new_simulator_runs": 0,
+  "new_training_runs": 0
+}
