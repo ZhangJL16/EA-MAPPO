@@ -10,3 +10,23 @@
 
 下一阶段：用户在新目录开展独立 problem selection。没有选定新方法或启动新实验。
 历史任务见 `docs/project_history_20260920/task_plan.md`，不作为当前授权。
+
+## 2026-09-20 独立 F0–F2 审计授权
+
+- [x] 以用户指定 `envs/UAVEnergyDeliverySAC.py` 完成 F0，见 `FULL_PROBLEM_AUDIT.md`。
+- [x] 16个reset状态核查：单目标、空订单池；零训练、零policy steps。
+- [ ] F1 长轨迹任务选择统计：当前实现没有多候选订单，未执行。
+- [ ] F2 完整调度性能比较：缺少调度state/action接口，未执行；未擅加机制。
+
+当前无后台运行。后续需完整调度入口或新的机制实现授权，不自动进入F3。
+
+## 2026-09-20 后续用户授权：PersistentUAVThroughput-v1
+
+- [x] 修订规格：仅actual depletion风险；空队列forced wait；独立物理calibration冻结27个regime。
+- [x] 独立实现 `/home/zjl/persistent_uav_throughput_v1/`：环境、公共随机流、B0–B5和恢复检查点。
+- [x] 16项针对性检查、冻结SAC小型执行与真实飞行中恢复等价检查通过。
+- [x] 启动1000条物理calibration，首轮checkpoint健康核查通过，运行交还用户。
+- [ ] calibration完整结果与参数冻结：由该运行产出，不监控到完成。
+- [ ] 正式baseline validation/evaluation：尚未启动，等待完整calibration产物后显式推进。
+
+未训练网络；未启动MPC、OracleSafe-SJF或small oracle。此授权不重开旧P2-A2研究。

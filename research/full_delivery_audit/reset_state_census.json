@@ -1,0 +1,697 @@
+{
+  "scope": "F0 structural verification and reset-state census only; NOT F1 trajectory statistics or F2 performance",
+  "source_sha256": {
+    "envs/UAVEnergyDeliverySAC.py": "972d6c1bb8fbcc723add22ed640305c173477a0dc943d9e336fb06ac3951f673",
+    "runtime_support/review_bundle/envs/navigation/telemetry_cost.py": "fc6e888e28bdb57f2bfa2e0474a87d3fd4dcd4556f2cd45b6783a04e7c03ee1f"
+  },
+  "config": "Unmodified constructor defaults: NAVIGATION, no obstacles, no finite battery; battery=1 is a placeholder.",
+  "interpretation": "One target is structurally available; feasible task count is NOT measured. Null estimates/outcomes are unavailable, not zero.",
+  "training_updates": 0,
+  "policy_steps": 0,
+  "reset_states": [
+    {
+      "state_id": "reset-20260920",
+      "seed": 20260920,
+      "time": 0.0,
+      "position": [
+        266.23736572265625,
+        453.0754089355469,
+        189.27565002441406
+      ],
+      "battery": 1.0,
+      "finite_energy_enabled": false,
+      "candidate_tasks": [
+        {
+          "kind": "single_navigation_goal",
+          "target": [
+            1515.815185546875,
+            3592.067138671875,
+            301.2518005371094
+          ],
+          "pickup": null,
+          "dropoff": null,
+          "deadline": null,
+          "payload": null,
+          "euclidean_distance": 3380.422119140625,
+          "estimated_duration": null,
+          "estimated_energy": null
+        }
+      ],
+      "current_load": null,
+      "legacy_order_count": 0,
+      "charger_state": {
+        "position": [
+          2880.0,
+          2000.0,
+          200.0
+        ],
+        "count": 1
+      },
+      "action_taken": null,
+      "successor": null,
+      "task_completed": false
+    },
+    {
+      "state_id": "reset-20260921",
+      "seed": 20260921,
+      "time": 0.0,
+      "position": [
+        3060.2353515625,
+        1065.0277099609375,
+        193.8834228515625
+      ],
+      "battery": 1.0,
+      "finite_energy_enabled": false,
+      "candidate_tasks": [
+        {
+          "kind": "single_navigation_goal",
+          "target": [
+            1290.885009765625,
+            2272.226806640625,
+            376.0743103027344
+          ],
+          "pickup": null,
+          "dropoff": null,
+          "deadline": null,
+          "payload": null,
+          "euclidean_distance": 2149.679931640625,
+          "estimated_duration": null,
+          "estimated_energy": null
+        }
+      ],
+      "current_load": null,
+      "legacy_order_count": 0,
+      "charger_state": {
+        "position": [
+          2880.0,
+          2000.0,
+          200.0
+        ],
+        "count": 1
+      },
+      "action_taken": null,
+      "successor": null,
+      "task_completed": false
+    },
+    {
+      "state_id": "reset-20260922",
+      "seed": 20260922,
+      "time": 0.0,
+      "position": [
+        3868.92041015625,
+        3403.02880859375,
+        143.59564208984375
+      ],
+      "battery": 1.0,
+      "finite_energy_enabled": false,
+      "candidate_tasks": [
+        {
+          "kind": "single_navigation_goal",
+          "target": [
+            2591.123291015625,
+            2477.65380859375,
+            331.8488464355469
+          ],
+          "pickup": null,
+          "dropoff": null,
+          "deadline": null,
+          "payload": null,
+          "euclidean_distance": 1588.875,
+          "estimated_duration": null,
+          "estimated_energy": null
+        }
+      ],
+      "current_load": null,
+      "legacy_order_count": 0,
+      "charger_state": {
+        "position": [
+          2880.0,
+          2000.0,
+          200.0
+        ],
+        "count": 1
+      },
+      "action_taken": null,
+      "successor": null,
+      "task_completed": false
+    },
+    {
+      "state_id": "reset-20260923",
+      "seed": 20260923,
+      "time": 0.0,
+      "position": [
+        3861.19873046875,
+        2072.691162109375,
+        326.8914794921875
+      ],
+      "battery": 1.0,
+      "finite_energy_enabled": false,
+      "candidate_tasks": [
+        {
+          "kind": "single_navigation_goal",
+          "target": [
+            921.0840454101562,
+            1241.283447265625,
+            377.01031494140625
+          ],
+          "pickup": null,
+          "dropoff": null,
+          "deadline": null,
+          "payload": null,
+          "euclidean_distance": 3055.818359375,
+          "estimated_duration": null,
+          "estimated_energy": null
+        }
+      ],
+      "current_load": null,
+      "legacy_order_count": 0,
+      "charger_state": {
+        "position": [
+          2880.0,
+          2000.0,
+          200.0
+        ],
+        "count": 1
+      },
+      "action_taken": null,
+      "successor": null,
+      "task_completed": false
+    },
+    {
+      "state_id": "reset-20260924",
+      "seed": 20260924,
+      "time": 0.0,
+      "position": [
+        350.53900146484375,
+        693.9528198242188,
+        253.4105224609375
+      ],
+      "battery": 1.0,
+      "finite_energy_enabled": false,
+      "candidate_tasks": [
+        {
+          "kind": "single_navigation_goal",
+          "target": [
+            2075.86572265625,
+            258.69549560546875,
+            245.72637939453125
+          ],
+          "pickup": null,
+          "dropoff": null,
+          "deadline": null,
+          "payload": null,
+          "euclidean_distance": 1779.3988037109375,
+          "estimated_duration": null,
+          "estimated_energy": null
+        }
+      ],
+      "current_load": null,
+      "legacy_order_count": 0,
+      "charger_state": {
+        "position": [
+          2880.0,
+          2000.0,
+          200.0
+        ],
+        "count": 1
+      },
+      "action_taken": null,
+      "successor": null,
+      "task_completed": false
+    },
+    {
+      "state_id": "reset-20260925",
+      "seed": 20260925,
+      "time": 0.0,
+      "position": [
+        705.1084594726562,
+        842.4218139648438,
+        190.22422790527344
+      ],
+      "battery": 1.0,
+      "finite_energy_enabled": false,
+      "candidate_tasks": [
+        {
+          "kind": "single_navigation_goal",
+          "target": [
+            1709.587158203125,
+            2039.5029296875,
+            137.60406494140625
+          ],
+          "pickup": null,
+          "dropoff": null,
+          "deadline": null,
+          "payload": null,
+          "euclidean_distance": 1563.5694580078125,
+          "estimated_duration": null,
+          "estimated_energy": null
+        }
+      ],
+      "current_load": null,
+      "legacy_order_count": 0,
+      "charger_state": {
+        "position": [
+          2880.0,
+          2000.0,
+          200.0
+        ],
+        "count": 1
+      },
+      "action_taken": null,
+      "successor": null,
+      "task_completed": false
+    },
+    {
+      "state_id": "reset-20260926",
+      "seed": 20260926,
+      "time": 0.0,
+      "position": [
+        3282.82958984375,
+        3237.719482421875,
+        239.4868927001953
+      ],
+      "battery": 1.0,
+      "finite_energy_enabled": false,
+      "candidate_tasks": [
+        {
+          "kind": "single_navigation_goal",
+          "target": [
+            3110.777099609375,
+            3792.126220703125,
+            125.98577880859375
+          ],
+          "pickup": null,
+          "dropoff": null,
+          "deadline": null,
+          "payload": null,
+          "euclidean_distance": 591.4823608398438,
+          "estimated_duration": null,
+          "estimated_energy": null
+        }
+      ],
+      "current_load": null,
+      "legacy_order_count": 0,
+      "charger_state": {
+        "position": [
+          2880.0,
+          2000.0,
+          200.0
+        ],
+        "count": 1
+      },
+      "action_taken": null,
+      "successor": null,
+      "task_completed": false
+    },
+    {
+      "state_id": "reset-20260927",
+      "seed": 20260927,
+      "time": 0.0,
+      "position": [
+        470.5709228515625,
+        1622.6014404296875,
+        36.83222579956055
+      ],
+      "battery": 1.0,
+      "finite_energy_enabled": false,
+      "candidate_tasks": [
+        {
+          "kind": "single_navigation_goal",
+          "target": [
+            3513.62158203125,
+            194.47634887695312,
+            344.5121765136719
+          ],
+          "pickup": null,
+          "dropoff": null,
+          "deadline": null,
+          "payload": null,
+          "euclidean_distance": 3375.55419921875,
+          "estimated_duration": null,
+          "estimated_energy": null
+        }
+      ],
+      "current_load": null,
+      "legacy_order_count": 0,
+      "charger_state": {
+        "position": [
+          2880.0,
+          2000.0,
+          200.0
+        ],
+        "count": 1
+      },
+      "action_taken": null,
+      "successor": null,
+      "task_completed": false
+    },
+    {
+      "state_id": "reset-20260928",
+      "seed": 20260928,
+      "time": 0.0,
+      "position": [
+        2115.552978515625,
+        306.5504455566406,
+        135.09629821777344
+      ],
+      "battery": 1.0,
+      "finite_energy_enabled": false,
+      "candidate_tasks": [
+        {
+          "kind": "single_navigation_goal",
+          "target": [
+            1711.218505859375,
+            3053.687744140625,
+            132.05422973632812
+          ],
+          "pickup": null,
+          "dropoff": null,
+          "deadline": null,
+          "payload": null,
+          "euclidean_distance": 2776.7353515625,
+          "estimated_duration": null,
+          "estimated_energy": null
+        }
+      ],
+      "current_load": null,
+      "legacy_order_count": 0,
+      "charger_state": {
+        "position": [
+          2880.0,
+          2000.0,
+          200.0
+        ],
+        "count": 1
+      },
+      "action_taken": null,
+      "successor": null,
+      "task_completed": false
+    },
+    {
+      "state_id": "reset-20260929",
+      "seed": 20260929,
+      "time": 0.0,
+      "position": [
+        1430.9437255859375,
+        3081.942626953125,
+        205.16087341308594
+      ],
+      "battery": 1.0,
+      "finite_energy_enabled": false,
+      "candidate_tasks": [
+        {
+          "kind": "single_navigation_goal",
+          "target": [
+            441.9134826660156,
+            103.32743072509766,
+            214.18434143066406
+          ],
+          "pickup": null,
+          "dropoff": null,
+          "deadline": null,
+          "payload": null,
+          "euclidean_distance": 3138.536376953125,
+          "estimated_duration": null,
+          "estimated_energy": null
+        }
+      ],
+      "current_load": null,
+      "legacy_order_count": 0,
+      "charger_state": {
+        "position": [
+          2880.0,
+          2000.0,
+          200.0
+        ],
+        "count": 1
+      },
+      "action_taken": null,
+      "successor": null,
+      "task_completed": false
+    },
+    {
+      "state_id": "reset-20260930",
+      "seed": 20260930,
+      "time": 0.0,
+      "position": [
+        1685.999755859375,
+        1493.0577392578125,
+        129.08285522460938
+      ],
+      "battery": 1.0,
+      "finite_energy_enabled": false,
+      "candidate_tasks": [
+        {
+          "kind": "single_navigation_goal",
+          "target": [
+            1352.6826171875,
+            697.5867309570312,
+            159.48211669921875
+          ],
+          "pickup": null,
+          "dropoff": null,
+          "deadline": null,
+          "payload": null,
+          "euclidean_distance": 863.0171508789062,
+          "estimated_duration": null,
+          "estimated_energy": null
+        }
+      ],
+      "current_load": null,
+      "legacy_order_count": 0,
+      "charger_state": {
+        "position": [
+          2880.0,
+          2000.0,
+          200.0
+        ],
+        "count": 1
+      },
+      "action_taken": null,
+      "successor": null,
+      "task_completed": false
+    },
+    {
+      "state_id": "reset-20260931",
+      "seed": 20260931,
+      "time": 0.0,
+      "position": [
+        1712.451416015625,
+        1498.4302978515625,
+        295.6003723144531
+      ],
+      "battery": 1.0,
+      "finite_energy_enabled": false,
+      "candidate_tasks": [
+        {
+          "kind": "single_navigation_goal",
+          "target": [
+            3058.70458984375,
+            533.57568359375,
+            101.53604125976562
+          ],
+          "pickup": null,
+          "dropoff": null,
+          "deadline": null,
+          "payload": null,
+          "euclidean_distance": 1667.6339111328125,
+          "estimated_duration": null,
+          "estimated_energy": null
+        }
+      ],
+      "current_load": null,
+      "legacy_order_count": 0,
+      "charger_state": {
+        "position": [
+          2880.0,
+          2000.0,
+          200.0
+        ],
+        "count": 1
+      },
+      "action_taken": null,
+      "successor": null,
+      "task_completed": false
+    },
+    {
+      "state_id": "reset-20260932",
+      "seed": 20260932,
+      "time": 0.0,
+      "position": [
+        3761.45947265625,
+        928.879638671875,
+        180.9510498046875
+      ],
+      "battery": 1.0,
+      "finite_energy_enabled": false,
+      "candidate_tasks": [
+        {
+          "kind": "single_navigation_goal",
+          "target": [
+            1113.66552734375,
+            2860.310546875,
+            228.2756805419922
+          ],
+          "pickup": null,
+          "dropoff": null,
+          "deadline": null,
+          "payload": null,
+          "euclidean_distance": 3277.724609375,
+          "estimated_duration": null,
+          "estimated_energy": null
+        }
+      ],
+      "current_load": null,
+      "legacy_order_count": 0,
+      "charger_state": {
+        "position": [
+          2880.0,
+          2000.0,
+          200.0
+        ],
+        "count": 1
+      },
+      "action_taken": null,
+      "successor": null,
+      "task_completed": false
+    },
+    {
+      "state_id": "reset-20260933",
+      "seed": 20260933,
+      "time": 0.0,
+      "position": [
+        1361.099365234375,
+        1433.58740234375,
+        285.7660217285156
+      ],
+      "battery": 1.0,
+      "finite_energy_enabled": false,
+      "candidate_tasks": [
+        {
+          "kind": "single_navigation_goal",
+          "target": [
+            2546.729248046875,
+            3341.122802734375,
+            134.53306579589844
+          ],
+          "pickup": null,
+          "dropoff": null,
+          "deadline": null,
+          "payload": null,
+          "euclidean_distance": 2251.062255859375,
+          "estimated_duration": null,
+          "estimated_energy": null
+        }
+      ],
+      "current_load": null,
+      "legacy_order_count": 0,
+      "charger_state": {
+        "position": [
+          2880.0,
+          2000.0,
+          200.0
+        ],
+        "count": 1
+      },
+      "action_taken": null,
+      "successor": null,
+      "task_completed": false
+    },
+    {
+      "state_id": "reset-20260934",
+      "seed": 20260934,
+      "time": 0.0,
+      "position": [
+        2059.217529296875,
+        2950.828125,
+        258.9205627441406
+      ],
+      "battery": 1.0,
+      "finite_energy_enabled": false,
+      "candidate_tasks": [
+        {
+          "kind": "single_navigation_goal",
+          "target": [
+            2022.0078125,
+            984.6394653320312,
+            136.06634521484375
+          ],
+          "pickup": null,
+          "dropoff": null,
+          "deadline": null,
+          "payload": null,
+          "euclidean_distance": 1970.37451171875,
+          "estimated_duration": null,
+          "estimated_energy": null
+        }
+      ],
+      "current_load": null,
+      "legacy_order_count": 0,
+      "charger_state": {
+        "position": [
+          2880.0,
+          2000.0,
+          200.0
+        ],
+        "count": 1
+      },
+      "action_taken": null,
+      "successor": null,
+      "task_completed": false
+    },
+    {
+      "state_id": "reset-20260935",
+      "seed": 20260935,
+      "time": 0.0,
+      "position": [
+        1698.255859375,
+        395.43438720703125,
+        329.66644287109375
+      ],
+      "battery": 1.0,
+      "finite_energy_enabled": false,
+      "candidate_tasks": [
+        {
+          "kind": "single_navigation_goal",
+          "target": [
+            2100.589599609375,
+            2786.305419921875,
+            366.0478820800781
+          ],
+          "pickup": null,
+          "dropoff": null,
+          "deadline": null,
+          "payload": null,
+          "euclidean_distance": 2424.759765625,
+          "estimated_duration": null,
+          "estimated_energy": null
+        }
+      ],
+      "current_load": null,
+      "legacy_order_count": 0,
+      "charger_state": {
+        "position": [
+          2880.0,
+          2000.0,
+          200.0
+        ],
+        "count": 1
+      },
+      "action_taken": null,
+      "successor": null,
+      "task_completed": false
+    }
+  ],
+  "summary": {
+    "n": 16,
+    "target_count_distribution": {
+      "1": 16
+    },
+    "legacy_order_count_distribution": {
+      "0": 16
+    },
+    "distance_min": 591.4823608398438,
+    "distance_mean": 2240.9152603149414,
+    "distance_max": 3380.422119140625
+  }
+}

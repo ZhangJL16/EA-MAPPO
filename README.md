@@ -18,3 +18,11 @@
 
 当前导航模型保留在 `artifacts/hocbf_correction_sac_20260908_v1/sac/checkpoint_000131072/model.zip`。
 Python/Lean 依赖保留在本机；迁移包不含它们，也不含 Git 历史。
+
+2026-09-20 用户另行授权的 F0–F2 原始环境审计见
+[FULL_PROBLEM_AUDIT.md](FULL_PROBLEM_AUDIT.md)。指定 SAC 环境只有单目标与返航切换；
+完整调度 F1/F2 因缺少任务池接口未运行。该审计不改变旧研究的结项结论。
+
+随后用户批准新版本实施：修订规格见 [MINIMAL_PERSISTENT_THROUGHPUT_SPEC.md](MINIMAL_PERSISTENT_THROUGHPUT_SPEC.md)。
+独立项目位于 `/home/zjl/persistent_uav_throughput_v1/`，实现持续任务队列、计时充电与B0–B5；
+本仓库导航代码只读复用。物理calibration启动后交还，不自动运行后续baseline或oracle。
