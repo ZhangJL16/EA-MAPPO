@@ -11,6 +11,7 @@ safety; observation noise only. Existing persistent-UAV experiments are unchange
   resolved by the revised scope rather than suppressed.
 - [Related work and remaining novelty questions](theory/RELATED_WORK.md)
 - [Reducibility audit: restricted separation, controlled-sensing encoding, unresolved novelty](theory/REDUCIBILITY_AUDIT_20260921.md)
+- [Dynamic admissibility: general pre-action lower bound and a sharp three-model family](theory/DYNAMIC_ADMISSIBILITY_COMPLEXITY_20260921.md)
 - `configs/protocol_v1.json`: exact parameters and seeds.
 - `scripts/run_all.py`: freeze, resumable 16-worker execution, complete-only collect/analyze.
 
