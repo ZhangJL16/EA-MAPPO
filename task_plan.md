@@ -51,7 +51,7 @@
 - [x] 29项测试通过；更新真实continuing smoke，覆盖充满后空队列站内等待。
 - [x] calibration与冻结27-regime manifest原样保留，未重跑、未调参。
 - [x] 新旧源码兼容记录单独保存，不重写历史来源。
-- [ ] 启动B4 validation（27×4×10），首个checkpoint健康核查后交还。
+- [x] B4 validation（27×4×10）已启动，可恢复checkpoint健康核查通过；交还运行，不监控完成。
 - [ ] B0–B5 evaluation：尚未启动，不自动从validation推进。
 
 第一轮只作结构诊断；最终98% kill test未授权。解释结果前需要estimator error audit；

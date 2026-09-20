@@ -1,0 +1,24 @@
+{
+  "pid": 252399,
+  "command": [
+    "/home/zjl/mappo/.venv/bin/python",
+    "-m",
+    "persistent_uav.cli",
+    "baselines",
+    "--frozen",
+    "evidence/v1_2/calibration/frozen_regimes.json",
+    "--calibration-compatibility",
+    "evidence/v1_3/calibration_compatibility.json",
+    "--output",
+    "artifacts/diagnostic_validation_20260920",
+    "--split",
+    "validation",
+    "--regimes",
+    "all",
+    "--checkpoint-policy-steps",
+    "100"
+  ],
+  "cwd": "/home/zjl/mappo/persistent_uav_throughput_v1",
+  "log": "/home/zjl/mappo/persistent_uav_throughput_v1/artifacts/diagnostic_validation_20260920.log",
+  "source_commit": "b8cb6736baa531b41e2040fb88cd29cee7b9783c"
+}

@@ -1,0 +1,23 @@
+{
+  "passed": true,
+  "checked_unix": 1789887943.2905853,
+  "pid": 252399,
+  "source_commit": "b8cb6736baa531b41e2040fb88cd29cee7b9783c",
+  "completed_runs": 9,
+  "planned_runs": 1080,
+  "policy_steps": 9700,
+  "checksum_valid": true,
+  "provenance_valid": true,
+  "contract_valid": true,
+  "finite_observation": true,
+  "active": {
+    "time": 84.35000000000066,
+    "battery": 27.690290875064836,
+    "mode": "SERVING",
+    "physical_resets": 1
+  },
+  "training_updates": 0,
+  "calibration_unchanged": true,
+  "scope": "startup health only; no inference from partial results; handed back running",
+  "resume_equivalence": "Existing unchanged checkpoint/resume path, also passed updated continuing smoke."
+}
