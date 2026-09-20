@@ -1,0 +1,88 @@
+{
+  "states": 205,
+  "branches": 561,
+  "groups": {
+    "A": {
+      "states": 67,
+      "any_safe_task": {
+        "True": 12,
+        "False": 55,
+        "None": 0
+      },
+      "alternative_safe_task": {
+        "True": 10,
+        "False": 57,
+        "None": 0
+      },
+      "direct_return_safe": {
+        "True": 0,
+        "False": 0,
+        "None": 67
+      },
+      "any_tested_safe_continuation": {
+        "True": 12,
+        "False": 55,
+        "None": 0
+      },
+      "branch_outcomes": {
+        "energy_depletion": 170,
+        "success": 12
+      }
+    },
+    "B": {
+      "states": 48,
+      "any_safe_task": {
+        "True": 0,
+        "False": 0,
+        "None": 48
+      },
+      "alternative_safe_task": {
+        "True": 0,
+        "False": 0,
+        "None": 48
+      },
+      "direct_return_safe": {
+        "True": 47,
+        "False": 1,
+        "None": 0
+      },
+      "any_tested_safe_continuation": {
+        "True": 47,
+        "False": 1,
+        "None": 0
+      },
+      "branch_outcomes": {
+        "success": 47,
+        "energy_depletion": 1
+      }
+    },
+    "C": {
+      "states": 90,
+      "any_safe_task": {
+        "True": 59,
+        "False": 31,
+        "None": 0
+      },
+      "alternative_safe_task": {
+        "True": 59,
+        "False": 31,
+        "None": 0
+      },
+      "direct_return_safe": {
+        "True": 65,
+        "False": 2,
+        "None": 23
+      },
+      "any_tested_safe_continuation": {
+        "True": 87,
+        "False": 3,
+        "None": 0
+      },
+      "branch_outcomes": {
+        "energy_depletion": 180,
+        "success": 151
+      }
+    }
+  },
+  "limits": "Failure-predecessor selection; deterministic frozen-controller continuation, not maximal viability or a population 5% risk estimate. No successful branch does not prove regime infeasibility."
+}

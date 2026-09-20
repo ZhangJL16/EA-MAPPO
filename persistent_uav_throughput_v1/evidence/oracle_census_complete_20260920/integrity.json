@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "unique_states": 205,
+  "unique_branches": 561,
+  "missing_states": 0,
+  "duplicate_states": 0,
+  "exact_root_reconstruction": true,
+  "plan_sha256": "78e100f822dbc620362b129ca1bfc218e9791b2b01d9f2fbf92fb7debdb9913e"
+}

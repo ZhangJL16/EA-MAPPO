@@ -3,8 +3,11 @@
 最新授权：只做 [Oracle Recoverability Census](ORACLE_RECOVERABILITY_CENSUS.md)，
 固定 205 个历史 failure-predecessor 状态、561 个有界分支；先精确回放恢复完整 simulator state，
 再检查 task+immediate-return 或合法的 immediate-return。不运行完整 OracleSafe policy、MPC 或训练。
-16 个单线程 CPU 分片已启动，首检查点全部通过；见
-[Census 启动交接](evidence/oracle_census_startup_20260920/README.md)。
+205/205 状态、561/561 分支已完成并通过 manual collect，见
+[完整 Census 结果与原始状态证据](evidence/oracle_census_complete_20260920/README.md)。
+A：12/67 有安全任务；B：47/48 立即返航成功；C：59/90 有安全替代任务、28/90 仅返航成功。
+这里仅指冻结 controller 下的 bounded continuation；未启动新 policy 或训练。
+历史 [Census 启动交接](evidence/oracle_census_startup_20260920/README.md) 保留。
 
 最新离线分析：[Stranding Decomposition](evidence/stranding_decomposition_20260920/README.md)。
 166 次返航耗尽分为 67 次 predicted-infeasible fallback、37 次任务低估余量翻转、

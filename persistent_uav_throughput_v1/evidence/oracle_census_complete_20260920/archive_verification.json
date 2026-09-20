@@ -1,0 +1,8 @@
+{
+  "passed": true,
+  "members_verified": 1708,
+  "archive_bytes": 10789486,
+  "archive_sha256": "72ea36cd221f7a40e6ce87241d5fffdef0d22f3ddc88819dd802affe964cb8c0",
+  "excluded": "empty process lock files only",
+  "new_simulations": 0
+}

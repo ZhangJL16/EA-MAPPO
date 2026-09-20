@@ -1,5 +1,9 @@
 # PersistentUAVThroughput-v1
 
+Census completed: 205 states / 561 branches; manual collect integrity PASS.
+Final evidence: evidence/oracle_census_complete_20260920/. No follow-on experiment
+is authorized by these outcomes. Await user review; do not rerun or tune.
+
 Latest user review after a7f298f authorizes only an Oracle Recoverability Census:
 - 205 fixed predecessor states: A=67 fallback; B=40 waiting-margin-loss + 8 waiting
   depletion; C=37 task-error margin flips + 53 task depletion. B is evaluated before idle.
