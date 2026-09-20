@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "comparison": "full remaining serve->serve->recharge->serve event log, summary and final observation",
+  "snapshot_time": 0.4,
+  "restored_outcome_equal": true,
+  "training_updates": 0,
+  "physical_resets": 1,
+  "completed_services": 3,
+  "completed_recharges": 1
+}

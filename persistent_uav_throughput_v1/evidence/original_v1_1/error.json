@@ -1,0 +1,5 @@
+{
+  "error": "ValueError('static obstacle overlaps a protected reset position')",
+  "time": 1789882975.5350657,
+  "resume": "Use last completed checkpoint; no automatic retry."
+}

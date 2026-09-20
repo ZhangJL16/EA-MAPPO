@@ -24,5 +24,6 @@ Python/Lean 依赖保留在本机；迁移包不含它们，也不含 Git 历史
 完整调度 F1/F2 因缺少任务池接口未运行。该审计不改变旧研究的结项结论。
 
 随后用户批准新版本实施：修订规格见 [MINIMAL_PERSISTENT_THROUGHPUT_SPEC.md](MINIMAL_PERSISTENT_THROUGHPUT_SPEC.md)。
-独立项目位于 `/home/zjl/persistent_uav_throughput_v1/`，实现持续任务队列、计时充电与B0–B5；
-本仓库导航代码只读复用。物理calibration启动后交还，不自动运行后续baseline或oracle。
+新版本代码按用户最新要求收回 [persistent_uav_throughput_v1/](persistent_uav_throughput_v1/README.md)，
+与旧环境分目录维护，源码和精简证据由当前仓库跟踪。旧导航源码不改。
+当前授权为修复空队列补能、完成calibration及导航资格审查；B0–B5和oracle运行尚未批准。

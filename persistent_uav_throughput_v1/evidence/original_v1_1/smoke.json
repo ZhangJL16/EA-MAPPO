@@ -1,0 +1,20 @@
+{
+  "kind": "ENGINEERING_SMOKE_ONLY_NOT_CALIBRATION_OR_BASELINE_RESULT",
+  "passed": true,
+  "config": {
+    "capacity": 100.0,
+    "recharge_rate": 1.0,
+    "arrival_rate": 0.01,
+    "cutoff": 1.0,
+    "queue_capacity": 5,
+    "initial_tasks": 3,
+    "option_step_limit": 4000,
+    "delta": 0.05
+  },
+  "steps_per_branch": 2,
+  "midflight_resume_next_state_equal": true,
+  "physical_resets": 1,
+  "observation_dim": 2056,
+  "training_updates": 0,
+  "collision_count": 0
+}

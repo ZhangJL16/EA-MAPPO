@@ -1,0 +1,19 @@
+{
+  "status": "running",
+  "completed_jobs": 93,
+  "planned_jobs": 1000,
+  "total_policy_steps": 56800,
+  "active_job": 93,
+  "active_job_simulation_time": 126.40000000000126,
+  "active_job_energy": 26.66227485413798,
+  "snapshot": {
+    "file": "checkpoint_7586994835ea7745e340.pkl",
+    "sha256": "7586994835ea7745e340483d8176cf0795e6d2d00332022d7c88099ddc07805e",
+    "bytes": 224431
+  },
+  "checkpoint_written_unix": 1789882975.4834614,
+  "training_updates": 0,
+  "scheduler_runs": 0,
+  "finite_state": true,
+  "next_stage": "NOT_STARTED"
+}

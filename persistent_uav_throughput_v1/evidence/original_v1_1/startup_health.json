@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "pid": 172751,
+  "checkpoint_loaded": true,
+  "provenance_verified": true,
+  "actual_actor_midflight_resume_check": "artifacts/engineering_smoke_20260920/smoke.json",
+  "checkpoint_policy_steps": 15200,
+  "planned_navigation_jobs": 1000,
+  "training_updates": 0,
+  "scheduler_runs": 0,
+  "handoff": "startup health only; stop monitoring; no baseline auto-launch"
+}

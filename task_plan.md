@@ -30,3 +30,15 @@
 - [ ] 正式baseline validation/evaluation：尚未启动，等待完整calibration产物后显式推进。
 
 未训练网络；未启动MPC、OracleSafe-SJF或small oracle。此授权不重开旧P2-A2研究。
+
+## 2026-09-20 最新审阅修订
+
+- [x] 用户要求新代码放回当前仓库的 `persistent_uav_throughput_v1/`，不使用嵌套Git/submodule。
+- [x] 空队列允许recharge/idle；站内满电且无任务才强制idle；非空队列仍无idle。
+- [x] 保存原始v1.1 source bundle、manifest、16项检查及93/1000中断前检查点。
+- [x] 发现并修复固定地图起点被旧生成保护距离误拒的问题，不改地图或1000对输入。
+- [x] 22项针对性检查、真实serve→serve→recharge→serve与完整恢复结果等价通过。
+- [x] 资格筛查规则已在本轮读取结果前写定；pilot已开始，故不称采集前预注册。
+- [ ] 当前同一1000对任务从保留检查点继续，完成后提交资格报告及27-regime manifest。
+
+正式B0–B5入口已暂停，等待用户审查calibration/qualification后重新授权。

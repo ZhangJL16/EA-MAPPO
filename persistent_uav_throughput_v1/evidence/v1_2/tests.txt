@@ -1,0 +1,31 @@
+test_exogenous_stream_reproducible_independent_of_scheduler (test_core.BaselineAndStreamTests.test_exogenous_stream_reproducible_independent_of_scheduler) ... ok
+test_frozen_regimes_depend_only_on_physical_statistics (test_core.BaselineAndStreamTests.test_frozen_regimes_depend_only_on_physical_statistics) ... ok
+test_rankings_are_not_all_the_same (test_core.BaselineAndStreamTests.test_rankings_are_not_all_the_same) ... ok
+test_reserve_uses_public_estimate_and_recharge_when_low (test_core.BaselineAndStreamTests.test_reserve_uses_public_estimate_and_recharge_when_low) ... ok
+test_validation_never_selects_infeasible_threshold (test_core.BaselineAndStreamTests.test_validation_never_selects_infeasible_threshold) ... ok
+test_arrivals_during_service_queue_capacity_and_no_redraw (test_core.EnvironmentTests.test_arrivals_during_service_queue_capacity_and_no_redraw) ... ok
+test_charging_consumes_time_and_arrivals_continue (test_core.EnvironmentTests.test_charging_consumes_time_and_arrivals_continue) ... ok
+test_cutoff_midcharge_does_not_refill (test_core.EnvironmentTests.test_cutoff_midcharge_does_not_refill) ... ok
+test_depletion_precedes_goal_and_absorbs_to_T (test_core.EnvironmentTests.test_depletion_precedes_goal_and_absorbs_to_T) ... ok
+test_empty_queue_can_idle_but_no_idle_with_backlog (test_core.EnvironmentTests.test_empty_queue_can_idle_but_no_idle_with_backlog) ... ok
+test_empty_queue_can_recharge_away_from_station (test_core.EnvironmentTests.test_empty_queue_can_recharge_away_from_station) ... ok
+test_empty_queue_forced_wait_until_arrival (test_core.EnvironmentTests.test_empty_queue_forced_wait_until_arrival) ... ok
+test_empty_station_partial_battery_can_charge (test_core.EnvironmentTests.test_empty_station_partial_battery_can_charge) ... ok
+test_full_station_empty_queue_forces_idle (test_core.EnvironmentTests.test_full_station_empty_queue_forces_idle) ... ok
+test_full_station_recharge_rejected (test_core.EnvironmentTests.test_full_station_recharge_rejected) ... ok
+test_goal_exactly_at_cutoff_counts_without_return_requirement (test_core.EnvironmentTests.test_goal_exactly_at_cutoff_counts_without_return_requirement) ... ok
+test_midflight_disk_resume_matches_uninterrupted (test_core.EnvironmentTests.test_midflight_disk_resume_matches_uninterrupted) ... ok
+test_no_wait_action_and_no_preemption (test_core.EnvironmentTests.test_no_wait_action_and_no_preemption) ... ok
+test_policy_view_has_no_map_future_or_random_state (test_core.EnvironmentTests.test_policy_view_has_no_map_future_or_random_state) ... ok
+test_wait_can_deplete_even_at_station_without_auto_recharge (test_core.EnvironmentTests.test_wait_can_deplete_even_at_station_without_auto_recharge) ... ok
+/home/zjl/mappo/persistent_uav_throughput_v1/persistent_uav/navigation.py:29: ImportWarning: can't resolve package from __spec__ or __package__, falling back on __name__ and __path__
+  from .config import MAP_SEED, PHYSICS_DT, ceil_grid
+test_protected_generation_halo_does_not_reject_legal_fixed_map_start (test_navigation_regression.NavigationRegression.test_protected_generation_halo_does_not_reject_legal_fixed_map_start) ... In /home/zjl/mappo/.venv/lib/python3.12/site-packages/matplotlib/mpl-data/stylelib/classic.mplstyle: 'parseString' deprecated - use 'parse_string'
+In /home/zjl/mappo/.venv/lib/python3.12/site-packages/matplotlib/mpl-data/stylelib/classic.mplstyle: 'resetCache' deprecated - use 'reset_cache'
+ok
+test_valid_start_observation_and_physical_step_match_original_source (test_navigation_regression.NavigationRegression.test_valid_start_observation_and_physical_step_match_original_source) ... ok
+
+----------------------------------------------------------------------
+Ran 22 tests in 0.178s
+
+OK
