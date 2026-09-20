@@ -1,0 +1,20 @@
+test_anytime_likelihood_ratio_martingale (test_core.CoreTests.test_anytime_likelihood_ratio_martingale) ... ok
+test_independent_bit_design (test_core.CoreTests.test_independent_bit_design) ... ok
+test_no_budget_reset_and_pickle_resume (test_core.CoreTests.test_no_budget_reset_and_pickle_resume) ... ok
+test_nuisance_does_not_change_decision_learning (test_core.CoreTests.test_nuisance_does_not_change_decision_learning) ... ok
+test_refinement_hand_computed (test_core.CoreTests.test_refinement_hand_computed) ... ok
+test_safe_refine_full_id_identical_without_nuisance (test_core.CoreTests.test_safe_refine_full_id_identical_without_nuisance) ... ok
+test_static_cannot_unlock_second_bit (test_core.CoreTests.test_static_cannot_unlock_second_bit) ... ok
+test_uav_clock_filters_without_gaussian_underflow (test_core.CoreTests.test_uav_clock_filters_without_gaussian_underflow) ... ok
+test_unlock_only_after_confidence (test_core.CoreTests.test_unlock_only_after_confidence) ... ok
+test_zero_information_stays_locked (test_core.CoreTests.test_zero_information_stays_locked) ... ok
+test_exact_cycle_clock_reveals_uav_parameter (test_theory_obstructions.TheoryObstructions.test_exact_cycle_clock_reveals_uav_parameter) ... ok
+test_nuisance_enumeration_size (test_theory_obstructions.TheoryObstructions.test_nuisance_enumeration_size) ... ok
+test_pairwise_overlap_does_not_imply_common_answer (test_theory_obstructions.TheoryObstructions.test_pairwise_overlap_does_not_imply_common_answer) ... ok
+test_positive_information_does_not_make_finite_evidence_exclusive (test_theory_obstructions.TheoryObstructions.test_positive_information_does_not_make_finite_evidence_exclusive) ... ok
+test_recursive_root_contains_indistinguishable_decision_pair (test_theory_obstructions.TheoryObstructions.test_recursive_root_contains_indistinguishable_decision_pair) ... ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 0.023s
+
+OK

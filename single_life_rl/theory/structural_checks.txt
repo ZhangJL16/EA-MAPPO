@@ -1,0 +1,10 @@
+test_exact_cycle_clock_reveals_uav_parameter (test_theory_obstructions.TheoryObstructions.test_exact_cycle_clock_reveals_uav_parameter) ... ok
+test_nuisance_enumeration_size (test_theory_obstructions.TheoryObstructions.test_nuisance_enumeration_size) ... ok
+test_pairwise_overlap_does_not_imply_common_answer (test_theory_obstructions.TheoryObstructions.test_pairwise_overlap_does_not_imply_common_answer) ... ok
+test_positive_information_does_not_make_finite_evidence_exclusive (test_theory_obstructions.TheoryObstructions.test_positive_information_does_not_make_finite_evidence_exclusive) ... ok
+test_recursive_root_contains_indistinguishable_decision_pair (test_theory_obstructions.TheoryObstructions.test_recursive_root_contains_indistinguishable_decision_pair) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.003s
+
+OK

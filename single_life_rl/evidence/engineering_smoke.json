@@ -1,0 +1,9 @@
+{
+  "matplotlib_available": true,
+  "midflight_disk_resume_exact": true,
+  "nonzero_policy_steps": 2,
+  "passed": true,
+  "physical_resets_per_copy": 1,
+  "snapshot_bytes": 124865,
+  "training_updates": 0
+}
