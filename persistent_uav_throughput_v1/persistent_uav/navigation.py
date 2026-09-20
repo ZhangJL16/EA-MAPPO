@@ -207,7 +207,9 @@ class FrozenNavigator:
             if np.linalg.norm(self.position - self.station) > self.goal_radius:
                 raise ValueError('cannot charge away from station')
             b.agent.energy = min(self.capacity, self.energy + recharge_rate * actual)
-        elif actual > 0:
+        elif actual > 0 and np.linalg.norm(self.position - self.station) > self.goal_radius:
+            # Away from the dock, stationary waiting is hover. At the dock it
+            # consumes no battery; only explicit recharge can increase energy.
             cost = b._realized_energy_cost(np.zeros(3), self.dt, velocity=np.zeros(3))
             if cost > 0:
                 depletion_time = ceil_grid(self.energy / cost * self.dt)

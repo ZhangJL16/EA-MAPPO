@@ -43,3 +43,17 @@
 - [x] 导航资格REVIEW_REQUIRED；完整报告与原始证据见 `persistent_uav_throughput_v1/CALIBRATION_REPORT.md`。
 
 正式B0–B5入口已暂停，等待用户审查calibration/qualification后重新授权。
+
+## 2026-09-20 dock-idle审阅与B0–B5 diagnostic授权
+
+用户已验收v1.2与1000-job calibration，并认可导航可进入scheduling diagnostic。
+- [x] 修复站内idle为零耗电、不自动补能；站外保留hover cost。
+- [x] 29项测试通过；更新真实continuing smoke，覆盖充满后空队列站内等待。
+- [x] calibration与冻结27-regime manifest原样保留，未重跑、未调参。
+- [x] 新旧源码兼容记录单独保存，不重写历史来源。
+- [ ] 启动B4 validation（27×4×10），首个checkpoint健康核查后交还。
+- [ ] B0–B5 evaluation：尚未启动，不自动从validation推进。
+
+第一轮只作结构诊断；最终98% kill test未授权。解释结果前需要estimator error audit；
+正式kill test还需MPC、small reference与estimation/planning decomposition。
+神经训练仍禁止；不把10-seed经验筛选称为5%风险保证。

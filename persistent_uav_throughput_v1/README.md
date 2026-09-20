@@ -2,7 +2,7 @@
 
 独立的新问题版本：持续空间任务调度，固定T内最大化完成数，实际电量耗尽风险为约束。
 单地点服务、单机、单站、初始3项/最多5项等待任务、外生Poisson到达、计时全充电。
-有任务时只选serve/recharge；空队列可选recharge/idle，站内满电时强制idle。无取送货、主动wait、部分充电或网络训练。
+有任务时只选serve/recharge；空队列可选recharge/idle，站内满电时强制idle。站内idle不耗电也不自动充电，站外idle保留悬停耗电。无取送货、非空队列主动wait、部分充电或网络训练。
 
 完整语义见 [MINIMAL_PERSISTENT_THROUGHPUT_SPEC.md](MINIMAL_PERSISTENT_THROUGHPUT_SPEC.md)。
 这里复用 `/home/zjl/mappo` 的冻结导航资产与Python依赖，旧仓库物理代码和历史结果不修改。
@@ -34,7 +34,7 @@
 smoke里的容量、估计系数和1秒cutoff都是工程检查fixture，不是calibration或baseline结果。
 已有输出目录不会被新运行覆盖。
 
-物理calibration（本轮唯一启动的研究运行）：
+历史物理calibration命令（已完成，不需重跑）：
 
 ```bash
 /home/zjl/mappo/.venv/bin/python -m persistent_uav.cli calibrate --output artifacts/calibration_20260920
@@ -49,11 +49,11 @@ calibration结束只生成 `jobs.json`、`statistics.json`、`frozen_regimes.jso
 统计明确区分成功任务条件分位数与失败任务；不因失败换地图或筛seed。
 1000条完整结果生成之前，baseline CLI拒绝运行正式评价。
 
-以下为后续实现入口示例；**当前代码拒绝baseline运行，须资格审查及用户后续批准**：
+用户已批准修复dock-idle后的B0–B5 diagnostic。先运行B4 validation，完成后再执行evaluation；不自动串联两个阶段：
 
 ```bash
-/home/zjl/mappo/.venv/bin/python -m persistent_uav.cli baselines --frozen artifacts/calibration_20260920/frozen_regimes.json --output artifacts/validation --split validation --regimes all
-/home/zjl/mappo/.venv/bin/python -m persistent_uav.cli baselines --frozen artifacts/calibration_20260920/frozen_regimes.json --output artifacts/evaluation --split evaluation --regimes all --threshold-file artifacts/validation/thresholds.json
+/home/zjl/mappo/.venv/bin/python -m persistent_uav.cli baselines --frozen evidence/v1_2/calibration/frozen_regimes.json --calibration-compatibility evidence/v1_3/calibration_compatibility.json --output artifacts/diagnostic_validation_20260920 --split validation --regimes all
+/home/zjl/mappo/.venv/bin/python -m persistent_uav.cli baselines --frozen evidence/v1_2/calibration/frozen_regimes.json --calibration-compatibility evidence/v1_3/calibration_compatibility.json --output artifacts/evaluation --split evaluation --regimes all --threshold-file artifacts/diagnostic_validation_20260920/thresholds.json
 ```
 
 validation固定10个seed、4个阈值；evaluation固定另外20个seed。选择规则使用实测depletion率预算，
@@ -70,7 +70,7 @@ B5用task+return的估计作排序/补能规则，不声称保证安全。
 电量耗尽后任务数固定至T，失败run保留；未实际返航的returnability不参与准入。
 
 MPC、OracleSafe-SJF、小规模oracle、98% kill test及任何神经训练均未实现/未运行。
-最新用户授权完成calibration并提交资格报告；不自动推进baseline。当前baseline入口明确拒绝运行，等待用户资格审查后批准。
+最新用户已通过导航资格审阅，并批准修复dock-idle后的B0–B5 diagnostic；首轮结果不能触发最终98% kill test。检查首个checkpoint后交还运行，不自动推进后续阶段。
 
 ## 当前证据位置
 
@@ -83,4 +83,16 @@ MPC、OracleSafe-SJF、小规模oracle、98% kill test及任何神经训练均�
 
 ## 本轮完成状态
 
-1000/1000 calibration已完成，988成功、12次navigation timeout。详见[CALIBRATION_REPORT.md](CALIBRATION_REPORT.md)。修复后的运行保存在 `artifacts/calibration_20260920_repaired/`，精简完整证据在 `evidence/v1_2/calibration/`。原运行目录因初始化错误中断，只作为历史保留。当前不需要续跑calibration。资格为REVIEW_REQUIRED，B0–B5仍未获准运行。
+1000/1000 calibration已完成，988成功、12次navigation timeout。详见[CALIBRATION_REPORT.md](CALIBRATION_REPORT.md)。修复后的运行保存在 `artifacts/calibration_20260920_repaired/`，精简完整证据在 `evidence/v1_2/calibration/`。原运行目录因初始化错误中断，只作为历史保留。当前不需要续跑calibration。自动资格报告保留历史REVIEW_REQUIRED原文；用户随后明确批准进入scheduling diagnostics。
+
+## v1.3 dock-idle修复与诊断入口
+
+`evidence/v1_3/`保存29项测试、更新的真实continuing trace和calibration兼容记录。
+站内70%电量idle保持70%；满电idle保持满电；显式recharge仍需占用时间。
+复用的calibration manifest逐字节不变；新diagnostic manifest记录新源码及兼容依据。
+B4 validation为27×4 thresholds×10 seeds=1080个持续任务流run。
+每run固定T≈10905秒，不是一个单目标飞行；首个checkpoint时不要求完成一个run。
+当前只启动该validation阶段；B0–B5 evaluation尚未启动。
+
+解释结果前仍需补estimator的MAE/RMSE/R²、energy underprediction和positive residual tail审计。
+10个validation seeds只支持经验风险筛选，不支持5% chance-constraint认证。

@@ -15,11 +15,12 @@ def run(output):
     output = Path(output)
     if output.exists() and any(output.iterdir()):
         raise FileExistsError('smoke output must be empty')
-    c = Config(100., 2., .01, 500.)
+    c = Config(100., 2., .01, 500., initial_tasks=2)
     nav = FrozenNavigator(c.capacity)
     home = nav.station
     targets = [home - [100, 0, 0], home + [-100, 100, 0], home - [100, 0, 0]]
-    tasks = tuple(Task(i, 0., 0., tuple(p.tolist())) for i, p in enumerate(targets))
+    tasks = tuple(Task(i, 200. if i == 2 else 0., 200. if i == 2 else 0., tuple(p.tolist()))
+                  for i, p in enumerate(targets))
     env = PersistentUAVThroughput(c, nav, tasks)
     actions = [Action('serve', 0, 'scripted_smoke'), Action('serve', 1, 'scripted_smoke'),
                Action('recharge', reason='scripted_smoke'), Action('serve', 2, 'scripted_smoke')]
@@ -31,10 +32,21 @@ def run(output):
 
     def finish(instance):
         action_index = 1
+        dock_idle = None
         while instance.completed < 3:
             if instance.done:
                 raise AssertionError(f'continuing smoke ended early: {instance.summary()}')
-            if instance.mode == 'IDLE':
+            if instance.mode == 'IDLE' and not instance.decision_required:
+                assert instance.completed_recharges == 1 and not instance.queue
+                before = instance.observe()
+                instance.step()
+                after = instance.observe()
+                assert after['time'] > before['time']
+                assert after['battery'] == before['battery'] == c.capacity
+                assert after['position'] == before['position']
+                assert [t['id'] for t in after['queue']] == [2]
+                dock_idle = dict(before=before, after=after, energy_used=0., automatic_recharge=False)
+            elif instance.mode == 'IDLE':
                 if action_index >= len(actions):
                     raise AssertionError('unexpected extra action required')
                 instance.step(actions[action_index])
@@ -43,7 +55,9 @@ def run(output):
                 instance.step()
         assert instance.completed_recharges == 1 and instance.nav.reset_count == 1
         assert instance.time_by_mode['charging'] > 0 and instance.time_by_mode['flight'] > 0
-        return dict(summary=instance.summary(), final_observation=instance.observe(), events=instance.events)
+        assert dock_idle is not None
+        return dict(summary=instance.summary(), final_observation=instance.observe(),
+                    events=instance.events, dock_idle=dock_idle)
 
     uninterrupted = finish(env)
     recovered = finish(resumed)
@@ -54,7 +68,7 @@ def run(output):
         kind='ENGINEERING_FIXTURE_NOT_BASELINE_RESULT', config=asdict(c),
         scripted_actions=[asdict(a) for a in actions], **uninterrupted))
     write_json(output / 'recovery_equivalence.json', dict(
-        passed=True, comparison='full remaining serve->serve->recharge->serve event log, summary and final observation',
+        passed=True, comparison='full remaining serve->serve->recharge->dock idle->serve trace, summary and final observation',
         snapshot_time=snapshot_time, restored_outcome_equal=True, training_updates=0,
         physical_resets=env.nav.reset_count, completed_services=env.completed,
         completed_recharges=env.completed_recharges))

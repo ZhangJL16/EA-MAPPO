@@ -15,6 +15,51 @@ from persistent_uav import navigation
 ROOT = Path(__file__).resolve().parents[1]
 
 
+class DockIdleRegression(unittest.TestCase):
+    def setUp(self):
+        self.nav = navigation.FrozenNavigator(100.)
+        self.addCleanup(self.nav.close)
+
+    def test_full_and_partial_dock_idle_preserve_energy_and_telemetry(self):
+        nav = self.nav
+        for energy in (100., 70.):
+            with self.subTest(energy=energy):
+                nav.base.agent.energy = energy
+                before_time = nav.time
+                before_cost = nav.base.cumulative_virtual_energy
+                before_position = nav.position
+                outcome = nav.advance_stationary(10.)
+                self.assertEqual(outcome.energy_used, 0.)
+                self.assertFalse(outcome.depleted)
+                self.assertEqual(nav.energy, energy)
+                self.assertAlmostEqual(nav.time - before_time, 10.)
+                self.assertEqual(nav.base.cumulative_virtual_energy, before_cost)
+                np.testing.assert_array_equal(nav.position, before_position)
+                self.assertEqual(nav.reset_count, 1)
+
+    def test_dock_tolerance_boundary_and_away_hover_metering(self):
+        nav = self.nav
+        nav.base.agent.pos = nav.station.copy() + [nav.goal_radius, 0., 0.]
+        self.assertEqual(nav.advance_stationary(1.).energy_used, 0.)
+        nav.base.agent.pos = nav.station.copy() + [nav.goal_radius + 1., 0., 0.]
+        before = nav.energy
+        cost = nav.base._realized_energy_cost(np.zeros(3), nav.dt, velocity=np.zeros(3))
+        outcome = nav.advance_stationary(1.)
+        self.assertGreater(outcome.energy_used, 0.)
+        self.assertAlmostEqual(outcome.energy_used, cost / nav.dt)
+        self.assertAlmostEqual(nav.energy, before - outcome.energy_used)
+
+    def test_only_explicit_recharge_increases_docked_energy(self):
+        nav = self.nav
+        nav.base.agent.energy = 70.
+        nav.advance_stationary(10.)
+        self.assertEqual(nav.energy, 70.)
+        nav.advance_stationary(10., recharge_rate=2.)
+        self.assertEqual(nav.energy, 90.)
+        nav.advance_stationary(10., recharge_rate=2.)
+        self.assertEqual(nav.energy, 100.)
+
+
 class NavigationRegression(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

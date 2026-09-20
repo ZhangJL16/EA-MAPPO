@@ -63,15 +63,26 @@ def choose_thresholds(rows, regimes, delta=0.05):
     return chosen
 
 
+def calibration_compatibility(frozen_path, frozen, compatibility_file):
+    if compatibility_file is None:
+        verify_provenance(frozen['provenance'])
+        return None
+    record = json.loads(Path(compatibility_file).read_text())
+    if (record['calibration_sha256'] != sha(frozen_path)
+            or record['calibration_provenance'] != frozen['provenance']):
+        raise ValueError('compatibility record refers to a different calibration')
+    verify_provenance(record['diagnostic_provenance'])
+    return record
+
+
 def run(frozen_path, output, *, split, regime_ids, methods=None, threshold_file=None,
+        compatibility_file=None,
         resume=False, checkpoint_policy_steps=100, stop_after_checkpoint=False):
-    raise PermissionError('B0–B5 runs are on hold pending navigation qualification and explicit user approval.')
-    # Retained implementation below is not an authorized execution entry point.
     frozen_path, output = Path(frozen_path).resolve(), Path(output).resolve()
     frozen = json.loads(frozen_path.read_text())
     if not frozen.get('pilot_complete') or frozen.get('pilot_jobs') != 1000:
         raise ValueError('real completed 1000-job physical calibration required')
-    verify_provenance(frozen['provenance'])
+    compatibility = calibration_compatibility(frozen_path, frozen, compatibility_file)
     if split not in ('validation', 'evaluation'):
         raise ValueError('unknown data split')
     if checkpoint_policy_steps < 1:
@@ -111,6 +122,8 @@ def run(frozen_path, output, *, split, regime_ids, methods=None, threshold_file=
             for threshold in thresholds:
                 jobs.extend(dict(regime=regime, method=method, threshold=threshold, seed=seed) for seed in seeds)
     contract = dict(kind='baseline_evaluation', split=split, calibration_sha256=sha(frozen_path),
+                    interpretation='B0–B5 diagnostic only; not a safety certificate or 98% kill test',
+                    calibration_compatibility=compatibility,
                     provenance=provenance(), regimes=ids, jobs=jobs,
                     unavailable=unavailable, threshold_data=threshold_data,
                     dataset_seeds=list(seeds), future_stream_visible=False, oracle_calls=0)

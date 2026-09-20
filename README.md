@@ -26,4 +26,5 @@ Python/Lean 依赖保留在本机；迁移包不含它们，也不含 Git 历史
 随后用户批准新版本实施：修订规格见 [MINIMAL_PERSISTENT_THROUGHPUT_SPEC.md](MINIMAL_PERSISTENT_THROUGHPUT_SPEC.md)。
 新版本代码按用户最新要求收回 [persistent_uav_throughput_v1/](persistent_uav_throughput_v1/README.md)，
 与旧环境分目录维护，源码和精简证据由当前仓库跟踪。旧导航源码不改。
-当前授权为修复空队列补能、完成calibration及导航资格审查；B0–B5和oracle运行尚未批准。
+最新授权：导航资格已获用户认可；修复站内idle零耗电后进入B0–B5 diagnostic。
+27个regime与calibration不变；神经训练禁止，MPC/oracle暂缓。

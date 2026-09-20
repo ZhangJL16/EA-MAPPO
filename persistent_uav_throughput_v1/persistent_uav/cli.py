@@ -59,6 +59,8 @@ def main():
             a.add_argument('--regimes', required=True, help='all or comma-separated IDs 0..26')
             a.add_argument('--methods', help='comma-separated baseline names; default all on evaluation')
             a.add_argument('--threshold-file', type=Path)
+            a.add_argument('--calibration-compatibility', type=Path,
+                           help='audited source change record; does not rewrite frozen calibration')
     args = p.parse_args()
     if args.command == 'smoke':
         smoke(args.output)
@@ -76,6 +78,7 @@ def main():
             run(args.frozen, args.output, split=args.split, regime_ids=ids,
                 methods=None if not args.methods else args.methods.split(','),
                 threshold_file=args.threshold_file, resume=args.resume,
+                compatibility_file=args.calibration_compatibility,
                 checkpoint_policy_steps=args.checkpoint_policy_steps,
                 stop_after_checkpoint=args.stop_after_checkpoint)
 

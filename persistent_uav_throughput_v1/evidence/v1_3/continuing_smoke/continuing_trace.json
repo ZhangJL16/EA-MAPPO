@@ -1,0 +1,434 @@
+{
+  "kind": "ENGINEERING_FIXTURE_NOT_BASELINE_RESULT",
+  "config": {
+    "capacity": 100.0,
+    "recharge_rate": 2.0,
+    "arrival_rate": 0.01,
+    "cutoff": 500.0,
+    "queue_capacity": 5,
+    "initial_tasks": 2,
+    "option_step_limit": 4000,
+    "delta": 0.05
+  },
+  "scripted_actions": [
+    {
+      "kind": "serve",
+      "task_id": 0,
+      "reason": "scripted_smoke"
+    },
+    {
+      "kind": "serve",
+      "task_id": 1,
+      "reason": "scripted_smoke"
+    },
+    {
+      "kind": "recharge",
+      "task_id": null,
+      "reason": "scripted_smoke"
+    },
+    {
+      "kind": "serve",
+      "task_id": 2,
+      "reason": "scripted_smoke"
+    }
+  ],
+  "summary": {
+    "completed": 3,
+    "evaluation_horizon": 500.0,
+    "simulation_time": 207.54999999999959,
+    "done": false,
+    "stream_sha256": "5c60ba9d6af6949206e7dc331b5bf2782861ef98d3ba5f2e1f2866e8cdf98ea3",
+    "depletion": false,
+    "failure": null,
+    "failure_time": null,
+    "navigation_failure": false,
+    "recharge_failure": false,
+    "recharge_censored": false,
+    "terminal_residual_battery": 98.5213947422488,
+    "collision_count": 0,
+    "collision_free_completions": 3,
+    "arrivals": 1,
+    "accepted": 1,
+    "overflow": 0,
+    "overflow_rate": 0.0,
+    "queue_time": [
+      199.79999999999959,
+      7.750000000000004,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "empty_fraction": 0.3995999999999992,
+    "time_by_mode": {
+      "flight": 36.34999999999952,
+      "charging": 3.0500000000000003,
+      "waiting": 168.15,
+      "failed": 0.0
+    },
+    "recharge_attempts": 1,
+    "completed_recharges": 1,
+    "mean_completed_task_latency": 11.06666666666652,
+    "estimate_infeasible_fallbacks": 0,
+    "physical_resets": 1,
+    "returnability": "not_an_admissibility_constraint; diagnostic_not_run"
+  },
+  "final_observation": {
+    "position": [
+      2784.276611328125,
+      2001.6529541015625,
+      200.4869842529297
+    ],
+    "velocity": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "battery": 98.5213947422488,
+    "capacity": 100.0,
+    "time": 207.54999999999959,
+    "remaining_time": 292.4500000000004,
+    "queue": [],
+    "current_task": null,
+    "charger_position": [
+      2880.0,
+      2000.0,
+      200.0
+    ],
+    "mode": "IDLE",
+    "decision_required": true,
+    "can_recharge": true,
+    "completed": 3
+  },
+  "events": [
+    {
+      "time": 0.0,
+      "event": "arrival",
+      "task_id": 0,
+      "original_arrival": 0.0,
+      "accepted": true,
+      "initial": true,
+      "queue_length": 1
+    },
+    {
+      "time": 0.0,
+      "event": "arrival",
+      "task_id": 1,
+      "original_arrival": 0.0,
+      "accepted": true,
+      "initial": true,
+      "queue_length": 2
+    },
+    {
+      "time": 0.0,
+      "event": "decision",
+      "observation": {
+        "position": [
+          2880.0,
+          2000.0,
+          200.0
+        ],
+        "velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "battery": 100.0,
+        "capacity": 100.0,
+        "time": 0.0,
+        "remaining_time": 500.0,
+        "queue": [
+          {
+            "id": 0,
+            "arrival": 0.0,
+            "original_arrival": 0.0,
+            "position": [
+              2780.0,
+              2000.0,
+              200.0
+            ]
+          },
+          {
+            "id": 1,
+            "arrival": 0.0,
+            "original_arrival": 0.0,
+            "position": [
+              2780.0,
+              2100.0,
+              200.0
+            ]
+          }
+        ],
+        "current_task": null,
+        "charger_position": [
+          2880.0,
+          2000.0,
+          200.0
+        ],
+        "mode": "IDLE",
+        "decision_required": true,
+        "can_recharge": false,
+        "completed": 0
+      },
+      "action": {
+        "kind": "serve",
+        "task_id": 0,
+        "reason": "scripted_smoke"
+      }
+    },
+    {
+      "time": 7.750000000000004,
+      "event": "task_completed",
+      "task_id": 0,
+      "collision_free": true,
+      "position": [
+        2784.31005859375,
+        2001.656982421875,
+        200.4915771484375
+      ],
+      "battery": 98.45311531205097
+    },
+    {
+      "time": 7.750000000000004,
+      "event": "decision",
+      "observation": {
+        "position": [
+          2784.31005859375,
+          2001.656982421875,
+          200.4915771484375
+        ],
+        "velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "battery": 98.45311531205097,
+        "capacity": 100.0,
+        "time": 7.750000000000004,
+        "remaining_time": 492.25,
+        "queue": [
+          {
+            "id": 1,
+            "arrival": 0.0,
+            "original_arrival": 0.0,
+            "position": [
+              2780.0,
+              2100.0,
+              200.0
+            ]
+          }
+        ],
+        "current_task": null,
+        "charger_position": [
+          2880.0,
+          2000.0,
+          200.0
+        ],
+        "mode": "IDLE",
+        "decision_required": true,
+        "can_recharge": true,
+        "completed": 1
+      },
+      "action": {
+        "kind": "serve",
+        "task_id": 1,
+        "reason": "scripted_smoke"
+      }
+    },
+    {
+      "time": 17.89999999999997,
+      "event": "task_completed",
+      "task_id": 1,
+      "collision_free": true,
+      "position": [
+        2778.2470703125,
+        2095.806396484375,
+        200.14373779296875
+      ],
+      "battery": 96.32536954485336
+    },
+    {
+      "time": 17.89999999999997,
+      "event": "decision",
+      "observation": {
+        "position": [
+          2778.2470703125,
+          2095.806396484375,
+          200.14373779296875
+        ],
+        "velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "battery": 96.32536954485336,
+        "capacity": 100.0,
+        "time": 17.89999999999997,
+        "remaining_time": 482.1,
+        "queue": [],
+        "current_task": null,
+        "charger_position": [
+          2880.0,
+          2000.0,
+          200.0
+        ],
+        "mode": "IDLE",
+        "decision_required": true,
+        "can_recharge": true,
+        "completed": 2
+      },
+      "action": {
+        "kind": "recharge",
+        "task_id": null,
+        "reason": "scripted_smoke"
+      }
+    },
+    {
+      "time": 28.799999999999933,
+      "event": "charger_arrival",
+      "battery": 93.93831108982398
+    },
+    {
+      "time": 31.85,
+      "event": "charge_complete",
+      "battery": 100.0
+    },
+    {
+      "time": 200.0,
+      "event": "arrival",
+      "task_id": 2,
+      "original_arrival": 200.0,
+      "accepted": true,
+      "initial": false,
+      "queue_length": 1
+    },
+    {
+      "time": 200.0,
+      "event": "decision",
+      "observation": {
+        "position": [
+          2875.71435546875,
+          2001.9644775390625,
+          200.09490966796875
+        ],
+        "velocity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "battery": 100.0,
+        "capacity": 100.0,
+        "time": 200.0,
+        "remaining_time": 300.0,
+        "queue": [
+          {
+            "id": 2,
+            "arrival": 200.0,
+            "original_arrival": 200.0,
+            "position": [
+              2780.0,
+              2000.0,
+              200.0
+            ]
+          }
+        ],
+        "current_task": null,
+        "charger_position": [
+          2880.0,
+          2000.0,
+          200.0
+        ],
+        "mode": "IDLE",
+        "decision_required": true,
+        "can_recharge": false,
+        "completed": 2
+      },
+      "action": {
+        "kind": "serve",
+        "task_id": 2,
+        "reason": "scripted_smoke"
+      }
+    },
+    {
+      "time": 207.54999999999959,
+      "event": "task_completed",
+      "task_id": 2,
+      "collision_free": true,
+      "position": [
+        2784.276611328125,
+        2001.6529541015625,
+        200.4869842529297
+      ],
+      "battery": 98.5213947422488
+    }
+  ],
+  "dock_idle": {
+    "before": {
+      "position": [
+        2875.71435546875,
+        2001.9644775390625,
+        200.09490966796875
+      ],
+      "velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "battery": 100.0,
+      "capacity": 100.0,
+      "time": 31.85,
+      "remaining_time": 468.15,
+      "queue": [],
+      "current_task": null,
+      "charger_position": [
+        2880.0,
+        2000.0,
+        200.0
+      ],
+      "mode": "IDLE",
+      "decision_required": false,
+      "can_recharge": false,
+      "completed": 2
+    },
+    "after": {
+      "position": [
+        2875.71435546875,
+        2001.9644775390625,
+        200.09490966796875
+      ],
+      "velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "battery": 100.0,
+      "capacity": 100.0,
+      "time": 200.0,
+      "remaining_time": 300.0,
+      "queue": [
+        {
+          "id": 2,
+          "arrival": 200.0,
+          "original_arrival": 200.0,
+          "position": [
+            2780.0,
+            2000.0,
+            200.0
+          ]
+        }
+      ],
+      "current_task": null,
+      "charger_position": [
+        2880.0,
+        2000.0,
+        200.0
+      ],
+      "mode": "IDLE",
+      "decision_required": true,
+      "can_recharge": false,
+      "completed": 2
+    },
+    "energy_used": 0.0,
+    "automatic_recharge": false
+  }
+}

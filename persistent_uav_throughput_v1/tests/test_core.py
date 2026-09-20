@@ -53,8 +53,10 @@ class TestNavigator:
 
     def advance_stationary(self, duration, *, recharge_rate=None):
         if recharge_rate is None:
-            duration = min(duration, self.energy / self.power)
-            used = duration * self.power
+            power = self.power if np.linalg.norm(self.position - self.station) > self.goal_radius else 0.
+            if power:
+                duration = min(duration, self.energy / power)
+            used = duration * power
             self.energy = max(0., self.energy - used)
         else:
             used = 0.
@@ -103,7 +105,7 @@ class EnvironmentTests(unittest.TestCase):
             env.step(Action('recharge'))
         env.step()
         self.assertAlmostEqual(env.time, 2.)
-        self.assertAlmostEqual(env.nav.energy, 8.)
+        self.assertAlmostEqual(env.nav.energy, 10.)
         self.assertTrue(env.decision_required)
 
     def test_full_station_recharge_rejected(self):
@@ -154,12 +156,41 @@ class EnvironmentTests(unittest.TestCase):
         self.assertEqual(env.nav.reset_count, 1)
         self.assertAlmostEqual(sum(env.time_by_mode.values()), 5.)
 
-    def test_wait_can_deplete_even_at_station_without_auto_recharge(self):
+    def test_away_idle_can_deplete_and_absorbs_to_cutoff(self):
         env = self.env([], capacity=1.)
-        env.step()
+        env.nav.position[0] = 5.
+        env.step(Action('idle'))
         self.assertTrue(env.done)
         self.assertEqual(env.failure, 'energy_depletion')
         self.assertFalse(env.recharge_failure)
+        self.assertEqual(env.failure_time, 1.)
+        self.assertEqual(env.time, 5.)
+
+    def test_partial_dock_idle_preserves_energy_without_charging(self):
+        env = self.env([task(0, 10, 2.)])
+        env.nav.energy = 7.
+        env.step(Action('idle'))
+        self.assertEqual(env.nav.energy, 7.)
+        self.assertEqual(env.time, 2.)
+        self.assertEqual([t.id for t in env.queue], [0])
+        self.assertEqual(env.completed_recharges, 0)
+        self.assertEqual(env.time_by_mode['waiting'], 2.)
+
+    def test_full_dock_idle_to_cutoff_never_depletes(self):
+        env = self.env([], capacity=1.)
+        env.step()
+        self.assertTrue(env.done)
+        self.assertIsNone(env.failure)
+        self.assertEqual(env.nav.energy, 1.)
+        self.assertEqual(env.time_by_mode['waiting'], 5.)
+
+    def test_away_idle_until_arrival_retains_hover_cost(self):
+        env = self.env([task(0, 10, 2.)])
+        env.nav.position[0] = 5.
+        env.step(Action('idle'))
+        self.assertEqual(env.nav.energy, 8.)
+        self.assertEqual(env.time, 2.)
+        self.assertIsNone(env.failure)
 
     def test_empty_queue_can_recharge_away_from_station(self):
         env = self.env([])
@@ -269,6 +300,36 @@ class BaselineAndStreamTests(unittest.TestCase):
                      arrivals=1, overflow=0, terminal_residual_battery=0.)
                 for t in THRESHOLDS for s in VALIDATION_SEEDS]
         self.assertIsNone(choose_thresholds(rows, [0])['0'])
+
+
+class CalibrationCompatibilityTests(unittest.TestCase):
+    def test_compatibility_requires_exact_calibration_and_current_source(self):
+        import copy
+        from pathlib import Path
+        from persistent_uav.evaluation import calibration_compatibility
+        from persistent_uav.provenance import provenance
+        from persistent_uav.storage import sha, write_json
+        current = provenance()
+        historical = copy.deepcopy(current)
+        historical['sources']['historical_source'] = 'old'
+        frozen = dict(provenance=historical)
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'frozen.json'
+            record_path = Path(directory) / 'compatibility.json'
+            write_json(path, frozen)
+            record = dict(calibration_sha256=sha(path), calibration_provenance=historical,
+                          diagnostic_provenance=current)
+            write_json(record_path, record)
+            self.assertEqual(calibration_compatibility(path, frozen, record_path), record)
+            with self.assertRaises(RuntimeError):
+                calibration_compatibility(path, frozen, None)
+            record['diagnostic_provenance']['sources']['unexpected_change'] = 'new'
+            write_json(record_path, record)
+            with self.assertRaises(RuntimeError):
+                calibration_compatibility(path, frozen, record_path)
+            write_json(path, dict(provenance=historical, changed_regimes=True))
+            with self.assertRaises(ValueError):
+                calibration_compatibility(path, frozen, record_path)
 
 
 if __name__ == '__main__':
