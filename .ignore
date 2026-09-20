@@ -1,4 +1,5 @@
 # Search scope only: does not change Git tracking or runtime access.
+/archive/parent_workspace_20260920/
 # Read historical paths directly or use: rg --no-ignore PATTERN PATH
 /artifacts/
 /paper/
@@ -88,4 +89,3 @@
 /docs/uav_safety_energy_novelty_audit.md
 /docs/uav_safety_energy_theory_derivation.md
 /docs/研究进度纪要-2026Q3.md
-

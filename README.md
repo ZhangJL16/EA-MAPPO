@@ -4,6 +4,9 @@
 
 先读 [项目总结与迁移说明](PROJECT_CLOSEOUT.md)。
 
+父目录旧资产现已全部收回 [archive/](archive/README.md)，包括外部实验环境、参考源码和结项包。
+全局隐藏工具目录保留原位；新研究可另开干净目录。
+
 | 入口 | 内容 |
 |---|---|
 | [最终实证结论](docs/VIABILITY_BOUNDARY_THEORY_20260919.md) | VB 达到当前 safe-tree 最优吞吐量的 99.13%，触发预设 KILL |

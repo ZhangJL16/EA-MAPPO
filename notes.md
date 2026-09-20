@@ -1,5 +1,9 @@
 # 当前项目结论
 
+2026-09-20 最终收拢：父目录 7 个旧研究目录及 4 个文件全部移至
+`archive/parent_workspace_20260920/`，原始路径见 relocation 清单。
+此前笔记中的父目录归档包路径均为历史位置；全局隐藏工具未移动。
+
 2026-09-20 后续整理：将父目录剩余 6 个 FPL/旧版 budget-reading 目录及 8 个
 散落记录文件，归档到 `/home/zjl/research_archive_20260920/remaining_research_records.tar.gz`。
 216 个文件逐项 SHA256 核对后移除原路径，33.40 MiB 原始内容压缩为 5.61 MiB。

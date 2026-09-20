@@ -1,0 +1,85 @@
+{
+  "status": "moved_and_inode_metadata_verified",
+  "method": "same-filesystem rename, preserving inode identities, permissions and symlinks",
+  "items": [
+    {
+      "original": "/home/zjl/article",
+      "archived": "archive/parent_workspace_20260920/article",
+      "tree_inode_metadata_sha256": "62153b98d979afd56ca6909d0fe762836b9555b0c5f098483326b6a2297081c6",
+      "entries": 51,
+      "type": "directory"
+    },
+    {
+      "original": "/home/zjl/control_adaptation_base_5101_20260919",
+      "archived": "archive/parent_workspace_20260920/control_adaptation_base_5101_20260919",
+      "tree_inode_metadata_sha256": "82d632c2de1b85981c3cbee16857df62191edc7ca1c19ca9dcc5251b63d203fd",
+      "entries": 10,
+      "type": "directory"
+    },
+    {
+      "original": "/home/zjl/control_adaptation_env_20260919",
+      "archived": "archive/parent_workspace_20260920/control_adaptation_env_20260919",
+      "tree_inode_metadata_sha256": "e7e6e3f129c91f70080fc0bae8172147c595fe955132b385a4e8ac4c0a3f65a5",
+      "entries": 892,
+      "type": "directory"
+    },
+    {
+      "original": "/home/zjl/control_adaptation_py311_20260919",
+      "archived": "archive/parent_workspace_20260920/control_adaptation_py311_20260919",
+      "tree_inode_metadata_sha256": "1b67cc9e4209a5b040a6ad523c1e32033adbc67f34d04cc73e0213b7ef88c8a9",
+      "entries": 31092,
+      "type": "directory"
+    },
+    {
+      "original": "/home/zjl/dad_public_reference_20260919",
+      "archived": "archive/parent_workspace_20260920/dad_public_reference_20260919",
+      "tree_inode_metadata_sha256": "159cb41db82e7cac81f184ba3979a12bf0b01fc1dcdb58c5e47e48421e944d5d",
+      "entries": 74,
+      "type": "directory"
+    },
+    {
+      "original": "/home/zjl/research_archive_20260920",
+      "archived": "archive/parent_workspace_20260920/research_archive_20260920",
+      "tree_inode_metadata_sha256": "7f01c5ec67b6104531147628d0f756ac851b74b2efd9630543558cd57115fe59",
+      "entries": 4,
+      "type": "directory"
+    },
+    {
+      "original": "/home/zjl/safe_control_gym_reference_20260919",
+      "archived": "archive/parent_workspace_20260920/safe_control_gym_reference_20260919",
+      "tree_inode_metadata_sha256": "76fd610fe08896fce20c1277833da8fc9e8b2c280c01420501aa4b5567314e22",
+      "entries": 450,
+      "type": "directory"
+    },
+    {
+      "original": "/home/zjl/control_adaptation_startup_lqr_20260919.json",
+      "archived": "archive/parent_workspace_20260920/control_adaptation_startup_lqr_20260919.json",
+      "tree_inode_metadata_sha256": "f3e17e6813d5122de2a30e9de3e9442ed11894fbb53b0e340f66625941db36aa",
+      "entries": 1,
+      "type": "file"
+    },
+    {
+      "original": "/home/zjl/control_adaptation_startup_sac_20260919.json",
+      "archived": "archive/parent_workspace_20260920/control_adaptation_startup_sac_20260919.json",
+      "tree_inode_metadata_sha256": "e5e5d606ea1dadb52659dc12224afb7fc71b6eef52c7bf766a545c72ea62f53e",
+      "entries": 1,
+      "type": "file"
+    },
+    {
+      "original": "/home/zjl/mappo_closeout_20260920.tar.gz",
+      "archived": "archive/parent_workspace_20260920/mappo_closeout_20260920.tar.gz",
+      "tree_inode_metadata_sha256": "8e335443d619e453097b2fff51fe1951a1c6893b63b2b4db34a8e0f4299689a8",
+      "entries": 1,
+      "type": "file"
+    },
+    {
+      "original": "/home/zjl/mappo_closeout_20260920.tar.gz.sha256",
+      "archived": "archive/parent_workspace_20260920/mappo_closeout_20260920.tar.gz.sha256",
+      "tree_inode_metadata_sha256": "28766745b798d7d3878f3ab68053040c0a42e32af023e8bbf9e7acfe65949067",
+      "entries": 1,
+      "type": "file"
+    }
+  ],
+  "global_hidden_tool_directories_moved": false,
+  "virtualenv_note": "Absolute paths in scripts/configs may still refer to original locations. Restore original directory paths or recreate environments before running; no claim of direct relocation compatibility."
+}

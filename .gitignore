@@ -1,4 +1,6 @@
 # Python/cache
+# Preserved parent-workspace assets; inventory is tracked under docs/cleanup_20260920.
+/archive/parent_workspace_20260920/
 __pycache__/
 *.py[cod]
 *.pyo

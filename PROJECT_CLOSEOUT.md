@@ -1,6 +1,10 @@
 # 项目结项总结与迁移说明
 
 日期：2026-09-20。状态：整个 regenerative-control 研究分支关闭。
+
+最新整理：父目录全部非隐藏旧研究资产已移入 `archive/parent_workspace_20260920/`。
+原位置映射见 `docs/cleanup_20260920/parent_relocation.json`。外部 Python 环境数据保留，
+但存在绝对路径引用，运行前需恢复原位置或重建环境；参见 `archive/README.md`。
 这是现有资产交接，不是新项目立项，也不授权重新训练或开展第三次 pivot。
 
 ## 研究问题与真实任务
@@ -72,7 +76,7 @@ P2-A2 完整树及其快照没有删除。未清理其他课题的原始数据�
 
 ## 搬到新文件夹
 
-准备的结项包路径为 `/home/zjl/mappo_closeout_20260920.tar.gz`，旁有 SHA256 校验文件。
+准备的结项包路径为 `/home/zjl/mappo/archive/parent_workspace_20260920/mappo_closeout_20260920.tar.gz`，旁有 SHA256 校验文件。
 内容为本次提交的 tracked source/docs/evidence、最终 SAC、P0 原始检查、完整 P2-A2。
 不含 `.git`、`.venv`、Lean `.lake`、已删除产物及其他未跟踪旧实验目录。
 

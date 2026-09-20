@@ -6,6 +6,7 @@
 - [x] 删除已结束实验的旧续跑快照、旧 return-only energy-head 权重及特征缓存。
 - [x] 将历史首页、计划、笔记和 AGENTS 原文存入 `docs/project_history_20260920/`。
 - [x] 当前入口改为 `PROJECT_CLOSEOUT.md`，不再展示历史启动指令。
+- [x] 父目录剩余旧研究资产归入 `archive/parent_workspace_20260920/`，保留依赖及恢复映射。
 
 下一阶段：用户在新目录开展独立 problem selection。没有选定新方法或启动新实验。
 历史任务见 `docs/project_history_20260920/task_plan.md`，不作为当前授权。
