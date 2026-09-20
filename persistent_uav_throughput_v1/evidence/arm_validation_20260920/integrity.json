@@ -1,0 +1,8 @@
+{
+  "passed": true,
+  "unique_jobs": 1080,
+  "missing_jobs": 0,
+  "duplicate_jobs": 0,
+  "old_x86_rows_imported": 0,
+  "sharding_manifest_sha256": "81f041b3e258e349a32ec4c639da4b324eaeda4516d41acd04f070f217f15b30"
+}
