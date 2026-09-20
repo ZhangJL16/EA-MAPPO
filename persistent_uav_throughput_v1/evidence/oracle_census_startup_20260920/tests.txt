@@ -1,0 +1,14 @@
+test_clone_isolation_and_midflight_resume (test_census.CensusTests.test_clone_isolation_and_midflight_resume) ... ok
+test_full_station_does_not_get_illegal_return_branch (test_census.CensusTests.test_full_station_does_not_get_illegal_return_branch) ... ok
+test_horizon_censor_is_unknown_not_failure (test_census.CensusTests.test_horizon_censor_is_unknown_not_failure) ... ok
+test_navigation_timeout_not_energy_infeasibility (test_census.CensusTests.test_navigation_timeout_not_energy_infeasibility) ... ok
+test_policy_step_watchdog_is_not_silently_unsafe (test_census.CensusTests.test_policy_step_watchdog_is_not_silently_unsafe) ... ok
+test_task_already_at_charger_needs_no_illegal_recharge (test_census.CensusTests.test_task_already_at_charger_needs_no_illegal_recharge) ... ok
+test_task_and_return_depletion_are_distinct (test_census.CensusTests.test_task_and_return_depletion_are_distinct) ... ok
+test_task_then_return_success_stops_before_charging (test_census.CensusTests.test_task_then_return_success_stops_before_charging) ... ok
+test_unmatched_root_is_rejected (test_census.CensusTests.test_unmatched_root_is_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.015s
+
+OK

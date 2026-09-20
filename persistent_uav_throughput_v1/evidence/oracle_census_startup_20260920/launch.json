@@ -1,0 +1,260 @@
+{
+  "workers": [
+    {
+      "worker": 0,
+      "pid": 714297,
+      "command": [
+        "/mnt/workspace/zjl-exp/.venv/bin/python",
+        "-u",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/scripts/oracle_recoverability_census.py",
+        "worker",
+        "--output",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/artifacts/oracle_recoverability_census_20260920",
+        "--worker",
+        "0"
+      ],
+      "log": "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/artifacts/oracle_recoverability_census_20260920/worker_00.log",
+      "started_unix": 1789915505.614559
+    },
+    {
+      "worker": 1,
+      "pid": 714298,
+      "command": [
+        "/mnt/workspace/zjl-exp/.venv/bin/python",
+        "-u",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/scripts/oracle_recoverability_census.py",
+        "worker",
+        "--output",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/artifacts/oracle_recoverability_census_20260920",
+        "--worker",
+        "1"
+      ],
+      "log": "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/artifacts/oracle_recoverability_census_20260920/worker_01.log",
+      "started_unix": 1789915505.6169827
+    },
+    {
+      "worker": 2,
+      "pid": 714299,
+      "command": [
+        "/mnt/workspace/zjl-exp/.venv/bin/python",
+        "-u",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/scripts/oracle_recoverability_census.py",
+        "worker",
+        "--output",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/artifacts/oracle_recoverability_census_20260920",
+        "--worker",
+        "2"
+      ],
+      "log": "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/artifacts/oracle_recoverability_census_20260920/worker_02.log",
+      "started_unix": 1789915505.6190126
+    },
+    {
+      "worker": 3,
+      "pid": 714300,
+      "command": [
+        "/mnt/workspace/zjl-exp/.venv/bin/python",
+        "-u",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/scripts/oracle_recoverability_census.py",
+        "worker",
+        "--output",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/artifacts/oracle_recoverability_census_20260920",
+        "--worker",
+        "3"
+      ],
+      "log": "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/artifacts/oracle_recoverability_census_20260920/worker_03.log",
+      "started_unix": 1789915505.6209197
+    },
+    {
+      "worker": 4,
+      "pid": 714301,
+      "command": [
+        "/mnt/workspace/zjl-exp/.venv/bin/python",
+        "-u",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/scripts/oracle_recoverability_census.py",
+        "worker",
+        "--output",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/artifacts/oracle_recoverability_census_20260920",
+        "--worker",
+        "4"
+      ],
+      "log": "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/artifacts/oracle_recoverability_census_20260920/worker_04.log",
+      "started_unix": 1789915505.6227767
+    },
+    {
+      "worker": 5,
+      "pid": 714302,
+      "command": [
+        "/mnt/workspace/zjl-exp/.venv/bin/python",
+        "-u",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/scripts/oracle_recoverability_census.py",
+        "worker",
+        "--output",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/artifacts/oracle_recoverability_census_20260920",
+        "--worker",
+        "5"
+      ],
+      "log": "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/artifacts/oracle_recoverability_census_20260920/worker_05.log",
+      "started_unix": 1789915505.6245635
+    },
+    {
+      "worker": 6,
+      "pid": 714303,
+      "command": [
+        "/mnt/workspace/zjl-exp/.venv/bin/python",
+        "-u",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/scripts/oracle_recoverability_census.py",
+        "worker",
+        "--output",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/artifacts/oracle_recoverability_census_20260920",
+        "--worker",
+        "6"
+      ],
+      "log": "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/artifacts/oracle_recoverability_census_20260920/worker_06.log",
+      "started_unix": 1789915505.6263335
+    },
+    {
+      "worker": 7,
+      "pid": 714304,
+      "command": [
+        "/mnt/workspace/zjl-exp/.venv/bin/python",
+        "-u",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/scripts/oracle_recoverability_census.py",
+        "worker",
+        "--output",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/artifacts/oracle_recoverability_census_20260920",
+        "--worker",
+        "7"
+      ],
+      "log": "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/artifacts/oracle_recoverability_census_20260920/worker_07.log",
+      "started_unix": 1789915505.6283753
+    },
+    {
+      "worker": 8,
+      "pid": 714305,
+      "command": [
+        "/mnt/workspace/zjl-exp/.venv/bin/python",
+        "-u",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/scripts/oracle_recoverability_census.py",
+        "worker",
+        "--output",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/artifacts/oracle_recoverability_census_20260920",
+        "--worker",
+        "8"
+      ],
+      "log": "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/artifacts/oracle_recoverability_census_20260920/worker_08.log",
+      "started_unix": 1789915505.6304166
+    },
+    {
+      "worker": 9,
+      "pid": 714306,
+      "command": [
+        "/mnt/workspace/zjl-exp/.venv/bin/python",
+        "-u",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/scripts/oracle_recoverability_census.py",
+        "worker",
+        "--output",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/artifacts/oracle_recoverability_census_20260920",
+        "--worker",
+        "9"
+      ],
+      "log": "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/artifacts/oracle_recoverability_census_20260920/worker_09.log",
+      "started_unix": 1789915505.6323714
+    },
+    {
+      "worker": 10,
+      "pid": 714307,
+      "command": [
+        "/mnt/workspace/zjl-exp/.venv/bin/python",
+        "-u",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/scripts/oracle_recoverability_census.py",
+        "worker",
+        "--output",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/artifacts/oracle_recoverability_census_20260920",
+        "--worker",
+        "10"
+      ],
+      "log": "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/artifacts/oracle_recoverability_census_20260920/worker_10.log",
+      "started_unix": 1789915505.634328
+    },
+    {
+      "worker": 11,
+      "pid": 714308,
+      "command": [
+        "/mnt/workspace/zjl-exp/.venv/bin/python",
+        "-u",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/scripts/oracle_recoverability_census.py",
+        "worker",
+        "--output",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/artifacts/oracle_recoverability_census_20260920",
+        "--worker",
+        "11"
+      ],
+      "log": "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/artifacts/oracle_recoverability_census_20260920/worker_11.log",
+      "started_unix": 1789915505.6364157
+    },
+    {
+      "worker": 12,
+      "pid": 714309,
+      "command": [
+        "/mnt/workspace/zjl-exp/.venv/bin/python",
+        "-u",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/scripts/oracle_recoverability_census.py",
+        "worker",
+        "--output",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/artifacts/oracle_recoverability_census_20260920",
+        "--worker",
+        "12"
+      ],
+      "log": "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/artifacts/oracle_recoverability_census_20260920/worker_12.log",
+      "started_unix": 1789915505.6384883
+    },
+    {
+      "worker": 13,
+      "pid": 714310,
+      "command": [
+        "/mnt/workspace/zjl-exp/.venv/bin/python",
+        "-u",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/scripts/oracle_recoverability_census.py",
+        "worker",
+        "--output",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/artifacts/oracle_recoverability_census_20260920",
+        "--worker",
+        "13"
+      ],
+      "log": "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/artifacts/oracle_recoverability_census_20260920/worker_13.log",
+      "started_unix": 1789915505.6404748
+    },
+    {
+      "worker": 14,
+      "pid": 714311,
+      "command": [
+        "/mnt/workspace/zjl-exp/.venv/bin/python",
+        "-u",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/scripts/oracle_recoverability_census.py",
+        "worker",
+        "--output",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/artifacts/oracle_recoverability_census_20260920",
+        "--worker",
+        "14"
+      ],
+      "log": "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/artifacts/oracle_recoverability_census_20260920/worker_14.log",
+      "started_unix": 1789915505.6426365
+    },
+    {
+      "worker": 15,
+      "pid": 714312,
+      "command": [
+        "/mnt/workspace/zjl-exp/.venv/bin/python",
+        "-u",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/scripts/oracle_recoverability_census.py",
+        "worker",
+        "--output",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/artifacts/oracle_recoverability_census_20260920",
+        "--worker",
+        "15"
+      ],
+      "log": "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/artifacts/oracle_recoverability_census_20260920/worker_15.log",
+      "started_unix": 1789915505.6448295
+    }
+  ]
+}

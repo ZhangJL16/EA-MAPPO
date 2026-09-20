@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "kind": "ENGINEERING_ONLY_NOT_CENSUS_RESULT",
+  "target_id": "r00_s920260927_e00009",
+  "original_decision_time": 132.3,
+  "exact_prefix_events": 9,
+  "replay_policy_steps": 526,
+  "exact_target_observation": true,
+  "full_state_clone_parent_unchanged": true,
+  "midflight_disk_resume_equal": true,
+  "bounded_branch_steps": 2,
+  "snapshot": {
+    "file": "checkpoint_c4caa22f1c20d127f21c.pkl",
+    "sha256": "c4caa22f1c20d127f21c1c13f551b8c6de23a04ad798d9d92e40285a94a8b0f0",
+    "bytes": 145374
+  },
+  "training_updates": 0
+}
