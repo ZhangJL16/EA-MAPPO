@@ -39,6 +39,7 @@
 - [x] 发现并修复固定地图起点被旧生成保护距离误拒的问题，不改地图或1000对输入。
 - [x] 22项针对性检查、真实serve→serve→recharge→serve与完整恢复结果等价通过。
 - [x] 资格筛查规则已在本轮读取结果前写定；pilot已开始，故不称采集前预注册。
-- [ ] 当前同一1000对任务从保留检查点继续，完成后提交资格报告及27-regime manifest。
+- [x] 同一1000对任务已完成：988成功、12 navigation timeout；27-regime manifest已冻结。
+- [x] 导航资格REVIEW_REQUIRED；完整报告与原始证据见 `persistent_uav_throughput_v1/CALIBRATION_REPORT.md`。
 
 正式B0–B5入口已暂停，等待用户审查calibration/qualification后重新授权。

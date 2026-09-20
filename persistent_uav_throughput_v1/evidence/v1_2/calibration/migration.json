@@ -1,0 +1,21 @@
+{
+  "original_source_commit": "1a13bf0",
+  "original_manifest_sha256": "50bc39ace449ef57e85cb0493d24aefab85c5039c8130f7cd608d874497b8b5b",
+  "original_resume_ref": {
+    "file": "checkpoint_7586994835ea7745e340.pkl",
+    "sha256": "7586994835ea7745e340483d8176cf0795e6d2d00332022d7c88099ddc07805e"
+  },
+  "error": {
+    "error": "ValueError('static obstacle overlaps a protected reset position')",
+    "time": 1789882975.5350657,
+    "resume": "Use last completed checkpoint; no automatic retry."
+  },
+  "preserved_completed_jobs": 93,
+  "resumed_active_job": 93,
+  "pair_list_sha256": "c3eb1e195f3530ec22a648923de0730b0dffbf081674e6089a379fcb8532f093",
+  "map_unchanged": true,
+  "pairs_unchanged": true,
+  "explanation": "Fixed map initialized at its protected station, then physically legal x is placed at reset only. No map, sample, collision or flight change.",
+  "software_failure_not_navigation_failure": true,
+  "uncheckpointed_tail": "Re-executed from last valid checkpoint; completed prefix retained byte-for-byte in JSON."
+}

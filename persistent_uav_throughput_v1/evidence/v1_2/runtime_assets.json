@@ -1,0 +1,25 @@
+{
+  "assets": [
+    {
+      "path": "artifacts/hocbf_correction_sac_20260908_v1/sac/checkpoint_000131072/model.zip",
+      "bytes": 26845473,
+      "sha256": "fb79482ae7d832b40137ff1a080ee84912eabb95867e118aca80c846f6ae62be"
+    },
+    {
+      "path": "runtime_support/review_bundle/safety/collision/_qp_native.c",
+      "bytes": 4353,
+      "sha256": "a8b18c5939d73fe61632e044e244d19a0bab363c1f11d732fee94a9f99443ec8"
+    },
+    {
+      "path": "runtime_support/review_bundle/safety/collision/_qp_native.so",
+      "bytes": 15712,
+      "sha256": "b348c6bcfc79e372082693bbe1a1796a1effc4b4875700735f559e0eee3b0c04"
+    }
+  ],
+  "local_archive": "artifacts/runtime_assets.tar.gz",
+  "archive_sha256": "fc967ad87d0e77aebefb44b643c3f843a3babf1614633b5e32cb2c1d2cce20a7",
+  "bytes": 19097100,
+  "note": "Python source is in the source commit; archive supplies the exact frozen SAC and native runtime assets. No optimizer is loaded.",
+  "native_qp_enabled_in_same_environment": true,
+  "native_asset_capture": "Supplemental runtime record captured during repaired pilot; not present in original startup manifest."
+}

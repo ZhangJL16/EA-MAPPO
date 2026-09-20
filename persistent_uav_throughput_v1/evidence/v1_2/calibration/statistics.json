@@ -1,0 +1,20 @@
+{
+  "total": 1000,
+  "successful": 988,
+  "navigation_failures": 12,
+  "success_fraction": 0.988,
+  "quantile_population": "successful jobs only; failures remain in raw data",
+  "collision_count": 1,
+  "time": {
+    "q25": 69.58750000000045,
+    "median": 109.050000000001,
+    "q75": 147.51250000000016,
+    "q90": 181.1199999999983
+  },
+  "energy": {
+    "q25": 14.683831642205938,
+    "median": 22.926218281545452,
+    "q75": 30.841671755084974,
+    "q90": 38.26202589171098
+  }
+}

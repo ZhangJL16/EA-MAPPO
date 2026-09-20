@@ -1,0 +1,22 @@
+{
+  "status": "complete",
+  "completed_jobs": 1000,
+  "planned_jobs": 1000,
+  "total_policy_steps": 601141,
+  "active_job": null,
+  "active_job_simulation_time": null,
+  "active_job_energy": null,
+  "snapshot": {
+    "file": "checkpoint_4ec5b56e6f8e0568ee06.pkl",
+    "sha256": "4ec5b56e6f8e0568ee067ac6b991ce7dd93116402b4dc1b0d563e9d9991a78eb",
+    "bytes": 238276
+  },
+  "checkpoint_written_unix": 1789886774.8824594,
+  "training_updates": 0,
+  "scheduler_runs": 0,
+  "finite_state": true,
+  "failure_reason_counts": {
+    "navigation_timeout": 12
+  },
+  "next_stage": "NAVIGATION_QUALIFICATION_AND_USER_REVIEW_REQUIRED"
+}

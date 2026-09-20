@@ -1,0 +1,11 @@
+{
+  "source_commit": "15fe98e14a84e109964d0b5570f53d024a8e54d3",
+  "original_source_commit": "1a13bf0",
+  "legacy_base_commit": "d8c3a6471eb5ecfd00004bc3805251ccfc78cab2",
+  "every_manifest_source_matches_commit": true,
+  "missing_or_different": [],
+  "python": "3.12.3",
+  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "checkpoint_sha256": "fb79482ae7d832b40137ff1a080ee84912eabb95867e118aca80c846f6ae62be",
+  "training_updates": 0
+}

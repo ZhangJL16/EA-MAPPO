@@ -80,3 +80,7 @@ MPC、OracleSafe-SJF、小规模oracle、98% kill test及任何神经训练均�
 - `NAVIGATION_QUALIFICATION_PROTOCOL.md`：读取结果前制定的资格筛查规则；并非采集前预注册。
 
 代码现位于当前仓库的 `persistent_uav_throughput_v1/`，没有嵌套Git仓库或submodule；新代码和精简证据由父仓库直接跟踪。原始独立实现的Git历史另以bundle保留。
+
+## 本轮完成状态
+
+1000/1000 calibration已完成，988成功、12次navigation timeout。详见[CALIBRATION_REPORT.md](CALIBRATION_REPORT.md)。修复后的运行保存在 `artifacts/calibration_20260920_repaired/`，精简完整证据在 `evidence/v1_2/calibration/`。原运行目录因初始化错误中断，只作为历史保留。当前不需要续跑calibration。资格为REVIEW_REQUIRED，B0–B5仍未获准运行。

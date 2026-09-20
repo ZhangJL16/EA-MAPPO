@@ -1,0 +1,244 @@
+{
+  "status": "REVIEW_REQUIRED",
+  "overall": {
+    "n": 1000,
+    "success": 988,
+    "failures": 12,
+    "success_rate": 0.988,
+    "success_wilson95": [
+      0.9791427315245017,
+      0.9931223521935965
+    ],
+    "failure_wilson95": [
+      0.006877647806403522,
+      0.02085726847549828
+    ],
+    "failure_reasons": {
+      "navigation_timeout": 12
+    }
+  },
+  "statistics": {
+    "total": 1000,
+    "successful": 988,
+    "navigation_failures": 12,
+    "success_fraction": 0.988,
+    "quantile_population": "successful jobs only; failures remain in raw data",
+    "collision_count": 1,
+    "time": {
+      "q25": 69.58750000000045,
+      "median": 109.050000000001,
+      "q75": 147.51250000000016,
+      "q90": 181.1199999999983
+    },
+    "energy": {
+      "q25": 14.683831642205938,
+      "median": 22.926218281545452,
+      "q75": 30.841671755084974,
+      "q90": 38.26202589171098
+    }
+  },
+  "strata": {
+    "horizontal_distance": [
+      {
+        "lower": 0,
+        "upper": 1000,
+        "n": 186,
+        "success": 182,
+        "failures": 4,
+        "success_rate": 0.978494623655914,
+        "success_wilson95": [
+          0.9460185290842833,
+          0.9916059556080807
+        ],
+        "failure_wilson95": [
+          0.008394044391919146,
+          0.05398147091571669
+        ],
+        "failure_reasons": {
+          "navigation_timeout": 4
+        }
+      },
+      {
+        "lower": 1000,
+        "upper": 2000,
+        "n": 331,
+        "success": 327,
+        "failures": 4,
+        "success_rate": 0.9879154078549849,
+        "success_wilson95": [
+          0.9693448487588323,
+          0.9952907765236536
+        ],
+        "failure_wilson95": [
+          0.004709223476346409,
+          0.030655151241167782
+        ],
+        "failure_reasons": {
+          "navigation_timeout": 4
+        }
+      },
+      {
+        "lower": 2000,
+        "upper": 3000,
+        "n": 329,
+        "success": 327,
+        "failures": 2,
+        "success_rate": 0.993920972644377,
+        "success_wilson95": [
+          0.9781095337514745,
+          0.9983313253636203
+        ],
+        "failure_wilson95": [
+          0.0016686746363796124,
+          0.02189046624852565
+        ],
+        "failure_reasons": {
+          "navigation_timeout": 2
+        }
+      },
+      {
+        "lower": 3000,
+        "upper": null,
+        "n": 154,
+        "success": 152,
+        "failures": 2,
+        "success_rate": 0.987012987012987,
+        "success_wilson95": [
+          0.9538894269441661,
+          0.9964312373522662
+        ],
+        "failure_wilson95": [
+          0.003568762647733807,
+          0.04611057305583393
+        ],
+        "failure_reasons": {
+          "navigation_timeout": 2
+        }
+      }
+    ],
+    "vertical_distance": [
+      {
+        "lower": 0,
+        "upper": 60,
+        "n": 321,
+        "success": 317,
+        "failures": 4,
+        "success_rate": 0.9875389408099688,
+        "success_wilson95": [
+          0.9684032029015511,
+          0.9951437567024249
+        ],
+        "failure_wilson95": [
+          0.004856243297575049,
+          0.03159679709844893
+        ],
+        "failure_reasons": {
+          "navigation_timeout": 4
+        }
+      },
+      {
+        "lower": 60,
+        "upper": 180,
+        "n": 443,
+        "success": 438,
+        "failures": 5,
+        "success_rate": 0.9887133182844243,
+        "success_wilson95": [
+          0.9738541467386221,
+          0.995169634409115
+        ],
+        "failure_wilson95": [
+          0.004830365590884891,
+          0.02614585326137775
+        ],
+        "failure_reasons": {
+          "navigation_timeout": 5
+        }
+      },
+      {
+        "lower": 180,
+        "upper": null,
+        "n": 236,
+        "success": 233,
+        "failures": 3,
+        "success_rate": 0.9872881355932204,
+        "success_wilson95": [
+          0.96329924217919,
+          0.9956675733618562
+        ],
+        "failure_wilson95": [
+          0.004332426638143875,
+          0.036700757820809976
+        ],
+        "failure_reasons": {
+          "navigation_timeout": 3
+        }
+      }
+    ],
+    "privileged_chord_exposure": [
+      {
+        "lower": 0,
+        "upper": 1,
+        "n": 611,
+        "success": 605,
+        "failures": 6,
+        "success_rate": 0.9901800327332242,
+        "success_wilson95": [
+          0.9787430199224245,
+          0.9954918684485077
+        ],
+        "failure_wilson95": [
+          0.0045081315514924145,
+          0.02125698007757546
+        ],
+        "failure_reasons": {
+          "navigation_timeout": 6
+        }
+      },
+      {
+        "lower": 1,
+        "upper": 2,
+        "n": 288,
+        "success": 282,
+        "failures": 6,
+        "success_rate": 0.9791666666666666,
+        "success_wilson95": [
+          0.9553011992768816,
+          0.9904177575680155
+        ],
+        "failure_wilson95": [
+          0.009582242431984241,
+          0.044698800723118104
+        ],
+        "failure_reasons": {
+          "navigation_timeout": 6
+        }
+      },
+      {
+        "lower": 2,
+        "upper": null,
+        "n": 101,
+        "success": 101,
+        "failures": 0,
+        "success_rate": 1.0,
+        "success_wilson95": [
+          0.9633593536001439,
+          1.0
+        ],
+        "failure_wilson95": [
+          0.0,
+          0.03664064639985608
+        ],
+        "failure_reasons": {}
+      }
+    ]
+  },
+  "failed_job_time_fraction": 0.0798986286149489,
+  "stopping_signals": [],
+  "hocbf_fallback_steps": 4555,
+  "timeout_after_any_contact": 1,
+  "timeout_without_contact": 11,
+  "training_updates": 0,
+  "baseline_runs": 0,
+  "caveat": "Pre-analysis of already-started pilot, not prospective preregistration. Ranking dominance untested."
+}

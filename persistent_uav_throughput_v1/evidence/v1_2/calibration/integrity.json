@@ -1,0 +1,26 @@
+{
+  "completed_jobs": 1000,
+  "planned_jobs": 1000,
+  "unique_job_ids": true,
+  "original_completed_prefix_preserved": 93,
+  "map_unchanged": true,
+  "pair_list_unchanged": true,
+  "source_commit": "15fe98e14a84e109964d0b5570f53d024a8e54d3",
+  "original_source_commit": "1a13bf0",
+  "evidence_sha256": {
+    "migration.json": "51c48ec9acad33fe4d594717c712fbd3d47524efc0489d2f20d9c4c4310470c3",
+    "jobs.json": "7e2ebaf204156ac5e8217bd70417785bdcb8cf4fe94764df46d496fef815d693",
+    "status.json": "48a851c0f00cff5d3c92715e152867be644c80c17313fc9299eac9d193755a19",
+    "annotated_jobs.json": "6b41ad2d400113c2a06f1f3a39ce84d3e536381bd9c40466efd99861c60ebaef",
+    "frozen_regimes.json": "a2b74f9ff84c83377ea081d0cda9610b635b739e6e178a0132bc1106c85f9f19",
+    "NAVIGATION_QUALIFICATION.md": "7519e970e5a9ac5debafb1e664e29668fa3cecbb2919d089186c9988b2d94237",
+    "statistics.json": "551bd0e14d45f08807f7b123e8ec63bd8f6046625231020f1db213a12677b328",
+    "qualification.json": "296331a08787251280332c0ee806ec60e0ecad6eed82a601c8c54068a72ad75d",
+    "manifest.json": "c31c4d018db2d4578e9b8d424a4fbd2d65d436c1a407c624778cc4ab3f824184"
+  },
+  "training_updates": 0,
+  "scheduler_runs": 0,
+  "software_error_count": 1,
+  "software_error": "fixed-map reset generation-halo validation; repaired without dropping a pair",
+  "qualification_status": "REVIEW_REQUIRED"
+}
