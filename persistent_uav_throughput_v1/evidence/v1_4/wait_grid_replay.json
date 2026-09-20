@@ -1,0 +1,82 @@
+{
+  "kind": "BOUNDED_ENGINEERING_REPLAY_NOT_BASELINE_RESULT",
+  "passed": true,
+  "job": {
+    "regime": 9,
+    "method": "threshold_sjf",
+    "threshold": 0.5,
+    "seed": 920260922
+  },
+  "steps_from_checkpoint": 51,
+  "historical_error": "stationary duration must lie on the physics grid",
+  "all_preceding_observations_events_summaries_identical": true,
+  "before": {
+    "position": [
+      1041.8443603515625,
+      3243.357421875,
+      363.63714599609375
+    ],
+    "velocity": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "battery": 65.62360856137882,
+    "capacity": 91.70487312618181,
+    "time": 2618.1999999998893,
+    "remaining_time": 8286.850000000111,
+    "queue": [],
+    "current_task": null,
+    "charger_position": [
+      2880.0,
+      2000.0,
+      200.0
+    ],
+    "mode": "IDLE",
+    "decision_required": true,
+    "can_recharge": true,
+    "completed": 14
+  },
+  "after": {
+    "position": [
+      1041.8443603515625,
+      3243.357421875,
+      363.63714599609375
+    ],
+    "velocity": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "battery": 56.82160856137882,
+    "capacity": 91.70487312618181,
+    "time": 2764.9,
+    "remaining_time": 8140.1500000000015,
+    "queue": [
+      {
+        "id": 14,
+        "arrival": 2764.9,
+        "original_arrival": 2764.8862865172914,
+        "position": [
+          2654.6169670376876,
+          611.3803287205864,
+          245.5261786242833
+        ]
+      }
+    ],
+    "current_task": null,
+    "charger_position": [
+      2880.0,
+      2000.0,
+      200.0
+    ],
+    "mode": "IDLE",
+    "decision_required": true,
+    "can_recharge": true,
+    "completed": 14
+  },
+  "snapshot_completed_rows": 382,
+  "physical_resets": 1,
+  "neural_updates": 0,
+  "production_run_resumed": false
+}

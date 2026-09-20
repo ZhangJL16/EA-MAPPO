@@ -1,5 +1,8 @@
 # PersistentUAVThroughput-v1
 
+最新状态：本地B4在382/1080因等待网格浮点检查中断；v1.4已修复，34项测试及现场回放通过。
+本地不续跑，ARM端同步后在新目录完整运行；见 [ARM_DIAGNOSTIC_HANDOFF.md](ARM_DIAGNOSTIC_HANDOFF.md)。
+
 独立的新问题版本：持续空间任务调度，固定T内最大化完成数，实际电量耗尽风险为约束。
 单地点服务、单机、单站、初始3项/最多5项等待任务、外生Poisson到达、计时全充电。
 有任务时只选serve/recharge；空队列可选recharge/idle，站内满电时强制idle。站内idle不耗电也不自动充电，站外idle保留悬停耗电。无取送货、非空队列主动wait、部分充电或网络训练。

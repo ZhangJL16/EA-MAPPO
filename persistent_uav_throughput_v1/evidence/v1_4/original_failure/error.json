@@ -1,0 +1,5 @@
+{
+  "error": "ValueError('stationary duration must lie on the physics grid')",
+  "time": 1789890568.1129231,
+  "resume": "Use last completed checkpoint; no automatic retry."
+}

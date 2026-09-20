@@ -1,4 +1,7 @@
-# B0–B5 diagnostic：B4 validation运行交接
+# 历史：B4 validation首次启动交接
+
+本运行已在382/1080异常退出，以下PID和启动状态均为历史。不要执行旧续跑命令。
+最新分工及修复见 [ARM_DIAGNOSTIC_HANDOFF.md](ARM_DIAGNOSTIC_HANDOFF.md)。
 
 源码提交：b8cb673。29项测试与更新continuing smoke均通过。
 旧1000-job calibration和全部27个regime保持不变，未重跑。

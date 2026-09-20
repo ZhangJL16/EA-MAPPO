@@ -303,6 +303,35 @@ class BaselineAndStreamTests(unittest.TestCase):
 
 
 class CalibrationCompatibilityTests(unittest.TestCase):
+    def test_failure_status_preserves_last_checkpoint_and_its_progress(self):
+        import json
+        from pathlib import Path
+        from persistent_uav.evaluation import record_failure
+        from persistent_uav.storage import write_json
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory)
+            ref = snapshot(path, {'completed_before_error': 3})
+            write_json(path / 'status.json', dict(status='running', completed_runs=3,
+                       total_policy_steps=100, snapshot=ref, training_updates=0))
+            before = (path / 'resume.json').read_bytes()
+            record_failure(path, ValueError('execution failed after checkpoint'))
+            result = json.loads((path / 'status.json').read_text())
+            self.assertEqual(result['status'], 'error')
+            self.assertEqual(result['completed_runs'], 3)
+            self.assertEqual(result['snapshot'], ref)
+            self.assertEqual((path / 'resume.json').read_bytes(), before)
+            self.assertEqual(restore(path), {'completed_before_error': 3})
+
+    def test_failure_before_first_checkpoint_reports_no_snapshot(self):
+        import json
+        from pathlib import Path
+        from persistent_uav.evaluation import record_failure
+        with tempfile.TemporaryDirectory() as directory:
+            record_failure(directory, RuntimeError('startup failed'))
+            status = json.loads((Path(directory) / 'status.json').read_text())
+            self.assertEqual(status['status'], 'error')
+            self.assertIsNone(status['snapshot'])
+
     def test_compatibility_requires_exact_calibration_and_current_source(self):
         import copy
         from pathlib import Path

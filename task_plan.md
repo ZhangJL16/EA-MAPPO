@@ -57,3 +57,13 @@
 第一轮只作结构诊断；最终98% kill test未授权。解释结果前需要estimator error audit；
 正式kill test还需MPC、small reference与estimation/planning decomposition。
 神经训练仍禁止；不把10-seed经验筛选称为5%风险保证。
+
+## v1.4等待网格修复与ARM分工
+
+- [x] 本地B4在382/1080异常退出；保存原始错误、快照和全部382条汇总。
+- [x] 现场复现：146.70000000011078被ceil误判为146.75；改用最近网格容差检查与对齐。
+- [x] 34项测试、实际checkpoint有限回放及continuing smoke通过。
+- [x] 异常状态写error且保留上个有效checkpoint；原状态证据保留。
+- [x] 未重跑calibration，未改变27 regimes；本地生产运行不续跑。
+- [ ] ARM端同步修复、更新已有跨平台兼容记录，验证后新目录运行1080条B4 validation。
+- [ ] ARM只检查首个checkpoint后交还；不自动evaluation或训练。

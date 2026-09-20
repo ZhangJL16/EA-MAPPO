@@ -1,0 +1,20 @@
+{
+  "error": "stationary duration must lie on the physics grid",
+  "steps_from_checkpoint": 51,
+  "job": {
+    "regime": 9,
+    "method": "threshold_sjf",
+    "threshold": 0.5,
+    "seed": 920260922
+  },
+  "stationary_calls": [
+    {
+      "time": 2618.1999999998893,
+      "duration": 146.70000000011078,
+      "nearest_grid": 146.70000000000002,
+      "ceil_grid": 146.75,
+      "next_arrival": 2764.9,
+      "mode": "WAITING"
+    }
+  ]
+}

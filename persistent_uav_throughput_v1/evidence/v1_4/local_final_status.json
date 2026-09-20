@@ -1,0 +1,15 @@
+{
+  "status": "error",
+  "completed_runs": 382,
+  "planned_runs": 1080,
+  "total_policy_steps": 606600,
+  "snapshot": {
+    "file": "checkpoint_7e6b1798f7e50fcf9eb1.pkl",
+    "sha256": "7e6b1798f7e50fcf9eb19b320d48761317a003ebfcb75356c7ef0740316b4b72",
+    "bytes": 407407
+  },
+  "checkpoint_written_unix": 1789890567.9162903,
+  "training_updates": 0,
+  "error": "ValueError('stationary duration must lie on the physics grid')",
+  "error_written_unix": 1789890568.1129231
+}

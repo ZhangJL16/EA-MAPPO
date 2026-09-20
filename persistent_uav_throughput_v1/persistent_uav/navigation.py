@@ -196,11 +196,16 @@ class FrozenNavigator:
                           obstacle_penalty=components['obstacle_penalty_component'])
 
     def advance_stationary(self, duration, *, recharge_rate=None):
-        if duration < 0 or abs(duration - ceil_grid(duration)) > 1e-7:
+        if not math.isfinite(duration) or duration < 0:
+            raise ValueError('stationary duration must lie on the physics grid')
+        # Validate proximity, not ceiling: accumulated flight-clock roundoff
+        # can put an exact grid interval a few ulps above its intended value.
+        grid_duration = round(duration / self.dt) * self.dt
+        if abs(duration - grid_duration) > 1e-7:
             raise ValueError('stationary duration must lie on the physics grid')
         if np.linalg.norm(self.velocity) > 1e-8:
             raise RuntimeError('stationary service cannot brake a moving agent for free')
-        actual = float(duration)
+        actual = float(grid_duration)
         used = 0.
         b = self.base
         if recharge_rate is not None:

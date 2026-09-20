@@ -75,6 +75,19 @@ def calibration_compatibility(frozen_path, frozen, compatibility_file):
     return record
 
 
+def record_failure(output, error):
+    """Mark failure without replacing the last valid checkpoint with partial state."""
+    output = Path(output)
+    details = dict(error=repr(error), time=time.time(),
+                   resume='Use last completed checkpoint; no automatic retry.')
+    write_json(output / 'error.json', details)
+    status_path = output / 'status.json'
+    status = json.loads(status_path.read_text()) if status_path.exists() else dict(
+        completed_runs=0, snapshot=None, training_updates=0)
+    status.update(status='error', error=details['error'], error_written_unix=details['time'])
+    write_json(status_path, status)
+
+
 def run(frozen_path, output, *, split, regime_ids, methods=None, threshold_file=None,
         compatibility_file=None,
         resume=False, checkpoint_policy_steps=100, stop_after_checkpoint=False):
@@ -194,6 +207,5 @@ def run(frozen_path, output, *, split, regime_ids, methods=None, threshold_file=
                 caution='Empirical validation budget only, not a safety guarantee. Null means no admissible threshold.'))
         save('complete')
     except Exception as error:
-        write_json(output / 'error.json', dict(error=repr(error), time=time.time(),
-                                             resume='Use last completed checkpoint; no automatic retry.'))
+        record_failure(output, error)
         raise

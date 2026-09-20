@@ -59,6 +59,37 @@ class DockIdleRegression(unittest.TestCase):
         nav.advance_stationary(10., recharge_rate=2.)
         self.assertEqual(nav.energy, 100.)
 
+    def test_stationary_accepts_roundoff_on_both_sides_of_grid(self):
+        for duration in (146.70000000011078, 146.69999999988924):
+            with self.subTest(duration=duration):
+                nav = self.nav
+                nav.base.simulation_time = 2618.1999999998893
+                nav.base.agent.energy = 70.
+                outcome = nav.advance_stationary(duration)
+                self.assertAlmostEqual(outcome.duration, 146.7)
+                self.assertAlmostEqual(nav.time, 2764.9)
+                self.assertEqual(nav.energy, 70.)
+
+    def test_off_grid_and_nonfinite_wait_rejected_without_mutation(self):
+        nav = self.nav
+        for duration in (.025, 146.70001, -.05, float('nan'), float('inf')):
+            with self.subTest(duration=duration):
+                before = (nav.time, nav.energy)
+                with self.assertRaisesRegex(ValueError, 'physics grid'):
+                    nav.advance_stationary(duration)
+                self.assertEqual((nav.time, nav.energy), before)
+
+    def test_rounded_interval_still_meters_hover_and_explicit_charge(self):
+        nav = self.nav
+        nav.base.agent.energy = 70.
+        nav.advance_stationary(1.00000000011, recharge_rate=2.)
+        self.assertEqual(nav.energy, 72.)
+        nav.base.agent.pos = nav.station.copy() + [nav.goal_radius + 1., 0., 0.]
+        cost = nav.base._realized_energy_cost(np.zeros(3), nav.dt, velocity=np.zeros(3))
+        outcome = nav.advance_stationary(1.00000000011)
+        self.assertEqual(outcome.duration, 1.)
+        self.assertAlmostEqual(outcome.energy_used, cost / nav.dt)
+
 
 class NavigationRegression(unittest.TestCase):
     @classmethod

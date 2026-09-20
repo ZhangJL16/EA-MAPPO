@@ -17,3 +17,8 @@ LiDAR-only deployment contracts.
   or automatically advance from validation to evaluation.
 - Before interpreting results, estimator error audit and estimation/planning
   decomposition remain required; poor B5 results alone do not establish scheduling difficulty.
+
+Latest handoff: local B4 failed at 382/1080; v1.4 wait-grid repair is engineering-only.
+Do not resume local production or import its 382 rows into ARM results. ARM is the
+new execution host after audited compatibility update and focused smoke. Preserve
+existing migration_20260920 records; see ARM_DIAGNOSTIC_HANDOFF.md.
