@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "focused_tests": 21,
+  "command": "python -m unittest discover -s persistent_uav_throughput_v1/tests -p test_mechanism_sweep.py",
+  "archive_full_window_checks": 420,
+  "count_mismatches": 0,
+  "flight_charge_wait_mismatches": 0,
+  "source_revision": "b2d7a8e488e774c39f9c6ae55f5e2e58a6160b1d",
+  "script_sha256": "97d03f36246bda5af961ea99fd6fa83c7843fbca7a2c4e3df1f11211c35b535f",
+  "engine_sha256": "691e0bc7445349c046b5c735d5e65d12d549875e55b681c1c659d7ce54c34495",
+  "physical_smoke_sha256": "6f6447d04765b33798934686149fa844cdf5389a1f748e2037bf980f22cfd26c",
+  "scientific_parameters_tuned": false,
+  "training_updates": 0
+}

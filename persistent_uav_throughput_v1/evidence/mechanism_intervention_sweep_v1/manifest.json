@@ -1,0 +1,51 @@
+{
+  "source_revision": "b2d7a8e488e774c39f9c6ae55f5e2e58a6160b1d",
+  "dependencies": {
+    "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/scripts/mechanism_intervention_sweep.py": "97d03f36246bda5af961ea99fd6fa83c7843fbca7a2c4e3df1f11211c35b535f",
+    "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/scripts/mechanism_sweep_engine.py": "691e0bc7445349c046b5c735d5e65d12d549875e55b681c1c659d7ce54c34495",
+    "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/MECHANISM_INTERVENTION_SWEEP_V1.md": "ca5fd7301341b489a2ee8435806551c6319bcba5d38daa01f1a782afe8c0d8b9",
+    "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/evidence/atlas_matched_pairs_v1/branch_features.jsonl": "f9f855f813d9342760ebd3c865d6349ea1bf3dd1f4765ad90c5b767b0ca8c479",
+    "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/evidence/atlas_retained_counterpart_v1/counterpart_pairs.jsonl": "a36f5ff744cfb3ea413594d1eed73c3ee7e43e88694962727f23de4e26df799a",
+    "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/scripts/infinite_queue_intervention.py": "96fa6f19554ba49d02d1e43e7a88033fcdf873464e849b8997eb6abf85f57b08",
+    "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/INFINITE_QUEUE_INTERVENTION_V1.md": "89d2419739bccac6145be9697485ec0503bb6306b6f1a8354f32c8adcc8d7b71",
+    "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/evidence/atlas_infinite_queue_v1/manifest.json": "5e77842eb74b1938f7651c0b7b0da4c3712af751a07a5528e80b8775a24806d1",
+    "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/evidence/real_state_branching_atlas_v1/manifest.json": "f61272ff637125d34b2940761cb78de6aa566e51615e737ef0f9a3d8e524c567",
+    "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/evidence/real_state_branching_atlas_v1/one_step_branches.jsonl": "ba3754872b16ae35004ff38981c9f4308b85bb96d40ce5d0879afa4f9644bdb7",
+    "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/evidence/real_state_branching_atlas_v1/continuation_branches.jsonl": "224994681190527b8ecde65cdf79bc062229e3d1f01961eb69a494701c3e3949"
+  },
+  "files": {
+    "bases.json": "770cf5c6a2717f5dc5c3221ec4248689c3892dfda3a701230a43866b98ecafe2",
+    "jobs.json": "aca1749085376aa67cbd3325a8b35505045e607be26ad6591dca0ebd4d77e4ce",
+    "pairs.json": "62093a1e42ada9c6fecb7cc6a3311713e0fdd9da55bab154e48073df091e25ca"
+  },
+  "workers": 16,
+  "total_jobs": 2164,
+  "imported_jobs": 70,
+  "new_jobs": 2094,
+  "primary_pairs": 77,
+  "primary_branches": 130,
+  "broad_roots": 128,
+  "broad_branches": 420,
+  "windows": [
+    436.2,
+    872.4,
+    1308.6
+  ],
+  "conditions": [
+    "C1",
+    "C2",
+    "C3",
+    "C4",
+    "C5",
+    "C6",
+    "C7",
+    "E",
+    "D1",
+    "D2",
+    "K8",
+    "K12"
+  ],
+  "created_unix": 1789984985.9974535,
+  "outcome_adaptive_selection": false,
+  "training_updates": 0
+}

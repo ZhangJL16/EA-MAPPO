@@ -1,0 +1,12 @@
+{
+  "pid": 1203308,
+  "command": [
+    "/mnt/workspace/zjl-exp/.venv/bin/python",
+    "-u",
+    "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/scripts/mechanism_intervention_sweep.py",
+    "supervise",
+    "--output",
+    "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/evidence/mechanism_intervention_sweep_v1"
+  ],
+  "manifest_sha256": "fc9d03d79bc9fa0f097550d1fa2ec57eebdcf7aa56c7e4f22625cecce18d9b11"
+}

@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "job": "C4__B4_0.75_r07_s920260923_d00005_task5",
+  "first_task_physics_exact_except_battery": true,
+  "nested_task_only_physical_step": true,
+  "midflight_disk_resume_exact": true,
+  "parent_unchanged": true,
+  "training_updates": 0
+}
