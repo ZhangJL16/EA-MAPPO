@@ -1,5 +1,7 @@
 # PersistentUAVThroughput-v1
 
+Latest authorization: Infinite-Queue Intervention v1 on the frozen 41 matched-divergent pairs (70 unique branches / 29 archived roots). See INFINITE_QUEUE_INTERVENTION_V1.md. Only root-onward queue capacity and occupancy-bin allocation change. Preserve historical losses, environment, first actions, absolute arrivals, downstream Oracle-Safe SJF and window. Complete-only collect is authorized; after first-checkpoint health hand back the running jobs. No outcome-driven tuning or follow-on intervention.
+
 2026-09-21 latest user authorization supersedes the historical census-only hold:
 - Run Real-State Counterfactual Branching Atlas v1; see REAL_STATE_BRANCHING_ATLAS_V1.md.
 - Fixed archived B5 and B4-.75 hash-selected roots; unchanged environment and no training.

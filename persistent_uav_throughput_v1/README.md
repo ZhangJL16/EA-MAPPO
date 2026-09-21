@@ -1,5 +1,7 @@
 # PersistentUAVThroughput-v1
 
+当前授权：[Infinite-Queue Intervention v1](INFINITE_QUEUE_INTERVENTION_V1.md) 已启动，41 对/70 唯一 continuation；[16-worker 启动检查通过](evidence/atlas_infinite_queue_v1/README.md)。固定 root 干预，无训练，等待完整结果。
+
 2026-09-21 当前授权：[Real-State Counterfactual Branching Atlas v1](REAL_STATE_BRANCHING_ATLAS_V1.md)。
 从 B5 和 B4-.75 归档按固定哈希抽取实际决策状态，执行 task+return census 与配对 Oracle-Safe SJF continuation。
 所有首动作统一从 root 起评价 1308.6 秒，计入首任务；环境、任务流、导航器不变，不训练。

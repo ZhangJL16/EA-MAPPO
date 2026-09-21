@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "job": "B4_0.75_r10_s920260925_d00016_task0",
+  "finite_control_first_task_exact": true,
+  "infinite_first_task_exact": true,
+  "root_clone_unchanged": true,
+  "nested_physical_step": true,
+  "midflight_disk_resume_exact": true,
+  "queue_capacity": 100,
+  "training_updates": 0
+}

@@ -1,0 +1,11 @@
+{
+  "pid": 1186311,
+  "command": [
+    "/mnt/workspace/zjl-exp/.venv/bin/python",
+    "-u",
+    "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/scripts/infinite_queue_intervention.py",
+    "supervise",
+    "--output",
+    "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/evidence/atlas_infinite_queue_v1"
+  ]
+}

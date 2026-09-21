@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "tests": 4,
+  "command": "/mnt/workspace/zjl-exp/.venv/bin/python -m unittest discover -s persistent_uav_throughput_v1/tests -p test_infinite_queue.py -v",
+  "scope": [
+    "only queue capacity and accounting change",
+    "future arrivals accepted with first physics unchanged",
+    "no resurrection of historical drops",
+    "clone isolation and idempotence"
+  ],
+  "test_file_sha256": "430ae82449326d3c1d152e187b194e220586162bda85c01babb8c6292125846c",
+  "note": "unbounded() tests passed before smoke-check-only correction; no change to tested intervention function"
+}

@@ -1,0 +1,375 @@
+{
+  "passed": true,
+  "workers": [
+    {
+      "worker": 0,
+      "pid": 1186295,
+      "status": {
+        "status": "running",
+        "index": 0,
+        "planned": 5,
+        "job": "B4_0.75_r10_s920260925_d00016_task0",
+        "stage": "oracle",
+        "policy_steps": 3400,
+        "queue_capacity": 100,
+        "queue_length": 4,
+        "snapshot": {
+          "file": "checkpoint_573f1717de444278ce68.pkl",
+          "sha256": "573f1717de444278ce687a10d3656fa5f955848a681480f9596d063394a776f9",
+          "bytes": 323604
+        },
+        "checkpoint_unix": 1789983291.4661486,
+        "training_updates": 0
+      },
+      "checkpoint_deserialized": true,
+      "contract_exact": true
+    },
+    {
+      "worker": 1,
+      "pid": 1186296,
+      "status": {
+        "status": "running",
+        "index": 0,
+        "planned": 5,
+        "job": "B4_0.75_r10_s920260925_d00016_task15",
+        "stage": "oracle",
+        "policy_steps": 3300,
+        "queue_capacity": 100,
+        "queue_length": 4,
+        "snapshot": {
+          "file": "checkpoint_e8cc79e9782586dccdd4.pkl",
+          "sha256": "e8cc79e9782586dccdd4215370b9e8a3626601e8f1e4fe941aa994d64e62131d",
+          "bytes": 324588
+        },
+        "checkpoint_unix": 1789983291.2247882,
+        "training_updates": 0
+      },
+      "checkpoint_deserialized": true,
+      "contract_exact": true
+    },
+    {
+      "worker": 2,
+      "pid": 1186297,
+      "status": {
+        "status": "running",
+        "index": 0,
+        "planned": 5,
+        "job": "B4_0.75_r10_s920260925_d00016_task16",
+        "stage": "oracle",
+        "policy_steps": 3300,
+        "queue_capacity": 100,
+        "queue_length": 4,
+        "snapshot": {
+          "file": "checkpoint_98d036836aa8d24fbad5.pkl",
+          "sha256": "98d036836aa8d24fbad5dc4b22ff9a947c64237c1bfd6c88535667752e7ec07b",
+          "bytes": 328559
+        },
+        "checkpoint_unix": 1789983291.3739753,
+        "training_updates": 0
+      },
+      "checkpoint_deserialized": true,
+      "contract_exact": true
+    },
+    {
+      "worker": 3,
+      "pid": 1186298,
+      "status": {
+        "status": "running",
+        "index": 0,
+        "planned": 5,
+        "job": "B4_0.75_r10_s920260925_d00016_task18",
+        "stage": "oracle",
+        "policy_steps": 3300,
+        "queue_capacity": 100,
+        "queue_length": 4,
+        "snapshot": {
+          "file": "checkpoint_03195760829da5ed6535.pkl",
+          "sha256": "03195760829da5ed653552be952c76a89365d89b370590d35032472a2223357b",
+          "bytes": 329152
+        },
+        "checkpoint_unix": 1789983290.655303,
+        "training_updates": 0
+      },
+      "checkpoint_deserialized": true,
+      "contract_exact": true
+    },
+    {
+      "worker": 4,
+      "pid": 1186299,
+      "status": {
+        "status": "running",
+        "index": 0,
+        "planned": 5,
+        "job": "B4_0.75_r10_s920260925_d00016_task3",
+        "stage": "oracle",
+        "policy_steps": 3500,
+        "queue_capacity": 100,
+        "queue_length": 4,
+        "snapshot": {
+          "file": "checkpoint_cd47294a2c41306e8fc6.pkl",
+          "sha256": "cd47294a2c41306e8fc60a4c594ef7aa50c87a9581f20d7c70eec15b72a7722d",
+          "bytes": 330138
+        },
+        "checkpoint_unix": 1789983291.6924999,
+        "training_updates": 0
+      },
+      "checkpoint_deserialized": true,
+      "contract_exact": true
+    },
+    {
+      "worker": 5,
+      "pid": 1186300,
+      "status": {
+        "status": "running",
+        "index": 0,
+        "planned": 5,
+        "job": "B4_0.75_r11_s920260924_d00017_task10",
+        "stage": "oracle",
+        "policy_steps": 3400,
+        "queue_capacity": 120,
+        "queue_length": 6,
+        "snapshot": {
+          "file": "checkpoint_968b6be554bf4cff80f2.pkl",
+          "sha256": "968b6be554bf4cff80f248b91baae0d27a42853d9c6baec79de6b99da51efcc3",
+          "bytes": 333121
+        },
+        "checkpoint_unix": 1789983291.0520258,
+        "training_updates": 0
+      },
+      "checkpoint_deserialized": true,
+      "contract_exact": true
+    },
+    {
+      "worker": 6,
+      "pid": 1186301,
+      "status": {
+        "status": "running",
+        "index": 0,
+        "planned": 4,
+        "job": "B4_0.75_r11_s920260924_d00017_task11",
+        "stage": "oracle",
+        "policy_steps": 3400,
+        "queue_capacity": 120,
+        "queue_length": 5,
+        "snapshot": {
+          "file": "checkpoint_c5f9beab7299fc1f4aa9.pkl",
+          "sha256": "c5f9beab7299fc1f4aa94ddddf385f2e33af773c6e150c0488e015b6c6cb96f4",
+          "bytes": 325348
+        },
+        "checkpoint_unix": 1789983291.309436,
+        "training_updates": 0
+      },
+      "checkpoint_deserialized": true,
+      "contract_exact": true
+    },
+    {
+      "worker": 7,
+      "pid": 1186302,
+      "status": {
+        "status": "running",
+        "index": 0,
+        "planned": 4,
+        "job": "B4_0.75_r11_s920260924_d00017_task20",
+        "stage": "oracle",
+        "policy_steps": 3200,
+        "queue_capacity": 120,
+        "queue_length": 5,
+        "snapshot": {
+          "file": "checkpoint_0a306df5128d4392c864.pkl",
+          "sha256": "0a306df5128d4392c864440890d60d1e77b01897069486f8b0d7d4f0d6c102ce",
+          "bytes": 325349
+        },
+        "checkpoint_unix": 1789983291.1271834,
+        "training_updates": 0
+      },
+      "checkpoint_deserialized": true,
+      "contract_exact": true
+    },
+    {
+      "worker": 8,
+      "pid": 1186303,
+      "status": {
+        "status": "running",
+        "index": 0,
+        "planned": 4,
+        "job": "B4_0.75_r11_s920260924_d00017_task9",
+        "stage": "oracle",
+        "policy_steps": 3100,
+        "queue_capacity": 120,
+        "queue_length": 6,
+        "snapshot": {
+          "file": "checkpoint_d9e8894f48e0829d83d7.pkl",
+          "sha256": "d9e8894f48e0829d83d716ce919907519a32798db4111b179210d0814f042cf8",
+          "bytes": 331934
+        },
+        "checkpoint_unix": 1789983290.8940325,
+        "training_updates": 0
+      },
+      "checkpoint_deserialized": true,
+      "contract_exact": true
+    },
+    {
+      "worker": 9,
+      "pid": 1186304,
+      "status": {
+        "status": "running",
+        "index": 0,
+        "planned": 4,
+        "job": "B4_0.75_r11_s920260925_d00015_task0",
+        "stage": "oracle",
+        "policy_steps": 3400,
+        "queue_capacity": 134,
+        "queue_length": 4,
+        "snapshot": {
+          "file": "checkpoint_6e33a39fb46fa728aeea.pkl",
+          "sha256": "6e33a39fb46fa728aeea5e17a6912c3a9de5746988b06640ba6427d0cf121ddf",
+          "bytes": 328500
+        },
+        "checkpoint_unix": 1789983291.3250422,
+        "training_updates": 0
+      },
+      "checkpoint_deserialized": true,
+      "contract_exact": true
+    },
+    {
+      "worker": 10,
+      "pid": 1186305,
+      "status": {
+        "status": "running",
+        "index": 0,
+        "planned": 4,
+        "job": "B4_0.75_r11_s920260925_d00015_task16",
+        "stage": "oracle",
+        "policy_steps": 3300,
+        "queue_capacity": 134,
+        "queue_length": 4,
+        "snapshot": {
+          "file": "checkpoint_4a2b13b5a7adce9c4f72.pkl",
+          "sha256": "4a2b13b5a7adce9c4f72739800acb9aa04ffc764f5948f7483a0c2ab87164c63",
+          "bytes": 326775
+        },
+        "checkpoint_unix": 1789983291.2730136,
+        "training_updates": 0
+      },
+      "checkpoint_deserialized": true,
+      "contract_exact": true
+    },
+    {
+      "worker": 11,
+      "pid": 1186306,
+      "status": {
+        "status": "running",
+        "index": 0,
+        "planned": 4,
+        "job": "B4_0.75_r11_s920260928_d00006_task2",
+        "stage": "oracle",
+        "policy_steps": 3200,
+        "queue_capacity": 131,
+        "queue_length": 6,
+        "snapshot": {
+          "file": "checkpoint_1370708b118656907623.pkl",
+          "sha256": "1370708b118656907623a6e0f695c5bbfa7aa439550ec2225e10083cba01631d",
+          "bytes": 309300
+        },
+        "checkpoint_unix": 1789983291.263387,
+        "training_updates": 0
+      },
+      "checkpoint_deserialized": true,
+      "contract_exact": true
+    },
+    {
+      "worker": 12,
+      "pid": 1186307,
+      "status": {
+        "status": "running",
+        "index": 0,
+        "planned": 4,
+        "job": "B4_0.75_r11_s920260928_d00006_task3",
+        "stage": "oracle",
+        "policy_steps": 3300,
+        "queue_capacity": 131,
+        "queue_length": 6,
+        "snapshot": {
+          "file": "checkpoint_72252e2341193665eb9d.pkl",
+          "sha256": "72252e2341193665eb9db02f5331da2f452ce3a6de9c9c4d520135a46c348f9f",
+          "bytes": 313610
+        },
+        "checkpoint_unix": 1789983290.8896441,
+        "training_updates": 0
+      },
+      "checkpoint_deserialized": true,
+      "contract_exact": true
+    },
+    {
+      "worker": 13,
+      "pid": 1186308,
+      "status": {
+        "status": "running",
+        "index": 0,
+        "planned": 4,
+        "job": "B4_0.75_r11_s920260928_d00006_task6",
+        "stage": "oracle",
+        "policy_steps": 3300,
+        "queue_capacity": 131,
+        "queue_length": 6,
+        "snapshot": {
+          "file": "checkpoint_e5cb9b477fee91547009.pkl",
+          "sha256": "e5cb9b477fee915470091e4b1608be457f4c32bb968870a5edbd8a999109cb45",
+          "bytes": 313677
+        },
+        "checkpoint_unix": 1789983291.3407288,
+        "training_updates": 0
+      },
+      "checkpoint_deserialized": true,
+      "contract_exact": true
+    },
+    {
+      "worker": 14,
+      "pid": 1186309,
+      "status": {
+        "status": "running",
+        "index": 0,
+        "planned": 4,
+        "job": "B4_0.75_r12_s920260929_d00056_task37",
+        "stage": "oracle",
+        "policy_steps": 3500,
+        "queue_capacity": 63,
+        "queue_length": 3,
+        "snapshot": {
+          "file": "checkpoint_fde0750ea1636faeb003.pkl",
+          "sha256": "fde0750ea1636faeb00346fa74428744f6cbd0a7e6f3f9ce12bbb84ea3123203",
+          "bytes": 362114
+        },
+        "checkpoint_unix": 1789983291.1836417,
+        "training_updates": 0
+      },
+      "checkpoint_deserialized": true,
+      "contract_exact": true
+    },
+    {
+      "worker": 15,
+      "pid": 1186310,
+      "status": {
+        "status": "running",
+        "index": 0,
+        "planned": 4,
+        "job": "B4_0.75_r12_s920260929_d00056_task39",
+        "stage": "oracle",
+        "policy_steps": 3600,
+        "queue_capacity": 63,
+        "queue_length": 3,
+        "snapshot": {
+          "file": "checkpoint_7381071940c6dcfc5b8f.pkl",
+          "sha256": "7381071940c6dcfc5b8ff8d31f7beec58c4964c1f250928420c849bc123b043e",
+          "bytes": 362730
+        },
+        "checkpoint_unix": 1789983291.4378037,
+        "training_updates": 0
+      },
+      "checkpoint_deserialized": true,
+      "contract_exact": true
+    }
+  ],
+  "training_updates": 0,
+  "scope": "first nonzero resumable checkpoint only; not scientific completion"
+}

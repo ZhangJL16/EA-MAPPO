@@ -1,0 +1,18 @@
+{
+  "source_revision": "8f79f237c6fb09073187d4bb6454887309a6a50d",
+  "script_sha256": "b0a1c0effa6447d3a0df489320b602b27c73f6d099248784697d0fa2a9f22b1b",
+  "atlas_sha256": "19d1bdb5be79d87feb4ce325d0558ca2fba740404aa83347b0d675cc223104bc",
+  "plan_sha256": "89d2419739bccac6145be9697485ec0503bb6306b6f1a8354f32c8adcc8d7b71",
+  "jobs_sha256": "e7fbdeedd2a51a7c2f5ad8ccde2957aacacfe0ba2ab5fc684e40c0ecf51607d0",
+  "pairs_sha256": "5f7b01ae4f4fb508fa4cb11b651224231aa593ad26d3a230ca5f0b75b777b2fc",
+  "source_pairs_sha256": "a36f5ff744cfb3ea413594d1eed73c3ee7e43e88694962727f23de4e26df799a",
+  "original_manifest_sha256": "f61272ff637125d34b2940761cb78de6aa566e51615e737ef0f9a3d8e524c567",
+  "workers": 16,
+  "jobs": 70,
+  "roots": 29,
+  "pairs": 41,
+  "window": 1308.6,
+  "intervention": "root onward queue_capacity=max(old capacity,len(full frozen stream)); extend queue_time with zeros",
+  "selection": "all 41 prior same-arrival joint-matched divergent pairs; outcome-conditioned historical selection",
+  "created_unix": 1789983147.2308805
+}

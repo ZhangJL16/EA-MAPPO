@@ -1,0 +1,14 @@
+{
+  "stage": "prelaunch smoke",
+  "formal_workers_started": 0,
+  "failed_check": "cross-deserialization pickle byte equality for parent objects",
+  "passed_before_failure": [
+    "finite-capacity first-task events exact",
+    "infinite-capacity first-task completion exact",
+    "nested resumed observations exact",
+    "nested resumed events exact"
+  ],
+  "fix": "compare each parent against its own pre-step bytes and compare cross-parent observations; never require equivalent deserialized objects to have identical pickle bytes",
+  "scientific_parameters_changed": false,
+  "pair_selection_changed": false
+}
