@@ -1,0 +1,32 @@
+from pathlib import Path
+import json
+P=Path(__file__).resolve().parent
+payload={n:json.loads((P/f).read_text()) for n,f in [('audits','pair_audits.json'),('timelines','timelines.json'),('traces','actual_event_traces.json')]}
+html='''<!doctype html><html lang="zh"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Atlas divergence timelines</title>
+<style>body{font:15px system-ui;margin:24px auto;max-width:1150px;padding:0 15px;color:#162333}select,button,input{font:inherit;margin:5px}svg{width:100%;background:#f6f8fb;border:1px solid #ddd}table{border-collapse:collapse;width:100%;font-size:13px}td,th{padding:6px;border-bottom:1px solid #ddd;text-align:left}pre{white-space:pre-wrap;font-size:12px} .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.note{color:#596778}label{display:inline-block}#clock{font-weight:bold}</style>
+<h1>真实 continuation 分叉时间线</h1><p>41 个同 arrival、time/battery matched 分叉对。蓝色=i，橙色=j。初始计数从 root 清零；所有时间均为距 root 的秒数。事件按原 0.05 秒网格合并。</p>
+<p class="note">首次计数差通常只是首任务完成时差；稳定领先是回顾性终点定义，不是因果决定时刻。状态面板中的电量/位置来自最近的决策快照，并非光标时刻插值。</p>
+<label>配对 <select id="pair"></select></label><label>定位 <select id="milestone"><option value="first_count_difference">首次计数差</option><option value="first_count_difference_after_both_first">两首任务完成后首次计数差</option><option value="persistent_lead" selected>最终赢家稳定领先</option><option value="final_gap_settled">最终数值差稳定</option><option value="first_other_queue_difference">非 counterpart 队列首次不同</option><option value="same_completed_set_after_both_first">完成任务集合首次重新相同</option></select></label><button id="locate">定位</button><span id="milestone_status"></span><p id="facts"></p>
+<svg id="plot" viewBox="0 0 1060 350" aria-label="两条累计吞吐阶梯线和实际事件"></svg><input id="time" type="range" min="0" max="1308.6" step="0.05" style="width:85%"><span id="clock"></span>
+<div class="grid"><div><h3>i 状态与最近快照</h3><pre id="statei"></pre></div><div><h3>j 状态与最近快照</h3><pre id="statej"></pre></div></div>
+<h3>实际事件（悬停图中标记可查看详情）</h3><label><input type="checkbox" id="all">显示全窗口事件；否则仅光标前后 100 秒</label><table><thead><tr><th>秒</th><th>侧</th><th>事件 / 动作</th><th>任务 / 结果</th></tr></thead><tbody id="events"></tbody></table><details><summary>完整 onset 审计和前序快照</summary><pre id="audit"></pre></details>
+<script>const DATA=__DATA__;
+const $=id=>document.getElementById(id), ns='http://www.w3.org/2000/svg';let audit,tl,es;
+DATA.audits.forEach((a,i)=>{let o=document.createElement('option');o.value=i;o.textContent=`${a.root_id}: ${a.task_i} / ${a.task_j}`;$('pair').append(o)});
+function el(tag,attrs,text){let e=document.createElementNS(ns,tag);Object.entries(attrs).forEach(([k,v])=>e.setAttribute(k,v));if(text!==undefined)e.textContent=text;return e}
+function rel(e){return Math.round(e.time*20)/20-audit.origin_tick/20}
+function describe(e){return e.event==='decision'?`${e.action.kind} ${e.action.task_id??''}`:e.event}
+function update(){let t=Number($('time').value);$('clock').textContent=t.toFixed(2)+' s';let plot=$('plot');plot.replaceChildren();let maxN=Math.max(...tl.rows.map(r=>Math.max(r.N_i,r.N_j))),X=v=>50+v/1308.6*970,Y=v=>205-v/Math.max(maxN,1)*175;
+for(let n=0;n<=maxN;n+=2){plot.append(el('line',{x1:50,x2:1020,y1:Y(n),y2:Y(n),stroke:'#dce1e8'}));plot.append(el('text',{x:12,y:Y(n)+4,'font-size':12},n))}
+for(let sec=0;sec<=1200;sec+=200)plot.append(el('text',{x:X(sec),y:338,'font-size':12},sec));
+[['N_i','#1767c1'],['N_j','#c56613']].forEach(([key,color])=>{let d=`M ${X(0)} ${Y(0)}`;tl.rows.forEach(r=>{d+=` H ${X(r.elapsed)} V ${Y(r[key])}`});plot.append(el('path',{d,fill:'none',stroke:color,'stroke-width':2}))});
+[['persistent_lead','#6337a5'],['final_gap_settled','#55823a']].forEach(([key,color])=>{let x=X(audit[key].elapsed);plot.append(el('line',{x1:x,x2:x,y1:15,y2:305,stroke:color,'stroke-dasharray':'5 4'}))});
+es.forEach((seq,side)=>{let y=244+side*42;plot.append(el('text',{x:12,y:y+4},side?'j':'i'));seq.forEach(e=>{let typ=e.event, color=typ==='task_completed'?'#168353':typ==='arrival'?(e.accepted?'#a3acb6':'#bf2932'):typ==='decision'?(e.action.kind==='recharge'?'#8144b0':'#637789'):'#d38a17';let dot=el('circle',{cx:X(rel(e)),cy:y,r:3,fill:color});dot.append(el('title',{},`${rel(e).toFixed(2)} ${describe(e)} ${e.task_id??''} ${typ==='arrival'?'accepted='+e.accepted:''}`));plot.append(dot)})});
+plot.append(el('line',{x1:X(t),x2:X(t),y1:0,y2:315,stroke:'#111','stroke-width':1}));
+let r=tl.rows.filter(r=>r.elapsed<=t+1e-7).at(-1)||tl.rows[0];['i','j'].forEach((side,ix)=>{let d=es[ix].filter(e=>e.event==='decision'&&rel(e)<=t+1e-7).at(-1);$('state'+side).textContent=JSON.stringify({completed:r['N_'+side],completed_ids:r['completed_'+side],queue_ids:r['queue_'+side],overflow:r['overflow_'+side],last_decision_elapsed:d?rel(d):null,snapshot_age:d?t-rel(d):null,snapshot_battery:d?.observation.battery??null,snapshot_position:d?.observation.position??null},null,2)});
+let entries=es.flatMap((seq,ix)=>seq.map(e=>({e,side:ix?'j':'i'}))).sort((a,b)=>rel(a.e)-rel(b.e));$('events').replaceChildren();entries.filter(x=>$('all').checked||Math.abs(rel(x.e)-t)<=100).forEach(({e,side})=>{let tr=document.createElement('tr');[rel(e).toFixed(2),side,describe(e),e.event==='arrival'?`task ${e.task_id}; accepted=${e.accepted}`:(e.task_id??(e.battery!==undefined?'battery='+e.battery.toFixed(3):''))].forEach(v=>{let td=document.createElement('td');td.textContent=v;tr.append(td)});$('events').append(tr)})}
+function locate(){let m=audit[$('milestone').value];$('milestone_status').textContent=m?'':'该配对没有此事件';if(m)$('time').value=m.elapsed;update()}
+function choose(){let k=Number($('pair').value);audit=DATA.audits[k];tl=DATA.timelines[k];es=[DATA.traces[audit.source_i],DATA.traces[audit.source_j]];$('facts').textContent=`最终差 i-j=${audit.final_delta}；首个动作差异 ordinal=${audit.first_action_difference_ordinal}${audit.first_action_difference.unmatched?'（末尾无对应动作）':''}；稳定领先=${audit.persistent_lead.elapsed.toFixed(2)}s；最终数值差稳定=${audit.final_gap_settled.elapsed.toFixed(2)}s。紫虚线=稳定领先，绿虚线=最终差稳定。`;$('audit').textContent=JSON.stringify(audit,null,2);locate()}
+$('pair').onchange=choose;$('milestone').onchange=locate;$('locate').onclick=locate;$('time').oninput=update;$('all').onchange=update;$('plot').onclick=e=>{let b=$('plot').getBoundingClientRect();$('time').value=Math.max(0,Math.min(1308.6,((e.clientX-b.left)/b.width*1060-50)/970*1308.6));update()};choose();
+</script></html>'''
+(P/'timeline_viewer.html').write_text(html.replace('__DATA__',json.dumps(payload,ensure_ascii=False,separators=(',',':')).replace('<','\\u003c')))

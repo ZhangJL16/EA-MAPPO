@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "pairs": 41,
+  "roots": 29,
+  "independent_count_checks": 3646,
+  "checks": [
+    "completion counts independently recomputed at every merged event batch",
+    "persistent winner lead suffix and earliest boundary",
+    "final exact gap suffix and earliest boundary",
+    "first nonzero count timestamp",
+    "strictly pre-onset downstream decision counts independently recomputed",
+    "all generated data SHA256"
+  ],
+  "simulation_calls": 0,
+  "verification_script_sha256": "16d6a429404dc66c73070532f206c5efbbe372ce9bccdf930206bfabd607d4d4",
+  "viewer_sha256": "74540c4f86eb9ef9c3c983aa99deb9ec8d38ac0e8c6092809279d372f570fc15"
+}

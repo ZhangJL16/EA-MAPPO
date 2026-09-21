@@ -7,6 +7,7 @@ Atlas 已完成 216 roots、956 个一步分支和 456 个 continuation；见 [�
 145/216 roots 存在多个安全任务；128 个完整案例中 82 个出现首动作吞吐差异，17 个 roots 仍有诊断中止导致的未知窗口结果。
 现有日志的 [matched-pair 分解](evidence/atlas_matched_pairs_v1/README.md) 已完成：时间与电量联合匹配 79 对，42 对仍有吞吐分叉；未识别主导因果机制，未新增 simulation。
 [Retained-counterpart 离线分析](evidence/atlas_retained_counterpart_v1/README.md) 已完成：77 对同 arrival 匹配，简单 counterpart 成本/余量/排名没有近乎完整解释吞吐排序；未新增仿真。
+[Divergence-onset audit](evidence/atlas_divergence_onset_v1/README.md) 已完成：41 对多数动作序列早分叉，完成数反复追平；提供离线交互时间线，未识别因果决定时刻。
 以下为历史证据与授权记录。
 
 最新授权：只做 [Oracle Recoverability Census](ORACLE_RECOVERABILITY_CENSUS.md)，
