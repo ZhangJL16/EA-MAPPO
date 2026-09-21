@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "counts": {
+    "queries": 154,
+    "task_time_opposed": 15,
+    "task_time_concordant": 25,
+    "task_time_missing_divergent": 1
+  },
+  "checks": [
+    "every counterpart candidate independently located in prior evidence by reversed task ID",
+    "all 77 pairs have identical other tasks and accepted arrival IDs",
+    "failed full-mission costs and incomplete task costs stay null",
+    "completed task duration equals completion minus start",
+    "all 12 direction summaries invariant under swapping pair sides",
+    "independent task-time direction recount",
+    "output SHA256 verification"
+  ],
+  "verification_script_sha256": "2dfb385fb5935565d96df4ce4f6f22f0dde3bdc378e1cf84c441fe8e9b76a4ba",
+  "new_simulations": 0
+}

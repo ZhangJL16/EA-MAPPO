@@ -1,0 +1,31 @@
+{
+  "passed": true,
+  "simulation_calls": 0,
+  "input_hashes": {
+    "integrity.json": "824ab65a05355e325f2700c1c7b9f0121776948ac78aa92d96d07874e4e1396d",
+    "pairs.jsonl": "e8f98a384435510016921bb1907b7de42da0d61a9d061e149a3dbd4ab9826a8e",
+    "branch_features.jsonl": "f9f855f813d9342760ebd3c865d6349ea1bf3dd1f4765ad90c5b767b0ca8c479",
+    "post_task_evidence.jsonl": "7be747935acff8580b2201c0e1359c6989bf4b07daab423f33e81c11984ca399"
+  },
+  "analysis_sha256": "833099d5f972440703db660b595f69f0a8ba70af9f4e96064c8ff689c962d710",
+  "plan_sha256": "4754d03c88b9fd704aa68aba9532b9e16a7f256e8e8d1f5283cb63dfc616e613",
+  "output_hashes": {
+    "counterpart_pairs.jsonl": "a36f5ff744cfb3ea413594d1eed73c3ee7e43e88694962727f23de4e26df799a",
+    "summary.json": "4b4168520ec8825529480d6277b590731f869026f30ff2d7f5695594ebd8b50c"
+  },
+  "python": "3.12.9 (main, Mar  3 2026, 01:44:51) [GCC 13.3.0]",
+  "checks": [
+    "input hash matches",
+    "retained counterpart present in post queue and candidate library",
+    "candidate start time equals first post observation time",
+    "candidate coverage equals post queue",
+    "archived next serve agrees with frozen predicted SJF over safe tasks",
+    "completed versus censored cost labels",
+    "N values match prior pair table"
+  ],
+  "queue_equivalence": {
+    "same_arrival_ids": 77,
+    "same_accepted_arrival_ids": 77,
+    "same_other_tasks": 77
+  }
+}

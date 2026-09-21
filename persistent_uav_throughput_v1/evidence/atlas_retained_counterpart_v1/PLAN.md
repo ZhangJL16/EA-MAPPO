@@ -1,0 +1,15 @@
+# Retained-counterpart archived analysis v1
+
+Retrospective user-requested analysis after matched-pair outcomes are known. No new simulations, changed thresholds, learned predictors or model selection. Not a preregistration or a causal mediation analysis.
+
+Primary population: all same-arrival-ID joint-matched pairs from atlas_matched_pairs_v1/pairs.jsonl (expected 77 pairs, including ties). Joint matching remains 2|Ti-Tj|/(Ti+Tj)<.10 and |ei-ej|/B<.05. Verify accepted arrival IDs agree and post queues excluding each retained counterpart contain exactly the same task IDs and coordinates; disclose failures without silently redefining population.
+
+For branch first=i extract candidate j from the first post-task oracle; reverse for branch first=j. Verify candidate coverage and start time. Record model-controller one-step safety, failure type/phase, completed task time/energy (null if task incomplete), full task+return duration and reserve (null unless return succeeds), partial observed duration/energy separately. Never rank a censored failed mission as a cheap completed mission.
+
+Ranks: primary SJF rank by frozen predicted task time and task-ID tiebreak, within all post-queue tasks; additionally within oracle-safe tasks (null if counterpart unsafe). Also report measured completed-task-time rank, explicitly diagnostic and null where incomplete competitor durations prevent complete ranking. Actual next action is the already archived decision, not a newly computed policy. Export full counterpart candidate data for independent audit.
+
+Compare fixed single-variable directions: safe preferred, lower task duration, lower full task+return duration, lower task energy, larger return reserve, lower SJF rank, counterpart actually chosen next preferred. These are descriptive checks of the requested hypothesis, not new deployed methods. Report matches/oppositions/feature ties/missing against throughput ordering, all-pair and divergent denominators, root-balanced direction accuracy and source/battery strata. Continuous comparisons use numerical equality tolerance 1e-7; ranks/flags exact. No tuned weights, regression, p-values, held-out-performance claims or selective reporting of best feature.
+
+Report both-safe pairs separately for comparability of completed mission costs. Describe counterfactual two-task-prefix duration (first time + counterpart task time) and full two-task+return duration, plus Euclidean counterpart distance, as secondary dissection of c(i,j) versus c(j,i). These use saved one-step branches only and are not extra rollouts. Report both-next subset, preserving equal-N pairs. A next-action association alone can reflect the downstream SJF rule.
+
+Units: pair within root; shared actions, runs and seeds create dependence. Include unique roots/source-run/seeds, pair and root-weighted summaries. Time/battery remain approximate matches; costs mix endpoint, controller and residual model state. Failure of these particular local scalars does not prove all local models fail or that long-horizon planning is necessary.
