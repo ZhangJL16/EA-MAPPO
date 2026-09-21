@@ -1,0 +1,12 @@
+{
+  "pid": 1008857,
+  "command": [
+    "/mnt/workspace/zjl-exp/.venv/bin/python",
+    "-u",
+    "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/scripts/real_state_branching_atlas.py",
+    "supervise",
+    "--output",
+    "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/evidence/real_state_branching_atlas_v1"
+  ],
+  "started_unix": 1789954619.3644485
+}

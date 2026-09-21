@@ -1,0 +1,8 @@
+{
+  "passed": true,
+  "tests": 10,
+  "command": "/mnt/workspace/zjl-exp/.venv/bin/python -m unittest discover -s persistent_uav_throughput_v1/tests -p test_real_state_atlas.py -v",
+  "result": "Ran 10 tests; OK",
+  "scope": "Engineering fixtures only, no research simulation outcomes",
+  "recorded_at": "2026-09-21T09:38:08.918098+08:00"
+}

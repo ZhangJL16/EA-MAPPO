@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "records": [
+    {
+      "root": "B4_0.75_r02_s920260929_d00001",
+      "policy": "B4_0.75",
+      "exact_replay": true,
+      "clone_parent_unchanged": true,
+      "resume_equal": true,
+      "nested_resume_equal": true,
+      "oracle_parent_unchanged": true,
+      "replay_policy_steps": 154
+    },
+    {
+      "root": "B5_r00_s920260926_d00001",
+      "policy": "B5",
+      "exact_replay": true,
+      "clone_parent_unchanged": true,
+      "resume_equal": true,
+      "nested_resume_equal": true,
+      "oracle_parent_unchanged": true,
+      "replay_policy_steps": 228
+    }
+  ],
+  "training_updates": 0
+}

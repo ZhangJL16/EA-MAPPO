@@ -1,0 +1,150 @@
+{
+  "passed": true,
+  "workers": [
+    {
+      "worker": 0,
+      "pid": 1008470,
+      "stage": "A",
+      "threads": 1,
+      "checkpoint_sha_verified": true,
+      "total_policy_steps": 3600,
+      "training_updates": 0
+    },
+    {
+      "worker": 1,
+      "pid": 1008471,
+      "stage": "A",
+      "threads": 1,
+      "checkpoint_sha_verified": true,
+      "total_policy_steps": 3200,
+      "training_updates": 0
+    },
+    {
+      "worker": 2,
+      "pid": 1008472,
+      "stage": "replay",
+      "threads": 1,
+      "checkpoint_sha_verified": true,
+      "total_policy_steps": 3800,
+      "training_updates": 0
+    },
+    {
+      "worker": 3,
+      "pid": 1008473,
+      "stage": "A",
+      "threads": 1,
+      "checkpoint_sha_verified": true,
+      "total_policy_steps": 3500,
+      "training_updates": 0
+    },
+    {
+      "worker": 4,
+      "pid": 1008474,
+      "stage": "A",
+      "threads": 1,
+      "checkpoint_sha_verified": true,
+      "total_policy_steps": 3500,
+      "training_updates": 0
+    },
+    {
+      "worker": 5,
+      "pid": 1008475,
+      "stage": "replay",
+      "threads": 1,
+      "checkpoint_sha_verified": true,
+      "total_policy_steps": 3200,
+      "training_updates": 0
+    },
+    {
+      "worker": 6,
+      "pid": 1008476,
+      "stage": "A",
+      "threads": 1,
+      "checkpoint_sha_verified": true,
+      "total_policy_steps": 3700,
+      "training_updates": 0
+    },
+    {
+      "worker": 7,
+      "pid": 1008477,
+      "stage": "A",
+      "threads": 1,
+      "checkpoint_sha_verified": true,
+      "total_policy_steps": 3300,
+      "training_updates": 0
+    },
+    {
+      "worker": 8,
+      "pid": 1008478,
+      "stage": "B",
+      "threads": 1,
+      "checkpoint_sha_verified": true,
+      "total_policy_steps": 3600,
+      "training_updates": 0
+    },
+    {
+      "worker": 9,
+      "pid": 1008479,
+      "stage": "A",
+      "threads": 1,
+      "checkpoint_sha_verified": true,
+      "total_policy_steps": 3700,
+      "training_updates": 0
+    },
+    {
+      "worker": 10,
+      "pid": 1008480,
+      "stage": "A",
+      "threads": 1,
+      "checkpoint_sha_verified": true,
+      "total_policy_steps": 3421,
+      "training_updates": 0
+    },
+    {
+      "worker": 11,
+      "pid": 1008481,
+      "stage": "replay",
+      "threads": 1,
+      "checkpoint_sha_verified": true,
+      "total_policy_steps": 3700,
+      "training_updates": 0
+    },
+    {
+      "worker": 12,
+      "pid": 1008482,
+      "stage": "A",
+      "threads": 1,
+      "checkpoint_sha_verified": true,
+      "total_policy_steps": 3700,
+      "training_updates": 0
+    },
+    {
+      "worker": 13,
+      "pid": 1008483,
+      "stage": "A",
+      "threads": 1,
+      "checkpoint_sha_verified": true,
+      "total_policy_steps": 3600,
+      "training_updates": 0
+    },
+    {
+      "worker": 14,
+      "pid": 1008485,
+      "stage": "replay",
+      "threads": 1,
+      "checkpoint_sha_verified": true,
+      "total_policy_steps": 3300,
+      "training_updates": 0
+    },
+    {
+      "worker": 15,
+      "pid": 1008486,
+      "stage": "replay",
+      "threads": 1,
+      "checkpoint_sha_verified": true,
+      "total_policy_steps": 3700,
+      "training_updates": 0
+    }
+  ],
+  "roots": 216
+}
