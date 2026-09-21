@@ -1,0 +1,85 @@
+{
+  "verified_raw_branch_files": 1412,
+  "verified_root_snapshots": 216,
+  "delta_N_distribution": {
+    "0": 46,
+    "1": 38,
+    "2": 17,
+    "3": 16,
+    "4": 8,
+    "5": 2,
+    "8": 1
+  },
+  "best_first_action_mean": 10.2734375,
+  "heuristics": {
+    "Safe-SJF": {
+      "roots": 128,
+      "suboptimal_roots": 41,
+      "tied_optimal_roots": 87,
+      "mean_gap": 0.515625,
+      "max_gap": 4,
+      "mean_N_W": 9.7578125
+    },
+    "Safe-Energy": {
+      "roots": 128,
+      "suboptimal_roots": 41,
+      "tied_optimal_roots": 87,
+      "mean_gap": 0.515625,
+      "max_gap": 4,
+      "mean_N_W": 9.7578125
+    },
+    "Safe-Reserve": {
+      "roots": 128,
+      "suboptimal_roots": 43,
+      "tied_optimal_roots": 85,
+      "mean_gap": 0.5546875,
+      "max_gap": 5,
+      "mean_N_W": 9.71875
+    },
+    "Safe-predicted-SJF": {
+      "roots": 128,
+      "suboptimal_roots": 41,
+      "tied_optimal_roots": 87,
+      "mean_gap": 0.515625,
+      "max_gap": 4,
+      "mean_N_W": 9.7578125
+    }
+  },
+  "reversals": {
+    "shorter": {
+      "roots": 55,
+      "reversed_pairs": 111,
+      "comparable_pairs": 550
+    },
+    "less_energy": {
+      "roots": 54,
+      "reversed_pairs": 106,
+      "comparable_pairs": 551
+    },
+    "more_post_battery": {
+      "roots": 54,
+      "reversed_pairs": 106,
+      "comparable_pairs": 551
+    }
+  },
+  "source_runs_represented": 179,
+  "seeds": [
+    920260920,
+    920260921,
+    920260922,
+    920260923,
+    920260924,
+    920260925,
+    920260926,
+    920260927,
+    920260928,
+    920260929
+  ],
+  "no_safe_roots": 17,
+  "completion_time_unix": 1789973821.6186626,
+  "actual_B5_true_safe_choices": {
+    "roots": 125,
+    "suboptimal": 40,
+    "mean_gap": 0.52
+  }
+}

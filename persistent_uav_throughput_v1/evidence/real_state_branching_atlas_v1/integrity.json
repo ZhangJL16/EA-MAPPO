@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "roots": 216,
+  "missing": 0,
+  "duplicate": 0,
+  "manifest_sha256": "f61272ff637125d34b2940761cb78de6aa566e51615e737ef0f9a3d8e524c567",
+  "one_step_sha256": "ba3754872b16ae35004ff38981c9f4308b85bb96d40ce5d0879afa4f9644bdb7",
+  "continuation_sha256": "224994681190527b8ecde65cdf79bc062229e3d1f01961eb69a494701c3e3949",
+  "summary_sha256": "14f3235505a96e263d67f7265e3efe551de95477ecfd54af7a0f7d3476f6a458"
+}

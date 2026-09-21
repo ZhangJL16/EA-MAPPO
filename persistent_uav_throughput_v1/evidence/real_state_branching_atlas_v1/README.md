@@ -1,6 +1,10 @@
 # Real-State Counterfactual Branching Atlas v1
 
-状态：**已冻结并启动；16-worker 首次检查点健康检查 PASS。科学结果尚未汇总。**
+状态：**216 roots 全部完成，自动 collect 与完整性核验 PASS。**
+
+见 [完整结果与解释边界](RESULTS.md)：145/216 multi-safe；128 个完整案例中 82 个首动作吞吐有差异；另 17 个 roots 含未决 continuation。
+
+以下启动记录保留为历史证据。
 记录时间：2026-09-21T09:38:08.918098+08:00。
 
 - 运行源码：`6d328f8e8746a14a5d4d4d8cc4cd8c1a79856280`；[协议](../../REAL_STATE_BRANCHING_ATLAS_V1.md)。

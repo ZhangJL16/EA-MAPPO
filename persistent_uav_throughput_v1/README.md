@@ -3,6 +3,8 @@
 2026-09-21 当前授权：[Real-State Counterfactual Branching Atlas v1](REAL_STATE_BRANCHING_ATLAS_V1.md)。
 从 B5 和 B4-.75 归档按固定哈希抽取实际决策状态，执行 task+return census 与配对 Oracle-Safe SJF continuation。
 所有首动作统一从 root 起评价 1308.6 秒，计入首任务；环境、任务流、导航器不变，不训练。
+Atlas 已完成 216 roots、956 个一步分支和 456 个 continuation；见 [完整结果](evidence/real_state_branching_atlas_v1/RESULTS.md)。
+145/216 roots 存在多个安全任务；128 个完整案例中 82 个出现首动作吞吐差异，17 个 roots 仍有诊断中止导致的未知窗口结果。
 以下为历史证据与授权记录。
 
 最新授权：只做 [Oracle Recoverability Census](ORACLE_RECOVERABILITY_CENSUS.md)，
