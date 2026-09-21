@@ -1,5 +1,15 @@
 # PersistentUAVThroughput-v1
 
+2026-09-21 latest user authorization supersedes the historical census-only hold:
+- Run Real-State Counterfactual Branching Atlas v1; see REAL_STATE_BRANCHING_ATLAS_V1.md.
+- Fixed archived B5 and B4-.75 hash-selected roots; unchanged environment and no training.
+- Explicit window clarification: [root time, root time + 1308.6s], including first task.
+- Privileged Oracle-Safe SJF is authorized only as the common diagnostic continuation.
+- Preserve all selected roots; checkpoint/resume; complete-only automated collection.
+- Focused checks and bounded first-checkpoint health, then hand back the running job.
+
+Historical authorization records follow and do not override this scope.
+
 Census completed: 205 states / 561 branches; manual collect integrity PASS.
 Final evidence: evidence/oracle_census_complete_20260920/. No follow-on experiment
 is authorized by these outcomes. Await user review; do not rerun or tune.

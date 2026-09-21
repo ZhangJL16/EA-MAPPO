@@ -1,5 +1,10 @@
 # PersistentUAVThroughput-v1
 
+2026-09-21 当前授权：[Real-State Counterfactual Branching Atlas v1](REAL_STATE_BRANCHING_ATLAS_V1.md)。
+从 B5 和 B4-.75 归档按固定哈希抽取实际决策状态，执行 task+return census 与配对 Oracle-Safe SJF continuation。
+所有首动作统一从 root 起评价 1308.6 秒，计入首任务；环境、任务流、导航器不变，不训练。
+以下为历史证据与授权记录。
+
 最新授权：只做 [Oracle Recoverability Census](ORACLE_RECOVERABILITY_CENSUS.md)，
 固定 205 个历史 failure-predecessor 状态、561 个有界分支；先精确回放恢复完整 simulator state，
 再检查 task+immediate-return 或合法的 immediate-return。不运行完整 OracleSafe policy、MPC 或训练。
