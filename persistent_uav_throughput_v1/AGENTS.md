@@ -1,5 +1,16 @@
 # PersistentUAVThroughput-v1
 
+Latest user authorization: execute the complete Mechanism Intervention Sweep v1;
+see MECHANISM_INTERVENTION_SWEEP_V1.md. This supersedes the prior IQ-only handoff.
+Freeze all 77 matched pairs, controller/dose/erasure conditions and the broader
+128-root C1/C4 panel before viewing intervention outcomes. Preserve the running
+70 IQ jobs unchanged; import only after verified completion, then execute all
+2094 new jobs with 16 workers and complete-only collection. No outcome-driven
+condition selection, training, new seeds, or subsequent experimental promotion.
+C4/C7 explicitly use task-only safety, no return/recharge, empty-queue waiting
+at the current position, and diagnostic unknown if no safe task exists.
+The deferred complete-only supervisor is explicitly authorized by the user.
+
 Latest authorization: Infinite-Queue Intervention v1 on the frozen 41 matched-divergent pairs (70 unique branches / 29 archived roots). See INFINITE_QUEUE_INTERVENTION_V1.md. Only root-onward queue capacity and occupancy-bin allocation change. Preserve historical losses, environment, first actions, absolute arrivals, downstream Oracle-Safe SJF and window. Complete-only collect is authorized; after first-checkpoint health hand back the running jobs. No outcome-driven tuning or follow-on intervention.
 
 2026-09-21 latest user authorization supersedes the historical census-only hold:

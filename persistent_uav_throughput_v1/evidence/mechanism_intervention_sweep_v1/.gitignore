@@ -1,0 +1,4 @@
+worker_*/
+engineering_smoke*/
+*.log
+.worker_*.lock

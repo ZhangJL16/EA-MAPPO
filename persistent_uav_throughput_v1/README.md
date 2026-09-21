@@ -1,5 +1,7 @@
 # PersistentUAVThroughput-v1
 
+当前新授权：[Mechanism Intervention Sweep v1](MECHANISM_INTERVENTION_SWEEP_V1.md)：完整干预矩阵、77 matched pairs、C1/C4 扩展至128 roots；共2164 jobs，其中70条已有C1经完整校验后导入，2094条新运行。C4/C7采用 task-only 安全与原地等待。详见[执行记录](evidence/mechanism_intervention_sweep_v1/README.md)。当前IQ批次保持不变。
+
 当前授权：[Infinite-Queue Intervention v1](INFINITE_QUEUE_INTERVENTION_V1.md) 已启动，41 对/70 唯一 continuation；[16-worker 启动检查通过](evidence/atlas_infinite_queue_v1/README.md)。固定 root 干预，无训练，等待完整结果。
 
 2026-09-21 当前授权：[Real-State Counterfactual Branching Atlas v1](REAL_STATE_BRANCHING_ATLAS_V1.md)。
