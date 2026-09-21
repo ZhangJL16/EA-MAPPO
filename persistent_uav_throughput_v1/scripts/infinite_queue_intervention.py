@@ -123,12 +123,13 @@ def smoke(output):
         assert atlas.advance_continuation(c,model) is None
     assert c['oracle']['env'].nav.policy_steps>c['env'].nav.policy_steps
     atlas.snapshot(folder/'resume',dict(c=c,rng=census.rng_state()))
-    clone=atlas.restore(folder/'resume');parent_before=pickle.dumps(c['env']);census.set_rng(clone['rng']);r1=atlas.advance_continuation(c,model)
+    clone=atlas.restore(folder/'resume');parent_before=pickle.dumps(c['env']);clone_parent_before=pickle.dumps(clone['c']['env']);census.set_rng(clone['rng']);r1=atlas.advance_continuation(c,model)
     census.set_rng(clone['rng']);r2=atlas.advance_continuation(clone['c'],model)
     census.assert_equal(census.normalized(r1),census.normalized(r2),'nested resume result')
     census.assert_equal(c['oracle']['env'].observe(),census.normalized(clone['c']['oracle']['env'].observe()),'nested resume observation')
     census.assert_equal(c['oracle']['env'].events,census.normalized(clone['c']['oracle']['env'].events),'nested resume events')
-    assert pickle.dumps(c['env'])==parent_before and pickle.dumps(clone['c']['env'])==parent_before
+    assert pickle.dumps(c['env'])==parent_before and pickle.dumps(clone['c']['env'])==clone_parent_before
+    census.assert_equal(c['env'].observe(),census.normalized(clone['c']['env'].observe()),'resume parent observation')
     write(output/'engineering_smoke.json',dict(passed=True,job=job['id'],finite_control_first_task_exact=True,infinite_first_task_exact=True,root_clone_unchanged=True,nested_physical_step=True,midflight_disk_resume_exact=True,queue_capacity=c['intervention_capacity'],training_updates=0))
     print('Real root and nested resume smoke PASS',flush=True)
 
