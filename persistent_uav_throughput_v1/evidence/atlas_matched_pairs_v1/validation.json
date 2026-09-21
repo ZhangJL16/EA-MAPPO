@@ -1,0 +1,45 @@
+{
+  "passed": true,
+  "independent_recount": "Original A/B aggregate rows and root capacity, independent of generated features and pairs",
+  "pair_counts": {
+    "all": [
+      551,
+      325,
+      128,
+      82
+    ],
+    "time": [
+      82,
+      44,
+      51,
+      30
+    ],
+    "battery": [
+      193,
+      109,
+      85,
+      55
+    ],
+    "joint": [
+      79,
+      42,
+      50,
+      29
+    ]
+  },
+  "count_order": [
+    "pairs",
+    "divergent_pairs",
+    "roots",
+    "divergent_roots"
+  ],
+  "checks": [
+    "420 raw B file SHA256 matches",
+    "A/B first completion time, battery and position",
+    "root battery minus first energy equals post battery",
+    "post queue equals root queue minus first task plus accepted actual arrivals",
+    "first post-task oracle candidate coverage equals post queue",
+    "all 128 root safe-action sets equal continuation action sets"
+  ],
+  "new_simulations": 0
+}
