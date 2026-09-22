@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "manifest_sha256": "fc9d03d79bc9fa0f097550d1fa2ec57eebdcf7aa56c7e4f22625cecce18d9b11",
+  "raw_files": 2164,
+  "output_hashes": {
+    "continuations.json": "56ce9e675a3fb4b5ce27e88b914975c8ed7b23e9a7ac1d320df092c537ca1206",
+    "measurements.json": "6024a4b702fe33b9daad429a516a15033ffe666c8c8bc9c8aca2ee85778819f4",
+    "pair_responses.json": "5b6b5f7c69ddce823e5914804ba58c5e118d34186a9ea9ab12a22375c7ddc372",
+    "broad_pair_responses.json": "54ab5df89dd2a7cb5468a574c56de376b2027e4d3792d59aef58ef787fe2b42e",
+    "broad_roots.json": "e88484aa78fc74b4a018fd5a3d6cc48c9e29728852ba96cc56f2d06211fac09c",
+    "summary.json": "cee9d64d37f53555ee4c62c70d3780ee57fe2aca4ee74d279b89bd80a9932685"
+  },
+  "training_updates": 0
+}

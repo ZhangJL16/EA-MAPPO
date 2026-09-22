@@ -1,0 +1,4136 @@
+[
+  {
+    "task_id": 0,
+    "start_time": 1646.5500000000306,
+    "window_origin": 1646.5500000000306,
+    "window_end": 2955.15,
+    "window_seconds": 1308.6,
+    "N_W": 12,
+    "N_observed": 12,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.5999999997312,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 4,
+    "forced_return_reasons": {
+      "no_safe_task_return": 2,
+      "empty_queue_return": 2
+    },
+    "first_task_completion": {
+      "time": 1687.10000000004,
+      "event": "task_completed",
+      "task_id": 0,
+      "collision_free": true,
+      "position": [
+        219.55963134765625,
+        1619.693359375,
+        374.9390869140625
+      ],
+      "battery": 57.50708355386196
+    },
+    "physical_end_time": 2955.149999999762,
+    "post_battery": 37.66565000629794,
+    "post_position": [
+      546.9791870117188,
+      1330.93994140625,
+      268.8746032714844
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1173.049999999337,
+      "charging": 135.54999999999995,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 33189,
+    "stream_sha256": "1bde99061c522f826464e7e3a924318495c1e6c2808d4181f6708fde76501e8b",
+    "physical_resets": 1,
+    "job_id": "B4_0.75_r10_s920260925_d00016_task0",
+    "root_id": "B4_0.75_r10_s920260925_d00016",
+    "policy": "B4_0.75",
+    "regime": 10,
+    "intervention_capacity": 100,
+    "file": "worker_00/B4_0.75_r10_s920260925_d00016_task0.json",
+    "sha256": "c563dd06328b73fa2392502998f799ea6dcb8636ed9fd7942a906f1f76d69ade"
+  },
+  {
+    "task_id": 16,
+    "start_time": 5226.44999999992,
+    "window_origin": 5226.44999999992,
+    "window_end": 6535.05,
+    "window_seconds": 1308.6,
+    "N_W": 11,
+    "N_observed": 11,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.5999999997603,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 3,
+    "forced_return_reasons": {
+      "no_safe_task_return": 3
+    },
+    "first_task_completion": {
+      "time": 5375.449999999784,
+      "event": "task_completed",
+      "task_id": 16,
+      "collision_free": true,
+      "position": [
+        519.5238037109375,
+        777.0206298828125,
+        252.21798706054688
+      ],
+      "battery": 45.30857850168008
+    },
+    "physical_end_time": 6535.04999999968,
+    "post_battery": 17.354524660384254,
+    "post_position": [
+      2737.84228515625,
+      2125.091064453125,
+      225.14259338378906
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1100.1999999990003,
+      "charging": 208.39999999999998,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 50625,
+    "stream_sha256": "a4a5fe26390c217bdc91ec08d174c26acd463925fdddc0d949145ba9ecb7c1b8",
+    "physical_resets": 1,
+    "job_id": "B4_0.75_r13_s920260920_d00042_task16",
+    "root_id": "B4_0.75_r13_s920260920_d00042",
+    "policy": "B4_0.75",
+    "regime": 13,
+    "intervention_capacity": 95,
+    "file": "worker_00/B4_0.75_r13_s920260920_d00042_task16.json",
+    "sha256": "1a28e23a8454b2b6e54b195e34b7d4e064df9aaa82db5b7f4234d1324e68e12f"
+  },
+  {
+    "task_id": 6,
+    "start_time": 374.95000000000005,
+    "window_origin": 374.95000000000005,
+    "window_end": 1683.5500000000002,
+    "window_seconds": 1308.6,
+    "N_W": 9,
+    "N_observed": 9,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.6,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 2,
+    "forced_return_reasons": {
+      "no_safe_task_return": 2
+    },
+    "first_task_completion": {
+      "time": 448.94999999999584,
+      "event": "task_completed",
+      "task_id": 6,
+      "collision_free": true,
+      "position": [
+        3872.649169921875,
+        2922.991455078125,
+        92.11416625976562
+      ],
+      "battery": 76.07930380298787
+    },
+    "physical_end_time": 1683.5500000000065,
+    "post_battery": 86.44833766218854,
+    "post_position": [
+      2841.275146484375,
+      2328.31640625,
+      342.8714294433594
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 879.9500000001607,
+      "charging": 428.65000000000003,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 49043,
+    "stream_sha256": "7a2e054fa00ed55b350de5e983ce591da3af97ef24e8156fad55ebbc5c09c0e9",
+    "physical_resets": 1,
+    "job_id": "B4_0.75_r16_s920260929_d00004_task6",
+    "root_id": "B4_0.75_r16_s920260929_d00004",
+    "policy": "B4_0.75",
+    "regime": 16,
+    "intervention_capacity": 102,
+    "file": "worker_00/B4_0.75_r16_s920260929_d00004_task6.json",
+    "sha256": "fa4fc1906701a124e586c6b83c05845b2d3d3afd22a3575e7ebe94e1be7c3ed9"
+  },
+  {
+    "task_id": 54,
+    "start_time": 4905.400000000001,
+    "window_origin": 4905.400000000001,
+    "window_end": 6214.0,
+    "window_seconds": 1308.6,
+    "N_W": 14,
+    "N_observed": 14,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.5999999999995,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 3,
+    "forced_return_reasons": {
+      "no_safe_task_return": 3
+    },
+    "first_task_completion": {
+      "time": 5030.899999999887,
+      "event": "task_completed",
+      "task_id": 54,
+      "collision_free": true,
+      "position": [
+        981.646484375,
+        1905.98291015625,
+        362.1749267578125
+      ],
+      "battery": 66.12677422579162
+    },
+    "physical_end_time": 6214.0,
+    "post_battery": 11.031608160862431,
+    "post_position": [
+      2875.157958984375,
+      2001.17822265625,
+      199.62060546875
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1205.4999999989059,
+      "charging": 103.10000000000002,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 155444,
+    "stream_sha256": "052d96f047384625e54d2926a3645bbb0dede56c6a7b4dcb849ad2d804a64413",
+    "physical_resets": 1,
+    "job_id": "B5_r11_s920260923_d00059_task54",
+    "root_id": "B5_r11_s920260923_d00059",
+    "policy": "B5",
+    "regime": 11,
+    "intervention_capacity": 142,
+    "file": "worker_00/B5_r11_s920260923_d00059_task54.json",
+    "sha256": "c092427361ac90e62a6551f80eed6b9a7e42636d5b46904c9a7ff732cc192349"
+  },
+  {
+    "task_id": 20,
+    "start_time": 2241.84999999985,
+    "window_origin": 2241.84999999985,
+    "window_end": 3550.4500000000003,
+    "window_seconds": 1308.6,
+    "N_W": 15,
+    "N_observed": 15,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.599999999969,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 2,
+    "forced_return_reasons": {
+      "no_safe_task_return": 2
+    },
+    "first_task_completion": {
+      "time": 2428.3999999996804,
+      "event": "task_completed",
+      "task_id": 20,
+      "collision_free": true,
+      "position": [
+        798.3134765625,
+        605.4025268554688,
+        98.2136459350586
+      ],
+      "battery": 36.60109549079311
+    },
+    "physical_end_time": 3550.449999999819,
+    "post_battery": 96.0840268506451,
+    "post_position": [
+      3698.08349609375,
+      1409.9739990234375,
+      252.8579864501953
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1202.3999999989078,
+      "charging": 106.19999999999999,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 117379,
+    "stream_sha256": "f90ec44cc8bfb559c20d15d8170b0bbd1560af8cd990d1c99e1cc2362b312c00",
+    "physical_resets": 1,
+    "job_id": "B5_r20_s920260920_d00024_task20",
+    "root_id": "B5_r20_s920260920_d00024",
+    "policy": "B5",
+    "regime": 20,
+    "intervention_capacity": 132,
+    "file": "worker_00/B5_r20_s920260920_d00024_task20.json",
+    "sha256": "b04225003c4026fe5b1718208cc15942c9ea245aab9e4f75213b3ef3b78d9769"
+  },
+  {
+    "task_id": 15,
+    "start_time": 1646.5500000000306,
+    "window_origin": 1646.5500000000306,
+    "window_end": 2955.15,
+    "window_seconds": 1308.6,
+    "N_W": 11,
+    "N_observed": 11,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.5999999997794,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 3,
+    "forced_return_reasons": {
+      "no_safe_task_return": 3
+    },
+    "first_task_completion": {
+      "time": 1690.8000000000407,
+      "event": "task_completed",
+      "task_id": 15,
+      "collision_free": true,
+      "position": [
+        794.9599609375,
+        2255.16357421875,
+        159.46153259277344
+      ],
+      "battery": 57.50176110546733
+    },
+    "physical_end_time": 2955.14999999981,
+    "post_battery": 50.46761986763389,
+    "post_position": [
+      923.4774780273438,
+      1084.767822265625,
+      271.07373046875
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1167.0999999993362,
+      "charging": 141.5,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 37446,
+    "stream_sha256": "1bde99061c522f826464e7e3a924318495c1e6c2808d4181f6708fde76501e8b",
+    "physical_resets": 1,
+    "job_id": "B4_0.75_r10_s920260925_d00016_task15",
+    "root_id": "B4_0.75_r10_s920260925_d00016",
+    "policy": "B4_0.75",
+    "regime": 10,
+    "intervention_capacity": 100,
+    "file": "worker_01/B4_0.75_r10_s920260925_d00016_task15.json",
+    "sha256": "46c4624510390bea3fdba9b9a58af41eddea8109aa3e01322ea0888a12f250cc"
+  },
+  {
+    "task_id": 26,
+    "start_time": 5226.44999999992,
+    "window_origin": 5226.44999999992,
+    "window_end": 6535.05,
+    "window_seconds": 1308.6,
+    "N_W": 11,
+    "N_observed": 11,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.599999999754,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 3,
+    "forced_return_reasons": {
+      "no_safe_task_return": 3
+    },
+    "first_task_completion": {
+      "time": 5353.299999999805,
+      "event": "task_completed",
+      "task_id": 26,
+      "collision_free": true,
+      "position": [
+        1206.3275146484375,
+        206.61056518554688,
+        160.55352783203125
+      ],
+      "battery": 45.4866503108137
+    },
+    "physical_end_time": 6535.049999999674,
+    "post_battery": 15.70607331539101,
+    "post_position": [
+      2850.66796875,
+      2033.0736083984375,
+      205.51931762695312
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1097.949999999003,
+      "charging": 210.64999999999998,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 50485,
+    "stream_sha256": "a4a5fe26390c217bdc91ec08d174c26acd463925fdddc0d949145ba9ecb7c1b8",
+    "physical_resets": 1,
+    "job_id": "B4_0.75_r13_s920260920_d00042_task26",
+    "root_id": "B4_0.75_r13_s920260920_d00042",
+    "policy": "B4_0.75",
+    "regime": 13,
+    "intervention_capacity": 95,
+    "file": "worker_01/B4_0.75_r13_s920260920_d00042_task26.json",
+    "sha256": "d43d3fa42ab5e163c7979ee2ef1c2d676fe9f4b65f02a7c0568c923f72e19f50"
+  },
+  {
+    "task_id": 15,
+    "start_time": 5229.049999999903,
+    "window_origin": 5229.049999999903,
+    "window_end": 6537.650000000001,
+    "window_seconds": 1308.6,
+    "N_W": 7,
+    "N_observed": 7,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.5999999999676,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 2,
+    "forced_return_reasons": {
+      "no_safe_task_return": 2
+    },
+    "first_task_completion": {
+      "time": 5407.89999999974,
+      "event": "task_completed",
+      "task_id": 15,
+      "collision_free": true,
+      "position": [
+        172.70143127441406,
+        2849.178466796875,
+        366.30523681640625
+      ],
+      "battery": 33.702030410932046
+    },
+    "physical_end_time": 6537.6499999998705,
+    "post_battery": 60.56702537179947,
+    "post_position": [
+      2796.576416015625,
+      3325.0771484375,
+      201.2205047607422
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 883.8499999991973,
+      "charging": 424.7500000000002,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 111995,
+    "stream_sha256": "388497cb23df4e684522f2abb290c7483144c4188458f341cad05391ed68061c",
+    "physical_resets": 1,
+    "job_id": "B4_0.75_r17_s920260924_d00040_task15",
+    "root_id": "B4_0.75_r17_s920260924_d00040",
+    "policy": "B4_0.75",
+    "regime": 17,
+    "intervention_capacity": 120,
+    "file": "worker_01/B4_0.75_r17_s920260924_d00040_task15.json",
+    "sha256": "9ca44fc1a7ced23e44cd38cb025282ca44fc9b94d45424f840e5c7c598c80d20"
+  },
+  {
+    "task_id": 55,
+    "start_time": 4905.400000000001,
+    "window_origin": 4905.400000000001,
+    "window_end": 6214.0,
+    "window_seconds": 1308.6,
+    "N_W": 13,
+    "N_observed": 13,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.5999999996448,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 3,
+    "forced_return_reasons": {
+      "no_safe_task_return": 3
+    },
+    "first_task_completion": {
+      "time": 5033.899999999884,
+      "event": "task_completed",
+      "task_id": 55,
+      "collision_free": true,
+      "position": [
+        1653.9552001953125,
+        112.07821655273438,
+        196.7449493408203
+      ],
+      "battery": 65.55764282316284
+    },
+    "physical_end_time": 6213.999999999645,
+    "post_battery": 9.13943272835153,
+    "post_position": [
+      2331.737548828125,
+      1985.6988525390625,
+      184.57931518554688
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1210.149999998901,
+      "charging": 98.45000000000005,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 150682,
+    "stream_sha256": "052d96f047384625e54d2926a3645bbb0dede56c6a7b4dcb849ad2d804a64413",
+    "physical_resets": 1,
+    "job_id": "B5_r11_s920260923_d00059_task55",
+    "root_id": "B5_r11_s920260923_d00059",
+    "policy": "B5",
+    "regime": 11,
+    "intervention_capacity": 142,
+    "file": "worker_01/B5_r11_s920260923_d00059_task55.json",
+    "sha256": "65f64003db45e0d10cd9fe5a59322ba0fd811529cd78f41956a9c07a56a5b0e8"
+  },
+  {
+    "task_id": 22,
+    "start_time": 2241.84999999985,
+    "window_origin": 2241.84999999985,
+    "window_end": 3550.4500000000003,
+    "window_seconds": 1308.6,
+    "N_W": 14,
+    "N_observed": 14,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.5999999999522,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 2,
+    "forced_return_reasons": {
+      "no_safe_task_return": 2
+    },
+    "first_task_completion": {
+      "time": 2439.4999999996703,
+      "event": "task_completed",
+      "task_id": 22,
+      "collision_free": true,
+      "position": [
+        1234.73876953125,
+        181.80445861816406,
+        307.6668395996094
+      ],
+      "battery": 36.10209219379584
+    },
+    "physical_end_time": 3550.449999999802,
+    "post_battery": 92.83832015171086,
+    "post_position": [
+      2285.63720703125,
+      1058.6923828125,
+      320.6991271972656
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1203.349999998908,
+      "charging": 105.25,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 129495,
+    "stream_sha256": "f90ec44cc8bfb559c20d15d8170b0bbd1560af8cd990d1c99e1cc2362b312c00",
+    "physical_resets": 1,
+    "job_id": "B5_r20_s920260920_d00024_task22",
+    "root_id": "B5_r20_s920260920_d00024",
+    "policy": "B5",
+    "regime": 20,
+    "intervention_capacity": 132,
+    "file": "worker_01/B5_r20_s920260920_d00024_task22.json",
+    "sha256": "80e5a234d95f2d9089828f2a6ed3546b41ebf6664fe6c17124ea25284424cbb6"
+  },
+  {
+    "task_id": 16,
+    "start_time": 1646.5500000000306,
+    "window_origin": 1646.5500000000306,
+    "window_end": 2955.15,
+    "window_seconds": 1308.6,
+    "N_W": 10,
+    "N_observed": 10,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.5999999997935,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 3,
+    "forced_return_reasons": {
+      "no_safe_task_return": 2,
+      "empty_queue_return": 1
+    },
+    "first_task_completion": {
+      "time": 1760.6000000000565,
+      "event": "task_completed",
+      "task_id": 16,
+      "collision_free": true,
+      "position": [
+        882.1702880859375,
+        3616.34521484375,
+        294.12017822265625
+      ],
+      "battery": 42.429770816522414
+    },
+    "physical_end_time": 2955.149999999824,
+    "post_battery": 53.699381129008344,
+    "post_position": [
+      1124.0379638671875,
+      956.7112426757812,
+      267.64251708984375
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1168.399999999336,
+      "charging": 140.2,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 34776,
+    "stream_sha256": "1bde99061c522f826464e7e3a924318495c1e6c2808d4181f6708fde76501e8b",
+    "physical_resets": 1,
+    "job_id": "B4_0.75_r10_s920260925_d00016_task16",
+    "root_id": "B4_0.75_r10_s920260925_d00016",
+    "policy": "B4_0.75",
+    "regime": 10,
+    "intervention_capacity": 100,
+    "file": "worker_02/B4_0.75_r10_s920260925_d00016_task16.json",
+    "sha256": "d5ad7da9755bbf169bc20e343a8e215f28948f5e40ebd953557c8aa8657b6b39"
+  },
+  {
+    "task_id": 48,
+    "start_time": 5226.44999999992,
+    "window_origin": 5226.44999999992,
+    "window_end": 6535.05,
+    "window_seconds": 1308.6,
+    "N_W": 8,
+    "N_observed": 8,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.5999999998894,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 3,
+    "forced_return_reasons": {
+      "no_safe_task_return": 3
+    },
+    "first_task_completion": {
+      "time": 5365.949999999793,
+      "event": "task_completed",
+      "task_id": 48,
+      "collision_free": true,
+      "position": [
+        2314.7998046875,
+        3086.231689453125,
+        272.2969970703125
+      ],
+      "battery": 42.95882273323871
+    },
+    "physical_end_time": 6535.049999999809,
+    "post_battery": 45.02128178061373,
+    "post_position": [
+      795.4176025390625,
+      1680.4676513671875,
+      371.67620849609375
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1064.9999999990323,
+      "charging": 243.60000000000002,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 71417,
+    "stream_sha256": "a4a5fe26390c217bdc91ec08d174c26acd463925fdddc0d949145ba9ecb7c1b8",
+    "physical_resets": 1,
+    "job_id": "B4_0.75_r13_s920260920_d00042_task48",
+    "root_id": "B4_0.75_r13_s920260920_d00042",
+    "policy": "B4_0.75",
+    "regime": 13,
+    "intervention_capacity": 95,
+    "file": "worker_02/B4_0.75_r13_s920260920_d00042_task48.json",
+    "sha256": "3c69009353e314e7149e2dd9a6976a4dd9388802a72ef1493209af92bdd84e35"
+  },
+  {
+    "task_id": 39,
+    "start_time": 5229.049999999903,
+    "window_origin": 5229.049999999903,
+    "window_end": 6537.650000000001,
+    "window_seconds": 1308.6,
+    "N_W": 8,
+    "N_observed": 8,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.599999999934,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 2,
+    "forced_return_reasons": {
+      "no_safe_task_return": 2
+    },
+    "first_task_completion": {
+      "time": 5402.099999999746,
+      "event": "task_completed",
+      "task_id": 39,
+      "collision_free": true,
+      "position": [
+        240.02581787109375,
+        2322.493408203125,
+        58.34998321533203
+      ],
+      "battery": 34.143923346410595
+    },
+    "physical_end_time": 6537.649999999837,
+    "post_battery": 53.02410386384694,
+    "post_position": [
+      1745.0960693359375,
+      3857.62890625,
+      142.23834228515625
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 897.2499999991869,
+      "charging": 411.35000000000014,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 122436,
+    "stream_sha256": "388497cb23df4e684522f2abb290c7483144c4188458f341cad05391ed68061c",
+    "physical_resets": 1,
+    "job_id": "B4_0.75_r17_s920260924_d00040_task39",
+    "root_id": "B4_0.75_r17_s920260924_d00040",
+    "policy": "B4_0.75",
+    "regime": 17,
+    "intervention_capacity": 120,
+    "file": "worker_02/B4_0.75_r17_s920260924_d00040_task39.json",
+    "sha256": "49ee69dc15a41d8946dd2d8d4c217b526966312372d8678f41def0864eb1e6af"
+  },
+  {
+    "task_id": 10,
+    "start_time": 2203.85,
+    "window_origin": 2203.85,
+    "window_end": 3512.4500000000003,
+    "window_seconds": 1308.6,
+    "N_W": 13,
+    "N_observed": 13,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.5999999997366,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 2,
+    "forced_return_reasons": {
+      "no_safe_task_return": 2
+    },
+    "first_task_completion": {
+      "time": 2347.3999999998696,
+      "event": "task_completed",
+      "task_id": 10,
+      "collision_free": true,
+      "position": [
+        293.97210693359375,
+        1213.4525146484375,
+        137.36817932128906
+      ],
+      "battery": 61.16607170710688
+    },
+    "physical_end_time": 3512.4499999997365,
+    "post_battery": 34.79065981224868,
+    "post_position": [
+      1555.69482421875,
+      1345.90478515625,
+      112.8184814453125
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1109.3999999989924,
+      "charging": 199.20000000000005,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 57084,
+    "stream_sha256": "f3e3dcff6e275842b20df82f612f3a0be88085f69e89e99964d4264fdac7ae9e",
+    "physical_resets": 1,
+    "job_id": "B5_r14_s920260926_d00017_task10",
+    "root_id": "B5_r14_s920260926_d00017",
+    "policy": "B5",
+    "regime": 14,
+    "intervention_capacity": 114,
+    "file": "worker_02/B5_r14_s920260926_d00017_task10.json",
+    "sha256": "8799a617c488dcf3e67fc39683ae8200c46f2fa75836effee2f1e477dbadc522"
+  },
+  {
+    "task_id": 7,
+    "start_time": 770.7000000000112,
+    "window_origin": 770.7000000000112,
+    "window_end": 2079.3,
+    "window_seconds": 1308.6,
+    "N_W": 11,
+    "N_observed": 11,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.5999999999617,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 2,
+    "forced_return_reasons": {
+      "no_safe_task_return": 2
+    },
+    "first_task_completion": {
+      "time": 888.750000000038,
+      "event": "task_completed",
+      "task_id": 7,
+      "collision_free": true,
+      "position": [
+        1331.6429443359375,
+        2883.36376953125,
+        291.65325927734375
+      ],
+      "battery": 100.66621140438117
+    },
+    "physical_end_time": 2079.299999999973,
+    "post_battery": 131.14591849461127,
+    "post_position": [
+      2338.714111328125,
+      2065.1796875,
+      311.7547607421875
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1115.350000000219,
+      "charging": 193.25000000000003,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 36943,
+    "stream_sha256": "1bde99061c522f826464e7e3a924318495c1e6c2808d4181f6708fde76501e8b",
+    "physical_resets": 1,
+    "job_id": "B5_r22_s920260925_d00008_task7",
+    "root_id": "B5_r22_s920260925_d00008",
+    "policy": "B5",
+    "regime": 22,
+    "intervention_capacity": 100,
+    "file": "worker_02/B5_r22_s920260925_d00008_task7.json",
+    "sha256": "ec76a383ec428bdec429eaac5c38387cf6b7eccf9217f18a7754b9fab1a34c39"
+  },
+  {
+    "task_id": 18,
+    "start_time": 1646.5500000000306,
+    "window_origin": 1646.5500000000306,
+    "window_end": 2955.15,
+    "window_seconds": 1308.6,
+    "N_W": 11,
+    "N_observed": 11,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.5999999997075,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 3,
+    "forced_return_reasons": {
+      "no_safe_task_return": 3
+    },
+    "first_task_completion": {
+      "time": 1750.0000000000541,
+      "event": "task_completed",
+      "task_id": 18,
+      "collision_free": true,
+      "position": [
+        2208.665771484375,
+        2850.386474609375,
+        43.85011291503906
+      ],
+      "battery": 43.27370109383297
+    },
+    "physical_end_time": 2955.149999999738,
+    "post_battery": 34.537510206767756,
+    "post_position": [
+      336.2970886230469,
+      913.7479858398438,
+      315.5032653808594
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1177.1999999993275,
+      "charging": 131.39999999999998,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 45396,
+    "stream_sha256": "1bde99061c522f826464e7e3a924318495c1e6c2808d4181f6708fde76501e8b",
+    "physical_resets": 1,
+    "job_id": "B4_0.75_r10_s920260925_d00016_task18",
+    "root_id": "B4_0.75_r10_s920260925_d00016",
+    "policy": "B4_0.75",
+    "regime": 10,
+    "intervention_capacity": 100,
+    "file": "worker_03/B4_0.75_r10_s920260925_d00016_task18.json",
+    "sha256": "455b148a0981c77838de52e48d8635fa0bfe626959af5f3e90dc19544bf20a49"
+  },
+  {
+    "task_id": 8,
+    "start_time": 5226.44999999992,
+    "window_origin": 5226.44999999992,
+    "window_end": 6535.05,
+    "window_seconds": 1308.6,
+    "N_W": 9,
+    "N_observed": 9,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.6,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 3,
+    "forced_return_reasons": {
+      "no_safe_task_return": 3
+    },
+    "first_task_completion": {
+      "time": 5380.14999999978,
+      "event": "task_completed",
+      "task_id": 8,
+      "collision_free": true,
+      "position": [
+        520.6522827148438,
+        463.7364501953125,
+        277.18072509765625
+      ],
+      "battery": 42.30802357334997
+    },
+    "physical_end_time": 6535.05,
+    "post_battery": 7.466743928992667,
+    "post_position": [
+      2877.04052734375,
+      1996.7542724609375,
+      198.92324829101562
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1106.949999998994,
+      "charging": 201.64999999999998,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 58377,
+    "stream_sha256": "a4a5fe26390c217bdc91ec08d174c26acd463925fdddc0d949145ba9ecb7c1b8",
+    "physical_resets": 1,
+    "job_id": "B4_0.75_r13_s920260920_d00042_task8",
+    "root_id": "B4_0.75_r13_s920260920_d00042",
+    "policy": "B4_0.75",
+    "regime": 13,
+    "intervention_capacity": 95,
+    "file": "worker_03/B4_0.75_r13_s920260920_d00042_task8.json",
+    "sha256": "f62fb53b895f1d835453cee5a9c5b3ee5742f1d8dba8867e42bf7d0b680c1291"
+  },
+  {
+    "task_id": 4,
+    "start_time": 176.4499999999985,
+    "window_origin": 176.4499999999985,
+    "window_end": 1485.0500000000002,
+    "window_seconds": 1308.6,
+    "N_W": 12,
+    "N_observed": 12,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.6,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 2,
+    "forced_return_reasons": {
+      "no_safe_task_return": 2
+    },
+    "first_task_completion": {
+      "time": 295.5999999999917,
+      "event": "task_completed",
+      "task_id": 4,
+      "collision_free": true,
+      "position": [
+        2338.258056640625,
+        2948.6103515625,
+        51.06789779663086
+      ],
+      "battery": 74.12046360315401
+    },
+    "physical_end_time": 1485.0500000000643,
+    "post_battery": 78.08911172442588,
+    "post_position": [
+      896.8345947265625,
+      3302.926025390625,
+      299.5469665527344
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1215.4000000001806,
+      "charging": 93.20000000000002,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 44019,
+    "stream_sha256": "7a2e054fa00ed55b350de5e983ce591da3af97ef24e8156fad55ebbc5c09c0e9",
+    "physical_resets": 1,
+    "job_id": "B4_0.75_r19_s920260929_d00003_task4",
+    "root_id": "B4_0.75_r19_s920260929_d00003",
+    "policy": "B4_0.75",
+    "regime": 19,
+    "intervention_capacity": 102,
+    "file": "worker_03/B4_0.75_r19_s920260929_d00003_task4.json",
+    "sha256": "b6661ab57652bc6598adf52911f81a36944803063da446a3aff6187a9afb3f9d"
+  },
+  {
+    "task_id": 7,
+    "start_time": 2203.85,
+    "window_origin": 2203.85,
+    "window_end": 3512.4500000000003,
+    "window_seconds": 1308.6,
+    "N_W": 11,
+    "N_observed": 11,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.5999999997716,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 2,
+    "forced_return_reasons": {
+      "no_safe_task_return": 2
+    },
+    "first_task_completion": {
+      "time": 2334.9499999998807,
+      "event": "task_completed",
+      "task_id": 7,
+      "collision_free": true,
+      "position": [
+        599.3594970703125,
+        2851.96337890625,
+        39.0009651184082
+      ],
+      "battery": 63.06768670310264
+    },
+    "physical_end_time": 3512.4499999997715,
+    "post_battery": 40.833471694252154,
+    "post_position": [
+      1784.6441650390625,
+      1424.3046875,
+      246.34115600585938
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1093.9999999990068,
+      "charging": 214.60000000000002,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 51585,
+    "stream_sha256": "f3e3dcff6e275842b20df82f612f3a0be88085f69e89e99964d4264fdac7ae9e",
+    "physical_resets": 1,
+    "job_id": "B5_r14_s920260926_d00017_task7",
+    "root_id": "B5_r14_s920260926_d00017",
+    "policy": "B5",
+    "regime": 14,
+    "intervention_capacity": 114,
+    "file": "worker_03/B5_r14_s920260926_d00017_task7.json",
+    "sha256": "565eaeb5e6742b0828a3287577a03c19719928fc20a1166307c7268f6b425f78"
+  },
+  {
+    "task_id": 8,
+    "start_time": 770.7000000000112,
+    "window_origin": 770.7000000000112,
+    "window_end": 2079.3,
+    "window_seconds": 1308.6,
+    "N_W": 12,
+    "N_observed": 12,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.5999999999894,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 3,
+    "forced_return_reasons": {
+      "no_safe_task_return": 1,
+      "empty_queue_return": 2
+    },
+    "first_task_completion": {
+      "time": 891.5000000000387,
+      "event": "task_completed",
+      "task_id": 8,
+      "collision_free": true,
+      "position": [
+        922.6233520507812,
+        1489.9869384765625,
+        231.41770935058594
+      ],
+      "battery": 100.53365428689484
+    },
+    "physical_end_time": 2079.3000000000006,
+    "post_battery": 104.48436054017121,
+    "post_position": [
+      2256.702880859375,
+      1865.39697265625,
+      204.16049194335938
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1133.7000000002222,
+      "charging": 174.9,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 30550,
+    "stream_sha256": "1bde99061c522f826464e7e3a924318495c1e6c2808d4181f6708fde76501e8b",
+    "physical_resets": 1,
+    "job_id": "B5_r22_s920260925_d00008_task8",
+    "root_id": "B5_r22_s920260925_d00008",
+    "policy": "B5",
+    "regime": 22,
+    "intervention_capacity": 100,
+    "file": "worker_03/B5_r22_s920260925_d00008_task8.json",
+    "sha256": "269e44ed0d652a30e28227ddf7f66eb5a3f88e04e28c2fc9e640bbc7cdbdd982"
+  },
+  {
+    "task_id": 3,
+    "start_time": 1646.5500000000306,
+    "window_origin": 1646.5500000000306,
+    "window_end": 2955.15,
+    "window_seconds": 1308.6,
+    "N_W": 11,
+    "N_observed": 11,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.5999999998471,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 3,
+    "forced_return_reasons": {
+      "no_safe_task_return": 3
+    },
+    "first_task_completion": {
+      "time": 1755.9500000000555,
+      "event": "task_completed",
+      "task_id": 3,
+      "collision_free": true,
+      "position": [
+        1530.448974609375,
+        3480.81298828125,
+        91.88753509521484
+      ],
+      "battery": 44.26238658092478
+    },
+    "physical_end_time": 2955.1499999998778,
+    "post_battery": 65.84543622283684,
+    "post_position": [
+      1038.052734375,
+      1018.7296142578125,
+      268.16241455078125
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1157.2999999993456,
+      "charging": 151.3,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 36344,
+    "stream_sha256": "1bde99061c522f826464e7e3a924318495c1e6c2808d4181f6708fde76501e8b",
+    "physical_resets": 1,
+    "job_id": "B4_0.75_r10_s920260925_d00016_task3",
+    "root_id": "B4_0.75_r10_s920260925_d00016",
+    "policy": "B4_0.75",
+    "regime": 10,
+    "intervention_capacity": 100,
+    "file": "worker_04/B4_0.75_r10_s920260925_d00016_task3.json",
+    "sha256": "68e17e63339dacb4c02ef4734654f9f3eda4c225660ff87beca80b4f524deec2"
+  },
+  {
+    "task_id": 0,
+    "start_time": 1602.25,
+    "window_origin": 1602.25,
+    "window_end": 2910.8500000000004,
+    "window_seconds": 1308.6,
+    "N_W": 11,
+    "N_observed": 11,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.6,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 3,
+    "forced_return_reasons": {
+      "no_safe_task_return": 3
+    },
+    "first_task_completion": {
+      "time": 1750.1500000000335,
+      "event": "task_completed",
+      "task_id": 0,
+      "collision_free": true,
+      "position": [
+        217.7248077392578,
+        1616.037109375,
+        373.3877868652344
+      ],
+      "battery": 61.48731754750814
+    },
+    "physical_end_time": 2910.8500000000004,
+    "post_battery": 3.078526496221559,
+    "post_position": [
+      2881.630126953125,
+      2004.4085693359375,
+      199.3988037109375
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1128.0499999994506,
+      "charging": 180.55,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 29773,
+    "stream_sha256": "1bde99061c522f826464e7e3a924318495c1e6c2808d4181f6708fde76501e8b",
+    "physical_resets": 1,
+    "job_id": "B4_0.75_r13_s920260925_d00015_task0",
+    "root_id": "B4_0.75_r13_s920260925_d00015",
+    "policy": "B4_0.75",
+    "regime": 13,
+    "intervention_capacity": 100,
+    "file": "worker_04/B4_0.75_r13_s920260925_d00015_task0.json",
+    "sha256": "da7334d3ff1c2c6e292dd995d59a9907622b8f9db899a039ac03cbc28337b2f7"
+  },
+  {
+    "task_id": 5,
+    "start_time": 176.4499999999985,
+    "window_origin": 176.4499999999985,
+    "window_end": 1485.0500000000002,
+    "window_seconds": 1308.6,
+    "N_W": 11,
+    "N_observed": 11,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.6,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 2,
+    "forced_return_reasons": {
+      "no_safe_task_return": 2
+    },
+    "first_task_completion": {
+      "time": 291.699999999992,
+      "event": "task_completed",
+      "task_id": 5,
+      "collision_free": true,
+      "position": [
+        1484.1356201171875,
+        2137.871826171875,
+        138.4189910888672
+      ],
+      "battery": 75.72753508405559
+    },
+    "physical_end_time": 1485.0500000000584,
+    "post_battery": 80.81386583563204,
+    "post_position": [
+      2892.91455078125,
+      2392.0048828125,
+      317.979736328125
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1212.6500000001802,
+      "charging": 95.95,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 56536,
+    "stream_sha256": "7a2e054fa00ed55b350de5e983ce591da3af97ef24e8156fad55ebbc5c09c0e9",
+    "physical_resets": 1,
+    "job_id": "B4_0.75_r19_s920260929_d00003_task5",
+    "root_id": "B4_0.75_r19_s920260929_d00003",
+    "policy": "B4_0.75",
+    "regime": 19,
+    "intervention_capacity": 102,
+    "file": "worker_04/B4_0.75_r19_s920260929_d00003_task5.json",
+    "sha256": "12a3c10a405d806fe608d96d3014813601818087993bab80dd3f034222b1a60a"
+  },
+  {
+    "task_id": 8,
+    "start_time": 2203.85,
+    "window_origin": 2203.85,
+    "window_end": 3512.4500000000003,
+    "window_seconds": 1308.6,
+    "N_W": 12,
+    "N_observed": 12,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.5999999996734,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 3,
+    "forced_return_reasons": {
+      "no_safe_task_return": 3
+    },
+    "first_task_completion": {
+      "time": 2327.199999999888,
+      "event": "task_completed",
+      "task_id": 8,
+      "collision_free": true,
+      "position": [
+        1151.109619140625,
+        3363.930908203125,
+        363.56243896484375
+      ],
+      "battery": 65.02443281120789
+    },
+    "physical_end_time": 3512.4499999996733,
+    "post_battery": 20.52656322762291,
+    "post_position": [
+      2749.857421875,
+      1970.83642578125,
+      216.82342529296875
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1120.449999998982,
+      "charging": 188.14999999999998,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 52879,
+    "stream_sha256": "f3e3dcff6e275842b20df82f612f3a0be88085f69e89e99964d4264fdac7ae9e",
+    "physical_resets": 1,
+    "job_id": "B5_r14_s920260926_d00017_task8",
+    "root_id": "B5_r14_s920260926_d00017",
+    "policy": "B5",
+    "regime": 14,
+    "intervention_capacity": 114,
+    "file": "worker_04/B5_r14_s920260926_d00017_task8.json",
+    "sha256": "ae8a7273278f97d9a11d6aa94b86c816ac1c83221eb40ac241d7b13061d2ba85"
+  },
+  {
+    "task_id": 12,
+    "start_time": 2352.449999999735,
+    "window_origin": 2352.449999999735,
+    "window_end": 3661.05,
+    "window_seconds": 1308.6,
+    "N_W": 7,
+    "N_observed": 7,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.6,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 2,
+    "forced_return_reasons": {
+      "no_safe_task_return": 2
+    },
+    "first_task_completion": {
+      "time": 2516.799999999586,
+      "event": "task_completed",
+      "task_id": 12,
+      "collision_free": true,
+      "position": [
+        3609.939208984375,
+        2724.635986328125,
+        342.3233947753906
+      ],
+      "battery": 24.129328188096103
+    },
+    "physical_end_time": 3661.0499999999747,
+    "post_battery": 131.4070127477071,
+    "post_position": [
+      3013.23583984375,
+      1904.7603759765625,
+      300.71881103515625
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 893.8999999991879,
+      "charging": 414.70000000000005,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 54825,
+    "stream_sha256": "1899cd68d212c3219997b54273f7d3bf15c2817a12eef73a72081636cc03cc18",
+    "physical_resets": 1,
+    "job_id": "B5_r25_s920260926_d00016_task12",
+    "root_id": "B5_r25_s920260926_d00016",
+    "policy": "B5",
+    "regime": 25,
+    "intervention_capacity": 80,
+    "file": "worker_04/B5_r25_s920260926_d00016_task12.json",
+    "sha256": "99692ab1757833e0e6f81e049b1841ecce141d181dca32bcdcfca868f9ff3bbd"
+  },
+  {
+    "task_id": 10,
+    "start_time": 1540.3000000000002,
+    "window_origin": 1540.3000000000002,
+    "window_end": 2848.9,
+    "window_seconds": 1308.6,
+    "N_W": 13,
+    "N_observed": 13,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.5999999998644,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 3,
+    "forced_return_reasons": {
+      "no_safe_task_return": 3
+    },
+    "first_task_completion": {
+      "time": 1704.4000000000374,
+      "event": "task_completed",
+      "task_id": 10,
+      "collision_free": true,
+      "position": [
+        300.2016296386719,
+        3556.3974609375,
+        90.80255889892578
+      ],
+      "battery": 56.39410811548152
+    },
+    "physical_end_time": 2848.8999999998646,
+    "post_battery": 62.414313519197385,
+    "post_position": [
+      3039.5224609375,
+      366.558837890625,
+      364.90155029296875
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1178.8999999994537,
+      "charging": 129.7,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 110527,
+    "stream_sha256": "388497cb23df4e684522f2abb290c7483144c4188458f341cad05391ed68061c",
+    "physical_resets": 1,
+    "job_id": "B4_0.75_r11_s920260924_d00017_task10",
+    "root_id": "B4_0.75_r11_s920260924_d00017",
+    "policy": "B4_0.75",
+    "regime": 11,
+    "intervention_capacity": 120,
+    "file": "worker_05/B4_0.75_r11_s920260924_d00017_task10.json",
+    "sha256": "3d943a595c955e2d5c8205e6245aac69ff357767b00211e4337336872fd1dcfa"
+  },
+  {
+    "task_id": 16,
+    "start_time": 1602.25,
+    "window_origin": 1602.25,
+    "window_end": 2910.8500000000004,
+    "window_seconds": 1308.6,
+    "N_W": 10,
+    "N_observed": 10,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.5999999997753,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 2,
+    "forced_return_reasons": {
+      "no_safe_task_return": 2
+    },
+    "first_task_completion": {
+      "time": 1736.4000000000306,
+      "event": "task_completed",
+      "task_id": 16,
+      "collision_free": true,
+      "position": [
+        882.455078125,
+        3616.165283203125,
+        294.07501220703125
+      ],
+      "battery": 62.653312694529724
+    },
+    "physical_end_time": 2910.8499999997753,
+    "post_battery": 42.962401123453596,
+    "post_position": [
+      466.3748779296875,
+      845.3530883789062,
+      368.8804016113281
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1099.949999999487,
+      "charging": 208.6500000000001,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 44810,
+    "stream_sha256": "1bde99061c522f826464e7e3a924318495c1e6c2808d4181f6708fde76501e8b",
+    "physical_resets": 1,
+    "job_id": "B4_0.75_r13_s920260925_d00015_task16",
+    "root_id": "B4_0.75_r13_s920260925_d00015",
+    "policy": "B4_0.75",
+    "regime": 13,
+    "intervention_capacity": 100,
+    "file": "worker_05/B4_0.75_r13_s920260925_d00015_task16.json",
+    "sha256": "4e604eb1e605b9a10766cbee1a3b49e71796a57e2e5f6a0ad6052664817067c0"
+  },
+  {
+    "task_id": 10,
+    "start_time": 878.0500000000001,
+    "window_origin": 878.0500000000001,
+    "window_end": 2186.65,
+    "window_seconds": 1308.6,
+    "N_W": 17,
+    "N_observed": 17,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.5999999999995,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 2,
+    "forced_return_reasons": {
+      "no_safe_task_return": 2
+    },
+    "first_task_completion": {
+      "time": 1031.1500000000347,
+      "event": "task_completed",
+      "task_id": 10,
+      "collision_free": true,
+      "position": [
+        391.2957458496094,
+        3552.12060546875,
+        219.3732147216797
+      ],
+      "battery": 104.3751936577333
+    },
+    "physical_end_time": 2186.6499999999996,
+    "post_battery": 137.4135170088822,
+    "post_position": [
+      2876.05615234375,
+      2001.7958984375,
+      199.03041076660156
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1206.450000000174,
+      "charging": 102.15,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 126352,
+    "stream_sha256": "e48b17deee74bc6cac8c1ddd845a3a9ddebb5c73b6fe92e9d153939eba0cbb03",
+    "physical_resets": 1,
+    "job_id": "B4_0.75_r20_s920260929_d00012_task10",
+    "root_id": "B4_0.75_r20_s920260929_d00012",
+    "policy": "B4_0.75",
+    "regime": 20,
+    "intervention_capacity": 132,
+    "file": "worker_05/B4_0.75_r20_s920260929_d00012_task10.json",
+    "sha256": "9c936d5269ea4b2bb8edc9eeb8210139e7411c90c251acc1f2698adb78f5b57e"
+  },
+  {
+    "task_id": 21,
+    "start_time": 1763.850000000012,
+    "window_origin": 1763.850000000012,
+    "window_end": 3072.4500000000003,
+    "window_seconds": 1308.6,
+    "N_W": 9,
+    "N_observed": 9,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.5999999997796,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 2,
+    "forced_return_reasons": {
+      "no_safe_task_return": 2
+    },
+    "first_task_completion": {
+      "time": 1896.150000000042,
+      "event": "task_completed",
+      "task_id": 21,
+      "collision_free": true,
+      "position": [
+        965.4713745117188,
+        1886.4515380859375,
+        52.22594451904297
+      ],
+      "battery": 53.25184327558233
+    },
+    "physical_end_time": 3072.4499999997915,
+    "post_battery": 41.45919640999848,
+    "post_position": [
+      1118.12939453125,
+      3090.680908203125,
+      238.75375366210938
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 927.2499999994802,
+      "charging": 381.35,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 41440,
+    "stream_sha256": "aa43a953917187c216b4bb157e8fe1f62cf46a4a5ebe19ef3340c6a8c85a2603",
+    "physical_resets": 1,
+    "job_id": "B5_r16_s920260923_d00016_task21",
+    "root_id": "B5_r16_s920260923_d00016",
+    "policy": "B5",
+    "regime": 16,
+    "intervention_capacity": 114,
+    "file": "worker_05/B5_r16_s920260923_d00016_task21.json",
+    "sha256": "515779c085c0370546b41e080e59dc11e1a79f0ab182b0c6b29f624fbb151642"
+  },
+  {
+    "task_id": 14,
+    "start_time": 2352.449999999735,
+    "window_origin": 2352.449999999735,
+    "window_end": 3661.05,
+    "window_seconds": 1308.6,
+    "N_W": 6,
+    "N_observed": 6,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.6,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 2,
+    "forced_return_reasons": {
+      "no_safe_task_return": 2
+    },
+    "first_task_completion": {
+      "time": 2530.099999999574,
+      "event": "task_completed",
+      "task_id": 14,
+      "collision_free": true,
+      "position": [
+        3802.099365234375,
+        2726.21728515625,
+        19.235280990600586
+      ],
+      "battery": 22.165245010103867
+    },
+    "physical_end_time": 3661.049999999985,
+    "post_battery": 134.04968469960102,
+    "post_position": [
+      3057.154541015625,
+      1939.817138671875,
+      277.27008056640625
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 891.6999999991904,
+      "charging": 416.9,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 46214,
+    "stream_sha256": "1899cd68d212c3219997b54273f7d3bf15c2817a12eef73a72081636cc03cc18",
+    "physical_resets": 1,
+    "job_id": "B5_r25_s920260926_d00016_task14",
+    "root_id": "B5_r25_s920260926_d00016",
+    "policy": "B5",
+    "regime": 25,
+    "intervention_capacity": 80,
+    "file": "worker_05/B5_r25_s920260926_d00016_task14.json",
+    "sha256": "6e65a87c8b9cb88a482b54d691a467ed7433648817aaabc8c9513e208c4c9f58"
+  },
+  {
+    "task_id": 11,
+    "start_time": 1540.3000000000002,
+    "window_origin": 1540.3000000000002,
+    "window_end": 2848.9,
+    "window_seconds": 1308.6,
+    "N_W": 14,
+    "N_observed": 14,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.5999999999453,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 3,
+    "forced_return_reasons": {
+      "no_safe_task_return": 3
+    },
+    "first_task_completion": {
+      "time": 1624.6500000000194,
+      "event": "task_completed",
+      "task_id": 11,
+      "collision_free": true,
+      "position": [
+        2388.373779296875,
+        1073.776123046875,
+        373.5306091308594
+      ],
+      "battery": 72.24873964247782
+    },
+    "physical_end_time": 2848.8999999999455,
+    "post_battery": 78.2794907525802,
+    "post_position": [
+      3060.382080078125,
+      951.88818359375,
+      60.96694564819336
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1167.399999999465,
+      "charging": 141.2,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 87094,
+    "stream_sha256": "388497cb23df4e684522f2abb290c7483144c4188458f341cad05391ed68061c",
+    "physical_resets": 1,
+    "job_id": "B4_0.75_r11_s920260924_d00017_task11",
+    "root_id": "B4_0.75_r11_s920260924_d00017",
+    "policy": "B4_0.75",
+    "regime": 11,
+    "intervention_capacity": 120,
+    "file": "worker_06/B4_0.75_r11_s920260924_d00017_task11.json",
+    "sha256": "1667437b379e4bafc9b2fc2c50f360dfe61b0da045c50b003b2516f4a23bdc74"
+  },
+  {
+    "task_id": 12,
+    "start_time": 7671.199999999969,
+    "window_origin": 7671.199999999969,
+    "window_end": 8979.800000000001,
+    "window_seconds": 1308.6,
+    "N_W": 12,
+    "N_observed": 12,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.6,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 2,
+    "forced_return_reasons": {
+      "no_safe_task_return": 2
+    },
+    "first_task_completion": {
+      "time": 7821.899999999832,
+      "event": "task_completed",
+      "task_id": 12,
+      "collision_free": true,
+      "position": [
+        184.68821716308594,
+        3890.337158203125,
+        124.69357299804688
+      ],
+      "battery": 51.62536824412092
+    },
+    "physical_end_time": 8979.800000001223,
+    "post_battery": 26.599579245912906,
+    "post_position": [
+      1790.1546630859375,
+      2037.3948974609375,
+      185.91651916503906
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1105.2500000021273,
+      "charging": 203.3499999999999,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 96279,
+    "stream_sha256": "f90ec44cc8bfb559c20d15d8170b0bbd1560af8cd990d1c99e1cc2362b312c00",
+    "physical_resets": 1,
+    "job_id": "B4_0.75_r14_s920260920_d00065_task12",
+    "root_id": "B4_0.75_r14_s920260920_d00065",
+    "policy": "B4_0.75",
+    "regime": 14,
+    "intervention_capacity": 132,
+    "file": "worker_06/B4_0.75_r14_s920260920_d00065_task12.json",
+    "sha256": "191297309f557474b4f3bf639061a232da086b5e0cb2b15f4dbef4882e8cc493"
+  },
+  {
+    "task_id": 9,
+    "start_time": 878.0500000000001,
+    "window_origin": 878.0500000000001,
+    "window_end": 2186.65,
+    "window_seconds": 1308.6,
+    "N_W": 15,
+    "N_observed": 15,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.599999999983,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 2,
+    "forced_return_reasons": {
+      "no_safe_task_return": 2
+    },
+    "first_task_completion": {
+      "time": 1026.5500000000336,
+      "event": "task_completed",
+      "task_id": 9,
+      "collision_free": true,
+      "position": [
+        610.6492309570312,
+        867.2975463867188,
+        110.74406433105469
+      ],
+      "battery": 106.55236797898606
+    },
+    "physical_end_time": 2186.6499999999833,
+    "post_battery": 2.9615778971742515,
+    "post_position": [
+      2848.463623046875,
+      2194.634521484375,
+      202.2447052001953
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1255.800000000128,
+      "charging": 52.80000000000001,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 124625,
+    "stream_sha256": "e48b17deee74bc6cac8c1ddd845a3a9ddebb5c73b6fe92e9d153939eba0cbb03",
+    "physical_resets": 1,
+    "job_id": "B4_0.75_r20_s920260929_d00012_task9",
+    "root_id": "B4_0.75_r20_s920260929_d00012",
+    "policy": "B4_0.75",
+    "regime": 20,
+    "intervention_capacity": 132,
+    "file": "worker_06/B4_0.75_r20_s920260929_d00012_task9.json",
+    "sha256": "8d8eac37f1503b9589df68373c2ac2d71e6dbb068ec1f028fe49a66244c75f4d"
+  },
+  {
+    "task_id": 22,
+    "start_time": 1763.850000000012,
+    "window_origin": 1763.850000000012,
+    "window_end": 3072.4500000000003,
+    "window_seconds": 1308.6,
+    "N_W": 10,
+    "N_observed": 10,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.5999999997155,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 3,
+    "forced_return_reasons": {
+      "no_safe_task_return": 3
+    },
+    "first_task_completion": {
+      "time": 1885.5000000000396,
+      "event": "task_completed",
+      "task_id": 22,
+      "collision_free": true,
+      "position": [
+        1585.503662109375,
+        1187.625244140625,
+        202.01580810546875
+      ],
+      "battery": 53.721314939716166
+    },
+    "physical_end_time": 3072.4499999997274,
+    "post_battery": 25.079495200991158,
+    "post_position": [
+      1532.418701171875,
+      3075.1884765625,
+      260.3716125488281
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 948.2499999994616,
+      "charging": 360.35,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 45425,
+    "stream_sha256": "aa43a953917187c216b4bb157e8fe1f62cf46a4a5ebe19ef3340c6a8c85a2603",
+    "physical_resets": 1,
+    "job_id": "B5_r16_s920260923_d00016_task22",
+    "root_id": "B5_r16_s920260923_d00016",
+    "policy": "B5",
+    "regime": 16,
+    "intervention_capacity": 114,
+    "file": "worker_06/B5_r16_s920260923_d00016_task22.json",
+    "sha256": "50efedee152fec3acaa56b51dad957c907fc858eba4af964c0b449d1472eabb9"
+  },
+  {
+    "task_id": 20,
+    "start_time": 1540.3000000000002,
+    "window_origin": 1540.3000000000002,
+    "window_end": 2848.9,
+    "window_seconds": 1308.6,
+    "N_W": 14,
+    "N_observed": 14,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.6,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 3,
+    "forced_return_reasons": {
+      "no_safe_task_return": 3
+    },
+    "first_task_completion": {
+      "time": 1624.4000000000192,
+      "event": "task_completed",
+      "task_id": 20,
+      "collision_free": true,
+      "position": [
+        1955.7220458984375,
+        933.2661743164062,
+        41.84140396118164
+      ],
+      "battery": 73.46276684261592
+    },
+    "physical_end_time": 2848.9,
+    "post_battery": 29.881333828146396,
+    "post_position": [
+      2879.970458984375,
+      2004.4833984375,
+      200.45220947265625
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1198.3499999994322,
+      "charging": 110.25,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 88611,
+    "stream_sha256": "388497cb23df4e684522f2abb290c7483144c4188458f341cad05391ed68061c",
+    "physical_resets": 1,
+    "job_id": "B4_0.75_r11_s920260924_d00017_task20",
+    "root_id": "B4_0.75_r11_s920260924_d00017",
+    "policy": "B4_0.75",
+    "regime": 11,
+    "intervention_capacity": 120,
+    "file": "worker_07/B4_0.75_r11_s920260924_d00017_task20.json",
+    "sha256": "82f7eb382ca4f05ecac876d066cf3f475c7180396396d702d5a518cdf9a8571b"
+  },
+  {
+    "task_id": 60,
+    "start_time": 7671.199999999969,
+    "window_origin": 7671.199999999969,
+    "window_end": 8979.800000000001,
+    "window_seconds": 1308.6,
+    "N_W": 13,
+    "N_observed": 13,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.6,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 3,
+    "forced_return_reasons": {
+      "no_safe_task_return": 3
+    },
+    "first_task_completion": {
+      "time": 7825.999999999828,
+      "event": "task_completed",
+      "task_id": 60,
+      "collision_free": true,
+      "position": [
+        484.6876220703125,
+        413.7311096191406,
+        338.6416931152344
+      ],
+      "battery": 50.99649351534063
+    },
+    "physical_end_time": 8979.80000000144,
+    "post_battery": 8.885572076170593,
+    "post_position": [
+      2663.73681640625,
+      2055.876953125,
+      234.49734497070312
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1114.5000000021428,
+      "charging": 194.0999999999999,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 109186,
+    "stream_sha256": "f90ec44cc8bfb559c20d15d8170b0bbd1560af8cd990d1c99e1cc2362b312c00",
+    "physical_resets": 1,
+    "job_id": "B4_0.75_r14_s920260920_d00065_task60",
+    "root_id": "B4_0.75_r14_s920260920_d00065",
+    "policy": "B4_0.75",
+    "regime": 14,
+    "intervention_capacity": 132,
+    "file": "worker_07/B4_0.75_r14_s920260920_d00065_task60.json",
+    "sha256": "8184b31d87539d53237d270e0a9fad5d3fefc39dba6811958b25c0e289fd5628"
+  },
+  {
+    "task_id": 26,
+    "start_time": 2755.249999999903,
+    "window_origin": 2755.249999999903,
+    "window_end": 4063.8500000000004,
+    "window_seconds": 1308.6,
+    "N_W": 15,
+    "N_observed": 15,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.6,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 2,
+    "forced_return_reasons": {
+      "no_safe_task_return": 2
+    },
+    "first_task_completion": {
+      "time": 2910.899999999762,
+      "event": "task_completed",
+      "task_id": 26,
+      "collision_free": true,
+      "position": [
+        272.1802673339844,
+        2329.810546875,
+        76.4844970703125
+      ],
+      "battery": 82.77575694862743
+    },
+    "physical_end_time": 4063.849999999978,
+    "post_battery": 131.845998736989,
+    "post_position": [
+      2482.730224609375,
+      2214.810546875,
+      85.29434204101562
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1202.8499999989085,
+      "charging": 105.75,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 117020,
+    "stream_sha256": "e48b17deee74bc6cac8c1ddd845a3a9ddebb5c73b6fe92e9d153939eba0cbb03",
+    "physical_resets": 1,
+    "job_id": "B4_0.75_r20_s920260929_d00032_task26",
+    "root_id": "B4_0.75_r20_s920260929_d00032",
+    "policy": "B4_0.75",
+    "regime": 20,
+    "intervention_capacity": 132,
+    "file": "worker_07/B4_0.75_r20_s920260929_d00032_task26.json",
+    "sha256": "2328c41d0ac1fa78280c496404911e7f62d2c7058e212c9f58264f6f8ba0fd4a"
+  },
+  {
+    "task_id": 29,
+    "start_time": 3524.549999999944,
+    "window_origin": 3524.549999999944,
+    "window_end": 4833.150000000001,
+    "window_seconds": 1308.6,
+    "N_W": 7,
+    "N_observed": 7,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.5999999999558,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 2,
+    "forced_return_reasons": {
+      "no_safe_task_return": 2
+    },
+    "first_task_completion": {
+      "time": 3639.1499999998396,
+      "event": "task_completed",
+      "task_id": 29,
+      "collision_free": true,
+      "position": [
+        950.31787109375,
+        1856.145751953125,
+        273.4348449707031
+      ],
+      "battery": 54.144287340412745
+    },
+    "physical_end_time": 4833.1499999999,
+    "post_battery": 66.98217004803693,
+    "post_position": [
+      2690.778564453125,
+      1516.4345703125,
+      316.1149597167969
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 889.999999999191,
+      "charging": 418.5999999999999,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 65510,
+    "stream_sha256": "1bde99061c522f826464e7e3a924318495c1e6c2808d4181f6708fde76501e8b",
+    "physical_resets": 1,
+    "job_id": "B5_r16_s920260925_d00029_task29",
+    "root_id": "B5_r16_s920260925_d00029",
+    "policy": "B5",
+    "regime": 16,
+    "intervention_capacity": 100,
+    "file": "worker_07/B5_r16_s920260925_d00029_task29.json",
+    "sha256": "fd626a89cc6577908ec26b2a978455daa80ba6bd34e4602b4bc439f239e9a40d"
+  },
+  {
+    "task_id": 9,
+    "start_time": 1540.3000000000002,
+    "window_origin": 1540.3000000000002,
+    "window_end": 2848.9,
+    "window_seconds": 1308.6,
+    "N_W": 14,
+    "N_observed": 14,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.5999999996634,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 3,
+    "forced_return_reasons": {
+      "no_safe_task_return": 3
+    },
+    "first_task_completion": {
+      "time": 1703.1500000000372,
+      "event": "task_completed",
+      "task_id": 9,
+      "collision_free": true,
+      "position": [
+        162.7620391845703,
+        829.8876342773438,
+        373.93548583984375
+      ],
+      "battery": 57.38642213705919
+    },
+    "physical_end_time": 2848.8999999996636,
+    "post_battery": 12.114918493817422,
+    "post_position": [
+      2877.0703125,
+      1996.3458251953125,
+      199.09144592285156
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1203.699999999422,
+      "charging": 104.90000000000003,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 101907,
+    "stream_sha256": "388497cb23df4e684522f2abb290c7483144c4188458f341cad05391ed68061c",
+    "physical_resets": 1,
+    "job_id": "B4_0.75_r11_s920260924_d00017_task9",
+    "root_id": "B4_0.75_r11_s920260924_d00017",
+    "policy": "B4_0.75",
+    "regime": 11,
+    "intervention_capacity": 120,
+    "file": "worker_08/B4_0.75_r11_s920260924_d00017_task9.json",
+    "sha256": "663b8785f714c991c1e034bdbe7bf0b354f2f79e6765d4d2feb8f3a6641623a0"
+  },
+  {
+    "task_id": 39,
+    "start_time": 5041.35,
+    "window_origin": 5041.35,
+    "window_end": 6349.950000000001,
+    "window_seconds": 1308.6,
+    "N_W": 14,
+    "N_observed": 14,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.599999999693,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 3,
+    "forced_return_reasons": {
+      "no_safe_task_return": 3
+    },
+    "first_task_completion": {
+      "time": 5180.949999999873,
+      "event": "task_completed",
+      "task_id": 39,
+      "collision_free": true,
+      "position": [
+        239.78126525878906,
+        2322.506103515625,
+        58.366912841796875
+      ],
+      "battery": 65.08086871580637
+    },
+    "physical_end_time": 6349.949999999693,
+    "post_battery": 18.929045338170358,
+    "post_position": [
+      2027.550048828125,
+      2446.839111328125,
+      185.32595825195312
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1121.1499999989824,
+      "charging": 187.45000000000016,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 125956,
+    "stream_sha256": "388497cb23df4e684522f2abb290c7483144c4188458f341cad05391ed68061c",
+    "physical_resets": 1,
+    "job_id": "B4_0.75_r14_s920260924_d00046_task39",
+    "root_id": "B4_0.75_r14_s920260924_d00046",
+    "policy": "B4_0.75",
+    "regime": 14,
+    "intervention_capacity": 120,
+    "file": "worker_08/B4_0.75_r14_s920260924_d00046_task39.json",
+    "sha256": "3a3cc313e09235a596a0d11869d6f24e95a1090df6f72bedc570c270322f16dc"
+  },
+  {
+    "task_id": 36,
+    "start_time": 2755.249999999903,
+    "window_origin": 2755.249999999903,
+    "window_end": 4063.8500000000004,
+    "window_seconds": 1308.6,
+    "N_W": 16,
+    "N_observed": 16,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.6,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 2,
+    "forced_return_reasons": {
+      "no_safe_task_return": 2
+    },
+    "first_task_completion": {
+      "time": 2922.449999999751,
+      "event": "task_completed",
+      "task_id": 36,
+      "collision_free": true,
+      "position": [
+        224.000244140625,
+        1994.27099609375,
+        234.33497619628906
+      ],
+      "battery": 80.83059121686733
+    },
+    "physical_end_time": 4063.8499999999785,
+    "post_battery": 132.01987198238763,
+    "post_position": [
+      2496.622802734375,
+      2206.05908203125,
+      88.32599639892578
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1201.0999999989094,
+      "charging": 107.5,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 95673,
+    "stream_sha256": "e48b17deee74bc6cac8c1ddd845a3a9ddebb5c73b6fe92e9d153939eba0cbb03",
+    "physical_resets": 1,
+    "job_id": "B4_0.75_r20_s920260929_d00032_task36",
+    "root_id": "B4_0.75_r20_s920260929_d00032",
+    "policy": "B4_0.75",
+    "regime": 20,
+    "intervention_capacity": 132,
+    "file": "worker_08/B4_0.75_r20_s920260929_d00032_task36.json",
+    "sha256": "00682e21e73811c47323b77b04bd430c298d684905bdf5ebc62e3cb19e5cc60f"
+  },
+  {
+    "task_id": 33,
+    "start_time": 3524.549999999944,
+    "window_origin": 3524.549999999944,
+    "window_end": 4833.150000000001,
+    "window_seconds": 1308.6,
+    "N_W": 8,
+    "N_observed": 8,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.5999999998912,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 2,
+    "forced_return_reasons": {
+      "no_safe_task_return": 2
+    },
+    "first_task_completion": {
+      "time": 3646.2999999998333,
+      "event": "task_completed",
+      "task_id": 33,
+      "collision_free": true,
+      "position": [
+        1586.0574951171875,
+        2957.622802734375,
+        295.7646789550781
+      ],
+      "battery": 51.88400567960876
+    },
+    "physical_end_time": 4833.149999999835,
+    "post_battery": 52.31869903924509,
+    "post_position": [
+      1622.98681640625,
+      1555.71240234375,
+      256.37933349609375
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 920.2999999991639,
+      "charging": 388.3000000000002,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 88869,
+    "stream_sha256": "1bde99061c522f826464e7e3a924318495c1e6c2808d4181f6708fde76501e8b",
+    "physical_resets": 1,
+    "job_id": "B5_r16_s920260925_d00029_task33",
+    "root_id": "B5_r16_s920260925_d00029",
+    "policy": "B5",
+    "regime": 16,
+    "intervention_capacity": 100,
+    "file": "worker_08/B5_r16_s920260925_d00029_task33.json",
+    "sha256": "d1e8b0ef52cbcec3dcb94e54fead976a8c8c098c9ede4cba920560b78a878ab1"
+  },
+  {
+    "task_id": 0,
+    "start_time": 1418.6000000000001,
+    "window_origin": 1418.6000000000001,
+    "window_end": 2727.2000000000003,
+    "window_seconds": 1308.6,
+    "N_W": 13,
+    "N_observed": 13,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.5999999999692,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 3,
+    "forced_return_reasons": {
+      "no_safe_task_return": 3
+    },
+    "first_task_completion": {
+      "time": 1566.0000000000337,
+      "event": "task_completed",
+      "task_id": 0,
+      "collision_free": true,
+      "position": [
+        217.7163848876953,
+        1616.0159912109375,
+        373.4888610839844
+      ],
+      "battery": 61.53745738936852
+    },
+    "physical_end_time": 2727.1999999999694,
+    "post_battery": 85.5953068206648,
+    "post_position": [
+      2247.152587890625,
+      2059.915771484375,
+      184.52574157714844
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1166.3499999995968,
+      "charging": 142.25000000000003,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 66518,
+    "stream_sha256": "8c4f8836db230b65d51f058185da3055e164dcab7a1ab8e83f9936eaafdfe35e",
+    "physical_resets": 1,
+    "job_id": "B4_0.75_r11_s920260925_d00015_task0",
+    "root_id": "B4_0.75_r11_s920260925_d00015",
+    "policy": "B4_0.75",
+    "regime": 11,
+    "intervention_capacity": 134,
+    "file": "worker_09/B4_0.75_r11_s920260925_d00015_task0.json",
+    "sha256": "a948d2425fe7d89cb3ae35ce16f709f56d28d4d75ebc211539f9f19766b4a8ac"
+  },
+  {
+    "task_id": 50,
+    "start_time": 5041.35,
+    "window_origin": 5041.35,
+    "window_end": 6349.950000000001,
+    "window_seconds": 1308.6,
+    "N_W": 14,
+    "N_observed": 14,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.5999999997139,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 3,
+    "forced_return_reasons": {
+      "no_safe_task_return": 3
+    },
+    "first_task_completion": {
+      "time": 5179.899999999874,
+      "event": "task_completed",
+      "task_id": 50,
+      "collision_free": true,
+      "position": [
+        261.4258728027344,
+        1422.7269287109375,
+        253.2010498046875
+      ],
+      "battery": 63.889155301008365
+    },
+    "physical_end_time": 6349.949999999714,
+    "post_battery": 23.67443163489609,
+    "post_position": [
+      1641.2088623046875,
+      2682.888671875,
+      150.22415161132812
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1114.2499999989873,
+      "charging": 194.35000000000002,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 132811,
+    "stream_sha256": "388497cb23df4e684522f2abb290c7483144c4188458f341cad05391ed68061c",
+    "physical_resets": 1,
+    "job_id": "B4_0.75_r14_s920260924_d00046_task50",
+    "root_id": "B4_0.75_r14_s920260924_d00046",
+    "policy": "B4_0.75",
+    "regime": 14,
+    "intervention_capacity": 120,
+    "file": "worker_09/B4_0.75_r14_s920260924_d00046_task50.json",
+    "sha256": "a90a5a029a0ff3d8e1d1dc7715d5df1e2be2f38860064eba671ee7879110441b"
+  },
+  {
+    "task_id": 11,
+    "start_time": 1429.400000000052,
+    "window_origin": 1429.400000000052,
+    "window_end": 2738.0,
+    "window_seconds": 1308.6,
+    "N_W": 15,
+    "N_observed": 15,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.5999999998658,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 2,
+    "forced_return_reasons": {
+      "no_safe_task_return": 2
+    },
+    "first_task_completion": {
+      "time": 1550.4000000000794,
+      "event": "task_completed",
+      "task_id": 11,
+      "collision_free": true,
+      "position": [
+        2387.335693359375,
+        1077.7242431640625,
+        372.69769287109375
+      ],
+      "battery": 67.3002436151597
+    },
+    "physical_end_time": 2737.9999999999177,
+    "post_battery": 116.81781267054058,
+    "post_position": [
+      3142.031982421875,
+      701.3838500976562,
+      42.18794250488281
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1103.9499999995912,
+      "charging": 204.65000000000003,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 91778,
+    "stream_sha256": "388497cb23df4e684522f2abb290c7483144c4188458f341cad05391ed68061c",
+    "physical_resets": 1,
+    "job_id": "B4_0.75_r23_s920260924_d00016_task11",
+    "root_id": "B4_0.75_r23_s920260924_d00016",
+    "policy": "B4_0.75",
+    "regime": 23,
+    "intervention_capacity": 120,
+    "file": "worker_09/B4_0.75_r23_s920260924_d00016_task11.json",
+    "sha256": "40d00815d1e033c7ffbd8a687154eae5bea399b7912d221fe5149d54748a8d3e"
+  },
+  {
+    "task_id": 3,
+    "start_time": 116.6000000000011,
+    "window_origin": 116.6000000000011,
+    "window_end": 1425.2,
+    "window_seconds": 1308.6,
+    "N_W": 11,
+    "N_observed": 11,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.6,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 2,
+    "forced_return_reasons": {
+      "no_safe_task_return": 2
+    },
+    "first_task_completion": {
+      "time": 285.3999999999923,
+      "event": "task_completed",
+      "task_id": 3,
+      "collision_free": true,
+      "position": [
+        3866.287841796875,
+        1590.19189453125,
+        343.5940246582031
+      ],
+      "battery": 27.801406075117427
+    },
+    "physical_end_time": 1425.2000000000637,
+    "post_battery": 31.66336710307665,
+    "post_position": [
+      2149.95068359375,
+      935.5266723632812,
+      192.5556182861328
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 914.9000000001417,
+      "charging": 393.70000000000005,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 55497,
+    "stream_sha256": "9bff18c11e277b32311bcf712e0c2b2fa20e5f233931b64182e11661f8ad7c4d",
+    "physical_resets": 1,
+    "job_id": "B5_r17_s920260927_d00002_task3",
+    "root_id": "B5_r17_s920260927_d00002",
+    "policy": "B5",
+    "regime": 17,
+    "intervention_capacity": 121,
+    "file": "worker_09/B5_r17_s920260927_d00002_task3.json",
+    "sha256": "c1416640726137994b92b8d406dc7fc2615f08b5e939f685f78dd27e101adf0a"
+  },
+  {
+    "task_id": 16,
+    "start_time": 1418.6000000000001,
+    "window_origin": 1418.6000000000001,
+    "window_end": 2727.2000000000003,
+    "window_seconds": 1308.6,
+    "N_W": 15,
+    "N_observed": 15,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.5999999999974,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 3,
+    "forced_return_reasons": {
+      "no_safe_task_return": 3
+    },
+    "first_task_completion": {
+      "time": 1552.7000000000305,
+      "event": "task_completed",
+      "task_id": 16,
+      "collision_free": true,
+      "position": [
+        882.355224609375,
+        3615.9267578125,
+        294.15106201171875
+      ],
+      "battery": 62.48054024715143
+    },
+    "physical_end_time": 2727.1999999999975,
+    "post_battery": 90.90341709490018,
+    "post_position": [
+      2882.46044921875,
+      1980.31787109375,
+      212.78346252441406
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1162.0999999996004,
+      "charging": 146.50000000000003,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 65978,
+    "stream_sha256": "8c4f8836db230b65d51f058185da3055e164dcab7a1ab8e83f9936eaafdfe35e",
+    "physical_resets": 1,
+    "job_id": "B4_0.75_r11_s920260925_d00015_task16",
+    "root_id": "B4_0.75_r11_s920260925_d00015",
+    "policy": "B4_0.75",
+    "regime": 11,
+    "intervention_capacity": 134,
+    "file": "worker_10/B4_0.75_r11_s920260925_d00015_task16.json",
+    "sha256": "8e21d8c7c3966473d23af5673c4eef4b8587180f8f75592a8999e18e54e439ae"
+  },
+  {
+    "task_id": 51,
+    "start_time": 5041.35,
+    "window_origin": 5041.35,
+    "window_end": 6349.950000000001,
+    "window_seconds": 1308.6,
+    "N_W": 14,
+    "N_observed": 14,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.5999999997548,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 3,
+    "forced_return_reasons": {
+      "no_safe_task_return": 3
+    },
+    "first_task_completion": {
+      "time": 5189.599999999866,
+      "event": "task_completed",
+      "task_id": 51,
+      "collision_free": true,
+      "position": [
+        127.0233154296875,
+        1792.1397705078125,
+        121.80245208740234
+      ],
+      "battery": 64.05231169799069
+    },
+    "physical_end_time": 6349.949999999755,
+    "post_battery": 33.6865042099538,
+    "post_position": [
+      913.154541015625,
+      3208.278076171875,
+      148.6074981689453
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1106.9999999989946,
+      "charging": 201.60000000000002,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 141461,
+    "stream_sha256": "388497cb23df4e684522f2abb290c7483144c4188458f341cad05391ed68061c",
+    "physical_resets": 1,
+    "job_id": "B4_0.75_r14_s920260924_d00046_task51",
+    "root_id": "B4_0.75_r14_s920260924_d00046",
+    "policy": "B4_0.75",
+    "regime": 14,
+    "intervention_capacity": 120,
+    "file": "worker_10/B4_0.75_r14_s920260924_d00046_task51.json",
+    "sha256": "069c8cc0562e04e9bf0a0d1e09750a0910c6afbfcb049a408cde73e8009f041d"
+  },
+  {
+    "task_id": 20,
+    "start_time": 1429.400000000052,
+    "window_origin": 1429.400000000052,
+    "window_end": 2738.0,
+    "window_seconds": 1308.6,
+    "N_W": 15,
+    "N_observed": 15,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.5999999997916,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 2,
+    "forced_return_reasons": {
+      "no_safe_task_return": 2
+    },
+    "first_task_completion": {
+      "time": 1556.6000000000809,
+      "event": "task_completed",
+      "task_id": 20,
+      "collision_free": true,
+      "position": [
+        1955.7896728515625,
+        942.3300170898438,
+        41.7598991394043
+      ],
+      "battery": 66.20325558006218
+    },
+    "physical_end_time": 2737.9999999998436,
+    "post_battery": 97.92158567031646,
+    "post_position": [
+      2758.991455078125,
+      3109.905517578125,
+      49.64828872680664
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1118.8999999995833,
+      "charging": 189.7,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 88665,
+    "stream_sha256": "388497cb23df4e684522f2abb290c7483144c4188458f341cad05391ed68061c",
+    "physical_resets": 1,
+    "job_id": "B4_0.75_r23_s920260924_d00016_task20",
+    "root_id": "B4_0.75_r23_s920260924_d00016",
+    "policy": "B4_0.75",
+    "regime": 23,
+    "intervention_capacity": 120,
+    "file": "worker_10/B4_0.75_r23_s920260924_d00016_task20.json",
+    "sha256": "8630dc96c410b1f06eb8686953d8efed9075cb4962ab3e731460fc0d44081350"
+  },
+  {
+    "task_id": 4,
+    "start_time": 116.6000000000011,
+    "window_origin": 116.6000000000011,
+    "window_end": 1425.2,
+    "window_seconds": 1308.6,
+    "N_W": 10,
+    "N_observed": 10,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.6,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 2,
+    "forced_return_reasons": {
+      "no_safe_task_return": 2
+    },
+    "first_task_completion": {
+      "time": 286.7999999999922,
+      "event": "task_completed",
+      "task_id": 4,
+      "collision_free": true,
+      "position": [
+        2345.28271484375,
+        277.3868408203125,
+        71.83251190185547
+      ],
+      "battery": 31.55568232125638
+    },
+    "physical_end_time": 1425.2000000000678,
+    "post_battery": 25.33456497368839,
+    "post_position": [
+      1636.0870361328125,
+      469.6548156738281,
+      170.03311157226562
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 933.500000000136,
+      "charging": 375.1,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 66778,
+    "stream_sha256": "9bff18c11e277b32311bcf712e0c2b2fa20e5f233931b64182e11661f8ad7c4d",
+    "physical_resets": 1,
+    "job_id": "B5_r17_s920260927_d00002_task4",
+    "root_id": "B5_r17_s920260927_d00002",
+    "policy": "B5",
+    "regime": 17,
+    "intervention_capacity": 121,
+    "file": "worker_10/B5_r17_s920260927_d00002_task4.json",
+    "sha256": "50077f1542aa62754d53afba569b93e3fd445df358901102ca903d3aaaa173d3"
+  },
+  {
+    "task_id": 2,
+    "start_time": 537.9,
+    "window_origin": 537.9,
+    "window_end": 1846.5,
+    "window_seconds": 1308.6,
+    "N_W": 14,
+    "N_observed": 14,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.6,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 3,
+    "forced_return_reasons": {
+      "no_safe_task_return": 3
+    },
+    "first_task_completion": {
+      "time": 667.5000000000294,
+      "event": "task_completed",
+      "task_id": 2,
+      "collision_free": true,
+      "position": [
+        420.4144287109375,
+        2183.185302734375,
+        103.78153991699219
+      ],
+      "battery": 66.74955977848789
+    },
+    "physical_end_time": 1846.50000000003,
+    "post_battery": 65.09511344920955,
+    "post_position": [
+      884.0816040039062,
+      1049.3677978515625,
+      159.07196044921875
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1177.550000000267,
+      "charging": 131.05,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 90716,
+    "stream_sha256": "b248420b30ac5b2457b78bef0338f609175e16259704ee2755954f425a63beb7",
+    "physical_resets": 1,
+    "job_id": "B4_0.75_r11_s920260928_d00006_task2",
+    "root_id": "B4_0.75_r11_s920260928_d00006",
+    "policy": "B4_0.75",
+    "regime": 11,
+    "intervention_capacity": 131,
+    "file": "worker_11/B4_0.75_r11_s920260928_d00006_task2.json",
+    "sha256": "0f9865a4bccb6600c8e5c93a58a1a2d51ca2523b2d19e8709c66bd0cbb68e9cb"
+  },
+  {
+    "task_id": 0,
+    "start_time": 2589.9500000000003,
+    "window_origin": 2589.9500000000003,
+    "window_end": 3898.55,
+    "window_seconds": 1308.6,
+    "N_W": 17,
+    "N_observed": 17,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.5999999996993,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 2,
+    "forced_return_reasons": {
+      "no_safe_task_return": 2
+    },
+    "first_task_completion": {
+      "time": 2739.899999999864,
+      "event": "task_completed",
+      "task_id": 0,
+      "collision_free": true,
+      "position": [
+        217.86952209472656,
+        1616.0211181640625,
+        373.9793701171875
+      ],
+      "battery": 61.20266603099795
+    },
+    "physical_end_time": 3898.5499999996996,
+    "post_battery": 19.05494533527731,
+    "post_position": [
+      2565.094970703125,
+      1529.208740234375,
+      117.3769760131836
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1112.3499999989913,
+      "charging": 196.25,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 129899,
+    "stream_sha256": "8c4f8836db230b65d51f058185da3055e164dcab7a1ab8e83f9936eaafdfe35e",
+    "physical_resets": 1,
+    "job_id": "B4_0.75_r14_s920260925_d00024_task0",
+    "root_id": "B4_0.75_r14_s920260925_d00024",
+    "policy": "B4_0.75",
+    "regime": 14,
+    "intervention_capacity": 134,
+    "file": "worker_11/B4_0.75_r14_s920260925_d00024_task0.json",
+    "sha256": "94b87ac9fc2b1afda0a253465db84b3c7c1651a4a1d44d77883833cb199d452e"
+  },
+  {
+    "task_id": 7,
+    "start_time": 1366.8500000000001,
+    "window_origin": 1366.8500000000001,
+    "window_end": 2675.4500000000003,
+    "window_seconds": 1308.6,
+    "N_W": 11,
+    "N_observed": 11,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.6,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 2,
+    "forced_return_reasons": {
+      "no_safe_task_return": 2
+    },
+    "first_task_completion": {
+      "time": 1497.7000000000298,
+      "event": "task_completed",
+      "task_id": 7,
+      "collision_free": true,
+      "position": [
+        599.4429321289062,
+        2851.8662109375,
+        39.0179328918457
+      ],
+      "battery": 108.99409466866896
+    },
+    "physical_end_time": 2675.4500000000003,
+    "post_battery": 38.053943800529616,
+    "post_position": [
+      2875.51513671875,
+      1998.7130126953125,
+      199.41896057128906
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1187.7499999995894,
+      "charging": 120.85000000000002,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 66588,
+    "stream_sha256": "f3e3dcff6e275842b20df82f612f3a0be88085f69e89e99964d4264fdac7ae9e",
+    "physical_resets": 1,
+    "job_id": "B4_0.75_r23_s920260926_d00009_task7",
+    "root_id": "B4_0.75_r23_s920260926_d00009",
+    "policy": "B4_0.75",
+    "regime": 23,
+    "intervention_capacity": 114,
+    "file": "worker_11/B4_0.75_r23_s920260926_d00009_task7.json",
+    "sha256": "9ee4f6c23a51752f769d395f7c91171eba5f8f1debf9961a7536a6f40b265148"
+  },
+  {
+    "task_id": 26,
+    "start_time": 4692.900000000001,
+    "window_origin": 4692.900000000001,
+    "window_end": 6001.5,
+    "window_seconds": 1308.6,
+    "N_W": 11,
+    "N_observed": 11,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.5999999996657,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 2,
+    "forced_return_reasons": {
+      "no_safe_task_return": 2
+    },
+    "first_task_completion": {
+      "time": 4830.949999999875,
+      "event": "task_completed",
+      "task_id": 26,
+      "collision_free": true,
+      "position": [
+        272.10919189453125,
+        2333.549072265625,
+        78.10179901123047
+      ],
+      "battery": 111.44603103452948
+    },
+    "physical_end_time": 6001.499999999666,
+    "post_battery": 58.38904843681655,
+    "post_position": [
+      1448.357421875,
+      3603.236328125,
+      249.6739501953125
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1235.1499999988782,
+      "charging": 73.45000000000005,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 48840,
+    "stream_sha256": "1d775cc814e72b7a9d0d9c2d018afb9c2a9dd9340b894922b4e428aa589b495f",
+    "physical_resets": 1,
+    "job_id": "B5_r18_s920260929_d00040_task26",
+    "root_id": "B5_r18_s920260929_d00040",
+    "policy": "B5",
+    "regime": 18,
+    "intervention_capacity": 63,
+    "file": "worker_11/B5_r18_s920260929_d00040_task26.json",
+    "sha256": "d4e5fc7c448a1bd6cea10d19e7c006bbbc0754913b74c3496a69bd9bb4e5b677"
+  },
+  {
+    "task_id": 3,
+    "start_time": 537.9,
+    "window_origin": 537.9,
+    "window_end": 1846.5,
+    "window_seconds": 1308.6,
+    "N_W": 14,
+    "N_observed": 14,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.6,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 3,
+    "forced_return_reasons": {
+      "no_safe_task_return": 3
+    },
+    "first_task_completion": {
+      "time": 675.4500000000312,
+      "event": "task_completed",
+      "task_id": 3,
+      "collision_free": true,
+      "position": [
+        708.70849609375,
+        1413.203125,
+        20.672142028808594
+      ],
+      "battery": 63.81017146622283
+    },
+    "physical_end_time": 1846.5000000000905,
+    "post_battery": 6.978408697855005,
+    "post_position": [
+      2178.023681640625,
+      1964.44287109375,
+      184.8362579345703
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1208.0000000002735,
+      "charging": 100.6,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 79678,
+    "stream_sha256": "b248420b30ac5b2457b78bef0338f609175e16259704ee2755954f425a63beb7",
+    "physical_resets": 1,
+    "job_id": "B4_0.75_r11_s920260928_d00006_task3",
+    "root_id": "B4_0.75_r11_s920260928_d00006",
+    "policy": "B4_0.75",
+    "regime": 11,
+    "intervention_capacity": 131,
+    "file": "worker_12/B4_0.75_r11_s920260928_d00006_task3.json",
+    "sha256": "cd43adf5c18ea774a917204ee5b0692cceb7856343395a584ba286d1abea6780"
+  },
+  {
+    "task_id": 28,
+    "start_time": 2589.9500000000003,
+    "window_origin": 2589.9500000000003,
+    "window_end": 3898.55,
+    "window_seconds": 1308.6,
+    "N_W": 15,
+    "N_observed": 15,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.5999999997457,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 2,
+    "forced_return_reasons": {
+      "no_safe_task_return": 2
+    },
+    "first_task_completion": {
+      "time": 2752.5999999998526,
+      "event": "task_completed",
+      "task_id": 28,
+      "collision_free": true,
+      "position": [
+        166.32107543945312,
+        355.644775390625,
+        199.51516723632812
+      ],
+      "battery": 58.24650577251032
+    },
+    "physical_end_time": 3898.549999999746,
+    "post_battery": 30.7391183921766,
+    "post_position": [
+      1827.1851806640625,
+      1930.584228515625,
+      255.29931640625
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1104.9499999989976,
+      "charging": 203.64999999999998,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 118169,
+    "stream_sha256": "8c4f8836db230b65d51f058185da3055e164dcab7a1ab8e83f9936eaafdfe35e",
+    "physical_resets": 1,
+    "job_id": "B4_0.75_r14_s920260925_d00024_task28",
+    "root_id": "B4_0.75_r14_s920260925_d00024",
+    "policy": "B4_0.75",
+    "regime": 14,
+    "intervention_capacity": 134,
+    "file": "worker_12/B4_0.75_r14_s920260925_d00024_task28.json",
+    "sha256": "b1151aefff4ad0a38ac4ee46cb0944435eaab15b75014ac6a843abca7836f096"
+  },
+  {
+    "task_id": 8,
+    "start_time": 1366.8500000000001,
+    "window_origin": 1366.8500000000001,
+    "window_end": 2675.4500000000003,
+    "window_seconds": 1308.6,
+    "N_W": 12,
+    "N_observed": 12,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.5999999994758,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 1,
+    "forced_return_reasons": {
+      "no_safe_task_return": 1
+    },
+    "first_task_completion": {
+      "time": 1489.400000000028,
+      "event": "task_completed",
+      "task_id": 8,
+      "collision_free": true,
+      "position": [
+        1151.1734619140625,
+        3363.875,
+        363.5489501953125
+      ],
+      "battery": 110.82883288306577
+    },
+    "physical_end_time": 2675.449999999476,
+    "post_battery": 19.43233770887234,
+    "post_position": [
+      1711.373046875,
+      1792.00341796875,
+      193.95692443847656
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1202.2999999996182,
+      "charging": 106.30000000000001,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 65420,
+    "stream_sha256": "f3e3dcff6e275842b20df82f612f3a0be88085f69e89e99964d4264fdac7ae9e",
+    "physical_resets": 1,
+    "job_id": "B4_0.75_r23_s920260926_d00009_task8",
+    "root_id": "B4_0.75_r23_s920260926_d00009",
+    "policy": "B4_0.75",
+    "regime": 23,
+    "intervention_capacity": 114,
+    "file": "worker_12/B4_0.75_r23_s920260926_d00009_task8.json",
+    "sha256": "603231b775f1e26cb3e37c5234b3e70e7fd47cfd8c72a9037d17d0449de8a243"
+  },
+  {
+    "task_id": 29,
+    "start_time": 4692.900000000001,
+    "window_origin": 4692.900000000001,
+    "window_end": 6001.5,
+    "window_seconds": 1308.6,
+    "N_W": 9,
+    "N_observed": 9,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.5999999999985,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 2,
+    "forced_return_reasons": {
+      "no_safe_task_return": 2
+    },
+    "first_task_completion": {
+      "time": 4829.7999999998765,
+      "event": "task_completed",
+      "task_id": 29,
+      "collision_free": true,
+      "position": [
+        318.5396728515625,
+        2477.8271484375,
+        63.07892608642578
+      ],
+      "battery": 111.72473172996398
+    },
+    "physical_end_time": 6001.499999999999,
+    "post_battery": 137.0413762671796,
+    "post_position": [
+      2872.11083984375,
+      1992.5692138671875,
+      195.81201171875
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1209.5999999989008,
+      "charging": 99.0,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 44141,
+    "stream_sha256": "1d775cc814e72b7a9d0d9c2d018afb9c2a9dd9340b894922b4e428aa589b495f",
+    "physical_resets": 1,
+    "job_id": "B5_r18_s920260929_d00040_task29",
+    "root_id": "B5_r18_s920260929_d00040",
+    "policy": "B5",
+    "regime": 18,
+    "intervention_capacity": 63,
+    "file": "worker_12/B5_r18_s920260929_d00040_task29.json",
+    "sha256": "972f4a222b83be2523504ea799265ee583e7e7e93a683a62e831f96946bff0ea"
+  },
+  {
+    "task_id": 6,
+    "start_time": 537.9,
+    "window_origin": 537.9,
+    "window_end": 1846.5,
+    "window_seconds": 1308.6,
+    "N_W": 13,
+    "N_observed": 13,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.6,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 3,
+    "forced_return_reasons": {
+      "no_safe_task_return": 3
+    },
+    "first_task_completion": {
+      "time": 679.5500000000321,
+      "event": "task_completed",
+      "task_id": 6,
+      "collision_free": true,
+      "position": [
+        1339.863037109375,
+        3600.8876953125,
+        78.80769348144531
+      ],
+      "battery": 60.44739280894899
+    },
+    "physical_end_time": 1846.500000000019,
+    "post_battery": 71.87193038295412,
+    "post_position": [
+      2826.656494140625,
+      2324.321044921875,
+      261.31597900390625
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1171.5000000002658,
+      "charging": 137.1,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 106264,
+    "stream_sha256": "b248420b30ac5b2457b78bef0338f609175e16259704ee2755954f425a63beb7",
+    "physical_resets": 1,
+    "job_id": "B4_0.75_r11_s920260928_d00006_task6",
+    "root_id": "B4_0.75_r11_s920260928_d00006",
+    "policy": "B4_0.75",
+    "regime": 11,
+    "intervention_capacity": 131,
+    "file": "worker_13/B4_0.75_r11_s920260928_d00006_task6.json",
+    "sha256": "63417944feff67d2ebefe296ccce5a5623b85b4b4f6f1cc3ff86833cb7a89030"
+  },
+  {
+    "task_id": 15,
+    "start_time": 3671.1000000000004,
+    "window_origin": 3671.1000000000004,
+    "window_end": 4979.700000000001,
+    "window_seconds": 1308.6,
+    "N_W": 9,
+    "N_observed": 9,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.599999999884,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 2,
+    "forced_return_reasons": {
+      "no_safe_task_return": 2
+    },
+    "first_task_completion": {
+      "time": 3832.3999999998537,
+      "event": "task_completed",
+      "task_id": 15,
+      "collision_free": true,
+      "position": [
+        172.57931518554688,
+        2847.0068359375,
+        368.44775390625
+      ],
+      "battery": 57.77701797475858
+    },
+    "physical_end_time": 4979.699999999884,
+    "post_battery": 66.16581565801668,
+    "post_position": [
+      3086.841552734375,
+      3606.28564453125,
+      245.22198486328125
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 920.9499999991649,
+      "charging": 387.6500000000001,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 48265,
+    "stream_sha256": "457addb9c650805eeefb4405f10e71a4de6b5afc6c0b2d7c4c0301b5b49a4baa",
+    "physical_resets": 1,
+    "job_id": "B4_0.75_r15_s920260924_d00026_task15",
+    "root_id": "B4_0.75_r15_s920260924_d00026",
+    "policy": "B4_0.75",
+    "regime": 15,
+    "intervention_capacity": 53,
+    "file": "worker_13/B4_0.75_r15_s920260924_d00026_task15.json",
+    "sha256": "2d036f064fbf8ace2ddd65587885e092297052a5ed771408a51c8a5ee1c6703e"
+  },
+  {
+    "task_id": 40,
+    "start_time": 4840.650000000001,
+    "window_origin": 4840.650000000001,
+    "window_end": 6149.25,
+    "window_seconds": 1308.6,
+    "N_W": 9,
+    "N_observed": 9,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.599999999581,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 1,
+    "forced_return_reasons": {
+      "no_safe_task_return": 1
+    },
+    "first_task_completion": {
+      "time": 4935.4999999999145,
+      "event": "task_completed",
+      "task_id": 40,
+      "collision_free": true,
+      "position": [
+        3832.406494140625,
+        486.0292053222656,
+        102.03961944580078
+      ],
+      "battery": 116.77394197025413
+    },
+    "physical_end_time": 6149.249999999582,
+    "post_battery": 61.674396757505015,
+    "post_position": [
+      3019.9755859375,
+      2578.837646484375,
+      349.18011474609375
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1101.5499999990006,
+      "charging": 207.04999999999995,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 41867,
+    "stream_sha256": "f3e3dcff6e275842b20df82f612f3a0be88085f69e89e99964d4264fdac7ae9e",
+    "physical_resets": 1,
+    "job_id": "B4_0.75_r26_s920260926_d00043_task40",
+    "root_id": "B4_0.75_r26_s920260926_d00043",
+    "policy": "B4_0.75",
+    "regime": 26,
+    "intervention_capacity": 114,
+    "file": "worker_13/B4_0.75_r26_s920260926_d00043_task40.json",
+    "sha256": "773d67a81a7bdd7a0ecdbf514c8fec7e57f51c5395c05fc97ac2fa981290ef9d"
+  },
+  {
+    "task_id": 58,
+    "start_time": 6756.599999999933,
+    "window_origin": 6756.599999999933,
+    "window_end": 8065.200000000001,
+    "window_seconds": 1308.6,
+    "N_W": 11,
+    "N_observed": 11,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.6,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 2,
+    "forced_return_reasons": {
+      "no_safe_task_return": 2
+    },
+    "first_task_completion": {
+      "time": 6937.199999999769,
+      "event": "task_completed",
+      "task_id": 58,
+      "collision_free": true,
+      "position": [
+        241.18093872070312,
+        1538.9344482421875,
+        90.26806640625
+      ],
+      "battery": 84.28784372919279
+    },
+    "physical_end_time": 8065.199999999959,
+    "post_battery": 127.25881707962952,
+    "post_position": [
+      3340.447265625,
+      2715.459228515625,
+      96.31769561767578
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1204.2499999989059,
+      "charging": 104.35000000000002,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 75434,
+    "stream_sha256": "3d37219de63452c68d098496c67c50b026f6eea8249861aa6d825e341d2c4aec",
+    "physical_resets": 1,
+    "job_id": "B5_r19_s920260924_d00071_task58",
+    "root_id": "B5_r19_s920260924_d00071",
+    "policy": "B5",
+    "regime": 19,
+    "intervention_capacity": 90,
+    "file": "worker_13/B5_r19_s920260924_d00071_task58.json",
+    "sha256": "2e85668c57d7d5eff10fbe0ebce99e7f8ba64948cd78e998089824fb83409223"
+  },
+  {
+    "task_id": 37,
+    "start_time": 6736.749999999857,
+    "window_origin": 6736.749999999857,
+    "window_end": 8045.35,
+    "window_seconds": 1308.6,
+    "N_W": 10,
+    "N_observed": 10,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.5999999998185,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 3,
+    "forced_return_reasons": {
+      "no_safe_task_return": 2,
+      "empty_queue_return": 1
+    },
+    "first_task_completion": {
+      "time": 6821.8999999997795,
+      "event": "task_completed",
+      "task_id": 37,
+      "collision_free": true,
+      "position": [
+        386.3525085449219,
+        3589.71435546875,
+        124.26712799072266
+      ],
+      "battery": 44.392250789024736
+    },
+    "physical_end_time": 8045.349999999676,
+    "post_battery": 12.377184546346507,
+    "post_position": [
+      2781.198974609375,
+      1982.85986328125,
+      214.4521942138672
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1095.3499999990054,
+      "charging": 213.25,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 26221,
+    "stream_sha256": "1d775cc814e72b7a9d0d9c2d018afb9c2a9dd9340b894922b4e428aa589b495f",
+    "physical_resets": 1,
+    "job_id": "B4_0.75_r12_s920260929_d00056_task37",
+    "root_id": "B4_0.75_r12_s920260929_d00056",
+    "policy": "B4_0.75",
+    "regime": 12,
+    "intervention_capacity": 63,
+    "file": "worker_14/B4_0.75_r12_s920260929_d00056_task37.json",
+    "sha256": "ddd2a8867efa797d4742df4d32aed68a3768bdb94bc8b60f20a0e1470d8c8045"
+  },
+  {
+    "task_id": 17,
+    "start_time": 3671.1000000000004,
+    "window_origin": 3671.1000000000004,
+    "window_end": 4979.700000000001,
+    "window_seconds": 1308.6,
+    "N_W": 9,
+    "N_observed": 9,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.599999999844,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 2,
+    "forced_return_reasons": {
+      "no_safe_task_return": 2
+    },
+    "first_task_completion": {
+      "time": 3828.899999999857,
+      "event": "task_completed",
+      "task_id": 17,
+      "collision_free": true,
+      "position": [
+        318.2521667480469,
+        483.313720703125,
+        22.115032196044922
+      ],
+      "battery": 58.55542774363765
+    },
+    "physical_end_time": 4979.699999999844,
+    "post_battery": 57.24997764004874,
+    "post_position": [
+      2212.15673828125,
+      3360.598388671875,
+      209.2798614501953
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 931.2499999991555,
+      "charging": 377.3499999999999,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 41979,
+    "stream_sha256": "457addb9c650805eeefb4405f10e71a4de6b5afc6c0b2d7c4c0301b5b49a4baa",
+    "physical_resets": 1,
+    "job_id": "B4_0.75_r15_s920260924_d00026_task17",
+    "root_id": "B4_0.75_r15_s920260924_d00026",
+    "policy": "B4_0.75",
+    "regime": 15,
+    "intervention_capacity": 53,
+    "file": "worker_14/B4_0.75_r15_s920260924_d00026_task17.json",
+    "sha256": "fe9780f684fdc8725bb07aa3704e0d2847d00b49dcfd7ff0342092052d95b3e9"
+  },
+  {
+    "task_id": 45,
+    "start_time": 4840.650000000001,
+    "window_origin": 4840.650000000001,
+    "window_end": 6149.25,
+    "window_seconds": 1308.6,
+    "N_W": 11,
+    "N_observed": 11,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.5999999995583,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 1,
+    "forced_return_reasons": {
+      "empty_queue_return": 1
+    },
+    "first_task_completion": {
+      "time": 4939.8999999999105,
+      "event": "task_completed",
+      "task_id": 45,
+      "collision_free": true,
+      "position": [
+        3510.4345703125,
+        3575.56884765625,
+        163.90167236328125
+      ],
+      "battery": 116.53100987936125
+    },
+    "physical_end_time": 6149.249999999559,
+    "post_battery": 56.262786601328315,
+    "post_position": [
+      3654.343505859375,
+      1197.767578125,
+      352.3352966308594
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1106.4499999989948,
+      "charging": 202.1500000000001,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 42517,
+    "stream_sha256": "f3e3dcff6e275842b20df82f612f3a0be88085f69e89e99964d4264fdac7ae9e",
+    "physical_resets": 1,
+    "job_id": "B4_0.75_r26_s920260926_d00043_task45",
+    "root_id": "B4_0.75_r26_s920260926_d00043",
+    "policy": "B4_0.75",
+    "regime": 26,
+    "intervention_capacity": 114,
+    "file": "worker_14/B4_0.75_r26_s920260926_d00043_task45.json",
+    "sha256": "672cb164937c093be876fe53464b8d8fd5cdafe108b96cd5709dbfefeca7e8d5"
+  },
+  {
+    "task_id": 59,
+    "start_time": 6756.599999999933,
+    "window_origin": 6756.599999999933,
+    "window_end": 8065.200000000001,
+    "window_seconds": 1308.6,
+    "N_W": 10,
+    "N_observed": 10,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.6,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 2,
+    "forced_return_reasons": {
+      "no_safe_task_return": 2
+    },
+    "first_task_completion": {
+      "time": 6922.599999999782,
+      "event": "task_completed",
+      "task_id": 59,
+      "collision_free": true,
+      "position": [
+        3007.18359375,
+        337.1425476074219,
+        221.7574005126953
+      ],
+      "battery": 87.10059860379864
+    },
+    "physical_end_time": 8065.19999999997,
+    "post_battery": 130.12495642383402,
+    "post_position": [
+      3162.16259765625,
+      2552.019287109375,
+      114.07549285888672
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1201.9999999989077,
+      "charging": 106.60000000000002,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 78032,
+    "stream_sha256": "3d37219de63452c68d098496c67c50b026f6eea8249861aa6d825e341d2c4aec",
+    "physical_resets": 1,
+    "job_id": "B5_r19_s920260924_d00071_task59",
+    "root_id": "B5_r19_s920260924_d00071",
+    "policy": "B5",
+    "regime": 19,
+    "intervention_capacity": 90,
+    "file": "worker_14/B5_r19_s920260924_d00071_task59.json",
+    "sha256": "8e94d34a1655c2d0d46ac4aeb2108cd82d4099f383c5121a9dcc30f0c2176d25"
+  },
+  {
+    "task_id": 39,
+    "start_time": 6736.749999999857,
+    "window_origin": 6736.749999999857,
+    "window_end": 8045.35,
+    "window_seconds": 1308.6,
+    "N_W": 9,
+    "N_observed": 9,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.5999999998185,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 3,
+    "forced_return_reasons": {
+      "no_safe_task_return": 3
+    },
+    "first_task_completion": {
+      "time": 6814.899999999786,
+      "event": "task_completed",
+      "task_id": 39,
+      "collision_free": true,
+      "position": [
+        1534.0435791015625,
+        1728.1529541015625,
+        68.8331527709961
+      ],
+      "battery": 44.29510193613749
+    },
+    "physical_end_time": 8045.349999999676,
+    "post_battery": 16.187120047937345,
+    "post_position": [
+      1844.214111328125,
+      1919.0035400390625,
+      197.7433319091797
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1095.1499999990065,
+      "charging": 213.45000000000005,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 35369,
+    "stream_sha256": "1d775cc814e72b7a9d0d9c2d018afb9c2a9dd9340b894922b4e428aa589b495f",
+    "physical_resets": 1,
+    "job_id": "B4_0.75_r12_s920260929_d00056_task39",
+    "root_id": "B4_0.75_r12_s920260929_d00056",
+    "policy": "B4_0.75",
+    "regime": 12,
+    "intervention_capacity": 63,
+    "file": "worker_15/B4_0.75_r12_s920260929_d00056_task39.json",
+    "sha256": "097db02607b386d6997596f8990a8560da73d632cd81882ba224396119a7f418"
+  },
+  {
+    "task_id": 5,
+    "start_time": 374.95000000000005,
+    "window_origin": 374.95000000000005,
+    "window_end": 1683.5500000000002,
+    "window_seconds": 1308.6,
+    "N_W": 11,
+    "N_observed": 11,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.6,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 2,
+    "forced_return_reasons": {
+      "no_safe_task_return": 2
+    },
+    "first_task_completion": {
+      "time": 448.29999999999586,
+      "event": "task_completed",
+      "task_id": 5,
+      "collision_free": true,
+      "position": [
+        1484.004150390625,
+        2140.053466796875,
+        138.329345703125
+      ],
+      "battery": 78.43628600057633
+    },
+    "physical_end_time": 1683.5500000000636,
+    "post_battery": 27.98118479858828,
+    "post_position": [
+      2851.86865234375,
+      3006.189208984375,
+      249.22015380859375
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 962.5500000001792,
+      "charging": 346.05,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 75724,
+    "stream_sha256": "7a2e054fa00ed55b350de5e983ce591da3af97ef24e8156fad55ebbc5c09c0e9",
+    "physical_resets": 1,
+    "job_id": "B4_0.75_r16_s920260929_d00004_task5",
+    "root_id": "B4_0.75_r16_s920260929_d00004",
+    "policy": "B4_0.75",
+    "regime": 16,
+    "intervention_capacity": 102,
+    "file": "worker_15/B4_0.75_r16_s920260929_d00004_task5.json",
+    "sha256": "5332c5b6d1b517101d101bbcac1650a3c7cd42a0a96f2981e06bbd90870db570"
+  },
+  {
+    "task_id": 46,
+    "start_time": 4840.650000000001,
+    "window_origin": 4840.650000000001,
+    "window_end": 6149.25,
+    "window_seconds": 1308.6,
+    "N_W": 10,
+    "N_observed": 10,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.5999999995756,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 1,
+    "forced_return_reasons": {
+      "no_safe_task_return": 1
+    },
+    "first_task_completion": {
+      "time": 4948.9499999999025,
+      "event": "task_completed",
+      "task_id": 46,
+      "collision_free": true,
+      "position": [
+        3742.823974609375,
+        291.5965881347656,
+        353.82427978515625
+      ],
+      "battery": 114.63383819798668
+    },
+    "physical_end_time": 6149.249999999576,
+    "post_battery": 62.786137239325114,
+    "post_position": [
+      3622.931884765625,
+      1930.9473876953125,
+      299.2449645996094
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1104.049999998998,
+      "charging": 204.54999999999995,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 47657,
+    "stream_sha256": "f3e3dcff6e275842b20df82f612f3a0be88085f69e89e99964d4264fdac7ae9e",
+    "physical_resets": 1,
+    "job_id": "B4_0.75_r26_s920260926_d00043_task46",
+    "root_id": "B4_0.75_r26_s920260926_d00043",
+    "policy": "B4_0.75",
+    "regime": 26,
+    "intervention_capacity": 114,
+    "file": "worker_15/B4_0.75_r26_s920260926_d00043_task46.json",
+    "sha256": "a79c630c8f4433ee634a9d4b38324050dde24bced5b71f5625365e7000262b1a"
+  },
+  {
+    "task_id": 60,
+    "start_time": 6756.599999999933,
+    "window_origin": 6756.599999999933,
+    "window_end": 8065.200000000001,
+    "window_seconds": 1308.6,
+    "N_W": 11,
+    "N_observed": 11,
+    "F_W": true,
+    "outcome": "window_end",
+    "failure": null,
+    "failure_time": null,
+    "time_alive": 1308.6,
+    "failure_elapsed": null,
+    "depletion": false,
+    "navigation_failure": false,
+    "no_safe_continuation": false,
+    "horizon_censored": false,
+    "forced_return_count": 2,
+    "forced_return_reasons": {
+      "no_safe_task_return": 2
+    },
+    "first_task_completion": {
+      "time": 6910.4999999997935,
+      "event": "task_completed",
+      "task_id": 60,
+      "collision_free": true,
+      "position": [
+        755.1837768554688,
+        1627.403564453125,
+        287.7982177734375
+      ],
+      "battery": 89.11128114793112
+    },
+    "physical_end_time": 8065.199999999962,
+    "post_battery": 127.99683057952473,
+    "post_position": [
+      3289.214599609375,
+      2666.03466796875,
+      93.642333984375
+    ],
+    "overflow": 0,
+    "time_by_mode": {
+      "flight": 1203.549999998907,
+      "charging": 105.04999999999995,
+      "waiting": 0.0,
+      "failed": 0.0
+    },
+    "oracle_policy_steps": 74574,
+    "stream_sha256": "3d37219de63452c68d098496c67c50b026f6eea8249861aa6d825e341d2c4aec",
+    "physical_resets": 1,
+    "job_id": "B5_r19_s920260924_d00071_task60",
+    "root_id": "B5_r19_s920260924_d00071",
+    "policy": "B5",
+    "regime": 19,
+    "intervention_capacity": 90,
+    "file": "worker_15/B5_r19_s920260924_d00071_task60.json",
+    "sha256": "95b6c12bc7ba05b173d8e2166936fc6773a4b95c871fa83e4c9b2304aaa15330"
+  }
+]

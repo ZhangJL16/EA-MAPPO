@@ -1,0 +1,486 @@
+{
+  "passed": true,
+  "workers": [
+    {
+      "worker": 0,
+      "pid": 1209944,
+      "command": [
+        "/mnt/workspace/zjl-exp/.venv/bin/python",
+        "-u",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/scripts/mechanism_intervention_sweep.py",
+        "worker",
+        "--output",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/evidence/mechanism_intervention_sweep_v1",
+        "--worker",
+        "0"
+      ],
+      "status": {
+        "status": "running",
+        "index": 0,
+        "planned": 131,
+        "job": "C1__B4_0.75_r07_s920260923_d00005_task5",
+        "stage": "oracle",
+        "policy_steps": 2600,
+        "snapshot": {
+          "file": "checkpoint_bee9a40ba7e722a4052b.pkl",
+          "sha256": "bee9a40ba7e722a4052b076c2f4d86aa94be922a851b4e500a9b7f93bc69f86d",
+          "bytes": 339341
+        },
+        "checkpoint_unix": 1789988529.447907,
+        "training_updates": 0
+      },
+      "checkpoint_deserialized": true
+    },
+    {
+      "worker": 1,
+      "pid": 1209945,
+      "command": [
+        "/mnt/workspace/zjl-exp/.venv/bin/python",
+        "-u",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/scripts/mechanism_intervention_sweep.py",
+        "worker",
+        "--output",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/evidence/mechanism_intervention_sweep_v1",
+        "--worker",
+        "1"
+      ],
+      "status": {
+        "status": "running",
+        "index": 0,
+        "planned": 131,
+        "job": "C1__B4_0.75_r07_s920260923_d00005_task8",
+        "stage": "oracle",
+        "policy_steps": 2700,
+        "snapshot": {
+          "file": "checkpoint_91dd3c8902cc090ef42c.pkl",
+          "sha256": "91dd3c8902cc090ef42c62fdff022d3094f728f7b7f83bfa1487f2a05fad46d0",
+          "bytes": 339186
+        },
+        "checkpoint_unix": 1789988529.4122853,
+        "training_updates": 0
+      },
+      "checkpoint_deserialized": true
+    },
+    {
+      "worker": 2,
+      "pid": 1209946,
+      "command": [
+        "/mnt/workspace/zjl-exp/.venv/bin/python",
+        "-u",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/scripts/mechanism_intervention_sweep.py",
+        "worker",
+        "--output",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/evidence/mechanism_intervention_sweep_v1",
+        "--worker",
+        "2"
+      ],
+      "status": {
+        "status": "running",
+        "index": 0,
+        "planned": 131,
+        "job": "C1__B4_0.75_r08_s920260922_d00005_task4",
+        "stage": "oracle",
+        "policy_steps": 2500,
+        "snapshot": {
+          "file": "checkpoint_27fc3ca6f5db1ef18d54.pkl",
+          "sha256": "27fc3ca6f5db1ef18d545c979237973af7fd1efe94d7485eea2eccecab2cc723",
+          "bytes": 342600
+        },
+        "checkpoint_unix": 1789988528.9821737,
+        "training_updates": 0
+      },
+      "checkpoint_deserialized": true
+    },
+    {
+      "worker": 3,
+      "pid": 1209947,
+      "command": [
+        "/mnt/workspace/zjl-exp/.venv/bin/python",
+        "-u",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/scripts/mechanism_intervention_sweep.py",
+        "worker",
+        "--output",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/evidence/mechanism_intervention_sweep_v1",
+        "--worker",
+        "3"
+      ],
+      "status": {
+        "status": "running",
+        "index": 0,
+        "planned": 131,
+        "job": "C1__B4_0.75_r08_s920260922_d00005_task9",
+        "stage": "physical",
+        "policy_steps": 2600,
+        "snapshot": {
+          "file": "checkpoint_ac382ca05b2d8d3b511b.pkl",
+          "sha256": "ac382ca05b2d8d3b511b0b58edb8fdef74187856b9011bdc5e2b5943794a6c9d",
+          "bytes": 213418
+        },
+        "checkpoint_unix": 1789988529.1968646,
+        "training_updates": 0
+      },
+      "checkpoint_deserialized": true
+    },
+    {
+      "worker": 4,
+      "pid": 1209948,
+      "command": [
+        "/mnt/workspace/zjl-exp/.venv/bin/python",
+        "-u",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/scripts/mechanism_intervention_sweep.py",
+        "worker",
+        "--output",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/evidence/mechanism_intervention_sweep_v1",
+        "--worker",
+        "4"
+      ],
+      "status": {
+        "status": "running",
+        "index": 0,
+        "planned": 131,
+        "job": "C1__B4_0.75_r08_s920260929_d00005_task4",
+        "stage": "oracle",
+        "policy_steps": 2700,
+        "snapshot": {
+          "file": "checkpoint_a2173a5a5b5debc719b5.pkl",
+          "sha256": "a2173a5a5b5debc719b55001a7216319bc360cdccc8fabb64841be590f9d666f",
+          "bytes": 329308
+        },
+        "checkpoint_unix": 1789988529.1195457,
+        "training_updates": 0
+      },
+      "checkpoint_deserialized": true
+    },
+    {
+      "worker": 5,
+      "pid": 1209949,
+      "command": [
+        "/mnt/workspace/zjl-exp/.venv/bin/python",
+        "-u",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/scripts/mechanism_intervention_sweep.py",
+        "worker",
+        "--output",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/evidence/mechanism_intervention_sweep_v1",
+        "--worker",
+        "5"
+      ],
+      "status": {
+        "status": "running",
+        "index": 0,
+        "planned": 131,
+        "job": "C1__B4_0.75_r08_s920260929_d00005_task5",
+        "stage": "oracle",
+        "policy_steps": 2700,
+        "snapshot": {
+          "file": "checkpoint_7f635eaf9774f4a5aa78.pkl",
+          "sha256": "7f635eaf9774f4a5aa78ede73053b99cdf8a2e6dbf61fb6def8ee668875924b1",
+          "bytes": 337731
+        },
+        "checkpoint_unix": 1789988529.4007206,
+        "training_updates": 0
+      },
+      "checkpoint_deserialized": true
+    },
+    {
+      "worker": 6,
+      "pid": 1209950,
+      "command": [
+        "/mnt/workspace/zjl-exp/.venv/bin/python",
+        "-u",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/scripts/mechanism_intervention_sweep.py",
+        "worker",
+        "--output",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/evidence/mechanism_intervention_sweep_v1",
+        "--worker",
+        "6"
+      ],
+      "status": {
+        "status": "running",
+        "index": 0,
+        "planned": 131,
+        "job": "C1__B4_0.75_r08_s920260929_d00005_task6",
+        "stage": "oracle",
+        "policy_steps": 2800,
+        "snapshot": {
+          "file": "checkpoint_d6bad8468fc4e69ebc81.pkl",
+          "sha256": "d6bad8468fc4e69ebc81fdfc781516aa2f471a1e4a74b5a7dc501a3fa974dd13",
+          "bytes": 336887
+        },
+        "checkpoint_unix": 1789988529.1699376,
+        "training_updates": 0
+      },
+      "checkpoint_deserialized": true
+    },
+    {
+      "worker": 7,
+      "pid": 1209951,
+      "command": [
+        "/mnt/workspace/zjl-exp/.venv/bin/python",
+        "-u",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/scripts/mechanism_intervention_sweep.py",
+        "worker",
+        "--output",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/evidence/mechanism_intervention_sweep_v1",
+        "--worker",
+        "7"
+      ],
+      "status": {
+        "status": "running",
+        "index": 0,
+        "planned": 131,
+        "job": "C1__B4_0.75_r08_s920260929_d00005_task7",
+        "stage": "oracle",
+        "policy_steps": 2800,
+        "snapshot": {
+          "file": "checkpoint_bcfaf2a8e3743ee8ba40.pkl",
+          "sha256": "bcfaf2a8e3743ee8ba40fc06519c8dcc59532e76da266cd797c4e4c51f2fb391",
+          "bytes": 329766
+        },
+        "checkpoint_unix": 1789988529.4034083,
+        "training_updates": 0
+      },
+      "checkpoint_deserialized": true
+    },
+    {
+      "worker": 8,
+      "pid": 1209952,
+      "command": [
+        "/mnt/workspace/zjl-exp/.venv/bin/python",
+        "-u",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/scripts/mechanism_intervention_sweep.py",
+        "worker",
+        "--output",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/evidence/mechanism_intervention_sweep_v1",
+        "--worker",
+        "8"
+      ],
+      "status": {
+        "status": "running",
+        "index": 0,
+        "planned": 131,
+        "job": "C1__B4_0.75_r09_s920260924_d00030_task17",
+        "stage": "oracle",
+        "policy_steps": 2600,
+        "snapshot": {
+          "file": "checkpoint_45e2113bacc6dd801339.pkl",
+          "sha256": "45e2113bacc6dd801339bd8f475c4448a89c2cf990292b2f300496b404126e70",
+          "bytes": 328610
+        },
+        "checkpoint_unix": 1789988529.0593708,
+        "training_updates": 0
+      },
+      "checkpoint_deserialized": true
+    },
+    {
+      "worker": 9,
+      "pid": 1209953,
+      "command": [
+        "/mnt/workspace/zjl-exp/.venv/bin/python",
+        "-u",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/scripts/mechanism_intervention_sweep.py",
+        "worker",
+        "--output",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/evidence/mechanism_intervention_sweep_v1",
+        "--worker",
+        "9"
+      ],
+      "status": {
+        "status": "running",
+        "index": 0,
+        "planned": 131,
+        "job": "C1__B4_0.75_r09_s920260924_d00030_task19",
+        "stage": "oracle",
+        "policy_steps": 2600,
+        "snapshot": {
+          "file": "checkpoint_2133db34a9eba992821a.pkl",
+          "sha256": "2133db34a9eba992821a5ac56771e9c6e3d7cd71ec8dc0f5d4ef804d61c6a0b2",
+          "bytes": 325928
+        },
+        "checkpoint_unix": 1789988529.410997,
+        "training_updates": 0
+      },
+      "checkpoint_deserialized": true
+    },
+    {
+      "worker": 10,
+      "pid": 1209954,
+      "command": [
+        "/mnt/workspace/zjl-exp/.venv/bin/python",
+        "-u",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/scripts/mechanism_intervention_sweep.py",
+        "worker",
+        "--output",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/evidence/mechanism_intervention_sweep_v1",
+        "--worker",
+        "10"
+      ],
+      "status": {
+        "status": "running",
+        "index": 0,
+        "planned": 131,
+        "job": "C1__B4_0.75_r09_s920260924_d00030_task20",
+        "stage": "oracle",
+        "policy_steps": 2600,
+        "snapshot": {
+          "file": "checkpoint_1d52a928c806fe08481e.pkl",
+          "sha256": "1d52a928c806fe08481e9b4a355e2fa87ab39be3bc439ef30db064e1d8cc561a",
+          "bytes": 326627
+        },
+        "checkpoint_unix": 1789988529.312118,
+        "training_updates": 0
+      },
+      "checkpoint_deserialized": true
+    },
+    {
+      "worker": 11,
+      "pid": 1209955,
+      "command": [
+        "/mnt/workspace/zjl-exp/.venv/bin/python",
+        "-u",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/scripts/mechanism_intervention_sweep.py",
+        "worker",
+        "--output",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/evidence/mechanism_intervention_sweep_v1",
+        "--worker",
+        "11"
+      ],
+      "status": {
+        "status": "running",
+        "index": 0,
+        "planned": 131,
+        "job": "C1__B4_0.75_r09_s920260924_d00030_task21",
+        "stage": "oracle",
+        "policy_steps": 2600,
+        "snapshot": {
+          "file": "checkpoint_338677a57b9e15f13301.pkl",
+          "sha256": "338677a57b9e15f133016066635b381b24da7ca774231f2a0e5fb5038eaf7d6a",
+          "bytes": 326613
+        },
+        "checkpoint_unix": 1789988529.6897295,
+        "training_updates": 0
+      },
+      "checkpoint_deserialized": true
+    },
+    {
+      "worker": 12,
+      "pid": 1209956,
+      "command": [
+        "/mnt/workspace/zjl-exp/.venv/bin/python",
+        "-u",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/scripts/mechanism_intervention_sweep.py",
+        "worker",
+        "--output",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/evidence/mechanism_intervention_sweep_v1",
+        "--worker",
+        "12"
+      ],
+      "status": {
+        "status": "running",
+        "index": 0,
+        "planned": 131,
+        "job": "C1__B4_0.75_r09_s920260924_d00030_task22",
+        "stage": "oracle",
+        "policy_steps": 2500,
+        "snapshot": {
+          "file": "checkpoint_dac344ed130d9d6e1c40.pkl",
+          "sha256": "dac344ed130d9d6e1c40d09070c4b5326477e99dd6996aedd3aeb2584511e48f",
+          "bytes": 325952
+        },
+        "checkpoint_unix": 1789988529.1581242,
+        "training_updates": 0
+      },
+      "checkpoint_deserialized": true
+    },
+    {
+      "worker": 13,
+      "pid": 1209957,
+      "command": [
+        "/mnt/workspace/zjl-exp/.venv/bin/python",
+        "-u",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/scripts/mechanism_intervention_sweep.py",
+        "worker",
+        "--output",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/evidence/mechanism_intervention_sweep_v1",
+        "--worker",
+        "13"
+      ],
+      "status": {
+        "status": "running",
+        "index": 0,
+        "planned": 131,
+        "job": "C1__B4_0.75_r09_s920260924_d00033_task17",
+        "stage": "oracle",
+        "policy_steps": 2600,
+        "snapshot": {
+          "file": "checkpoint_1fd20ddf00714a2ecbdf.pkl",
+          "sha256": "1fd20ddf00714a2ecbdfecaf306bfdebb816be92ca2810d6903d78f65d62ebcc",
+          "bytes": 330703
+        },
+        "checkpoint_unix": 1789988529.0373487,
+        "training_updates": 0
+      },
+      "checkpoint_deserialized": true
+    },
+    {
+      "worker": 14,
+      "pid": 1209958,
+      "command": [
+        "/mnt/workspace/zjl-exp/.venv/bin/python",
+        "-u",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/scripts/mechanism_intervention_sweep.py",
+        "worker",
+        "--output",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/evidence/mechanism_intervention_sweep_v1",
+        "--worker",
+        "14"
+      ],
+      "status": {
+        "status": "running",
+        "index": 0,
+        "planned": 130,
+        "job": "C1__B4_0.75_r09_s920260924_d00033_task20",
+        "stage": "oracle",
+        "policy_steps": 2600,
+        "snapshot": {
+          "file": "checkpoint_93c11d709042b720097f.pkl",
+          "sha256": "93c11d709042b720097fd8db5294cacf8ee144f5ecfbdbc5912747a23799c85a",
+          "bytes": 332192
+        },
+        "checkpoint_unix": 1789988529.3043456,
+        "training_updates": 0
+      },
+      "checkpoint_deserialized": true
+    },
+    {
+      "worker": 15,
+      "pid": 1209959,
+      "command": [
+        "/mnt/workspace/zjl-exp/.venv/bin/python",
+        "-u",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/scripts/mechanism_intervention_sweep.py",
+        "worker",
+        "--output",
+        "/mnt/workspace/zjl-exp/repo/persistent_uav_throughput_v1/evidence/mechanism_intervention_sweep_v1",
+        "--worker",
+        "15"
+      ],
+      "status": {
+        "status": "running",
+        "index": 0,
+        "planned": 130,
+        "job": "C1__B4_0.75_r09_s920260924_d00033_task21",
+        "stage": "oracle",
+        "policy_steps": 2700,
+        "snapshot": {
+          "file": "checkpoint_6cdaacce665483b53a5e.pkl",
+          "sha256": "6cdaacce665483b53a5e9f4c0f2d1938263ee9d4c10a4d66730356a3a4c5a66c",
+          "bytes": 332192
+        },
+        "checkpoint_unix": 1789988529.2613947,
+        "training_updates": 0
+      },
+      "checkpoint_deserialized": true
+    }
+  ],
+  "training_updates": 0
+}

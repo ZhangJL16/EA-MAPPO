@@ -1,3 +1,7 @@
+# 完成状态
+
+2164/2164任务已返回并通过完整性复核；2105条到达完整窗口，59条为诊断未知。见[完整结果](RESULTS.md)及completion_review.json。以下保留启动阶段记录。
+
 # Mechanism Intervention Sweep v1
 
 Frozen scope: 77 pairs / 130 primary branches; C1/C4 extend to 128 roots / 420 branches. C1–C7, D1/D2, pair-specific counterpart erasure and K8/K12 are all included. Deduplicated total: **2164 jobs**, including **70 prior C1 imports** and **2094 new runs**. No scientific results are available in this record.

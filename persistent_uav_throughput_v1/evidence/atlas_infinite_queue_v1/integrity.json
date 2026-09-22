@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "manifest_sha256": "5e77842eb74b1938f7651c0b7b0da4c3712af751a07a5528e80b8775a24806d1",
+  "output_hashes": {
+    "continuations.json": "362da086e57ed233530ac419ec8e6f2e4e048c98d793785bff2de534f79a20fd",
+    "pair_comparisons.json": "5bbb497c8b313b571be835a4d2094fc49c900fec80257779bd49eea3ceecd785",
+    "summary.json": "ec3905819e5377887b5c589cf771c6cb875e5229129f2c8e52a0acdc50a1e8d9"
+  },
+  "raw_files": 70
+}

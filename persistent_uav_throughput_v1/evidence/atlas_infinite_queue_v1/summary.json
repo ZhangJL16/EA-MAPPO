@@ -1,0 +1,88 @@
+{
+  "groups": {
+    "all": {
+      "pairs": 41,
+      "resolved": 41,
+      "unknown": 0,
+      "old_abs_gap_mean": 1.7317073170731707,
+      "new_abs_gap_mean": 1.1219512195121952,
+      "root_balanced_abs_change": -0.5833333333333334,
+      "disappeared": 7,
+      "smaller": 17,
+      "equal": 22,
+      "larger": 2,
+      "reversed": 4
+    },
+    "B4_0.75": {
+      "pairs": 29,
+      "resolved": 29,
+      "unknown": 0,
+      "old_abs_gap_mean": 1.8275862068965518,
+      "new_abs_gap_mean": 1.103448275862069,
+      "root_balanced_abs_change": -0.6798245614035088,
+      "disappeared": 7,
+      "smaller": 15,
+      "equal": 12,
+      "larger": 2,
+      "reversed": 3
+    },
+    "B5": {
+      "pairs": 12,
+      "resolved": 12,
+      "unknown": 0,
+      "old_abs_gap_mean": 1.5,
+      "new_abs_gap_mean": 1.1666666666666667,
+      "root_balanced_abs_change": -0.4,
+      "disappeared": 0,
+      "smaller": 2,
+      "equal": 10,
+      "larger": 0,
+      "reversed": 1
+    },
+    "B=2": {
+      "pairs": 0,
+      "resolved": 0,
+      "unknown": 0,
+      "old_abs_gap_mean": null,
+      "new_abs_gap_mean": null,
+      "root_balanced_abs_change": null,
+      "disappeared": 0,
+      "smaller": 0,
+      "equal": 0,
+      "larger": 0,
+      "reversed": 0
+    },
+    "B=4": {
+      "pairs": 28,
+      "resolved": 28,
+      "unknown": 0,
+      "old_abs_gap_mean": 1.7142857142857142,
+      "new_abs_gap_mean": 1.1071428571428572,
+      "root_balanced_abs_change": -0.46759259259259256,
+      "disappeared": 6,
+      "smaller": 12,
+      "equal": 15,
+      "larger": 1,
+      "reversed": 4
+    },
+    "B=6": {
+      "pairs": 13,
+      "resolved": 13,
+      "unknown": 0,
+      "old_abs_gap_mean": 1.7692307692307692,
+      "new_abs_gap_mean": 1.1538461538461537,
+      "root_balanced_abs_change": -0.7727272727272727,
+      "disappeared": 1,
+      "smaller": 5,
+      "equal": 7,
+      "larger": 1,
+      "reversed": 0
+    }
+  },
+  "outcomes": {
+    "window_end": 70
+  },
+  "unique_jobs": 70,
+  "pairs": 41,
+  "all_observed_arrivals_accepted": true
+}

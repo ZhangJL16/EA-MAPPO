@@ -1,0 +1,28 @@
+{
+  "passed": true,
+  "reviewed_unix": 1790056293.4406283,
+  "jobs": 2164,
+  "unique_jobs": 2164,
+  "missing": 0,
+  "duplicates": 0,
+  "raw_hashes_verified": 2164,
+  "completed_workers": 16,
+  "worker_errors": 0,
+  "window_end": 2105,
+  "diagnostic_unknown": 59,
+  "imported_jobs": 70,
+  "new_jobs": 2094,
+  "source_and_protocol_verified": true,
+  "prior_import_integrity_verified": true,
+  "no_arrival_exhaustion": {
+    "C3": {
+      "known": 127,
+      "exhausted": 127
+    },
+    "C7": {
+      "known": 128,
+      "exhausted": 128
+    }
+  },
+  "results_sha256": "305f659fd8a3b6222ad738fb502a35b0f2a813fd7f3acbaa2cd86ac53192e227"
+}
