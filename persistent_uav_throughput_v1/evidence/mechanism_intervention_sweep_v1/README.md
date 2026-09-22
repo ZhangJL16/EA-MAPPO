@@ -1,3 +1,7 @@
+# 原始数据归档
+
+全部2164条原始结果现已纳入 [raw_archives/](raw_archives/README.md)：6个分包，包含70条导入C1与2094条新结果，逐文件SHA256验证。查看该目录manifest.json可按job ID定位和恢复。以下保留完整结果和历史启动记录。
+
 # 完成状态
 
 2164/2164任务已返回并通过完整性复核；2105条到达完整窗口，59条为诊断未知。见[完整结果](RESULTS.md)及completion_review.json。以下保留启动阶段记录。
