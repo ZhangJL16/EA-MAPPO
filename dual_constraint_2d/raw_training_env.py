@@ -68,6 +68,12 @@ class RawTrainingEnv(DualConstraintEnv):
                 self.case.config.policy_hold_steps,
                 max(0, floor((self.horizon_s - self.time_s + 1e-10) / self.case.config.physics_dt_s)),
             )
+            # Event-based charging can leave less than one physics step before
+            # the horizon.  No flight step fits in that remainder; close the
+            # episode instead of returning an unchanged state forever.
+            if count == 0:
+                self.time_s = self.horizon_s
+                event = "horizon"
             controller = _controller(self.case)
             desired = np.array((velocity[0], velocity[1], 0.0))
             for _ in range(count):
@@ -88,12 +94,12 @@ class RawTrainingEnv(DualConstraintEnv):
                     self.failure_reason = "depletion"
                     event = "depletion"
                     break
-            if not self.done and self._at_target():
+            if count > 0 and not self.done and self._at_target():
                 self.completed_targets += 1
                 reward += 1.0
                 self.target = self._draw_target()
                 event = "target_completed"
-            elif not self.done and self._at_station():
+            elif count > 0 and not self.done and self._at_station():
                 self.mode = "docked"
                 event = "docked"
         reward += self.state.raw_contact_penalty - last_penalty

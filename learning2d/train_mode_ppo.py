@@ -56,7 +56,7 @@ def training_manifest(seed: int, total_timesteps: int, n_steps: int,
                       checkpoint_steps: int, device: str) -> dict:
     calibration_path = CALIBRATION_OUTPUT / "calibration.json"
     return {
-        "protocol": "dual_constraint_2d_mode_masked_ppo_v1",
+        "protocol": "dual_constraint_2d_mode_masked_ppo_v2_horizon_close",
         "seed": seed,
         "train_map_ids": list(TRAIN_MAP_IDS),
         "validation_map_ids": list(VALIDATION_MAP_IDS),

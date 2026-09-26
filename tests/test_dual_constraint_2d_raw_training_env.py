@@ -32,6 +32,20 @@ class RawTrainingTest(unittest.TestCase):
         self.assertEqual(env.energy, 0.0)
         self.assertEqual(env.charge_events, 0)
 
+    def test_substep_horizon_remainder_terminates_without_flight(self) -> None:
+        env = RawTrainingEnv(0, 85.39121788182787, 29.9, horizon_s=10)
+        env.mode = "flight"
+        env.time_s = 9.9507001226987
+        position = env.state.position.copy()
+        energy = env.energy
+        _, _, done, info = env.step(EnvironmentAction((5.0, 0.0)))
+        self.assertTrue(done)
+        self.assertEqual(info["event"], "horizon")
+        self.assertEqual(env.time_s, 10.0)
+        np.testing.assert_array_equal(env.state.position, position)
+        self.assertEqual(env.energy, energy)
+        self.assertEqual(info["new_collision_steps"], 0)
+
 
 if __name__ == "__main__":
     unittest.main()

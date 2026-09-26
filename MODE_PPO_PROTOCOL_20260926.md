@@ -31,15 +31,17 @@
 训练程序 `python3 -m learning2d.train_mode_ppo` 在 `artifacts/` 下写入
 manifest、逐 episode 记录、模型和状态文件。使用相同参数及输出目录
 再次执行即可继续；恢复不保证逐位等价，因为 Gym episode 和随机流在
-重启时重置。`--max-new-timesteps 512` 只运行第一个检查点。
+重启时重置。`--max-new-timesteps 512` 只运行第一个检查点。v1 在
+不足一个物理步的 horizon 余量处暴露了环境停止错误；当前正式运行
+采用修复后的 `v2_horizon_close`，保留 v1 记录和迁移来源。
 
 单行启动命令示例：
 
-`cd /home/zjl/uav_learning_research && python3 -m learning2d.train_mode_ppo --output artifacts/mode_ppo_v1_20260926/seed101 --seed 101 --total-timesteps 51200 --n-steps 512 --checkpoint-steps 512 --max-new-timesteps 512 --device cuda`
+`cd /home/zjl/uav_learning_research && python3 -m learning2d.train_mode_ppo --output artifacts/mode_ppo_v2_20260926/seed101 --seed 101 --total-timesteps 51200 --n-steps 512 --checkpoint-steps 512 --max-new-timesteps 512 --device cuda`
 
 单行续跑命令示例：
 
-`cd /home/zjl/uav_learning_research && python3 -m learning2d.train_mode_ppo --output artifacts/mode_ppo_v1_20260926/seed101 --seed 101 --total-timesteps 51200 --n-steps 512 --checkpoint-steps 512 --device cuda`
+`cd /home/zjl/uav_learning_research && python3 -m learning2d.train_mode_ppo --output artifacts/mode_ppo_v2_20260926/seed101 --seed 101 --total-timesteps 51200 --n-steps 512 --checkpoint-steps 512 --device cuda`
 
 验证入口 `python3 -m learning2d.evaluate_mode_ppo` 会拒绝未完成训练的
 模型，并为每张图记录模型、训练 manifest 和评价源码的 SHA。正式验证

@@ -38,7 +38,7 @@ def evaluate(output: Path, *, map_id: int, training_output: Path,
     training_status_path = training_output / "status.json"
     training_manifest = json.loads(training_manifest_path.read_text())
     training_status = json.loads(training_status_path.read_text())
-    if training_manifest["protocol"] != "dual_constraint_2d_mode_masked_ppo_v1":
+    if training_manifest["protocol"] != "dual_constraint_2d_mode_masked_ppo_v2_horizon_close":
         raise ValueError("not a mode-masked PPO training run")
     if not training_status["complete"]:
         raise ValueError("training must complete before result evaluation")
