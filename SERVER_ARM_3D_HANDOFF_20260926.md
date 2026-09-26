@@ -2,7 +2,7 @@
 
 目标远程仓库：`ZhangJL16/EA-MAPPO` 的独立分支 `research/uav-learning-20260926`。该分支是 `/home/zjl/uav_learning_research` 独立项目的源码快照，不继续旧 `master` 的 regenerative-control 实验。用户已说明：本地提交代码到 GitHub，服务器侧有人负责 ARM64 可运行性适配；用户之后在 Ascend 服务器运行三维研究。服务器资源快照见 `ASCEND_SERVER_INVENTORY_20260926.md`。
 
-本次交付包括 `nav3d/`、`nav3d_v2/`、`delivery_1km/`、`dual_constraint_2d/`、`gpu2d/`、测试、`pyproject.toml`、`uv.lock` 和研究协议。`.venv/`、原始运行 `artifacts/`、本地性能剖析缓存、`literature/` 下的论文全文和提取文本不进入 GitHub。历史报告中的 `artifacts/...` 路径指本地原始证据；服务器如需复核原始航迹，应另行按 SHA 传输或从固定源码重新生成，不能把报告当成原始数据已经上传。
+本次交付包括 `nav3d/`、`nav3d_v2/`、`delivery_1km/`、`dual_constraint_2d/`、`gpu2d/`、测试、`pyproject.toml`、`uv.lock` 和研究协议。干净检出测试发现，冻结的三维 v2 资格脚本与 1 km 能耗审计需要原始三维 manifest/航迹；因此分支**选择性包含** `artifacts/nav3d_qualification_20260923/`、`nav3d_v2_paired_20260923/`、`nav3d_v2_holdout_20260923/`、`nav3d_v2_freeze_20260923.json`、`delivery_1km_nav_v1_20260923/`、`delivery_1km_energy_oat_20260925/` 和 `delivery_1km_preflight_cv_20260925/`，共约 17 MiB。其余大规模二维/GPU 运行产物、`.venv/`、性能剖析缓存和 `literature/` 下的论文全文与提取文本不进入 GitHub。
 
 三维当前可执行范围：解析导航 v2 与 1 km 静态地图导航资格。已在本地完成的 1 km v1 资格为 96/96 到达、0 统一接触；这不是完整三维配送或能量安全结论。当前项目尚无持续订单队列、取货→送达履约状态机、真实 M100 功率曲线或三维高层学习训练入口。`sac_native_qualification.py` 仍依赖旧 `/home/zjl/mappo` 和冻结 SAC 资产，本分支未携带那些资产，故不作为服务器三维解析实验入口。
 

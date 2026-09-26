@@ -1,0 +1,2306 @@
+[
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 3.5312466891995893,
+      "energy_wh_payload_0.25": 4.012347585875589,
+      "energy_wh_payload_0.5": 4.516360171096068,
+      "flight_seconds": 38.35
+    },
+    "job_id": "m100_station_to_ground_00",
+    "map_id": 100,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 5.850870544177585,
+        "energy_wh_payload_0.25": 6.635754455100765,
+        "energy_wh_payload_0.5": 7.454523644622218,
+        "flight_seconds": 58.43164171030322
+      },
+      "route": {
+        "energy_wh_payload_0.0": 3.5219401837000017,
+        "energy_wh_payload_0.25": 4.001386651522524,
+        "energy_wh_payload_0.5": 4.50368502280009,
+        "flight_seconds": 38.23303277766771
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 10.140086569545616,
+      "energy_wh_payload_0.25": 11.481886951720067,
+      "energy_wh_payload_0.5": 12.884566927244183,
+      "flight_seconds": 101.7
+    },
+    "job_id": "m100_station_to_roof_00",
+    "map_id": 100,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 12.45219707756939,
+        "energy_wh_payload_0.25": 14.122996011191931,
+        "energy_wh_payload_0.5": 15.86851220413277,
+        "flight_seconds": 127.12772605160393
+      },
+      "route": {
+        "energy_wh_payload_0.0": 10.86905233830717,
+        "energy_wh_payload_0.25": 12.316953403767858,
+        "energy_wh_payload_0.5": 13.829299500681111,
+        "flight_seconds": 109.26257921257012
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 11.353958388786603,
+      "energy_wh_payload_0.25": 12.867592214118382,
+      "energy_wh_payload_0.5": 14.448443022341422,
+      "flight_seconds": 114.0
+    },
+    "job_id": "m100_ground_to_roof_00",
+    "map_id": 100,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 11.840588155586312,
+        "energy_wh_payload_0.25": 13.428466964289234,
+        "energy_wh_payload_0.5": 15.087093929677415,
+        "flight_seconds": 120.4975359799078
+      },
+      "route": {
+        "energy_wh_payload_0.0": 11.382394915729554,
+        "energy_wh_payload_0.25": 12.899434792412409,
+        "energy_wh_payload_0.5": 14.48388829796631,
+        "flight_seconds": 114.37553330913028
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 9.33512112520546,
+      "energy_wh_payload_0.25": 10.604414964140998,
+      "energy_wh_payload_0.5": 11.934411144666123,
+      "flight_seconds": 101.55000000000001
+    },
+    "job_id": "m100_roof_to_station_00",
+    "map_id": 100,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 12.45219707756939,
+        "energy_wh_payload_0.25": 14.122996011191931,
+        "energy_wh_payload_0.5": 15.86851220413277,
+        "flight_seconds": 127.12772605160393
+      },
+      "route": {
+        "energy_wh_payload_0.0": 10.10700813720681,
+        "energy_wh_payload_0.25": 11.489380038784965,
+        "energy_wh_payload_0.5": 12.936331281211576,
+        "flight_seconds": 109.54481141920243
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 6.1668593387025235,
+      "energy_wh_payload_0.25": 7.00644367852378,
+      "energy_wh_payload_0.5": 7.8860990711357495,
+      "flight_seconds": 67.05
+    },
+    "job_id": "m100_station_to_ground_01",
+    "map_id": 100,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 8.482080824489437,
+        "energy_wh_payload_0.25": 9.623696426679992,
+        "energy_wh_payload_0.5": 10.816272832818923,
+        "flight_seconds": 86.9554641236576
+      },
+      "route": {
+        "energy_wh_payload_0.0": 6.137950630183529,
+        "energy_wh_payload_0.25": 6.972603993864387,
+        "energy_wh_payload_0.5": 7.847143682282396,
+        "flight_seconds": 66.69892721180729
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 6.964243268789327,
+      "energy_wh_payload_0.25": 7.887270398235519,
+      "energy_wh_payload_0.5": 8.848276614509215,
+      "flight_seconds": 66.15
+    },
+    "job_id": "m100_station_to_roof_01",
+    "map_id": 100,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 5.955601864914202,
+        "energy_wh_payload_0.25": 6.7508615772927065,
+        "energy_wh_payload_0.5": 7.579840067917284,
+        "flight_seconds": 58.35926437945754
+      },
+      "route": {
+        "energy_wh_payload_0.0": 6.94033193890718,
+        "energy_wh_payload_0.25": 7.859307368503096,
+        "energy_wh_payload_0.5": 8.816104967055324,
+        "flight_seconds": 65.84109586028956
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 7.814053659984275,
+      "energy_wh_payload_0.25": 8.852577203551713,
+      "energy_wh_payload_0.5": 9.934612324878648,
+      "flight_seconds": 75.4
+    },
+    "job_id": "m100_ground_to_roof_01",
+    "map_id": 100,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 6.801284270791659,
+        "energy_wh_payload_0.25": 7.711199097275288,
+        "energy_wh_payload_0.5": 8.66032084997543,
+        "flight_seconds": 67.52694472178577
+      },
+      "route": {
+        "energy_wh_payload_0.0": 7.785920986142544,
+        "energy_wh_payload_0.25": 8.819712111923476,
+        "energy_wh_payload_0.5": 9.896831546776294,
+        "flight_seconds": 75.04230091878705
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 6.641007077112756,
+      "energy_wh_payload_0.25": 7.535982125722787,
+      "energy_wh_payload_0.5": 8.468963565367051,
+      "flight_seconds": 66.2
+    },
+    "job_id": "m100_roof_to_station_01",
+    "map_id": 100,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 5.955601864914202,
+        "energy_wh_payload_0.25": 6.7508615772927065,
+        "energy_wh_payload_0.5": 7.579840067917284,
+        "flight_seconds": 58.35926437945754
+      },
+      "route": {
+        "energy_wh_payload_0.0": 6.6192159654805565,
+        "energy_wh_payload_0.25": 7.510578218284907,
+        "energy_wh_payload_0.5": 8.43981923635893,
+        "flight_seconds": 65.96002501116322
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 4.390734162318538,
+      "energy_wh_payload_0.25": 4.988483287131655,
+      "energy_wh_payload_0.5": 5.614740745330274,
+      "flight_seconds": 47.7
+    },
+    "job_id": "m101_station_to_ground_00",
+    "map_id": 101,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 6.60495364444059,
+        "energy_wh_payload_0.25": 7.492975195892245,
+        "energy_wh_payload_0.5": 8.420023406872177,
+        "flight_seconds": 66.94291454279849
+      },
+      "route": {
+        "energy_wh_payload_0.0": 4.3260962343075775,
+        "energy_wh_payload_0.25": 4.914186275221195,
+        "energy_wh_payload_0.5": 5.530459234351522,
+        "flight_seconds": 47.01801924312816
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 8.540190795416205,
+      "energy_wh_payload_0.25": 9.677407077541137,
+      "energy_wh_payload_0.5": 10.862355578340349,
+      "flight_seconds": 82.80000000000001
+    },
+    "job_id": "m101_station_to_roof_00",
+    "map_id": 101,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 6.895012373501587,
+        "energy_wh_payload_0.25": 7.819462866587043,
+        "energy_wh_payload_0.5": 8.78420462380895,
+        "flight_seconds": 69.1922956487093
+      },
+      "route": {
+        "energy_wh_payload_0.0": 8.472182153975938,
+        "energy_wh_payload_0.25": 9.598905076111066,
+        "energy_wh_payload_0.5": 10.772996987895981,
+        "flight_seconds": 82.0575970801135
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 6.609235463637803,
+      "energy_wh_payload_0.25": 7.48323532360553,
+      "energy_wh_payload_0.5": 8.392397847029947,
+      "flight_seconds": 61.75
+    },
+    "job_id": "m101_ground_to_roof_00",
+    "map_id": 101,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 5.041125071631117,
+        "energy_wh_payload_0.25": 5.714106514711626,
+        "energy_wh_payload_0.5": 6.415268641034861,
+        "flight_seconds": 49.00536139510056
+      },
+      "route": {
+        "energy_wh_payload_0.0": 6.581861242753079,
+        "energy_wh_payload_0.25": 7.452028394722315,
+        "energy_wh_payload_0.5": 8.35723750178593,
+        "flight_seconds": 61.48299206592014
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 8.322831263946304,
+      "energy_wh_payload_0.25": 9.441014264563721,
+      "energy_wh_payload_0.5": 10.606929482749512,
+      "flight_seconds": 82.80000000000001
+    },
+    "job_id": "m101_roof_to_station_00",
+    "map_id": 101,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 6.895012373501587,
+        "energy_wh_payload_0.25": 7.819462866587043,
+        "energy_wh_payload_0.5": 8.78420462380895,
+        "flight_seconds": 69.1922956487093
+      },
+      "route": {
+        "energy_wh_payload_0.0": 8.264138606319337,
+        "energy_wh_payload_0.25": 9.373223843478549,
+        "energy_wh_payload_0.5": 10.529738219634881,
+        "flight_seconds": 82.18800278547128
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 11.317941423946428,
+      "energy_wh_payload_0.25": 12.83602189462109,
+      "energy_wh_payload_0.5": 14.419590142257869,
+      "flight_seconds": 112.95
+    },
+    "job_id": "m101_station_to_ground_01",
+    "map_id": 101,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 8.903613384221316,
+        "energy_wh_payload_0.25": 10.103434784813782,
+        "energy_wh_payload_0.5": 11.357298916676145,
+        "flight_seconds": 91.97296517832146
+      },
+      "route": {
+        "energy_wh_payload_0.0": 11.16675433483915,
+        "energy_wh_payload_0.25": 12.66119856341786,
+        "energy_wh_payload_0.5": 14.220317755082627,
+        "flight_seconds": 111.3091906542946
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 6.518806054877906,
+      "energy_wh_payload_0.25": 7.376386216102379,
+      "energy_wh_payload_0.5": 8.269137651976694,
+      "flight_seconds": 61.0
+    },
+    "job_id": "m101_station_to_roof_01",
+    "map_id": 101,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 6.230848851052129,
+        "energy_wh_payload_0.25": 7.059846056776904,
+        "energy_wh_payload_0.5": 7.92363664895664,
+        "flight_seconds": 60.28811892028171
+      },
+      "route": {
+        "energy_wh_payload_0.0": 6.536261352562378,
+        "energy_wh_payload_0.25": 7.396538895129178,
+        "energy_wh_payload_0.5": 8.292049738167709,
+        "flight_seconds": 61.12763050400755
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 12.693576563153972,
+      "energy_wh_payload_0.25": 14.387241557377925,
+      "energy_wh_payload_0.5": 16.156289680933057,
+      "flight_seconds": 128.1
+    },
+    "job_id": "m101_ground_to_roof_01",
+    "map_id": 101,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 12.270954202444534,
+        "energy_wh_payload_0.25": 13.91925663406516,
+        "energy_wh_payload_0.5": 15.641809642656517,
+        "flight_seconds": 126.058680858112
+      },
+      "route": {
+        "energy_wh_payload_0.0": 12.729841863211332,
+        "energy_wh_payload_0.25": 14.430716792475865,
+        "energy_wh_payload_0.5": 16.207214186043085,
+        "flight_seconds": 128.53971480866284
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 5.901650407075596,
+      "energy_wh_payload_0.25": 6.705188746892245,
+      "energy_wh_payload_0.5": 7.54389835023524,
+      "flight_seconds": 61.0
+    },
+    "job_id": "m101_roof_to_station_01",
+    "map_id": 101,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 6.230848851052129,
+        "energy_wh_payload_0.25": 7.059846056776904,
+        "energy_wh_payload_0.5": 7.92363664895664,
+        "flight_seconds": 60.28811892028171
+      },
+      "route": {
+        "energy_wh_payload_0.0": 5.945545129349917,
+        "energy_wh_payload_0.25": 6.755742451825572,
+        "energy_wh_payload_0.5": 7.601343862070555,
+        "flight_seconds": 61.497902817770694
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 5.315539821574419,
+      "energy_wh_payload_0.25": 6.038507637225629,
+      "energy_wh_payload_0.5": 6.796007071478495,
+      "flight_seconds": 57.75
+    },
+    "job_id": "m102_station_to_ground_00",
+    "map_id": 102,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 7.568015299877386,
+        "energy_wh_payload_0.25": 8.586435777492643,
+        "energy_wh_payload_0.5": 9.650077626726075,
+        "flight_seconds": 77.30593309603171
+      },
+      "route": {
+        "energy_wh_payload_0.0": 5.253769674998287,
+        "energy_wh_payload_0.25": 5.967798281301058,
+        "energy_wh_payload_0.5": 6.716058050833874,
+        "flight_seconds": 57.11663195180042
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 7.264701500687295,
+      "energy_wh_payload_0.25": 8.220977185539445,
+      "energy_wh_payload_0.5": 9.217637794622538,
+      "flight_seconds": 69.15
+    },
+    "job_id": "m102_station_to_roof_00",
+    "map_id": 102,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 7.670982767555587,
+        "energy_wh_payload_0.25": 8.693094962630552,
+        "energy_wh_payload_0.5": 9.75882416925072,
+        "flight_seconds": 75.17804505865539
+      },
+      "route": {
+        "energy_wh_payload_0.0": 7.378888881309727,
+        "energy_wh_payload_0.25": 8.352349530201867,
+        "energy_wh_payload_0.5": 9.366812967786618,
+        "flight_seconds": 70.4740013074175
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 6.4789137262124195,
+      "energy_wh_payload_0.25": 7.329819127447881,
+      "energy_wh_payload_0.5": 8.215987870776162,
+      "flight_seconds": 60.650000000000006
+    },
+    "job_id": "m102_ground_to_roof_00",
+    "map_id": 102,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 6.902778701651068,
+        "energy_wh_payload_0.25": 7.8207528488231315,
+        "energy_wh_payload_0.5": 8.777314318187193,
+        "flight_seconds": 66.80708680662386
+      },
+      "route": {
+        "energy_wh_payload_0.0": 6.56484672695851,
+        "energy_wh_payload_0.25": 7.427849669292521,
+        "energy_wh_payload_0.5": 8.326545302152491,
+        "flight_seconds": 61.61404182002111
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 6.526373045842561,
+      "energy_wh_payload_0.25": 7.4204735712115415,
+      "energy_wh_payload_0.5": 8.355242932822815,
+      "flight_seconds": 69.8
+    },
+    "job_id": "m102_roof_to_station_00",
+    "map_id": 102,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 7.670982767555587,
+        "energy_wh_payload_0.25": 8.693094962630552,
+        "energy_wh_payload_0.5": 9.75882416925072,
+        "flight_seconds": 75.17804505865539
+      },
+      "route": {
+        "energy_wh_payload_0.0": 6.628379573980209,
+        "energy_wh_payload_0.25": 7.538217969448659,
+        "energy_wh_payload_0.5": 8.489267371110568,
+        "flight_seconds": 70.91714518974938
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 12.461818178951784,
+      "energy_wh_payload_0.25": 14.135127528603256,
+      "energy_wh_payload_0.5": 15.881468550791004,
+      "flight_seconds": 125.5
+    },
+    "job_id": "m102_station_to_ground_01",
+    "map_id": 102,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 10.091566173014323,
+        "energy_wh_payload_0.25": 11.452080208026624,
+        "energy_wh_payload_0.5": 12.874338147564991,
+        "flight_seconds": 104.80453658367935
+      },
+      "route": {
+        "energy_wh_payload_0.0": 12.318941891580618,
+        "energy_wh_payload_0.25": 13.970071368674715,
+        "energy_wh_payload_0.5": 15.69347616255661,
+        "flight_seconds": 123.95924182804768
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 10.61092340081718,
+      "energy_wh_payload_0.25": 12.026142581021743,
+      "energy_wh_payload_0.5": 13.502953751306272,
+      "flight_seconds": 105.5
+    },
+    "job_id": "m102_station_to_roof_01",
+    "map_id": 102,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 9.61290220887524,
+        "energy_wh_payload_0.25": 10.903239995310889,
+        "energy_wh_payload_0.5": 12.251014034988636,
+        "flight_seconds": 97.91459531488711
+      },
+      "route": {
+        "energy_wh_payload_0.0": 10.600267372108293,
+        "energy_wh_payload_0.25": 12.014402651163246,
+        "energy_wh_payload_0.5": 13.490092525935129,
+        "flight_seconds": 105.39852419313986
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 5.545966085346521,
+      "energy_wh_payload_0.25": 6.273828442724322,
+      "energy_wh_payload_0.5": 7.030299240028359,
+      "flight_seconds": 50.400000000000006
+    },
+    "job_id": "m102_ground_to_roof_01",
+    "map_id": 102,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 4.777615716857585,
+        "energy_wh_payload_0.25": 5.412480148388361,
+        "energy_wh_payload_0.5": 6.073122592769142,
+        "flight_seconds": 45.22549464782201
+      },
+      "route": {
+        "energy_wh_payload_0.0": 5.5647515775061684,
+        "energy_wh_payload_0.25": 6.295615697892105,
+        "energy_wh_payload_0.5": 7.055187118500314,
+        "flight_seconds": 50.59243620390457
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 10.208087871294456,
+      "energy_wh_payload_0.25": 11.588032490862057,
+      "energy_wh_payload_0.5": 13.029569095170924,
+      "flight_seconds": 105.5
+    },
+    "job_id": "m102_roof_to_station_01",
+    "map_id": 102,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 9.61290220887524,
+        "energy_wh_payload_0.25": 10.903239995310889,
+        "energy_wh_payload_0.5": 12.251014034988636,
+        "flight_seconds": 97.91459531488711
+      },
+      "route": {
+        "energy_wh_payload_0.0": 10.213676408450864,
+        "energy_wh_payload_0.25": 11.59503955793871,
+        "energy_wh_payload_0.5": 13.038064556982336,
+        "flight_seconds": 105.62678974406175
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 9.326762935937746,
+      "energy_wh_payload_0.25": 10.594495134076913,
+      "energy_wh_payload_0.5": 11.922877328305697,
+      "flight_seconds": 101.4
+    },
+    "job_id": "m103_station_to_ground_00",
+    "map_id": 103,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 11.618435904403707,
+        "energy_wh_payload_0.25": 13.185362101757843,
+        "energy_wh_payload_0.5": 14.823697670580412,
+        "flight_seconds": 121.0572227125801
+      },
+      "route": {
+        "energy_wh_payload_0.0": 9.221579782757342,
+        "energy_wh_payload_0.25": 10.473882568765116,
+        "energy_wh_payload_0.5": 11.786306562541581,
+        "flight_seconds": 100.30252302239086
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 9.180277200658017,
+      "energy_wh_payload_0.25": 10.401249201904932,
+      "energy_wh_payload_0.5": 11.674418111499815,
+      "flight_seconds": 89.85000000000001
+    },
+    "job_id": "m103_station_to_roof_00",
+    "map_id": 103,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 8.164196351173672,
+        "energy_wh_payload_0.25": 9.258289559020403,
+        "energy_wh_payload_0.5": 10.400376520198519,
+        "flight_seconds": 82.18203418686029
+      },
+      "route": {
+        "energy_wh_payload_0.0": 9.176779745114773,
+        "energy_wh_payload_0.25": 10.397702364311902,
+        "energy_wh_payload_0.5": 11.67082248242078,
+        "flight_seconds": 89.82238271309889
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 13.985329159073919,
+      "energy_wh_payload_0.25": 15.860555119713146,
+      "energy_wh_payload_0.5": 17.819258632117347,
+      "flight_seconds": 142.20000000000002
+    },
+    "job_id": "m103_ground_to_roof_00",
+    "map_id": 103,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 12.800144683267701,
+        "energy_wh_payload_0.25": 14.522685853883067,
+        "energy_wh_payload_0.5": 16.323472591751603,
+        "flight_seconds": 132.59910493034252
+      },
+      "route": {
+        "energy_wh_payload_0.0": 13.893961442805564,
+        "energy_wh_payload_0.25": 15.754974743661997,
+        "energy_wh_payload_0.5": 17.69895189426989,
+        "flight_seconds": 141.16355845347633
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 8.789222111787788,
+      "energy_wh_payload_0.25": 9.975951101505107,
+      "energy_wh_payload_0.5": 11.21487699894609,
+      "flight_seconds": 89.85000000000001
+    },
+    "job_id": "m103_roof_to_station_00",
+    "map_id": 103,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 8.164196351173672,
+        "energy_wh_payload_0.25": 9.258289559020403,
+        "energy_wh_payload_0.5": 10.400376520198519,
+        "flight_seconds": 82.18203418686029
+      },
+      "route": {
+        "energy_wh_payload_0.0": 8.803417541228708,
+        "energy_wh_payload_0.25": 9.992793488648594,
+        "energy_wh_payload_0.5": 11.23448187226713,
+        "flight_seconds": 90.06904318224481
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 2.85514726733117,
+      "energy_wh_payload_0.25": 3.244627728666501,
+      "energy_wh_payload_0.5": 3.652616620527486,
+      "flight_seconds": 31.0
+    },
+    "job_id": "m103_station_to_ground_01",
+    "map_id": 103,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 5.281567052563554,
+        "energy_wh_payload_0.25": 5.989468939249377,
+        "energy_wh_payload_0.5": 6.727429051182819,
+        "flight_seconds": 52.14222575637286
+      },
+      "route": {
+        "energy_wh_payload_0.0": 2.7861637289628414,
+        "energy_wh_payload_0.25": 3.1652226773098704,
+        "energy_wh_payload_0.5": 3.562429833274362,
+        "flight_seconds": 30.26031397582141
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 8.905174855420206,
+      "energy_wh_payload_0.25": 10.088639674613985,
+      "energy_wh_payload_0.5": 11.322509298261373,
+      "flight_seconds": 86.85000000000001
+    },
+    "job_id": "m103_station_to_roof_01",
+    "map_id": 103,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 7.898834525457913,
+        "energy_wh_payload_0.25": 8.956955352505414,
+        "energy_wh_payload_0.5": 10.061338318121058,
+        "flight_seconds": 79.29615950031305
+      },
+      "route": {
+        "energy_wh_payload_0.0": 8.906263882701676,
+        "energy_wh_payload_0.25": 10.090479269939431,
+        "energy_wh_payload_0.5": 11.325127800491867,
+        "flight_seconds": 86.87812418697311
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 6.876983992747795,
+      "energy_wh_payload_0.25": 7.7855588089234775,
+      "energy_wh_payload_0.5": 8.731330482751304,
+      "flight_seconds": 64.8
+    },
+    "job_id": "m103_ground_to_roof_01",
+    "map_id": 103,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 5.917336007313184,
+        "energy_wh_payload_0.25": 6.706845405209006,
+        "energy_wh_payload_0.5": 7.529686701695485,
+        "flight_seconds": 57.74687900557485
+      },
+      "route": {
+        "energy_wh_payload_0.0": 6.880703692542785,
+        "energy_wh_payload_0.25": 7.790063819595111,
+        "energy_wh_payload_0.5": 8.736646003459368,
+        "flight_seconds": 64.83219753832003
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 8.51411976750415,
+      "energy_wh_payload_0.25": 9.663341575144253,
+      "energy_wh_payload_0.5": 10.862968186604512,
+      "flight_seconds": 86.85000000000001
+    },
+    "job_id": "m103_roof_to_station_01",
+    "map_id": 103,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 7.898834525457913,
+        "energy_wh_payload_0.25": 8.956955352505414,
+        "energy_wh_payload_0.5": 10.061338318121058,
+        "flight_seconds": 79.29615950031305
+      },
+      "route": {
+        "energy_wh_payload_0.0": 8.53290167881561,
+        "energy_wh_payload_0.25": 9.685570394276123,
+        "energy_wh_payload_0.5": 10.888787190338217,
+        "flight_seconds": 87.12478465611903
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 2.8230702118097017,
+      "energy_wh_payload_0.25": 3.208167863717716,
+      "energy_wh_payload_0.5": 3.6115652536611913,
+      "flight_seconds": 30.650000000000002
+    },
+    "job_id": "m104_station_to_ground_00",
+    "map_id": 104,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 5.07717288779344,
+        "energy_wh_payload_0.25": 5.758216227783331,
+        "energy_wh_payload_0.5": 6.468303794002119,
+        "flight_seconds": 50.32064333378446
+      },
+      "route": {
+        "energy_wh_payload_0.0": 2.7596166925410968,
+        "energy_wh_payload_0.25": 3.135100771049149,
+        "energy_wh_payload_0.5": 3.5285508133769046,
+        "flight_seconds": 29.96710116668077
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 10.681421838154387,
+      "energy_wh_payload_0.25": 12.107196355352352,
+      "energy_wh_payload_0.5": 13.594982838189289,
+      "flight_seconds": 106.25
+    },
+    "job_id": "m104_station_to_roof_00",
+    "map_id": 104,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 9.587844308167082,
+        "energy_wh_payload_0.25": 10.874943893038031,
+        "energy_wh_payload_0.5": 12.21941253227202,
+        "flight_seconds": 97.75168289382681
+      },
+      "route": {
+        "energy_wh_payload_0.0": 10.625022836825647,
+        "energy_wh_payload_0.25": 12.04211786669098,
+        "energy_wh_payload_0.5": 13.520904097497414,
+        "flight_seconds": 105.60168631206302
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 12.981898751028638,
+      "energy_wh_payload_0.25": 14.720548791348168,
+      "energy_wh_payload_0.5": 16.536188442802604,
+      "flight_seconds": 131.3
+    },
+    "job_id": "m104_ground_to_roof_00",
+    "map_id": 104,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 11.771363332786706,
+        "energy_wh_payload_0.25": 13.354687220679203,
+        "energy_wh_payload_0.5": 15.009710155497185,
+        "flight_seconds": 121.59910760742041
+      },
+      "route": {
+        "energy_wh_payload_0.0": 12.895339883713275,
+        "energy_wh_payload_0.25": 14.6205378208739,
+        "energy_wh_payload_0.5": 16.422232416381682,
+        "flight_seconds": 130.3114685540497
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 10.25861546573653,
+      "energy_wh_payload_0.25": 11.64736660423406,
+      "energy_wh_payload_0.5": 13.098129697761838,
+      "flight_seconds": 106.25
+    },
+    "job_id": "m104_roof_to_station_00",
+    "map_id": 104,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 9.587844308167082,
+        "energy_wh_payload_0.25": 10.874943893038031,
+        "energy_wh_payload_0.5": 12.21941253227202,
+        "flight_seconds": 97.75168289382681
+      },
+      "route": {
+        "energy_wh_payload_0.0": 10.220665183301497,
+        "energy_wh_payload_0.25": 11.603534703351853,
+        "energy_wh_payload_0.5": 13.048214953213733,
+        "flight_seconds": 105.85897862283002
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 7.42225877949616,
+      "energy_wh_payload_0.25": 8.410059051522044,
+      "energy_wh_payload_0.5": 9.438019517423031,
+      "flight_seconds": 70.55
+    },
+    "job_id": "m104_station_to_ground_01",
+    "map_id": 104,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 5.167476398437852,
+        "energy_wh_payload_0.25": 5.860770648174545,
+        "energy_wh_payload_0.5": 6.583701767767832,
+        "flight_seconds": 51.30689815784809
+      },
+      "route": {
+        "energy_wh_payload_0.0": 7.344740075290532,
+        "energy_wh_payload_0.25": 8.32076553729357,
+        "energy_wh_payload_0.5": 9.336575187047535,
+        "flight_seconds": 69.75758197161527
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 11.08034804479904,
+      "energy_wh_payload_0.25": 12.56134293369053,
+      "energy_wh_payload_0.5": 14.106597014052877,
+      "flight_seconds": 110.4
+    },
+    "job_id": "m104_station_to_roof_01",
+    "map_id": 104,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 9.270004459570814,
+        "energy_wh_payload_0.25": 10.51729708486722,
+        "energy_wh_payload_0.5": 11.820592885094987,
+        "flight_seconds": 95.31299981154078
+      },
+      "route": {
+        "energy_wh_payload_0.0": 11.036000430952123,
+        "energy_wh_payload_0.25": 12.51117642790576,
+        "energy_wh_payload_0.5": 14.050433397228405,
+        "flight_seconds": 109.99468030605233
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 10.08612012571327,
+      "energy_wh_payload_0.25": 11.43128277176043,
+      "energy_wh_payload_0.5": 12.834232600098716,
+      "flight_seconds": 99.55000000000001
+    },
+    "job_id": "m104_ground_to_roof_01",
+    "map_id": 104,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 8.340467488651228,
+        "energy_wh_payload_0.25": 9.461655675085975,
+        "energy_wh_payload_0.5": 10.632746673812871,
+        "flight_seconds": 85.16100998110262
+      },
+      "route": {
+        "energy_wh_payload_0.0": 10.070834196012052,
+        "energy_wh_payload_0.25": 11.415028256581099,
+        "energy_wh_payload_0.5": 12.817009134435942,
+        "flight_seconds": 99.48995915911742
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 10.89580468406886,
+      "energy_wh_payload_0.25": 12.360639896017496,
+      "energy_wh_payload_0.5": 13.88973429716854,
+      "flight_seconds": 110.4
+    },
+    "job_id": "m104_roof_to_station_01",
+    "map_id": 104,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 9.270004459570814,
+        "energy_wh_payload_0.25": 10.51729708486722,
+        "energy_wh_payload_0.5": 11.820592885094987,
+        "flight_seconds": 95.31299981154078
+      },
+      "route": {
+        "energy_wh_payload_0.0": 10.859499043743863,
+        "energy_wh_payload_0.25": 12.31973566732938,
+        "energy_wh_payload_0.5": 13.844105437420485,
+        "flight_seconds": 110.10698793612339
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 7.770423884670647,
+      "energy_wh_payload_0.25": 8.826555938260682,
+      "energy_wh_payload_0.5": 9.933205722455977,
+      "flight_seconds": 84.45
+    },
+    "job_id": "m105_station_to_ground_00",
+    "map_id": 105,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 10.183504056060496,
+        "energy_wh_payload_0.25": 11.555505656922975,
+        "energy_wh_payload_0.5": 12.989407571645513,
+        "flight_seconds": 105.26988565354836
+      },
+      "route": {
+        "energy_wh_payload_0.0": 7.679541074652307,
+        "energy_wh_payload_0.25": 8.722570907983169,
+        "energy_wh_payload_0.5": 9.81566979329328,
+        "flight_seconds": 83.5217189931829
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 5.16750386841867,
+      "energy_wh_payload_0.25": 5.845826360563367,
+      "energy_wh_payload_0.5": 6.550175144232517,
+      "flight_seconds": 46.300000000000004
+    },
+    "job_id": "m105_station_to_roof_00",
+    "map_id": 105,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 3.884788624591894,
+        "energy_wh_payload_0.25": 4.400618241116122,
+        "energy_wh_payload_0.5": 4.937025562677798,
+        "flight_seconds": 36.32836652553003
+      },
+      "route": {
+        "energy_wh_payload_0.0": 5.167560838030276,
+        "energy_wh_payload_0.25": 5.8457054475911425,
+        "energy_wh_payload_0.5": 6.549873469023512,
+        "flight_seconds": 46.278033866772745
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 10.394038552515644,
+      "energy_wh_payload_0.25": 11.782932366625424,
+      "energy_wh_payload_0.5": 13.231879371844471,
+      "flight_seconds": 103.2
+    },
+    "job_id": "m105_ground_to_roof_00",
+    "map_id": 105,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 9.11636622116531,
+        "energy_wh_payload_0.25": 10.340524565790119,
+        "energy_wh_payload_0.5": 11.619055487118487,
+        "flight_seconds": 92.79699491687202
+      },
+      "route": {
+        "energy_wh_payload_0.0": 10.32382750068247,
+        "energy_wh_payload_0.25": 11.701659647567324,
+        "energy_wh_payload_0.5": 13.139148801995978,
+        "flight_seconds": 102.40110175251293
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 4.871936657267387,
+      "energy_wh_payload_0.25": 5.52437761607835,
+      "energy_wh_payload_0.5": 6.202844867004856,
+      "flight_seconds": 46.300000000000004
+    },
+    "job_id": "m105_roof_to_station_00",
+    "map_id": 105,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 3.884788624591894,
+        "energy_wh_payload_0.25": 4.400618241116122,
+        "energy_wh_payload_0.5": 4.937025562677798,
+        "flight_seconds": 36.32836652553003
+      },
+      "route": {
+        "energy_wh_payload_0.0": 4.885218644456489,
+        "energy_wh_payload_0.25": 5.539498642684893,
+        "energy_wh_payload_0.5": 6.219888198589299,
+        "flight_seconds": 46.4629866721001
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 9.76021956839548,
+      "energy_wh_payload_0.25": 11.08774148913492,
+      "energy_wh_payload_0.5": 12.478732316026473,
+      "flight_seconds": 106.15
+    },
+    "job_id": "m105_station_to_ground_01",
+    "map_id": 105,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 12.169908243329974,
+        "energy_wh_payload_0.25": 13.810858765524294,
+        "energy_wh_payload_0.5": 15.526541347518899,
+        "flight_seconds": 126.71074509131998
+      },
+      "route": {
+        "energy_wh_payload_0.0": 9.623250850318914,
+        "energy_wh_payload_0.25": 10.930035371912778,
+        "energy_wh_payload_0.5": 12.299567488504733,
+        "flight_seconds": 104.67790869920628
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 9.75087232838531,
+      "energy_wh_payload_0.25": 11.047694960878367,
+      "energy_wh_payload_0.5": 12.400661983341456,
+      "flight_seconds": 96.2
+    },
+    "job_id": "m105_station_to_roof_01",
+    "map_id": 105,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 9.051252077235807,
+        "energy_wh_payload_0.25": 10.264535826612068,
+        "energy_wh_payload_0.5": 11.531382758919875,
+        "flight_seconds": 91.50915256031878
+      },
+      "route": {
+        "energy_wh_payload_0.0": 9.776915234976125,
+        "energy_wh_payload_0.25": 11.078762875065095,
+        "energy_wh_payload_0.5": 12.436927024594647,
+        "flight_seconds": 96.51276377076749
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 8.65734631358391,
+      "energy_wh_payload_0.25": 9.806968899567128,
+      "energy_wh_payload_0.5": 11.005612967028357,
+      "flight_seconds": 84.35000000000001
+    },
+    "job_id": "m105_ground_to_roof_01",
+    "map_id": 105,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 7.915128218259664,
+        "energy_wh_payload_0.25": 8.974586634237376,
+        "energy_wh_payload_0.5": 10.080269116159043,
+        "flight_seconds": 79.24605317685906
+      },
+      "route": {
+        "energy_wh_payload_0.0": 8.659719519376992,
+        "energy_wh_payload_0.25": 9.80996756811465,
+        "energy_wh_payload_0.5": 11.009244817190464,
+        "flight_seconds": 84.35271560212266
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 9.274054719758972,
+      "energy_wh_payload_0.25": 10.529124534826439,
+      "energy_wh_payload_0.5": 11.840338731339699,
+      "flight_seconds": 96.2
+    },
+    "job_id": "m105_roof_to_station_01",
+    "map_id": 105,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 9.051252077235807,
+        "energy_wh_payload_0.25": 10.264535826612068,
+        "energy_wh_payload_0.5": 11.531382758919875,
+        "flight_seconds": 91.50915256031878
+      },
+      "route": {
+        "energy_wh_payload_0.0": 9.321509764144386,
+        "energy_wh_payload_0.25": 10.584864841635778,
+        "energy_wh_payload_0.5": 11.90467537794036,
+        "flight_seconds": 96.81108446568602
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 10.842822149872354,
+      "energy_wh_payload_0.25": 12.295875203735562,
+      "energy_wh_payload_0.5": 13.811358832646096,
+      "flight_seconds": 107.80000000000001
+    },
+    "job_id": "m106_station_to_ground_00",
+    "map_id": 106,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 8.521422386294457,
+        "energy_wh_payload_0.25": 9.66922554136528,
+        "energy_wh_payload_0.5": 10.868489374692754,
+        "flight_seconds": 87.70841815377645
+      },
+      "route": {
+        "energy_wh_payload_0.0": 10.719327903607255,
+        "energy_wh_payload_0.25": 12.15324871872908,
+        "energy_wh_payload_0.5": 13.648951424816891,
+        "flight_seconds": 106.4794942822588
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 4.901631277962651,
+      "energy_wh_payload_0.25": 5.538234762331004,
+      "energy_wh_payload_0.5": 6.199691607927218,
+      "flight_seconds": 43.5
+    },
+    "job_id": "m106_station_to_roof_00",
+    "map_id": 106,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 5.282150913445239,
+        "energy_wh_payload_0.25": 5.980368107288239,
+        "energy_wh_payload_0.5": 6.706616585089706,
+        "flight_seconds": 49.18534998396001
+      },
+      "route": {
+        "energy_wh_payload_0.0": 4.954114480124998,
+        "energy_wh_payload_0.25": 5.598746479698729,
+        "energy_wh_payload_0.5": 6.268466901776933,
+        "flight_seconds": 43.986199422429834
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 9.602100482649508,
+      "energy_wh_payload_0.25": 10.875713674234811,
+      "energy_wh_payload_0.5": 12.2047913572123,
+      "flight_seconds": 94.60000000000001
+    },
+    "job_id": "m106_ground_to_roof_00",
+    "map_id": 106,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 9.676411878483611,
+        "energy_wh_payload_0.25": 10.971031715234341,
+        "energy_wh_payload_0.5": 12.322555903084133,
+        "flight_seconds": 97.2413551757661
+      },
+      "route": {
+        "energy_wh_payload_0.0": 9.651623783349486,
+        "energy_wh_payload_0.25": 10.93367267050355,
+        "energy_wh_payload_0.5": 12.271448852320079,
+        "flight_seconds": 95.11536844548044
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 4.159265101977386,
+      "energy_wh_payload_0.25": 4.730845704511735,
+      "energy_wh_payload_0.5": 5.327278953668961,
+      "flight_seconds": 43.5
+    },
+    "job_id": "m106_roof_to_station_00",
+    "map_id": 106,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 5.282150913445239,
+        "energy_wh_payload_0.25": 5.980368107288239,
+        "energy_wh_payload_0.5": 6.706616585089706,
+        "flight_seconds": 49.18534998396001
+      },
+      "route": {
+        "energy_wh_payload_0.0": 4.247478119210193,
+        "energy_wh_payload_0.25": 4.832406297218321,
+        "energy_wh_payload_0.5": 5.442645103552388,
+        "flight_seconds": 44.465509167686605
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 1.2299726478655786,
+      "energy_wh_payload_0.25": 1.398319411939156,
+      "energy_wh_payload_0.5": 1.5745941487386257,
+      "flight_seconds": 13.3
+    },
+    "job_id": "m106_station_to_ground_01",
+    "map_id": 106,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 3.6765383772618927,
+        "energy_wh_payload_0.25": 4.166778940907699,
+        "energy_wh_payload_0.5": 4.67664623794567,
+        "flight_seconds": 34.72436168917952
+      },
+      "route": {
+        "energy_wh_payload_0.0": 1.1965998375699873,
+        "energy_wh_payload_0.25": 1.360107907841172,
+        "energy_wh_payload_0.5": 1.53138335311937,
+        "flight_seconds": 12.955037926326888
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 6.280022805058195,
+      "energy_wh_payload_0.25": 7.107265910515606,
+      "energy_wh_payload_0.5": 7.967825913753547,
+      "flight_seconds": 58.300000000000004
+    },
+    "job_id": "m106_station_to_roof_01",
+    "map_id": 106,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 5.4297394834982375,
+        "energy_wh_payload_0.25": 6.152639213306341,
+        "energy_wh_payload_0.5": 6.905543666730003,
+        "flight_seconds": 52.2488395241103
+      },
+      "route": {
+        "energy_wh_payload_0.0": 6.290917207105842,
+        "energy_wh_payload_0.25": 7.120214744259648,
+        "energy_wh_payload_0.5": 7.982894378286024,
+        "flight_seconds": 58.41609656079729
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 7.089808315125715,
+      "energy_wh_payload_0.25": 8.02801626879863,
+      "energy_wh_payload_0.5": 9.004809755820204,
+      "flight_seconds": 67.15
+    },
+    "job_id": "m106_ground_to_roof_01",
+    "map_id": 106,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 6.167189533601618,
+        "energy_wh_payload_0.25": 6.990178257302748,
+        "energy_wh_payload_0.5": 7.848017216749664,
+        "flight_seconds": 60.31365490909194
+      },
+      "route": {
+        "energy_wh_payload_0.0": 7.066445783932271,
+        "energy_wh_payload_0.25": 8.000976750071729,
+        "energy_wh_payload_0.5": 8.973948093842017,
+        "flight_seconds": 66.8571935607641
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 5.885608950636515,
+      "energy_wh_payload_0.25": 6.678315012784749,
+      "energy_wh_payload_0.5": 7.504337969004096,
+      "flight_seconds": 58.300000000000004
+    },
+    "job_id": "m106_roof_to_station_01",
+    "map_id": 106,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 5.4297394834982375,
+        "energy_wh_payload_0.25": 6.152639213306341,
+        "energy_wh_payload_0.5": 6.905543666730003,
+        "flight_seconds": 52.2488395241103
+      },
+      "route": {
+        "energy_wh_payload_0.0": 5.914878616754641,
+        "energy_wh_payload_0.25": 6.712404591982248,
+        "energy_wh_payload_0.5": 7.543430911555231,
+        "flight_seconds": 58.6711626328497
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 4.312662549865838,
+      "energy_wh_payload_0.25": 4.899795506495298,
+      "energy_wh_payload_0.5": 5.514928699624718,
+      "flight_seconds": 46.85
+    },
+    "job_id": "m107_station_to_ground_00",
+    "map_id": 107,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 6.753104570639996,
+        "energy_wh_payload_0.25": 7.660672097813211,
+        "energy_wh_payload_0.5": 8.607868056199242,
+        "flight_seconds": 68.12877370575771
+      },
+      "route": {
+        "energy_wh_payload_0.0": 4.238888095990684,
+        "energy_wh_payload_0.25": 4.815054512909486,
+        "energy_wh_payload_0.5": 5.418844853441999,
+        "flight_seconds": 46.07075168890842
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 13.832501125770314,
+      "energy_wh_payload_0.25": 15.683393764097929,
+      "energy_wh_payload_0.5": 17.61760298521385,
+      "flight_seconds": 140.95000000000002
+    },
+    "job_id": "m107_station_to_roof_00",
+    "map_id": 107,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 14.06385275689151,
+        "energy_wh_payload_0.25": 15.951304501072228,
+        "energy_wh_payload_0.5": 17.92402145890206,
+        "flight_seconds": 144.52469431322606
+      },
+      "route": {
+        "energy_wh_payload_0.0": 13.847216630263832,
+        "energy_wh_payload_0.25": 15.69887051064575,
+        "energy_wh_payload_0.5": 17.63391691268236,
+        "flight_seconds": 141.12729255585873
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 10.59030163273726,
+      "energy_wh_payload_0.25": 11.997606733455155,
+      "energy_wh_payload_0.5": 13.467128085061937,
+      "flight_seconds": 105.55000000000001
+    },
+    "job_id": "m107_ground_to_roof_00",
+    "map_id": 107,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 11.018246067490479,
+        "energy_wh_payload_0.25": 12.4931149034848,
+        "energy_wh_payload_0.5": 14.033381203404979,
+        "flight_seconds": 111.43236854111908
+      },
+      "route": {
+        "energy_wh_payload_0.0": 10.714368458374826,
+        "energy_wh_payload_0.25": 12.140892109046504,
+        "energy_wh_payload_0.5": 13.630385238153673,
+        "flight_seconds": 107.03379134455405
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 13.07278161397436,
+      "energy_wh_payload_0.25": 14.85938942592175,
+      "energy_wh_payload_0.5": 16.729627829423972,
+      "flight_seconds": 141.6
+    },
+    "job_id": "m107_roof_to_station_00",
+    "map_id": 107,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 14.06385275689151,
+        "energy_wh_payload_0.25": 15.951304501072228,
+        "energy_wh_payload_0.5": 17.92402145890206,
+        "flight_seconds": 144.52469431322606
+      },
+      "route": {
+        "energy_wh_payload_0.0": 13.085019142149884,
+        "energy_wh_payload_0.25": 14.871704347796644,
+        "energy_wh_payload_0.5": 16.741968448959508,
+        "flight_seconds": 141.539324630151
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 3.268356563392683,
+      "energy_wh_payload_0.25": 3.7140533172098307,
+      "energy_wh_payload_0.5": 4.180948556313527,
+      "flight_seconds": 35.5
+    },
+    "job_id": "m107_station_to_ground_01",
+    "map_id": 107,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 5.729397688625479,
+        "energy_wh_payload_0.25": 6.498285469664093,
+        "energy_wh_payload_0.5": 7.3001236193171515,
+        "flight_seconds": 57.00559035031442
+      },
+      "route": {
+        "energy_wh_payload_0.0": 3.1911429870795085,
+        "energy_wh_payload_0.25": 3.6251294787705235,
+        "energy_wh_payload_0.5": 4.079909641708088,
+        "flight_seconds": 34.66857157040528
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 8.980436330358065,
+      "energy_wh_payload_0.25": 10.17293437560751,
+      "energy_wh_payload_0.5": 11.417101757092544,
+      "flight_seconds": 88.25
+    },
+    "job_id": "m107_station_to_roof_01",
+    "map_id": 107,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 9.180730453673501,
+        "energy_wh_payload_0.25": 10.407359349006422,
+        "energy_wh_payload_0.5": 11.687532985280406,
+        "flight_seconds": 91.6651737286706
+      },
+      "route": {
+        "energy_wh_payload_0.0": 8.969717660800763,
+        "energy_wh_payload_0.25": 10.159994191772581,
+        "energy_wh_payload_0.5": 11.40180319340229,
+        "flight_seconds": 88.02927220299158
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 9.93638540416283,
+      "energy_wh_payload_0.25": 11.257253515859725,
+      "energy_wh_payload_0.5": 12.636022388421287,
+      "flight_seconds": 98.60000000000001
+    },
+    "job_id": "m107_ground_to_roof_01",
+    "map_id": 107,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 10.140043858285818,
+        "energy_wh_payload_0.25": 11.496629230177103,
+        "energy_wh_payload_0.5": 12.913017340371795,
+        "flight_seconds": 102.08868370238399
+      },
+      "route": {
+        "energy_wh_payload_0.0": 9.96037281529863,
+        "energy_wh_payload_0.25": 11.285082114884755,
+        "energy_wh_payload_0.5": 12.667781967974019,
+        "flight_seconds": 98.81016577227459
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 8.231175539762294,
+      "energy_wh_payload_0.25": 9.35770933967034,
+      "energy_wh_payload_0.5": 10.535876653503022,
+      "flight_seconds": 88.2
+    },
+    "job_id": "m107_roof_to_station_01",
+    "map_id": 107,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 9.180730453673501,
+        "energy_wh_payload_0.25": 10.407359349006422,
+        "energy_wh_payload_0.5": 11.687532985280406,
+        "flight_seconds": 91.6651737286706
+      },
+      "route": {
+        "energy_wh_payload_0.0": 8.257294512118769,
+        "energy_wh_payload_0.25": 9.386845065188128,
+        "energy_wh_payload_0.5": 10.568102291868351,
+        "flight_seconds": 88.41439704570345
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 16.0291071659321,
+      "energy_wh_payload_0.25": 18.186438751274643,
+      "energy_wh_payload_0.5": 20.440159895916505,
+      "flight_seconds": 164.45000000000002
+    },
+    "job_id": "m108_station_to_ground_00",
+    "map_id": 108,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 13.638098663723849,
+        "energy_wh_payload_0.25": 15.479619687216672,
+        "energy_wh_payload_0.5": 17.4060863803368,
+        "flight_seconds": 143.45645161039482
+      },
+      "route": {
+        "energy_wh_payload_0.0": 15.877255591253887,
+        "energy_wh_payload_0.25": 18.011567377971698,
+        "energy_wh_payload_0.5": 20.24148557924055,
+        "flight_seconds": 162.84739429269928
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 11.621836498347228,
+      "energy_wh_payload_0.25": 13.173437169294665,
+      "energy_wh_payload_0.5": 14.793699509742,
+      "flight_seconds": 116.85000000000001
+    },
+    "job_id": "m108_station_to_roof_00",
+    "map_id": 108,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 11.338223190555011,
+        "energy_wh_payload_0.25": 12.859264884952193,
+        "energy_wh_payload_0.5": 14.44837955458782,
+        "flight_seconds": 115.7551347043209
+      },
+      "route": {
+        "energy_wh_payload_0.0": 11.587699331865707,
+        "energy_wh_payload_0.25": 13.133758995159853,
+        "energy_wh_payload_0.5": 14.748238962352465,
+        "flight_seconds": 116.37891165776334
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 11.201561176468346,
+      "energy_wh_payload_0.25": 12.696768062185846,
+      "energy_wh_payload_0.5": 14.25789472447513,
+      "flight_seconds": 112.30000000000001
+    },
+    "job_id": "m108_ground_to_roof_00",
+    "map_id": 108,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 10.91593717083934,
+        "energy_wh_payload_0.25": 12.379705945201252,
+        "energy_wh_payload_0.5": 13.9087787959262,
+        "flight_seconds": 111.14665458370112
+      },
+      "route": {
+        "energy_wh_payload_0.0": 11.149638470495946,
+        "energy_wh_payload_0.25": 12.636263711974745,
+        "energy_wh_payload_0.5": 14.188451442526546,
+        "flight_seconds": 111.61097144592465
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 10.974355023387442,
+      "energy_wh_payload_0.25": 12.469257478983483,
+      "energy_wh_payload_0.5": 14.032821493185715,
+      "flight_seconds": 116.85000000000001
+    },
+    "job_id": "m108_roof_to_station_00",
+    "map_id": 108,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 11.338223190555011,
+        "energy_wh_payload_0.25": 12.859264884952193,
+        "energy_wh_payload_0.5": 14.44837955458782,
+        "flight_seconds": 115.7551347043209
+      },
+      "route": {
+        "energy_wh_payload_0.0": 10.970148068452291,
+        "energy_wh_payload_0.25": 12.464050452372561,
+        "energy_wh_payload_0.5": 14.026568193656074,
+        "flight_seconds": 116.79865542884619
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 8.003855764485342,
+      "energy_wh_payload_0.25": 9.090437059184858,
+      "energy_wh_payload_0.5": 10.229058961075186,
+      "flight_seconds": 86.95
+    },
+    "job_id": "m108_station_to_ground_01",
+    "map_id": 108,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 10.223828828158103,
+        "energy_wh_payload_0.25": 11.602286444051382,
+        "energy_wh_payload_0.5": 13.04330260931064,
+        "flight_seconds": 106.19593639317131
+      },
+      "route": {
+        "energy_wh_payload_0.0": 7.9530220046779165,
+        "energy_wh_payload_0.25": 9.033327300137252,
+        "energy_wh_payload_0.5": 10.1654755349184,
+        "flight_seconds": 86.4980493148071
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 7.046826018465233,
+      "energy_wh_payload_0.25": 7.977068473225796,
+      "energy_wh_payload_0.5": 8.946086428427217,
+      "flight_seconds": 67.0
+    },
+    "job_id": "m108_station_to_roof_01",
+    "map_id": 108,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 6.804653445056626,
+        "energy_wh_payload_0.25": 7.711701595152621,
+        "energy_wh_payload_0.5": 8.657279932032496,
+        "flight_seconds": 66.54590378338456
+      },
+      "route": {
+        "energy_wh_payload_0.0": 7.07037312103035,
+        "energy_wh_payload_0.25": 8.004180219196153,
+        "energy_wh_payload_0.5": 8.976855864903229,
+        "flight_seconds": 67.18893923179671
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 9.29030841665239,
+      "energy_wh_payload_0.25": 10.524910984677122,
+      "energy_wh_payload_0.5": 11.812896021626363,
+      "flight_seconds": 91.4
+    },
+    "job_id": "m108_ground_to_roof_01",
+    "map_id": 108,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 8.938996089218797,
+        "energy_wh_payload_0.25": 10.13551637402877,
+        "energy_wh_payload_0.5": 11.384561575903165,
+        "flight_seconds": 89.83835294576775
+      },
+      "route": {
+        "energy_wh_payload_0.0": 9.297516861753214,
+        "energy_wh_payload_0.25": 10.533494302450038,
+        "energy_wh_payload_0.5": 11.822869697357275,
+        "flight_seconds": 91.42960790448636
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 6.46561379145187,
+      "energy_wh_payload_0.25": 7.34496195202323,
+      "energy_wh_payload_0.5": 8.263085596426363,
+      "flight_seconds": 67.0
+    },
+    "job_id": "m108_roof_to_station_01",
+    "map_id": 108,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 6.804653445056626,
+        "energy_wh_payload_0.25": 7.711701595152621,
+        "energy_wh_payload_0.5": 8.657279932032496,
+        "flight_seconds": 66.54590378338456
+      },
+      "route": {
+        "energy_wh_payload_0.0": 6.516038577075128,
+        "energy_wh_payload_0.25": 7.40302756735487,
+        "energy_wh_payload_0.5": 8.329060191650237,
+        "flight_seconds": 67.56571519471056
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 7.314069280387668,
+      "energy_wh_payload_0.25": 8.30579149629677,
+      "energy_wh_payload_0.5": 9.345064782003107,
+      "flight_seconds": 79.4
+    },
+    "job_id": "m109_station_to_ground_00",
+    "map_id": 109,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 9.612378031952828,
+        "energy_wh_payload_0.25": 10.908187203676249,
+        "energy_wh_payload_0.5": 12.26253375181836,
+        "flight_seconds": 99.52637685735485
+      },
+      "route": {
+        "energy_wh_payload_0.0": 7.308949663874898,
+        "energy_wh_payload_0.25": 8.30197929129686,
+        "energy_wh_payload_0.5": 9.342645858824119,
+        "flight_seconds": 79.48948855829185
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 9.21096182669619,
+      "energy_wh_payload_0.25": 10.437561950551522,
+      "energy_wh_payload_0.5": 11.717561091473781,
+      "flight_seconds": 91.25
+    },
+    "job_id": "m109_station_to_roof_00",
+    "map_id": 109,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 9.224375979328405,
+        "energy_wh_payload_0.25": 10.458961199539944,
+        "energy_wh_payload_0.5": 11.747756693726696,
+        "flight_seconds": 92.71340826407857
+      },
+      "route": {
+        "energy_wh_payload_0.0": 9.199877150825653,
+        "energy_wh_payload_0.25": 10.423985295115926,
+        "energy_wh_payload_0.5": 11.70135177671165,
+        "flight_seconds": 91.00357265932558
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 9.07701445073448,
+      "energy_wh_payload_0.25": 10.28563866340939,
+      "energy_wh_payload_0.5": 11.546788158200725,
+      "flight_seconds": 89.80000000000001
+    },
+    "job_id": "m109_ground_to_roof_00",
+    "map_id": 109,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 9.08887696932225,
+        "energy_wh_payload_0.25": 10.30508087275844,
+        "energy_wh_payload_0.5": 11.574608761232737,
+        "flight_seconds": 91.23673203590141
+      },
+      "route": {
+        "energy_wh_payload_0.0": 9.060488855168455,
+        "energy_wh_payload_0.25": 10.265680511434242,
+        "energy_wh_payload_0.5": 11.523221294108444,
+        "flight_seconds": 89.4863572430723
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 8.61080125403769,
+      "energy_wh_payload_0.25": 9.784846835608041,
+      "energy_wh_payload_0.5": 11.01229132826338,
+      "flight_seconds": 91.25
+    },
+    "job_id": "m109_roof_to_station_00",
+    "map_id": 109,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 9.224375979328405,
+        "energy_wh_payload_0.25": 10.458961199539944,
+        "energy_wh_payload_0.5": 11.747756693726696,
+        "flight_seconds": 92.71340826407857
+      },
+      "route": {
+        "energy_wh_payload_0.0": 8.629287296573134,
+        "energy_wh_payload_0.25": 9.805309603723382,
+        "energy_wh_payload_0.5": 11.034771987566762,
+        "flight_seconds": 91.39235595349845
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 9.24332808175618,
+      "energy_wh_payload_0.25": 10.479076509301093,
+      "energy_wh_payload_0.5": 11.767546401849534,
+      "flight_seconds": 91.2
+    },
+    "job_id": "m109_station_to_ground_01",
+    "map_id": 109,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 7.431427201509491,
+        "energy_wh_payload_0.25": 8.431376292159149,
+        "energy_wh_payload_0.5": 9.475597322208348,
+        "flight_seconds": 75.75824566589763
+      },
+      "route": {
+        "energy_wh_payload_0.0": 9.212851505118806,
+        "energy_wh_payload_0.25": 10.444618998956683,
+        "energy_wh_payload_0.5": 11.728999221831199,
+        "flight_seconds": 90.9418525600727
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 5.728824019205111,
+      "energy_wh_payload_0.25": 6.479982828782502,
+      "energy_wh_payload_0.5": 7.262054249218151,
+      "flight_seconds": 53.25
+    },
+    "job_id": "m109_station_to_roof_01",
+    "map_id": 109,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 6.459976080935321,
+        "energy_wh_payload_0.25": 7.317337117236508,
+        "energy_wh_payload_0.5": 8.210365179150394,
+        "flight_seconds": 61.92016074561748
+      },
+      "route": {
+        "energy_wh_payload_0.0": 5.825727390394805,
+        "energy_wh_payload_0.25": 6.5904056904684,
+        "energy_wh_payload_0.5": 7.386521567754549,
+        "flight_seconds": 54.32893418628165
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 8.03890312233116,
+      "energy_wh_payload_0.25": 9.10441408002078,
+      "energy_wh_payload_0.5": 10.215866840993817,
+      "flight_seconds": 78.4
+    },
+    "job_id": "m109_ground_to_roof_01",
+    "map_id": 109,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 8.628214431751688,
+        "energy_wh_payload_0.25": 9.779711019072783,
+        "energy_wh_payload_0.5": 10.981056917642876,
+        "flight_seconds": 85.54975058193507
+      },
+      "route": {
+        "energy_wh_payload_0.0": 8.092359243318475,
+        "energy_wh_payload_0.25": 9.164643817646253,
+        "energy_wh_payload_0.5": 10.283150900521928,
+        "flight_seconds": 79.00079615297136
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 4.985437302768992,
+      "energy_wh_payload_0.25": 5.672654139800921,
+      "energy_wh_payload_0.5": 6.390987391894702,
+      "flight_seconds": 53.7
+    },
+    "job_id": "m109_roof_to_station_01",
+    "map_id": 109,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 6.459976080935321,
+        "energy_wh_payload_0.25": 7.317337117236508,
+        "energy_wh_payload_0.5": 8.210365179150394,
+        "flight_seconds": 61.92016074561748
+      },
+      "route": {
+        "energy_wh_payload_0.0": 5.107957795912128,
+        "energy_wh_payload_0.25": 5.81214684689178,
+        "energy_wh_payload_0.5": 6.548002092900493,
+        "flight_seconds": 54.81800146520422
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 13.107164382218025,
+      "energy_wh_payload_0.25": 14.866100078107511,
+      "energy_wh_payload_0.5": 16.703101619586985,
+      "flight_seconds": 133.4
+    },
+    "job_id": "m110_station_to_ground_00",
+    "map_id": 110,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 11.352522874344624,
+        "energy_wh_payload_0.25": 12.883706906657817,
+        "energy_wh_payload_0.5": 14.484718136305878,
+        "flight_seconds": 118.34281868557218
+      },
+      "route": {
+        "energy_wh_payload_0.0": 13.101279499957625,
+        "energy_wh_payload_0.25": 14.861347829311939,
+        "energy_wh_payload_0.5": 16.699562518576876,
+        "flight_seconds": 133.49246771856178
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 5.192205864630547,
+      "energy_wh_payload_0.25": 5.875254948675223,
+      "energy_wh_payload_0.5": 6.585387632417363,
+      "flight_seconds": 47.6
+    },
+    "job_id": "m110_station_to_roof_00",
+    "map_id": 110,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 4.705684880967824,
+        "energy_wh_payload_0.25": 5.3312352459507295,
+        "energy_wh_payload_0.5": 5.982261682279951,
+        "flight_seconds": 44.652453055471426
+      },
+      "route": {
+        "energy_wh_payload_0.0": 5.216529284039796,
+        "energy_wh_payload_0.25": 5.902948967512157,
+        "energy_wh_payload_0.5": 6.616550574402191,
+        "flight_seconds": 47.80468981482945
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 14.089617534867324,
+      "energy_wh_payload_0.25": 15.981879936649293,
+      "energy_wh_payload_0.5": 17.95915554715913,
+      "flight_seconds": 144.45000000000002
+    },
+    "job_id": "m110_ground_to_roof_00",
+    "map_id": 110,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 13.351499460464414,
+        "energy_wh_payload_0.25": 15.148593573682772,
+        "energy_wh_payload_0.5": 17.027477267971246,
+        "flight_seconds": 138.51948638926055
+      },
+      "route": {
+        "energy_wh_payload_0.0": 14.01897677575589,
+        "energy_wh_payload_0.25": 15.900039518265974,
+        "energy_wh_payload_0.5": 17.865694041965018,
+        "flight_seconds": 143.61767757084934
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 4.822297942125775,
+      "energy_wh_payload_0.25": 5.4732081097595815,
+      "energy_wh_payload_0.5": 6.151229181906472,
+      "flight_seconds": 47.650000000000006
+    },
+    "job_id": "m110_roof_to_station_00",
+    "map_id": 110,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 4.705684880967824,
+        "energy_wh_payload_0.25": 5.3312352459507295,
+        "energy_wh_payload_0.5": 5.982261682279951,
+        "flight_seconds": 44.652453055471426
+      },
+      "route": {
+        "energy_wh_payload_0.0": 4.8572817510856225,
+        "energy_wh_payload_0.25": 5.513224323888542,
+        "energy_wh_payload_0.5": 6.196444748983722,
+        "flight_seconds": 48.01367711212693
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 7.743244568240705,
+      "energy_wh_payload_0.25": 8.796802301352926,
+      "energy_wh_payload_0.5": 9.900695934527246,
+      "flight_seconds": 84.2
+    },
+    "job_id": "m110_station_to_ground_01",
+    "map_id": 110,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 9.94798034895807,
+        "energy_wh_payload_0.25": 11.288843041434799,
+        "energy_wh_payload_0.5": 12.690384606535796,
+        "flight_seconds": 103.09379398848455
+      },
+      "route": {
+        "energy_wh_payload_0.0": 7.634490577957401,
+        "energy_wh_payload_0.25": 8.671526035783826,
+        "energy_wh_payload_0.5": 9.758322747593189,
+        "flight_seconds": 83.0277940356719
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 12.783911118200782,
+      "energy_wh_payload_0.25": 14.492687435257794,
+      "energy_wh_payload_0.5": 16.278475778981427,
+      "flight_seconds": 130.20000000000002
+    },
+    "job_id": "m110_station_to_roof_01",
+    "map_id": 110,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 13.26881994422027,
+        "energy_wh_payload_0.25": 15.050078570811532,
+        "energy_wh_payload_0.5": 16.911600376442053,
+        "flight_seconds": 136.19651779276975
+      },
+      "route": {
+        "energy_wh_payload_0.0": 12.882451514498579,
+        "energy_wh_payload_0.25": 14.605950037570713,
+        "energy_wh_payload_0.5": 16.40705767052845,
+        "flight_seconds": 131.37406469193579
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 8.487362678899588,
+      "energy_wh_payload_0.25": 9.611408896060908,
+      "energy_wh_payload_0.5": 10.78449386846928,
+      "flight_seconds": 83.4
+    },
+    "job_id": "m110_ground_to_roof_01",
+    "map_id": 110,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 9.11743042097533,
+        "energy_wh_payload_0.25": 10.33615854246166,
+        "energy_wh_payload_0.5": 11.60811024918901,
+        "flight_seconds": 91.12515809878643
+      },
+      "route": {
+        "energy_wh_payload_0.0": 8.650968327371976,
+        "energy_wh_payload_0.25": 9.800182025264188,
+        "energy_wh_payload_0.5": 10.999406957773429,
+        "flight_seconds": 85.31516491667293
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 12.107826703376185,
+      "energy_wh_payload_0.25": 13.760417338341231,
+      "energy_wh_payload_0.5": 15.490418992339757,
+      "flight_seconds": 131.0
+    },
+    "job_id": "m110_roof_to_station_01",
+    "map_id": 110,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 13.26881994422027,
+        "energy_wh_payload_0.25": 15.050078570811532,
+        "energy_wh_payload_0.5": 16.911600376442053,
+        "flight_seconds": 136.19651779276975
+      },
+      "route": {
+        "energy_wh_payload_0.0": 12.187677053422583,
+        "energy_wh_payload_0.25": 13.852233715526623,
+        "energy_wh_payload_0.5": 15.59458501121798,
+        "flight_seconds": 131.77824015184103
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 5.192653145404788,
+      "energy_wh_payload_0.25": 5.898580931273695,
+      "energy_wh_payload_0.5": 6.638241496860786,
+      "flight_seconds": 56.400000000000006
+    },
+    "job_id": "m111_station_to_ground_00",
+    "map_id": 111,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 7.47037970585367,
+        "energy_wh_payload_0.25": 8.47557827759741,
+        "energy_wh_payload_0.5": 9.525336015099322,
+        "flight_seconds": 76.21759672603405
+      },
+      "route": {
+        "energy_wh_payload_0.0": 5.137148290251574,
+        "energy_wh_payload_0.25": 5.835310169927649,
+        "energy_wh_payload_0.5": 6.566945174860507,
+        "flight_seconds": 55.84646903543864
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 12.147291590032966,
+      "energy_wh_payload_0.25": 13.771664056809184,
+      "energy_wh_payload_0.5": 15.467761124067485,
+      "flight_seconds": 122.35000000000001
+    },
+    "job_id": "m111_station_to_roof_00",
+    "map_id": 111,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 11.209081810104779,
+        "energy_wh_payload_0.25": 12.715457896045478,
+        "energy_wh_payload_0.5": 14.289651150399013,
+        "flight_seconds": 115.19763335291871
+      },
+      "route": {
+        "energy_wh_payload_0.0": 12.103023590292587,
+        "energy_wh_payload_0.25": 13.72083332090341,
+        "energy_wh_payload_0.5": 15.410118528536808,
+        "flight_seconds": 121.84060682680986
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 7.953832475890918,
+      "energy_wh_payload_0.25": 9.009559564746313,
+      "energy_wh_payload_0.5": 10.109703246886408,
+      "flight_seconds": 76.75
+    },
+    "job_id": "m111_ground_to_roof_00",
+    "map_id": 111,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 7.165377702305172,
+        "energy_wh_payload_0.25": 8.123272489897346,
+        "energy_wh_payload_0.5": 9.122504648490706,
+        "flight_seconds": 71.10780371335295
+      },
+      "route": {
+        "energy_wh_payload_0.0": 7.919061874164825,
+        "energy_wh_payload_0.25": 8.968976159755295,
+        "energy_wh_payload_0.5": 10.063078833897444,
+        "flight_seconds": 76.29816883325019
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 11.690533401654339,
+      "energy_wh_payload_0.25": 13.274909580673315,
+      "energy_wh_payload_0.5": 14.931010374118422,
+      "flight_seconds": 122.35000000000001
+    },
+    "job_id": "m111_roof_to_station_00",
+    "map_id": 111,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 11.209081810104779,
+        "energy_wh_payload_0.25": 12.715457896045478,
+        "energy_wh_payload_0.5": 14.289651150399013,
+        "flight_seconds": 115.19763335291871
+      },
+      "route": {
+        "energy_wh_payload_0.0": 11.665609404748942,
+        "energy_wh_payload_0.25": 13.246352296860897,
+        "energy_wh_payload_0.5": 14.898697191270648,
+        "flight_seconds": 122.11424333078013
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 9.31824508113378,
+      "energy_wh_payload_0.25": 10.563186599354673,
+      "energy_wh_payload_0.5": 11.860749167319415,
+      "flight_seconds": 91.30000000000001
+    },
+    "job_id": "m111_station_to_ground_01",
+    "map_id": 111,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 7.15498094370815,
+        "energy_wh_payload_0.25": 8.11739935203058,
+        "energy_wh_payload_0.5": 9.122311568433451,
+        "flight_seconds": 72.77870077301317
+      },
+      "route": {
+        "energy_wh_payload_0.0": 9.251398322093092,
+        "energy_wh_payload_0.25": 10.486562657094867,
+        "energy_wh_payload_0.5": 11.77403905064653,
+        "flight_seconds": 90.64087762897266
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 9.531232212602504,
+      "energy_wh_payload_0.25": 10.80034192136678,
+      "energy_wh_payload_0.5": 12.124092095005963,
+      "flight_seconds": 93.85000000000001
+    },
+    "job_id": "m111_station_to_roof_01",
+    "map_id": 111,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 8.605355089009752,
+        "energy_wh_payload_0.25": 9.758995153606538,
+        "energy_wh_payload_0.5": 10.963490697500985,
+        "flight_seconds": 86.93738773737219
+      },
+      "route": {
+        "energy_wh_payload_0.0": 9.509946381508374,
+        "energy_wh_payload_0.25": 10.776112761168031,
+        "energy_wh_payload_0.5": 12.096802103313829,
+        "flight_seconds": 93.60339697803163
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 14.265766160129553,
+      "energy_wh_payload_0.25": 16.17459139847971,
+      "energy_wh_payload_0.5": 18.168894475024175,
+      "flight_seconds": 145.25
+    },
+    "job_id": "m111_ground_to_roof_01",
+    "map_id": 111,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 13.240105546595723,
+        "energy_wh_payload_0.25": 15.022395453201213,
+        "energy_wh_payload_0.5": 16.88589104522694,
+        "flight_seconds": 137.4715892143591
+      },
+      "route": {
+        "energy_wh_payload_0.0": 14.296352942082768,
+        "energy_wh_payload_0.25": 16.21218551569637,
+        "energy_wh_payload_0.5": 18.21375718333303,
+        "flight_seconds": 145.7034492219777
+      }
+    }
+  },
+  {
+    "actual": {
+      "energy_wh_payload_0.0": 9.107492644995839,
+      "energy_wh_payload_0.25": 10.339497323714323,
+      "energy_wh_payload_0.5": 11.62614247473988,
+      "flight_seconds": 93.85000000000001
+    },
+    "job_id": "m111_roof_to_station_01",
+    "map_id": 111,
+    "predicted": {
+      "direct": {
+        "energy_wh_payload_0.0": 8.605355089009752,
+        "energy_wh_payload_0.25": 9.758995153606538,
+        "energy_wh_payload_0.5": 10.963490697500985,
+        "flight_seconds": 86.93738773737219
+      },
+      "route": {
+        "energy_wh_payload_0.0": 9.104166422972291,
+        "energy_wh_payload_0.25": 10.335946674595334,
+        "energy_wh_payload_0.5": 11.62236726354656,
+        "flight_seconds": 93.85724381909145
+      }
+    }
+  }
+]

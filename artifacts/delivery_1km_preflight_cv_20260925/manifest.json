@@ -1,0 +1,36 @@
+{
+  "energy_manifest_sha256": "28a540798f3a8b673a1e9594e08840ec391c3f209d634470b2e26323d8226233",
+  "features": {
+    "direct": [
+      "intercept",
+      "euclidean_distance_m",
+      "absolute_endpoint_height_change_m"
+    ],
+    "route": [
+      "intercept",
+      "preflight_route_length_m",
+      "planned_ascent_m",
+      "planned_descent_m",
+      "planned_segment_count"
+    ]
+  },
+  "fit": "ordinary_least_squares; predictions_clipped_at_zero; leave_one_map_out",
+  "jobs": 96,
+  "map_ids": [
+    100,
+    101,
+    102,
+    103,
+    104,
+    105,
+    106,
+    107,
+    108,
+    109,
+    110,
+    111
+  ],
+  "navigation_manifest_sha256": "ba1394aed604b0dd1b0f5c17cc4fc03cd6dc4e61aadeef693c5daf1c04def938",
+  "protocol": "m100_1km_preflight_leave_one_map_out_v1",
+  "source_sha256": "76c5ff21597cb0bc3bda9adf5d9b4892a2a63ce1f518ccb601542c50ef970891"
+}

@@ -1,0 +1,29 @@
+{
+  "actual_path_length": 69.89040587324631,
+  "collision_count": 0,
+  "control_seconds": {
+    "p50": 0.0006051319996913662,
+    "p95": 0.0007343050005147231,
+    "p99": 0.0009139075993516606
+  },
+  "controller_infeasible_steps": 0,
+  "flight_seconds": 15.450000000000001,
+  "intervention_steps": 263,
+  "job_id": "m10_blocked_00",
+  "map_id": 10,
+  "outcome": "arrived",
+  "qp_seconds": {
+    "p50": 0.0002451390000715037,
+    "p95": 0.00031834140008868417,
+    "p99": 0.00044098964037402803
+  },
+  "route_checked_edges": 8400,
+  "route_length": 65.30567565843035,
+  "route_nodes": 130,
+  "route_planning_seconds": 0.14035295499979838,
+  "safety_cost": 0,
+  "steps": 309,
+  "stratum": "blocked",
+  "trace": "traces/m10_blocked_00.npz",
+  "wall_seconds": 0.345100939999611
+}

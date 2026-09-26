@@ -1,0 +1,611 @@
+{
+  "energy_labels": 5472,
+  "independent_flights": 96,
+  "jobs": 96,
+  "navigation_collision_count": 0,
+  "navigation_manifest_sha256": "ba1394aed604b0dd1b0f5c17cc4fc03cd6dc4e61aadeef693c5daf1c04def938",
+  "payloads": {
+    "0.0": {
+      "base_energy_wh_mean": 8.578772189118453,
+      "base_energy_wh_quantiles_0_25_50_75_95_100": [
+        1.2299726478655786,
+        6.508832972711534,
+        8.723284212685849,
+        10.59545707475724,
+        13.288498568106098,
+        16.0291071659321
+      ],
+      "base_infeasible_routes": 0,
+      "profiles": {
+        "additional_electronics_w_high": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": 2.5684812239440102,
+          "mean_paired_energy_change_pct": 2.3858921609849264,
+          "min_paired_energy_change_pct": 2.0953908506970276,
+          "violation_types_by_route": {}
+        },
+        "additional_electronics_w_low": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": -1.9721325653619115,
+          "mean_paired_energy_change_pct": -2.245545563279932,
+          "min_paired_energy_change_pct": -2.4173940931237823,
+          "violation_types_by_route": {}
+        },
+        "base": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": 0.0,
+          "mean_paired_energy_change_pct": 0.0,
+          "min_paired_energy_change_pct": 0.0,
+          "violation_types_by_route": {}
+        },
+        "drag_area_m2_high": {
+          "infeasible_routes": 20,
+          "infeasible_steps": 20,
+          "max_paired_energy_change_pct": 9.811875767111777,
+          "mean_paired_energy_change_pct": 6.484505434908257,
+          "min_paired_energy_change_pct": 2.292249981563522,
+          "violation_types_by_route": {
+            "published_tilt_limit": 20
+          }
+        },
+        "drag_area_m2_low": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": -1.093505819539782,
+          "mean_paired_energy_change_pct": -3.0912392909001203,
+          "min_paired_energy_change_pct": -4.675731838458022,
+          "violation_types_by_route": {}
+        },
+        "hover_power_multiplier_high": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": 13.164131314623141,
+          "mean_paired_energy_change_pct": 12.232776705704746,
+          "min_paired_energy_change_pct": 11.079956950330967,
+          "violation_types_by_route": {}
+        },
+        "hover_power_multiplier_low": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": -11.07995695033095,
+          "mean_paired_energy_change_pct": -12.232776705704763,
+          "min_paired_energy_change_pct": -13.164131314623141,
+          "violation_types_by_route": {}
+        },
+        "induced_power_fraction_high": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": -0.9961906120831225,
+          "mean_paired_energy_change_pct": -2.676229444852758,
+          "min_paired_energy_change_pct": -3.9335387184279096,
+          "violation_types_by_route": {}
+        },
+        "induced_power_fraction_low": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": 3.9335387184278976,
+          "mean_paired_energy_change_pct": 2.676229444852742,
+          "min_paired_energy_change_pct": 0.9961906120831053,
+          "violation_types_by_route": {}
+        },
+        "profile_power_fraction_high": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": 0.3240525307786898,
+          "mean_paired_energy_change_pct": 0.21785419433503997,
+          "min_paired_energy_change_pct": 0.07950857379710542,
+          "violation_types_by_route": {}
+        },
+        "profile_power_fraction_low": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": -0.07950857379710542,
+          "mean_paired_energy_change_pct": -0.21785419433504002,
+          "min_paired_energy_change_pct": -0.3240525307786898,
+          "violation_types_by_route": {}
+        },
+        "propulsive_efficiency_high": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": -1.0246273799118082,
+          "mean_paired_energy_change_pct": -2.190573810703557,
+          "min_paired_energy_change_pct": -3.67650248147943,
+          "violation_types_by_route": {}
+        },
+        "propulsive_efficiency_low": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": 5.681867471377321,
+          "mean_paired_energy_change_pct": 3.3854322529054923,
+          "min_paired_energy_change_pct": 1.5835150416819177,
+          "violation_types_by_route": {}
+        },
+        "rotor_tip_speed_mps_high": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": -0.06678720198956649,
+          "mean_paired_energy_change_pct": -0.18299752324143603,
+          "min_paired_energy_change_pct": -0.27220412585410864,
+          "violation_types_by_route": {}
+        },
+        "rotor_tip_speed_mps_low": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": 0.5880953336354198,
+          "mean_paired_energy_change_pct": 0.39536501934877794,
+          "min_paired_energy_change_pct": 0.14429333763179664,
+          "violation_types_by_route": {}
+        },
+        "thrust_headroom_over_mtow_high": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": 0.0,
+          "mean_paired_energy_change_pct": 0.0,
+          "min_paired_energy_change_pct": 0.0,
+          "violation_types_by_route": {}
+        },
+        "thrust_headroom_over_mtow_low": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": 0.0,
+          "mean_paired_energy_change_pct": 0.0,
+          "min_paired_energy_change_pct": 0.0,
+          "violation_types_by_route": {}
+        },
+        "usable_energy_fraction_high": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": 9.751208381202343,
+          "mean_paired_energy_change_pct": 9.061316078299816,
+          "min_paired_energy_change_pct": 8.207375518763683,
+          "violation_types_by_route": {}
+        },
+        "usable_energy_fraction_low": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": -8.207375518763664,
+          "mean_paired_energy_change_pct": -9.061316078299818,
+          "min_paired_energy_change_pct": -9.751208381202325,
+          "violation_types_by_route": {}
+        }
+      }
+    },
+    "0.25": {
+      "base_energy_wh_mean": 9.729028183488522,
+      "base_energy_wh_quantiles_0_25_50_75_95_100": [
+        1.398319411939156,
+        7.3685301500825915,
+        9.891460000536117,
+        12.004740695346802,
+        15.070423499605116,
+        18.186438751274643
+      ],
+      "base_infeasible_routes": 0,
+      "profiles": {
+        "additional_electronics_w_high": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": 2.2610472538477797,
+          "mean_paired_energy_change_pct": 2.1035291310156445,
+          "min_paired_energy_change_pct": 1.85453195360942,
+          "violation_types_by_route": {}
+        },
+        "additional_electronics_w_low": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": -1.7454418386912216,
+          "mean_paired_energy_change_pct": -1.979792123308842,
+          "min_paired_energy_change_pct": -2.128044474209682,
+          "violation_types_by_route": {}
+        },
+        "base": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": 0.0,
+          "mean_paired_energy_change_pct": 0.0,
+          "min_paired_energy_change_pct": 0.0,
+          "violation_types_by_route": {}
+        },
+        "drag_area_m2_high": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": 8.631699325294191,
+          "mean_paired_energy_change_pct": 5.709809676756382,
+          "min_paired_energy_change_pct": 2.0237614419575145,
+          "violation_types_by_route": {}
+        },
+        "drag_area_m2_low": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": -0.9659551882153246,
+          "mean_paired_energy_change_pct": -2.7233808721712065,
+          "min_paired_energy_change_pct": -4.115460866287784,
+          "violation_types_by_route": {}
+        },
+        "hover_power_multiplier_high": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": 13.382220912253713,
+          "mean_paired_energy_change_pct": 12.483677403420486,
+          "min_paired_energy_change_pct": 11.327175858709845,
+          "violation_types_by_route": {}
+        },
+        "hover_power_multiplier_low": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": -11.327175858709877,
+          "mean_paired_energy_change_pct": -12.483677403420486,
+          "min_paired_energy_change_pct": -13.382220912253699,
+          "violation_types_by_route": {}
+        },
+        "induced_power_fraction_high": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": -0.9520041495881374,
+          "mean_paired_energy_change_pct": -2.5534032513655665,
+          "min_paired_energy_change_pct": -3.7515256686410523,
+          "violation_types_by_route": {}
+        },
+        "induced_power_fraction_low": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": 3.7515256686410097,
+          "mean_paired_energy_change_pct": 2.55340325136555,
+          "min_paired_energy_change_pct": 0.952004149588107,
+          "violation_types_by_route": {}
+        },
+        "profile_power_fraction_high": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": 0.3283775312167726,
+          "mean_paired_energy_change_pct": 0.22098734109332552,
+          "min_paired_energy_change_pct": 0.08087770761574033,
+          "violation_types_by_route": {}
+        },
+        "profile_power_fraction_low": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": -0.08087770761575552,
+          "mean_paired_energy_change_pct": -0.22098734109332752,
+          "min_paired_energy_change_pct": -0.32837753121679397,
+          "violation_types_by_route": {}
+        },
+        "propulsive_efficiency_high": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": -0.9055780139713737,
+          "mean_paired_energy_change_pct": -2.0214339963183954,
+          "min_paired_energy_change_pct": -3.4931681177267735,
+          "violation_types_by_route": {}
+        },
+        "propulsive_efficiency_low": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": 5.3985325455777,
+          "mean_paired_energy_change_pct": 3.124034357946608,
+          "min_paired_energy_change_pct": 1.3995296579557837,
+          "violation_types_by_route": {}
+        },
+        "rotor_tip_speed_mps_high": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": -0.06793727439723768,
+          "mean_paired_energy_change_pct": -0.18562936651839404,
+          "min_paired_energy_change_pct": -0.27583712622210355,
+          "violation_types_by_route": {}
+        },
+        "rotor_tip_speed_mps_low": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": 0.5959444085044998,
+          "mean_paired_energy_change_pct": 0.4010511005027066,
+          "min_paired_energy_change_pct": 0.14677806196930485,
+          "violation_types_by_route": {}
+        },
+        "thrust_headroom_over_mtow_high": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": 0.0,
+          "mean_paired_energy_change_pct": 0.0,
+          "min_paired_energy_change_pct": 0.0,
+          "violation_types_by_route": {}
+        },
+        "thrust_headroom_over_mtow_low": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": 0.0,
+          "mean_paired_energy_change_pct": 0.0,
+          "min_paired_energy_change_pct": 0.0,
+          "violation_types_by_route": {}
+        },
+        "usable_energy_fraction_high": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": 9.912756231299053,
+          "mean_paired_energy_change_pct": 9.247168446978138,
+          "min_paired_energy_change_pct": 8.390500636081372,
+          "violation_types_by_route": {}
+        },
+        "usable_energy_fraction_low": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": -8.390500636081372,
+          "mean_paired_energy_change_pct": -9.247168446978138,
+          "min_paired_energy_change_pct": -9.912756231299053,
+          "violation_types_by_route": {}
+        }
+      }
+    },
+    "0.5": {
+      "base_energy_wh_mean": 10.929972254459804,
+      "base_energy_wh_quantiles_0_25_50_75_95_100": [
+        1.5745941487386257,
+        8.26762463808911,
+        11.113584163604735,
+        13.47608450162302,
+        16.95162161837144,
+        20.440159895916505
+      ],
+      "base_infeasible_routes": 0,
+      "profiles": {
+        "additional_electronics_w_high": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": 2.0090713352078073,
+          "mean_paired_energy_change_pct": 1.8721903103275244,
+          "min_paired_energy_change_pct": 1.6566684252811132,
+          "violation_types_by_route": {}
+        },
+        "additional_electronics_w_low": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": -1.5592173414410504,
+          "mean_paired_energy_change_pct": -1.7620614685435516,
+          "min_paired_energy_change_pct": -1.8908906684308686,
+          "violation_types_by_route": {}
+        },
+        "base": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": 0.0,
+          "mean_paired_energy_change_pct": 0.0,
+          "min_paired_energy_change_pct": 0.0,
+          "violation_types_by_route": {}
+        },
+        "drag_area_m2_high": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": 7.662722019612165,
+          "mean_paired_energy_change_pct": 5.074435197204946,
+          "min_paired_energy_change_pct": 1.8036384182969865,
+          "violation_types_by_route": {}
+        },
+        "drag_area_m2_low": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": -0.8614270999974396,
+          "mean_paired_energy_change_pct": -2.421813569408236,
+          "min_paired_energy_change_pct": -3.6556675402080514,
+          "violation_types_by_route": {}
+        },
+        "hover_power_multiplier_high": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": 13.560223375908791,
+          "mean_paired_energy_change_pct": 12.692131257888441,
+          "min_paired_energy_change_pct": 11.537356951791539,
+          "violation_types_by_route": {}
+        },
+        "hover_power_multiplier_low": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": -11.537356951791583,
+          "mean_paired_energy_change_pct": -12.692131257888464,
+          "min_paired_energy_change_pct": -13.56022337590882,
+          "violation_types_by_route": {}
+        },
+        "induced_power_fraction_high": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": -0.9099381155084842,
+          "mean_paired_energy_change_pct": -2.4357903654258877,
+          "min_paired_energy_change_pct": -3.576314073140629,
+          "violation_types_by_route": {}
+        },
+        "induced_power_fraction_low": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": 3.57631407314061,
+          "mean_paired_energy_change_pct": 2.4357903654258712,
+          "min_paired_energy_change_pct": 0.90993811550843,
+          "violation_types_by_route": {}
+        },
+        "profile_power_fraction_high": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": 0.3316635462355705,
+          "mean_paired_energy_change_pct": 0.22346484042785786,
+          "min_paired_energy_change_pct": 0.08202522494639838,
+          "violation_types_by_route": {}
+        },
+        "profile_power_fraction_low": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": -0.0820252249464255,
+          "mean_paired_energy_change_pct": -0.2234648404278549,
+          "min_paired_energy_change_pct": -0.3316635462355895,
+          "violation_types_by_route": {}
+        },
+        "propulsive_efficiency_high": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": -0.8083017320665739,
+          "mean_paired_energy_change_pct": -1.8794561324763748,
+          "min_paired_energy_change_pct": -3.3342159499294337,
+          "violation_types_by_route": {}
+        },
+        "propulsive_efficiency_low": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": 5.1528791953454505,
+          "mean_paired_energy_change_pct": 2.9046140229180346,
+          "min_paired_energy_change_pct": 1.249193585921065,
+          "violation_types_by_route": {}
+        },
+        "rotor_tip_speed_mps_high": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": -0.06890118895499851,
+          "mean_paired_energy_change_pct": -0.18771046595939977,
+          "min_paired_energy_change_pct": -0.27859737883791114,
+          "violation_types_by_route": {}
+        },
+        "rotor_tip_speed_mps_low": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": 0.6019079172423676,
+          "mean_paired_energy_change_pct": 0.4055473029987023,
+          "min_paired_energy_change_pct": 0.14886059342125005,
+          "violation_types_by_route": {}
+        },
+        "thrust_headroom_over_mtow_high": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": 0.0,
+          "mean_paired_energy_change_pct": 0.0,
+          "min_paired_energy_change_pct": 0.0,
+          "violation_types_by_route": {}
+        },
+        "thrust_headroom_over_mtow_low": {
+          "infeasible_routes": 78,
+          "infeasible_steps": 1384,
+          "max_paired_energy_change_pct": 0.0,
+          "mean_paired_energy_change_pct": 0.0,
+          "min_paired_energy_change_pct": 0.0,
+          "violation_types_by_route": {
+            "assumed_thrust_limit": 78
+          }
+        },
+        "usable_energy_fraction_high": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": 10.04460990808059,
+          "mean_paired_energy_change_pct": 9.401578709547001,
+          "min_paired_energy_change_pct": 8.546190334660398,
+          "violation_types_by_route": {}
+        },
+        "usable_energy_fraction_low": {
+          "infeasible_routes": 0,
+          "infeasible_steps": 0,
+          "max_paired_energy_change_pct": -8.54619033466044,
+          "mean_paired_energy_change_pct": -9.401578709547012,
+          "min_paired_energy_change_pct": -10.044609908080604,
+          "violation_types_by_route": {}
+        }
+      }
+    }
+  },
+  "protocol": "m100_1km_energy_model_oat_20260925",
+  "result_sha256": {
+    "m100_ground_to_roof_00": "1e46453ba7e2377b5e5dc49bb51e32af81c716de324ed409674eece46d3a7c04",
+    "m100_ground_to_roof_01": "4a6eeac326a2aaf1c3ddab789284bfc1b6dcfdba4382ed04e217df7a2a3e8ec3",
+    "m100_roof_to_station_00": "d8c5f96914a17e22106785c84266fa4957c05d1207b32d7bc96fb84fd3741052",
+    "m100_roof_to_station_01": "1ee35d4c1db875a8234d9ff78bce5121d2f6bd223329b692c374b3f467629d02",
+    "m100_station_to_ground_00": "88e7dc47fd72541b65bd1fe6e9499a2892ce78612d3accd984f58f5d6435febd",
+    "m100_station_to_ground_01": "1536484b5484c6b6a03a9e26e702ef58d36498936772fe812d3631ec49b0aa29",
+    "m100_station_to_roof_00": "bf224c524418a4284e2a354dd6d2a702f3a83bdb1e126e1c01b2e22afd57b2d9",
+    "m100_station_to_roof_01": "4294ad4151b86f2de60ba4dcecf683b6de4d87974ecc7a998d7af5419b6d72c7",
+    "m101_ground_to_roof_00": "78785cb72c8d57c0476e833ae64f79510b76a3479ae5181daa3e898af502969a",
+    "m101_ground_to_roof_01": "07ea47034807d2cf629a8c7d3de1fd22cefc8fd227192b621130758f597d097b",
+    "m101_roof_to_station_00": "a318937946701f9a99b33fdc6c5a251bf680d94780c3a6a38f4d3900044581cc",
+    "m101_roof_to_station_01": "1e90f7eac9e07471d984e511c871a628524fa10c8d412d763d4a7f8e1a065c4c",
+    "m101_station_to_ground_00": "a2862e9d2dde449d631c04448775578438509d0f32c98fa687e5baccca3fb503",
+    "m101_station_to_ground_01": "7835b32a20b33361aafea4ba8a3c5b4f8d5559532845c0b632c636bfdaf37e6c",
+    "m101_station_to_roof_00": "87f08e29939a744c5aee7ffc82cd5bcd58fa1d91bcef4a049ab34101b11c4b81",
+    "m101_station_to_roof_01": "3893c0c0baf7ebded0e73016065803f0769fa8d1e5fe5eec0296d0c33d16cca7",
+    "m102_ground_to_roof_00": "0c5e86f49513209a7dcb6614ecfc03fdec7a6767fb6594331f8b69b17172bd8c",
+    "m102_ground_to_roof_01": "4598b28c47c5593b6322bca6ef525783a2615610e3ec5a9ce7d14fc04837da67",
+    "m102_roof_to_station_00": "fa4b65994d46bcf637e3a434d657cd7b885e7085c44f39020cc19fbc5930027e",
+    "m102_roof_to_station_01": "75928b79c7b9b8e444d8e053433551e0a38a2883ceab3927432bd593d9629ae0",
+    "m102_station_to_ground_00": "d0444f4c2d38516ea90bfa309004b11aa64fbad94944fd17239d5ad96e1b9047",
+    "m102_station_to_ground_01": "214cc74f088103d6ff5517d83a724bb9000547329960a3618f29d19a61c8f2f8",
+    "m102_station_to_roof_00": "cac9580f4c7dbeb3415666f48096db259e9aad6ba21959f543cb06b7277ba5dd",
+    "m102_station_to_roof_01": "20e6a16aaf9bdb0d90ad3c273fdf55a1a50a28bc224b4d2e4648717cf52b3d2a",
+    "m103_ground_to_roof_00": "832aab9d43642990e370f3ce7337953c236dd03b773a524533ea05617378edc4",
+    "m103_ground_to_roof_01": "1ef46e0c3b19227485e015dd7d97a0ced8301712bafd4626488b27ceadc82221",
+    "m103_roof_to_station_00": "d3cddbe1dcf0e9c65ccb912bed51e938048618a5f56a5c868c78eb39025d5e10",
+    "m103_roof_to_station_01": "3c6ccefa6e5603da852e8084bbf7871204b4309beb2046540a6a96c263430650",
+    "m103_station_to_ground_00": "cfd52138b4b1978eb39eb40f930d9a4e16120b0089bd9f3d6b71664dc2c66676",
+    "m103_station_to_ground_01": "78bc36270663a5eff331fe3b7e80f46de2aa8ee103cd00e9a7736a5e8a7371af",
+    "m103_station_to_roof_00": "6565605e5735970f221b726a22d80c6fe965cdec69cd4b842c0b1d548999aa32",
+    "m103_station_to_roof_01": "aedf1d2fef5736d40694a39ab2575e9eb0957ad7ecc27afed6bcd5a75ca811c9",
+    "m104_ground_to_roof_00": "da2d12702ab5261068dbf90d49c3ad31b86521076735e9bf2d0155f1dd0189cb",
+    "m104_ground_to_roof_01": "63b39b428a40813b3394310e66011c617185fad04001ee5eb227ee3c06705439",
+    "m104_roof_to_station_00": "b9628294de5a3cdc3f6e242a8d24bd8f646256cdfd19cac0af38a3ba6f91e973",
+    "m104_roof_to_station_01": "f8f755881c826d3c9bb64a2fc0918913caf218183062afd8c64a0147d577f848",
+    "m104_station_to_ground_00": "53192b78361dbfec0a818a52c271dc9f31bfd34f68781114f36c8f65a285e091",
+    "m104_station_to_ground_01": "364718f4624f28dfd05c853bf19140d1f4cd45d0b5e5959d9bf8fa0f9ec30256",
+    "m104_station_to_roof_00": "cb86aadcaf48949763735c9e825a5f1163da8e28a023d928726c9ec701ac61fa",
+    "m104_station_to_roof_01": "8d4ce1fee5bf97c0027ecec6ab2ce92d57b554fd5671d06b76b86fa492a56e1a",
+    "m105_ground_to_roof_00": "331333b9433dd91ce16424329de4f10dbadc88accc4d34a0009954c6a11ee940",
+    "m105_ground_to_roof_01": "1835f60b67af2784060aa4c914d682c8e9c03b7214a8e4db200b902f78a3511e",
+    "m105_roof_to_station_00": "040c234cce9dd10dde8ee504e782ab188799ab1118d60085fa8a39d0dca48357",
+    "m105_roof_to_station_01": "e8df08f440c0b13f52489c054f66e583a4517771c25745703687d6eacecf875e",
+    "m105_station_to_ground_00": "303019b5786c0dbad373c2a38a62caec75634a3c15c29ff34f844ecb97ef52b8",
+    "m105_station_to_ground_01": "a84889481605bb3af4dcb0a2923ff5169658a5db960f3213110f02100eca302b",
+    "m105_station_to_roof_00": "fd7912ca452ea6b695d681c87e4ed586d01275211087177266f594ec4e4ac7a0",
+    "m105_station_to_roof_01": "f53b00f65345a690b3a509cbc7abc58cb2f3c78874bcc8108c77067facc8e241",
+    "m106_ground_to_roof_00": "7c7fabf24449588b097765824ec875d463bb08e1bc00273b2efcc7a32ffd9798",
+    "m106_ground_to_roof_01": "dd028c16ec41301daaaff0f1b22cd031027dc646fb9541e8c4eec57c36dffc5b",
+    "m106_roof_to_station_00": "0cd26e8856799cea5c0ea9a73290e8db7cb05e6097d27f3027d6932cef17d077",
+    "m106_roof_to_station_01": "aeec964391f40304af6315dfccf2f7fda9ab8697511ccc367547af27c066f8ef",
+    "m106_station_to_ground_00": "2b7b2f4b8fa7373dfa08dba194b7581af05173ad754a3a39acc447da299a6cc4",
+    "m106_station_to_ground_01": "45968137c0db80e635fa56c0a55ea9e8b7e65aa80fddf464b8b33f509fab8110",
+    "m106_station_to_roof_00": "29b6abe0cd67cf1582492a4a6f87e85c058cea694312b8503e2b4eb27b1a9ec6",
+    "m106_station_to_roof_01": "b5b40c98683127f22c3c24603cbead11f51c438ff323960f1dbe49320875395e",
+    "m107_ground_to_roof_00": "ec2363434420e6d55e4429141b471d5af3449644a58fb4cdfb515fe0beb41bf9",
+    "m107_ground_to_roof_01": "8046aec7ef004a433275b4d55c80b7845e870df0444462cd98b2b2d0c3794e09",
+    "m107_roof_to_station_00": "d97c1d83312a60d045806678b245dc19d783de21330949e8fff323d1dc728fef",
+    "m107_roof_to_station_01": "6d92438f3fa046b9769a158de3bb41c794dd0d003166558251390413c9394f22",
+    "m107_station_to_ground_00": "571a5f1fc1647bed01dba4532633a54762b2cf0687cd420a1aeba3066f6ac5b5",
+    "m107_station_to_ground_01": "2608e96adccba61b13ba435b2998bea08ccfb4d34a8ca737f4110f39f93c27f3",
+    "m107_station_to_roof_00": "3f3cf8c83abc5fd3ca00d08719ffecee82e7905cc1669d92fe5b957d0bd4aef4",
+    "m107_station_to_roof_01": "b9a8014e25957d3d0174da13dd30bd4aa7dbcd3498fe2cd6ae8fc4c4f95a321c",
+    "m108_ground_to_roof_00": "a5d337814872fb73b03bc4c12d31c5d6e716791696d706059647171b0e408b69",
+    "m108_ground_to_roof_01": "51375e680c471996ece903645d5ed49632fb32a4dac18a5d8973f103baf558bb",
+    "m108_roof_to_station_00": "afb443f208b10956e690a4fa5bbdad1ca3129cccd6c2b8512d8a4500087c1b35",
+    "m108_roof_to_station_01": "0fa3730dc7a59bcbb45fd4953d109b95434aff211787d851f8b3407a528b1be7",
+    "m108_station_to_ground_00": "cbfa52bf92a308ad0cacc7223eba345391d2a8a68d6e343dec500c1e748f0d61",
+    "m108_station_to_ground_01": "56d3caee81c6bc1a508efbafe83a2ac6a4a14e14f1b87934f345416caad7150f",
+    "m108_station_to_roof_00": "e666252813e4e05c7d6433951fb0f6f2624835e956a9ab7181666d0b7da2f009",
+    "m108_station_to_roof_01": "434f0a5e90f2aa29d5357eb4c3cdf1e7370801628ec526a35685e1f80fe225f4",
+    "m109_ground_to_roof_00": "3b9c96235d31811c03a52e684f69d29d2ff016cbc24c2bee250f1f117c92996c",
+    "m109_ground_to_roof_01": "8bd257b9f2e6136f5b4576590a0007b90c79b1d9971bdd0ee0f56e0aba4f65a7",
+    "m109_roof_to_station_00": "80d70aa3acb1841ee8099d8ce0850db64cbd1ce61b888f34ed6b201e7b81adee",
+    "m109_roof_to_station_01": "b4dd433b3e49c7942a01d54d78fad8bdb0398aab4b0cdd216019ff6f48d8388d",
+    "m109_station_to_ground_00": "0d68796f5cf1f6b4aabb0cee1c67ecfe5f033053d4e20bfe662a5a6da4e41ecf",
+    "m109_station_to_ground_01": "d37f5603004b7a9cb370dd511bde85eaaaef56e442fd358539296eccfb15549c",
+    "m109_station_to_roof_00": "9b601a7d05de9fce980fd25cdd3097e5014657d5e00dd1de3b58a0f8162326c3",
+    "m109_station_to_roof_01": "ed1b86f3e3694ab2e1f9babbbc0657a5d01fb7faa9a98b2e1058a28015b2ea77",
+    "m110_ground_to_roof_00": "f7469f3d0619ef0c546e1173216c7d00a8bb0f2ec5e0ac033afe3a385805878b",
+    "m110_ground_to_roof_01": "122578a53be886c3f4c52397b2fabf8dbd4f19dd3b6071155078fc95e5186403",
+    "m110_roof_to_station_00": "a2bf7b552a8af1b43cfc79b973ab0c0bc7c78ecdb8d5b4f9a2bdcad281068fe9",
+    "m110_roof_to_station_01": "2f6a4beb909e34b4ee71bc3c0ff1d0335dd0d4763bca4c7a7359ed958d68ad4d",
+    "m110_station_to_ground_00": "f7f5ae621d2f8af8f7e93783de96573ae7365529bcf65fd6cb4e613993a62b2d",
+    "m110_station_to_ground_01": "2540256ddcae56033c2636c523ffb65ce44cec309eeeb812165fa53b6906f59d",
+    "m110_station_to_roof_00": "3488c6e82c290e3d60f2259f64e1529bb2ec478cca29ca0cc19685c96b4195fe",
+    "m110_station_to_roof_01": "74d6f9d7edd2f3a940605f219dd28a94dd6a960bc0b0a446741cd697aae3b9c3",
+    "m111_ground_to_roof_00": "dd59fb5a73b3ffbc5ecc72a95523ded415993aff677b21c9c9787dafa2999b6b",
+    "m111_ground_to_roof_01": "02382b42179a83749f4c4b51718f4b5c5c57920c4c9b8362b3e00280040e1a61",
+    "m111_roof_to_station_00": "75855553c0c7441cb04fa183a0faa8b57a5b90f121145bb7c851e50c36a2e32a",
+    "m111_roof_to_station_01": "87a2fa15a8ed734e41cee30e9a04710cf27f48f5516bce332d927a6ad84c82c7",
+    "m111_station_to_ground_00": "58fca5c46ba8ae64ecb5195e9f900791701702fecf754a48c22a6b5c0153ba8d",
+    "m111_station_to_ground_01": "ea99bff84c0a58084a119d80983ad8bb02bc6753772069aeddd6b9ae46895e18",
+    "m111_station_to_roof_00": "54195171fc2dae8df7a6f71924c7a76bdb98959b2baecee65362e8ac341ccefb",
+    "m111_station_to_roof_01": "9f8a5790c1be4a3b0180bfa37af9e0ad1dc17609da5a707241c849a354226027"
+  },
+  "source_sha256": "de86ac6e412048d7a1f793deec9d8933bc3c1dade0cac201e227d6be9f10a0f5"
+}

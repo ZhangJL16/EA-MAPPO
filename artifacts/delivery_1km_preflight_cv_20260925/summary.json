@@ -1,0 +1,111 @@
+{
+  "map_ids": [
+    100,
+    101,
+    102,
+    103,
+    104,
+    105,
+    106,
+    107,
+    108,
+    109,
+    110,
+    111
+  ],
+  "metrics": {
+    "direct": {
+      "energy_wh_payload_0.0": {
+        "count": 96,
+        "largest_underprediction": 2.4143280397251115,
+        "mae": 1.1722082063790944,
+        "positive_residual_p90": 1.6954155294883297,
+        "positive_residual_p95": 2.186143698333799,
+        "positive_residual_p99": 2.392174479084094,
+        "r2": 0.7658787262673336,
+        "rmse": 1.418389947628763,
+        "underprediction_rate": 0.5520833333333334
+      },
+      "energy_wh_payload_0.25": {
+        "count": 96,
+        "largest_underprediction": 2.7325871098073087,
+        "mae": 1.3247745547163376,
+        "positive_residual_p90": 1.9137856538142741,
+        "positive_residual_p95": 2.4716625363299443,
+        "positive_residual_p99": 2.7081074663454374,
+        "r2": 0.7674897582843969,
+        "rmse": 1.6031212004920083,
+        "underprediction_rate": 0.5520833333333334
+      },
+      "energy_wh_payload_0.5": {
+        "count": 96,
+        "largest_underprediction": 3.062291225581724,
+        "mae": 1.4827929158421969,
+        "positive_residual_p90": 2.1398184404086216,
+        "positive_residual_p95": 2.767407636578273,
+        "positive_residual_p99": 3.035484401079807,
+        "r2": 0.7692501819925792,
+        "rmse": 1.79450465924753,
+        "underprediction_rate": 0.5520833333333334
+      },
+      "flight_seconds": {
+        "count": 96,
+        "largest_underprediction": 20.993548389605195,
+        "mae": 10.018163301319222,
+        "positive_residual_p90": 14.723085666662605,
+        "positive_residual_p95": 18.70174988077811,
+        "positive_residual_p99": 20.977860500074875,
+        "r2": 0.837876475326582,
+        "rmse": 12.220666331966019,
+        "underprediction_rate": 0.5833333333333334
+      }
+    },
+    "route": {
+      "energy_wh_payload_0.0": {
+        "count": 96,
+        "largest_underprediction": 0.1518515746782132,
+        "mae": 0.06388350506669044,
+        "positive_residual_p90": 0.08203878576049561,
+        "positive_residual_p95": 0.11243905427875323,
+        "positive_residual_p99": 0.15122031338582492,
+        "r2": 0.9981738026623734,
+        "rmse": 0.12527057135275904,
+        "underprediction_rate": 0.5520833333333334
+      },
+      "energy_wh_payload_0.25": {
+        "count": 96,
+        "largest_underprediction": 0.17487137330294544,
+        "mae": 0.07343900598283587,
+        "positive_residual_p90": 0.09465224235137182,
+        "positive_residual_p95": 0.12961382042844605,
+        "positive_residual_p99": 0.17482573330821588,
+        "r2": 0.9981309211044054,
+        "rmse": 0.14373387381474237,
+        "underprediction_rate": 0.5625
+      },
+      "energy_wh_payload_0.5": {
+        "count": 96,
+        "largest_underprediction": 0.19927238717524176,
+        "mae": 0.08332889903308506,
+        "positive_residual_p90": 0.10770017839820945,
+        "positive_residual_p95": 0.14738174215784383,
+        "positive_residual_p99": 0.19870422020091957,
+        "r2": 0.9981000463372347,
+        "rmse": 0.16283411994415678,
+        "underprediction_rate": 0.5625
+      },
+      "flight_seconds": {
+        "count": 96,
+        "largest_underprediction": 1.6408093457054065,
+        "mae": 0.6904468089791478,
+        "positive_residual_p90": 0.8803017179838903,
+        "positive_residual_p95": 1.2092809026813782,
+        "positive_residual_p99": 1.6045158892209725,
+        "r2": 0.9981165603374976,
+        "rmse": 1.3171878736766196,
+        "underprediction_rate": 0.5416666666666666
+      }
+    }
+  },
+  "protocol": "m100_1km_preflight_leave_one_map_out_v1"
+}

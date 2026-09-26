@@ -1,0 +1,41 @@
+{
+  "actual_length_m": 723.2815864119536,
+  "collision_count": 0,
+  "control_seconds": {
+    "p50": 0.0014125995003269054,
+    "p95": 0.001651055251022626,
+    "p99": 0.0018350918804389952
+  },
+  "controller_infeasible_steps": 0,
+  "goal_m": [
+    841.0938909517146,
+    143.56391318814315,
+    72.0295212952098
+  ],
+  "intervention_steps": 1868,
+  "job_id": "m100_ground_to_roof_00",
+  "map_id": 100,
+  "outcome": "arrived",
+  "qp_seconds": {
+    "p50": 0.00024144799954228802,
+    "p95": 0.0003364950996001425,
+    "p99": 0.0004511304498191752
+  },
+  "route_length_m": 729.6773799750358,
+  "route_planning_seconds": 0.0006126980006229132,
+  "seconds": 114.0,
+  "start_m": [
+    428.9777588187107,
+    651.0121183424264,
+    2.0
+  ],
+  "station_m": [
+    228.2805539219783,
+    481.48127167318677,
+    2.0
+  ],
+  "steps": 2280,
+  "stratum": "ground_to_roof",
+  "trace": "traces/m100_ground_to_roof_00.npz",
+  "wall_seconds": 3.367117183001028
+}

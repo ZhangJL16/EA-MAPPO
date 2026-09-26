@@ -1,0 +1,29 @@
+{
+  "actual_path_length": 48.08181562672378,
+  "collision_count": 0,
+  "control_seconds": {
+    "p50": 0.00037480099990716553,
+    "p95": 0.0006657936000010522,
+    "p99": 0.0007584967999719087
+  },
+  "controller_infeasible_steps": 0,
+  "flight_seconds": 8.85,
+  "intervention_steps": 81,
+  "job_id": "h05_clear_03",
+  "map_id": 5,
+  "outcome": "arrived",
+  "qp_seconds": {
+    "p50": 5.516000328498194e-06,
+    "p95": 0.0002814325996951083,
+    "p99": 0.0003947175200119091
+  },
+  "route_checked_edges": 8388,
+  "route_length": 48.58159201415722,
+  "route_nodes": 130,
+  "route_planning_seconds": 0.15193170600014128,
+  "safety_cost": 0,
+  "steps": 177,
+  "stratum": "clear",
+  "trace": "traces/h05_clear_03.npz",
+  "wall_seconds": 0.2560265519996392
+}
