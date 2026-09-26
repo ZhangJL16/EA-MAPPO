@@ -32,3 +32,14 @@ Evidence: `GPU_MPC_V6_FINAL_RESULT_20260926.md`, local 48-job summaries under
 `artifacts/gpu_mpc_parallel_v6_8workers_20260926/`, and
 `gpu2d/rollout_mpc.py`. The reviewer found no root `EXPERIMENT_AUDIT.json`, so
 this is not a full experiment-integrity audit.
+
+## 2026-09-26: frozen PPO dock stall
+
+Across validation maps 32–39, frozen PPO seeds 101/202/303 completed 7/14/8
+targets in total and executed zero explicit charges. Rejected dock departures
+accounted for 8506/9112, 8635/9346, and 8510/9144 policy decisions.
+This is a concrete action-selection failure, not evidence that the collision
+and return-energy problem requires learning. The new dock-only supervisor is
+a diagnostic intervention; its first 40-decision checkpoint includes one
+override to charge, but no completed 600-second result. See
+`PPO_DOCK_STALL_DIAGNOSTIC_20260926.md`.
