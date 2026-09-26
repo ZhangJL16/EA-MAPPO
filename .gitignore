@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+*.pyc
+artifacts/
+profile_output/
+literature/
+*.pdf
+*.pkl
+*.npz
+*.prof
+.env
+.env.*

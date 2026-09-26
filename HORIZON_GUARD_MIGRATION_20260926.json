@@ -1,0 +1,28 @@
+{
+  "cpu": {
+    "migrated_validation_jobs": 56,
+    "target": "/home/zjl/uav_learning_research/artifacts/dual_constraint_2d_static_matrix_v2_horizon_fix_20260926"
+  },
+  "gpu": {
+    "persisted_events": 560,
+    "target": "/home/zjl/uav_learning_research/artifacts/gpu_mpc_8h_campaign_v2_20260926"
+  },
+  "original_project_venv_note": "No torch or stable-baselines3 installed; migration resumed with dependency-complete interpreter.",
+  "source_changes": [
+    {
+      "after_sha256": "551ab550b091b05945f2e32f01766cbccf4cb4c36ff3bdd9535b4ca23339241f",
+      "before_sha256": "60e643f8d5439bcbe61e447dfc313a7ba8287debc166335e94c51fcb076c834f",
+      "path": "/home/zjl/uav_learning_research/dual_constraint_2d/mpc.py"
+    },
+    {
+      "after_sha256": "51c8ba266f929698a3b36c0a52ffb7d5d52cfdb7a3ce4a5a1b7c74ece2b9f0fd",
+      "before_sha256": "9f76dc0e9ce41000c0e99019c91fbc3898348e88e8e6604f85cfc0d02a2b1a76",
+      "path": "/home/zjl/uav_learning_research/gpu2d/rollout_mpc.py"
+    },
+    {
+      "after_sha256": "82f1cac196b6529664a14e65613ed92737177339468f9d68c0abe3b8c70829c9",
+      "path": "/home/zjl/uav_learning_research/tests/test_horizon_zero_guard.py"
+    }
+  ],
+  "test_result": "4/4 passed with /home/zjl/mappo/.venv/bin/python"
+}
