@@ -10,3 +10,4 @@ literature/
 *.prof
 .env
 .env.*
+.aris/
