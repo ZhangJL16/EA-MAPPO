@@ -1,0 +1,26 @@
+{
+  "algorithm": "ppo",
+  "calibration_sha256": "4ca665dc8668b790df43ad718e64f31d8f4ce8b91cea47e288d294d91ab50591",
+  "horizon_s": 600.0,
+  "map_id": 34,
+  "model_path": "/home/zjl/uav_learning_research/artifacts/mode_ppo_v4_lambda1_20260926/seed101/model_000051200.zip",
+  "model_sha256": "71ca7c3382f4fb994f90a1334b70fcece5ea5fdf1cb98b3319e069b696858429",
+  "protocol": "dual_constraint_2d_static_fullmap_eval_v0",
+  "source_sha256": {
+    "dual_constraint_2d/action_adapter.py": "ca88931b24a6da148d5c507ec9403449f48b6ebc525177a15a35bc1ea5076b08",
+    "dual_constraint_2d/backup.py": "5c36d15edc8ed69316538abe7b9a5fb0d5ed04b23b37babff7fa48c1cd81bfdb",
+    "dual_constraint_2d/calibration.py": "aa964fa4f9b07601a05c7f38070b98396f2f1f0259fae5bd18162b306dffa79b",
+    "dual_constraint_2d/environment.py": "1ebfdc4194594125f4978a1a03dc09697ffe648ffc4d656d86feea341c49d4ed",
+    "dual_constraint_2d/evaluate_matrix.py": "f255ac33f0b253505a3611fc6b3c875ed295418f56f568954db7b4449abc2b76",
+    "dual_constraint_2d/gym_adapter.py": "34463d35ae704f3e0850fdc768645b88244a6d0615cc46ee79274bf90ddf8e71",
+    "dual_constraint_2d/mpc.py": "551ab550b091b05945f2e32f01766cbccf4cb4c36ff3bdd9535b4ca23339241f",
+    "dual_constraint_2d/reference.py": "c7d49c9ed62bc1168cbb2cd0d76fc5579d829acb80ef230524dca374e7e28437",
+    "dual_constraint_2d/routes.py": "d6d71f55500909392271d4e6a279ed6c8741ecdfbe1f62ed064ab49392eb494a",
+    "dual_constraint_2d/shield.py": "2bc942019d19eecdd81441f87cad9707cf6195b45f0e5f37081f3b3f93a5fe42",
+    "dual_constraint_2d/synthetic.py": "9caadf80b3ed31a592dbe9aa47db0cc03f34793d2a28e9633c20dde38c13f55c",
+    "dual_constraint_2d/targets.py": "e9e196d73d1327f89fd485dddd0bbddee305aa9002470b75467c5062c7150abc",
+    "nav3d/controller.py": "7eec397690c933d513027bec4b00960c6834cfca6bcfabd88ed9b39f39d84b9d",
+    "nav3d/geometry.py": "495d11b8b6264a3976d37772f2d9eeb2a4d56d4a3c7d3aa7a04968f89e54dac3",
+    "nav3d/simulation.py": "97a8c08412ddd6f728f1566974024c670b2e2bab79304f3658abdc849be8fde1"
+  }
+}

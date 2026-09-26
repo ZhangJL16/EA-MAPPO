@@ -1,0 +1,19 @@
+{
+  "actual_depletion": false,
+  "algorithm": "ppo",
+  "charge_events": 12,
+  "collision_count": 0,
+  "collision_intervention_steps": 338,
+  "completed_targets": 3,
+  "done": true,
+  "energy_filter_events": 0,
+  "failure_reason": null,
+  "final_energy": 65.1032380067322,
+  "map_id": 32,
+  "plant_decisions": 862,
+  "policy_decisions": 520,
+  "rejected_departures": 0,
+  "return_takeovers": 12,
+  "safety_cost": 0,
+  "simulated_seconds": 600.0
+}

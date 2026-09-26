@@ -1,0 +1,137 @@
+{
+  "calibration_sha256": "4ca665dc8668b790df43ad718e64f31d8f4ce8b91cea47e288d294d91ab50591",
+  "map_ids": [
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39
+  ],
+  "model_sha256": "71ca7c3382f4fb994f90a1334b70fcece5ea5fdf1cb98b3319e069b696858429",
+  "protocol": "raw_frozen_ppo_replay_v1",
+  "rows": [
+    {
+      "action_counts": {
+        "3": 152,
+        "4": 1
+      },
+      "actual_depletion": true,
+      "charge_events": 0,
+      "collision_count": 0,
+      "completed_targets": 3,
+      "failure_reason": "depletion",
+      "map_id": 32,
+      "policy_decisions": 153,
+      "shaped_return": 1.040929167690496,
+      "simulated_seconds": 76.14999999999782
+    },
+    {
+      "action_counts": {
+        "3": 152,
+        "4": 1
+      },
+      "actual_depletion": true,
+      "charge_events": 0,
+      "collision_count": 0,
+      "completed_targets": 3,
+      "failure_reason": "depletion",
+      "map_id": 33,
+      "policy_decisions": 153,
+      "shaped_return": 1.0407565325557826,
+      "simulated_seconds": 76.19999999999781
+    },
+    {
+      "action_counts": {
+        "3": 151,
+        "4": 1
+      },
+      "actual_depletion": true,
+      "charge_events": 0,
+      "collision_count": 0,
+      "completed_targets": 2,
+      "failure_reason": "depletion",
+      "map_id": 34,
+      "policy_decisions": 152,
+      "shaped_return": 0.04838634018537924,
+      "simulated_seconds": 75.89999999999783
+    },
+    {
+      "action_counts": {
+        "3": 152,
+        "4": 1
+      },
+      "actual_depletion": true,
+      "charge_events": 0,
+      "collision_count": 0,
+      "completed_targets": 1,
+      "failure_reason": "depletion",
+      "map_id": 35,
+      "policy_decisions": 153,
+      "shaped_return": -0.9563577649168358,
+      "simulated_seconds": 76.3999999999978
+    },
+    {
+      "action_counts": {
+        "3": 152,
+        "4": 1
+      },
+      "actual_depletion": true,
+      "charge_events": 0,
+      "collision_count": 0,
+      "completed_targets": 1,
+      "failure_reason": "depletion",
+      "map_id": 36,
+      "policy_decisions": 153,
+      "shaped_return": -0.9515099313115352,
+      "simulated_seconds": 76.19999999999781
+    },
+    {
+      "action_counts": {
+        "3": 151,
+        "4": 1
+      },
+      "actual_depletion": true,
+      "charge_events": 0,
+      "collision_count": 0,
+      "completed_targets": 2,
+      "failure_reason": "depletion",
+      "map_id": 37,
+      "policy_decisions": 152,
+      "shaped_return": 0.04824805714179581,
+      "simulated_seconds": 75.89999999999783
+    },
+    {
+      "action_counts": {
+        "3": 151,
+        "4": 1
+      },
+      "actual_depletion": true,
+      "charge_events": 0,
+      "collision_count": 0,
+      "completed_targets": 1,
+      "failure_reason": "depletion",
+      "map_id": 38,
+      "policy_decisions": 152,
+      "shaped_return": -0.9482873845875242,
+      "simulated_seconds": 75.79999999999784
+    },
+    {
+      "action_counts": {
+        "3": 152,
+        "4": 1
+      },
+      "actual_depletion": true,
+      "charge_events": 0,
+      "collision_count": 0,
+      "completed_targets": 1,
+      "failure_reason": "depletion",
+      "map_id": 39,
+      "policy_decisions": 153,
+      "shaped_return": -0.9515898335547963,
+      "simulated_seconds": 76.19999999999781
+    }
+  ]
+}
