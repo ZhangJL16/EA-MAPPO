@@ -40,6 +40,13 @@ SHA-256 为 `45df92582b1ea725e1136c589cad3050ce6fd36128b1484c2f2745075bd01afa`�
 源码针对性 6 项测试通过；与先前未完成的原始二维矩阵相比，旧源码
 SHA 差异为 0，因此该诊断没有破坏原矩阵的恢复条件。
 
+2026-09-26 用户明确同意继续后，已启动完整 24 作业矩阵，使用 8 worker。
+启动后首轮健康检查：顶层状态为 `phase=validation`、`completed_jobs=0/24`；
+首批 8 个作业都写出断点，未发现 `error.json`。这是启动检查，
+**不是完整结果**；后续完成数、吞吐和异常以各作业最终 `summary.json`
+及顶层 `status.json` 为准。运行进程在本机启动时的 PID 为 29622，
+但 PID 不能作为持久身份凭据。
+
 续跑完整 24 个验证作业的单行命令：
 
 `cd /home/zjl/uav_learning_research && python3 -m diagnostics2d.dock_matrix --output artifacts/ppo_dock_supervision_validation_20260926 --workers 8`
