@@ -1,0 +1,43 @@
+{
+  "candidate_id": 3,
+  "job_id": "m000_c003",
+  "map_id": 0,
+  "outbound": {
+    "arrived": true,
+    "collision_count": 0,
+    "energy": 35.25848551361121,
+    "final_position_xy": [
+      119.51622250376741,
+      14.786208109202018
+    ],
+    "final_speed_mps": 0.08891802058004741,
+    "infeasible_steps": 0,
+    "reason": "arrived",
+    "route_length_m": 142.78748465014854,
+    "seconds": 24.450000000000003,
+    "steps": 489
+  },
+  "outcome": "reference_round_trip_success",
+  "proposal_attempts": 1,
+  "return": {
+    "arrived": true,
+    "collision_count": 0,
+    "energy": 35.35397855026795,
+    "final_position_xy": [
+      156.58115838451667,
+      152.83925958091217
+    ],
+    "final_speed_mps": 0.08288243240767224,
+    "infeasible_steps": 0,
+    "reason": "arrived",
+    "route_length_m": 142.98479874399558,
+    "seconds": 24.55,
+    "steps": 491
+  },
+  "round_trip_energy": 70.61246406387917,
+  "round_trip_seconds": 49.0,
+  "target_xy": [
+    119.56096963836805,
+    14.978381417743714
+  ]
+}

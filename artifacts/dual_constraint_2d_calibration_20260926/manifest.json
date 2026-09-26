@@ -1,0 +1,48 @@
+{
+  "candidates_per_map": 8,
+  "capacity_rule": "2 * median(successful reference round-trip energy)",
+  "energy": {
+    "acceleration_squared_rate": 0.02,
+    "idle_rate": 1.0,
+    "speed_squared_rate": 0.01
+  },
+  "full_charge_time_rule": "median(successful reference round-trip seconds)",
+  "map_ids": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "protocol": "synthetic_v0_policy_independent_round_trip_20260926",
+  "reference_arrival_speed_mps": 0.1,
+  "reference_goal_radius_m": 1.5,
+  "reference_max_steps": 3000,
+  "scenario": {
+    "body_radius_m": 0.4,
+    "flight_height_m": 2.0,
+    "horizon_s": 600.0,
+    "max_acceleration_mps2": 4.0,
+    "max_speed_mps": 7.0,
+    "obstacle_count": 8,
+    "obstacle_edge_margin_m": 5.0,
+    "obstacle_radius_max_m": 15.0,
+    "obstacle_radius_min_m": 8.0,
+    "obstacle_separation_m": 3.0,
+    "physics_dt_s": 0.05,
+    "planning_margin_m": 0.2,
+    "policy_dt_s": 0.5,
+    "side_m": 200.0,
+    "station_edge_margin_m": 20.0,
+    "station_obstacle_margin_m": 12.0
+  },
+  "source_sha256": {
+    "calibration.py": "aa964fa4f9b07601a05c7f38070b98396f2f1f0259fae5bd18162b306dffa79b",
+    "reference.py": "c7d49c9ed62bc1168cbb2cd0d76fc5579d829acb80ef230524dca374e7e28437",
+    "routes.py": "d6d71f55500909392271d4e6a279ed6c8741ecdfbe1f62ed064ab49392eb494a",
+    "synthetic.py": "9caadf80b3ed31a592dbe9aa47db0cc03f34793d2a28e9633c20dde38c13f55c"
+  }
+}

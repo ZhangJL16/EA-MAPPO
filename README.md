@@ -28,6 +28,7 @@
 - [二维 PPO v4 GAE 长时信用分配单变量诊断协议](MODE_PPO_V4_LONG_CREDIT_PROTOCOL_20260926.md)
 - [二维 PPO v4 训练首检查点与可恢复运行状态](MODE_PPO_V4_STARTUP_20260926.md)
 - [二维 PPO v4 完整结果：任务推进改善但返站依赖安全层](MODE_PPO_V4_LAMBDA1_RESULT_20260926.md)
+- [二维研究服务器交接：已完成证据与下一次配对实验](SERVER_2D_RESEARCH_HANDOFF_20260926.md)
 - [M100 官方与社区仿真平台核查及已选路线](M100_SIMULATOR_OPTIONS_20260925.md)
 - 文献全文及本地提取文本保留在本机 `literature/`，不随 GitHub 代码分支发布；公开依据见各研究说明中的论文链接。
 - [可用于后续实验规划的 Ascend 服务器资源快照](ASCEND_SERVER_INVENTORY_20260926.md)

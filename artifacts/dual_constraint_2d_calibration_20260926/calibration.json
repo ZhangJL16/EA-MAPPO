@@ -1,0 +1,10 @@
+{
+  "capacity_synthetic_energy": 85.39121788182787,
+  "completed_jobs": 64,
+  "full_battery_infeasible_count": 6,
+  "full_charge_seconds": 29.900000000000002,
+  "new_jobs": 63,
+  "proposal_attempts_total": 72,
+  "successful_reference_round_trips": 59,
+  "total_jobs": 64
+}

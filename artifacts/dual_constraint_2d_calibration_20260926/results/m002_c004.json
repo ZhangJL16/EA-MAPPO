@@ -1,0 +1,26 @@
+{
+  "candidate_id": 4,
+  "job_id": "m002_c004",
+  "map_id": 2,
+  "outbound": {
+    "arrived": true,
+    "collision_count": 0,
+    "energy": 31.90056978756062,
+    "final_position_xy": [
+      20.957953116064424,
+      176.39522669235492
+    ],
+    "final_speed_mps": 0.09425797005644627,
+    "infeasible_steps": 1,
+    "reason": "arrived",
+    "route_length_m": 126.87436745112865,
+    "seconds": 22.150000000000002,
+    "steps": 443
+  },
+  "outcome": "outbound_reference_failure",
+  "proposal_attempts": 1,
+  "target_xy": [
+    20.991126600688588,
+    176.20145680031453
+  ]
+}
