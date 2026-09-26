@@ -29,7 +29,7 @@
 - [可用于后续实验规划的 Ascend 服务器资源快照](ASCEND_SERVER_INVENTORY_20260926.md)
 - [16-worker GPU-MPC 运行中断与内存核查](GPU_MPC_V5_INTERRUPTION_20260926.md)
 - [GPU-MPC H4/H8 完整 48 作业结果](GPU_MPC_V6_FINAL_RESULT_20260926.md)
-- [下一阶段公平比较与 ARM 三维准备计划](NEXT_PHASE_PLAN_20260926.md)
+- [本地二维公平比较与服务器独立三维](NEXT_PHASE_PLAN_20260926.md)
 - [独立 GitHub 分支与 ARM64 三维实验交接](SERVER_ARM_3D_HANDOFF_20260926.md)
 
 用户当前先研究[二维碰撞与返站能量双约束](dual_constraint_2d/README.md)：在未见过的同类静态地图上，单无人机逐步选择局部航向/速度和补能，要求执行后仍有避碰且电量足够的返站方案；使用**明确标注的合成机制环境**、连续单目标任务、PPO 与规划基线检验机制。M100/1 km 与先前三维取送货方案保留为后续外部验证/扩展，不把它们的评价结果当成二维双约束结果。二维已实现确定性模型内的可执行返站轨迹核验，但尚无形式化或现实安全证明；最新运行状态以对应实验目录的 manifest、summary 和中断记录为准。
