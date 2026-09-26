@@ -10,6 +10,8 @@
 | 2026-09-26 18:51 | /experiment-plan | refine-logs/EXPERIMENT_TRACKER_20260926_185119.md | implementation | v4 运行阶段与停止条件 |
 | 2026-09-26 18:51 | /experiment-plan | refine-logs/EXPERIMENT_PLAN.md | implementation | 当前 v4 诊断计划副本 |
 | 2026-09-26 18:51 | /experiment-plan | refine-logs/EXPERIMENT_TRACKER.md | implementation | 当前 v4 诊断跟踪副本 |
+| 2026-09-26 18:55 | /experiment-plan | refine-logs/EXPERIMENT_TRACKER_20260926_185547.md | implementation | v4 首检查点健康与长训练运行状态 |
+| 2026-09-26 18:55 | /experiment-plan | refine-logs/EXPERIMENT_TRACKER.md | implementation | 当前 v4 启动后跟踪副本 |
 # 2026-09-26 八小时研究矩阵
 
 - `refine-logs/EXPERIMENT_PLAN_8H_20260926.md`：GPU 长视界与现有精确矩阵的固定实验方案。
