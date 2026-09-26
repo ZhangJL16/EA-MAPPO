@@ -43,3 +43,13 @@ and return-energy problem requires learning. The new dock-only supervisor is
 a diagnostic intervention; its first 40-decision checkpoint includes one
 override to charge, but no completed 600-second result. See
 `PPO_DOCK_STALL_DIAGNOSTIC_20260926.md`.
+
+The completed 24-job validation diagnosis is now recorded in
+`PPO_DOCK_SUPERVISION_RESULT_20260926.md`: 29 raw versus 89 supervised
+completions, with 13 paired gains, 11 ties, and no losses. The intervention
+removed 25,651 rejected dock departures but produced 511 charges. Its mean
+3.708 targets/map-seed remains below the contextual route-full 7.625 and GPU-H4
+8.5 means. On map 36, seeds 101 and 303 each charged 54 times and completed
+zero targets because they repeatedly chose immediate return. The next learning
+problem is conditional charge/return action learning, not a claim of planning
+superiority from this hybrid diagnostic.
