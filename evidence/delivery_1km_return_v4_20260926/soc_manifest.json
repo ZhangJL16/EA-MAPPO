@@ -1,0 +1,52 @@
+{
+  "calibration_map_ids": [
+    112,
+    113,
+    114
+  ],
+  "confirmation_map_ids": [
+    115,
+    116,
+    117,
+    118,
+    119,
+    120,
+    121,
+    122,
+    123,
+    124,
+    125,
+    126,
+    127
+  ],
+  "interpretation": "retrospective SOC labels with preflight route estimator; map is the independent unit",
+  "matrix_manifest_sha256": "a4c67dea7b078c5639578c99b76610c668667ceb6269e95528ed1fdb4db0e3e7",
+  "preflight_manifest_sha256": "5db9bcc8127f0e9e951d4aea4ed6bac11df290f9300d6fb4739c901a18689e3f",
+  "preflight_rows_sha256": "5983dd00b1f84e3ef62fef564b200aa5b00c9a2d2cfb304b9a77369723296ae9",
+  "protocol": "m100_1km_return_multimap_soc_v1",
+  "soc_grid": [
+    0.05,
+    0.1,
+    0.15,
+    0.2,
+    0.4,
+    0.6,
+    0.8,
+    1.0
+  ],
+  "source_sha256": "f73e5eb4bb2bf2ac1c458ba62dec8f1ff6c8cc1122f47ac62aedd0d73bbd6208",
+  "training_map_ids": [
+    100,
+    101,
+    102,
+    103,
+    104,
+    105,
+    106,
+    107,
+    108,
+    109,
+    110,
+    111
+  ]
+}

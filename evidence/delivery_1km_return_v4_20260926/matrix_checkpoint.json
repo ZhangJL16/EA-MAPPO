@@ -1,0 +1,9 @@
+{
+  "completed_jobs": 32,
+  "last_job_id": "m127_station_to_roof_00",
+  "last_status": "return_audit_complete",
+  "output_bytes": 3853353577,
+  "protocol": "m100_1km_return_multimap_v4_backup_cbf_verified_qp_retry",
+  "source_sha256": "2cee99dfee1584b08ba831ba9a6a05d38a72f9abd8ee1eee1aa58e2163b85f5f",
+  "total_jobs": 32
+}

@@ -1,0 +1,254 @@
+{
+  "checkpoint_jobs": 1,
+  "disk_budget_bytes": 8589934592,
+  "initial_disk_budget_bytes": 4294967296,
+  "storage_amendment_sha256": "c73653d8c9b497e08c86251a4deb17345125af94aac9e439fd5e72bb2f2ecef1",
+  "jobs": [
+    {
+      "job_id": "m112_station_to_ground_00",
+      "map_id": 112,
+      "navigation_outcome": "arrived",
+      "navigation_result_sha256": "3120385c1a9fe4c040116c38b396547a01de621b001760270e716e624cd32f40",
+      "stratum": "station_to_ground"
+    },
+    {
+      "job_id": "m112_station_to_roof_00",
+      "map_id": 112,
+      "navigation_outcome": "arrived",
+      "navigation_result_sha256": "e7542ed49ffb344838263ead437227388058747ea54f1ae517baea1398c64efe",
+      "stratum": "station_to_roof"
+    },
+    {
+      "job_id": "m113_station_to_ground_00",
+      "map_id": 113,
+      "navigation_outcome": "arrived",
+      "navigation_result_sha256": "a2dcdb6a3fbccd2c8b6c1f0fb58acf37d381239a183eb1f7a325f5aa00bbd96a",
+      "stratum": "station_to_ground"
+    },
+    {
+      "job_id": "m113_station_to_roof_00",
+      "map_id": 113,
+      "navigation_outcome": "arrived",
+      "navigation_result_sha256": "85816850e799bbd1b485dc8e953f0130718cd1a317245949d0dc50f6b25d4551",
+      "stratum": "station_to_roof"
+    },
+    {
+      "job_id": "m114_station_to_ground_00",
+      "map_id": 114,
+      "navigation_outcome": "arrived",
+      "navigation_result_sha256": "ec84b68c332178224c0c85b1d56f94ea01b5569dbc8a7035aed6667e02ec93ad",
+      "stratum": "station_to_ground"
+    },
+    {
+      "job_id": "m114_station_to_roof_00",
+      "map_id": 114,
+      "navigation_outcome": "arrived",
+      "navigation_result_sha256": "06c87d2a3781e9b9a97822586d0ed02964b21258d5d76ccdf4d41b1a1f0da320",
+      "stratum": "station_to_roof"
+    },
+    {
+      "job_id": "m115_station_to_ground_00",
+      "map_id": 115,
+      "navigation_outcome": "arrived",
+      "navigation_result_sha256": "1298d57c6dd2c1bfe1a486f00a417a167377270f8fa1114be27510ad84388e63",
+      "stratum": "station_to_ground"
+    },
+    {
+      "job_id": "m115_station_to_roof_00",
+      "map_id": 115,
+      "navigation_outcome": "arrived",
+      "navigation_result_sha256": "ca38500e19b050aec51053997d42d0adf1b5ccd314842e20e9f8a61279c599be",
+      "stratum": "station_to_roof"
+    },
+    {
+      "job_id": "m116_station_to_ground_00",
+      "map_id": 116,
+      "navigation_outcome": "arrived",
+      "navigation_result_sha256": "1607be26173565f11d6a1548bcc41cea1b6922cd3f914b83e7c88a2acdc68e2f",
+      "stratum": "station_to_ground"
+    },
+    {
+      "job_id": "m116_station_to_roof_00",
+      "map_id": 116,
+      "navigation_outcome": "arrived",
+      "navigation_result_sha256": "fd44f14ed1977a056a6e8d748fdf472cccd4c0fd7f237996fc2f69ee0dd84ab2",
+      "stratum": "station_to_roof"
+    },
+    {
+      "job_id": "m117_station_to_ground_00",
+      "map_id": 117,
+      "navigation_outcome": "arrived",
+      "navigation_result_sha256": "6c06fb3508610f69ae2934d21fca46041c03856291b04982c8cee03e81dd3e80",
+      "stratum": "station_to_ground"
+    },
+    {
+      "job_id": "m117_station_to_roof_00",
+      "map_id": 117,
+      "navigation_outcome": "arrived",
+      "navigation_result_sha256": "c2969ed38c299794c7ad9d047872bc1843b19632ddeb30bb81c61a032faf23ca",
+      "stratum": "station_to_roof"
+    },
+    {
+      "job_id": "m118_station_to_ground_00",
+      "map_id": 118,
+      "navigation_outcome": "arrived",
+      "navigation_result_sha256": "49b8967cb73d598d051387d6bd2aa1dd614e1ede74eddb13c93d765e6ce9b027",
+      "stratum": "station_to_ground"
+    },
+    {
+      "job_id": "m118_station_to_roof_00",
+      "map_id": 118,
+      "navigation_outcome": "arrived",
+      "navigation_result_sha256": "0600f6857bf2c95cbcaee67ec41da3456941088ab7cf828cc19758d79f6bc303",
+      "stratum": "station_to_roof"
+    },
+    {
+      "job_id": "m119_station_to_ground_00",
+      "map_id": 119,
+      "navigation_outcome": "arrived",
+      "navigation_result_sha256": "b1d92709f66c3ad950ed5ff78b932ab6f816275dcca951298a4602423c0795c8",
+      "stratum": "station_to_ground"
+    },
+    {
+      "job_id": "m119_station_to_roof_00",
+      "map_id": 119,
+      "navigation_outcome": "arrived",
+      "navigation_result_sha256": "c9c86f4af344a96eea72fb227970a2751d71b2d5a3f63d305ae261c34858ea34",
+      "stratum": "station_to_roof"
+    },
+    {
+      "job_id": "m120_station_to_ground_00",
+      "map_id": 120,
+      "navigation_outcome": "arrived",
+      "navigation_result_sha256": "8d6a64b7792b905e8de37c585d994da2ebabe2c1970e71af8b736ef90bb93380",
+      "stratum": "station_to_ground"
+    },
+    {
+      "job_id": "m120_station_to_roof_00",
+      "map_id": 120,
+      "navigation_outcome": "arrived",
+      "navigation_result_sha256": "72dee612e8dbeacc98e25c488036e6ca6c30a041dc3980989b6dd500d3a20de6",
+      "stratum": "station_to_roof"
+    },
+    {
+      "job_id": "m121_station_to_ground_00",
+      "map_id": 121,
+      "navigation_outcome": "arrived",
+      "navigation_result_sha256": "bd4977dbd937cbfe312c3d86c22602844d693ff2ca56489b135af8e6f535ed74",
+      "stratum": "station_to_ground"
+    },
+    {
+      "job_id": "m121_station_to_roof_00",
+      "map_id": 121,
+      "navigation_outcome": "arrived",
+      "navigation_result_sha256": "9a71e9fb54c1993be89bcdb85af2ca38986d05f7500d2207fe91abde6ceb0be9",
+      "stratum": "station_to_roof"
+    },
+    {
+      "job_id": "m122_station_to_ground_00",
+      "map_id": 122,
+      "navigation_outcome": "arrived",
+      "navigation_result_sha256": "b00974ec608ba9f2d542c298247f8a98c079b8d620b9570604cee0f48c6f3f58",
+      "stratum": "station_to_ground"
+    },
+    {
+      "job_id": "m122_station_to_roof_00",
+      "map_id": 122,
+      "navigation_outcome": "arrived",
+      "navigation_result_sha256": "ce81be6cbf4dfa87a59c2bc1af2bcc4216f50a401e83836683f07fdf4bd31dc7",
+      "stratum": "station_to_roof"
+    },
+    {
+      "job_id": "m123_station_to_ground_00",
+      "map_id": 123,
+      "navigation_outcome": "arrived",
+      "navigation_result_sha256": "46922bf5a268108a54b2db73ad05d2723b90b084f31bb2b8339e3245834b155c",
+      "stratum": "station_to_ground"
+    },
+    {
+      "job_id": "m123_station_to_roof_00",
+      "map_id": 123,
+      "navigation_outcome": "arrived",
+      "navigation_result_sha256": "beb5039978ae5e0fcf34ff46610d6b11605b3aa816d73b7e1e1c5512d11b2b8f",
+      "stratum": "station_to_roof"
+    },
+    {
+      "job_id": "m124_station_to_ground_00",
+      "map_id": 124,
+      "navigation_outcome": "arrived",
+      "navigation_result_sha256": "ead16132d4faf998695cb1ab06dc0f19f1df3b4ffa599185d31a54729f79fefb",
+      "stratum": "station_to_ground"
+    },
+    {
+      "job_id": "m124_station_to_roof_00",
+      "map_id": 124,
+      "navigation_outcome": "arrived",
+      "navigation_result_sha256": "fd3fcbea08f65d824457536982ed213534b5e32a984e245e2d7b528bc3588467",
+      "stratum": "station_to_roof"
+    },
+    {
+      "job_id": "m125_station_to_ground_00",
+      "map_id": 125,
+      "navigation_outcome": "arrived",
+      "navigation_result_sha256": "3cd1ad1c57f6b46881ba359e3facdf62f21730506b133e4b3c131afd0169c1dc",
+      "stratum": "station_to_ground"
+    },
+    {
+      "job_id": "m125_station_to_roof_00",
+      "map_id": 125,
+      "navigation_outcome": "arrived",
+      "navigation_result_sha256": "8a722d2c8de8a2db39787772df9590d0d61b5eab0a884c1bcd8029e9881afe42",
+      "stratum": "station_to_roof"
+    },
+    {
+      "job_id": "m126_station_to_ground_00",
+      "map_id": 126,
+      "navigation_outcome": "arrived",
+      "navigation_result_sha256": "efa6313ae292e64f95521039ea3091edfef35e4e4d4f8ef40e32d3cdc5d4780a",
+      "stratum": "station_to_ground"
+    },
+    {
+      "job_id": "m126_station_to_roof_00",
+      "map_id": 126,
+      "navigation_outcome": "arrived",
+      "navigation_result_sha256": "e0b66d00ed32505f597d971493099e982dcfd3f54f884bdf78f3e19e2d0ca2ab",
+      "stratum": "station_to_roof"
+    },
+    {
+      "job_id": "m127_station_to_ground_00",
+      "map_id": 127,
+      "navigation_outcome": "arrived",
+      "navigation_result_sha256": "da00fd500c5082927093c8d60b5fa27c0da682dd12863a193c24625488f3263e",
+      "stratum": "station_to_ground"
+    },
+    {
+      "job_id": "m127_station_to_roof_00",
+      "map_id": 127,
+      "navigation_outcome": "arrived",
+      "navigation_result_sha256": "7a2007a8a013b93b078d9c81d72296c7d519f25711d9def8f683bc24d4144c09",
+      "stratum": "station_to_roof"
+    }
+  ],
+  "map_ids": [
+    112,
+    113,
+    114,
+    115,
+    116,
+    117,
+    118,
+    119,
+    120,
+    121,
+    122,
+    123,
+    124,
+    125,
+    126,
+    127
+  ],
+  "navigation_manifest_sha256": "91cec15be0e2fe5952f363e99ec6be944bc0f821d9ca57c4b7bb094e579fb226",
+  "protocol": "m100_1km_return_multimap_v4_backup_cbf_verified_qp_retry",
+  "return_source_sha256": "2eb42444431c8e7c73bbf672ed3012d2abaf45c18bda2900e96f5e5e81c9c98f",
+  "source_sha256": "2cee99dfee1584b08ba831ba9a6a05d38a72f9abd8ee1eee1aa58e2163b85f5f"
+}

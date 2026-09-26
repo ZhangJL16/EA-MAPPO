@@ -1,0 +1,31 @@
+{
+  "files": {
+    "matrix_checkpoint.json": {
+      "bytes": 324,
+      "sha256": "28df4fcf1b3b3f5e31551c3e6bf99dba6ef310dd142c526a6be41892b3fbd9bb"
+    },
+    "matrix_manifest.json": {
+      "bytes": 8897,
+      "sha256": "a4c67dea7b078c5639578c99b76610c668667ceb6269e95528ed1fdb4db0e3e7"
+    },
+    "prediction_sources_summary.json": {
+      "bytes": 434532,
+      "sha256": "5ab79a7ad915ca443b777d89c4398f1fc2a93aabec2de318d90aca7532d3cb7b"
+    },
+    "route_summaries.json": {
+      "bytes": 258208,
+      "sha256": "769008c480aa203bdd1dead64daf4513a98b609f02bc243e37629925c66f9374"
+    },
+    "soc_manifest.json": {
+      "bytes": 974,
+      "sha256": "fd406b3dd217229a760be11e089e5d075eb4d4c6687cb444af018268abd8b6ae"
+    },
+    "soc_summary.json": {
+      "bytes": 3296417,
+      "sha256": "95c48e87aed1b31346670d35e346460136d77f7fddd20956d96d296a0e0e8f36"
+    }
+  },
+  "protocol": "delivery_1km_return_v4_frozen_archive_20260926",
+  "raw_artifacts_committed": false,
+  "raw_route_artifacts": "artifacts/delivery_1km_return_confirm_v4_112_127_20260926/routes"
+}
