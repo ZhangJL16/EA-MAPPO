@@ -1,0 +1,59 @@
+{
+  "calibration_sha256": "4ca665dc8668b790df43ad718e64f31d8f4ce8b91cea47e288d294d91ab50591",
+  "map_ids": [
+    34,
+    36,
+    39
+  ],
+  "model_sha256": "88c77554a96b81f284a52811fda94a0ae63f1e6db685bbf89ea70b898dd4e775",
+  "protocol": "raw_frozen_ppo_replay_v1",
+  "rows": [
+    {
+      "action_counts": {
+        "1": 142,
+        "4": 1
+      },
+      "actual_depletion": true,
+      "charge_events": 0,
+      "collision_count": 0,
+      "completed_targets": 2,
+      "failure_reason": "depletion",
+      "map_id": 34,
+      "policy_decisions": 143,
+      "shaped_return": 0.029082035504668813,
+      "simulated_seconds": 71.1999999999981
+    },
+    {
+      "action_counts": {
+        "12": 109,
+        "4": 109,
+        "9": 109
+      },
+      "actual_depletion": false,
+      "charge_events": 109,
+      "collision_count": 0,
+      "completed_targets": 0,
+      "failure_reason": null,
+      "map_id": 36,
+      "policy_decisions": 327,
+      "shaped_return": -0.6000299590204885,
+      "simulated_seconds": 600.0
+    },
+    {
+      "action_counts": {
+        "12": 109,
+        "4": 109,
+        "9": 109
+      },
+      "actual_depletion": false,
+      "charge_events": 109,
+      "collision_count": 0,
+      "completed_targets": 0,
+      "failure_reason": null,
+      "map_id": 39,
+      "policy_decisions": 327,
+      "shaped_return": -0.6000299590204867,
+      "simulated_seconds": 600.0
+    }
+  ]
+}

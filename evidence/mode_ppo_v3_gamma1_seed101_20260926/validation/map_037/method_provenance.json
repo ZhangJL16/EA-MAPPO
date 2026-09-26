@@ -1,0 +1,19 @@
+{
+  "map_id": 37,
+  "model_path": "/home/zjl/uav_learning_research/artifacts/mode_ppo_v3_gamma1_20260926/seed101/model_000051200.zip",
+  "model_sha256": "88c77554a96b81f284a52811fda94a0ae63f1e6db685bbf89ea70b898dd4e775",
+  "protocol": "dual_constraint_2d_finite_horizon_eval_v3",
+  "source_sha256": {
+    "dual_constraint_2d/action_adapter.py": "ca88931b24a6da148d5c507ec9403449f48b6ebc525177a15a35bc1ea5076b08",
+    "dual_constraint_2d/environment.py": "1ebfdc4194594125f4978a1a03dc09697ffe648ffc4d656d86feea341c49d4ed",
+    "dual_constraint_2d/evaluate_matrix.py": "f255ac33f0b253505a3611fc6b3c875ed295418f56f568954db7b4449abc2b76",
+    "dual_constraint_2d/gym_adapter.py": "34463d35ae704f3e0850fdc768645b88244a6d0615cc46ee79274bf90ddf8e71",
+    "dual_constraint_2d/shield.py": "2bc942019d19eecdd81441f87cad9707cf6195b45f0e5f37081f3b3f93a5fe42",
+    "learning2d/evaluate_finite_horizon_ppo.py": "69f2bc028a546dcd7e05c919a29f21a716158f2846aa0858a0531545208e009d",
+    "learning2d/finite_horizon_gym.py": "3b236b2c8cf4de2360fc04a7535a311b312cbb544ef5ecce53058b549014a021",
+    "learning2d/mode_policy.py": "fd43e83cdc3da67663b078478266cc5dcd85189b5fee4a2538aff12efe701019"
+  },
+  "training_gamma": 1.0,
+  "training_manifest_sha256": "f92c8f607627901467a2a17dc21a0f66416bce7061e5d60d1ff0264ec1e4cbab",
+  "training_status_sha256": "7fcdb28a32eec6523689f3dfdc0bf1b3c963aec864b83a30693ff539d0f42981"
+}
