@@ -1,0 +1,17 @@
+{
+  "map_id": 39,
+  "model_path": "/home/zjl/uav_learning_research/artifacts/mode_ppo_v2_20260926/seed101/model_000051200.zip",
+  "model_sha256": "c0967702bfe998c884191f8cdca75b53bac21ea12385a71bf7f6813029615efa",
+  "protocol": "dual_constraint_2d_mode_masked_eval_v1",
+  "source_sha256": {
+    "dual_constraint_2d/action_adapter.py": "ca88931b24a6da148d5c507ec9403449f48b6ebc525177a15a35bc1ea5076b08",
+    "dual_constraint_2d/environment.py": "1ebfdc4194594125f4978a1a03dc09697ffe648ffc4d656d86feea341c49d4ed",
+    "dual_constraint_2d/evaluate_matrix.py": "f255ac33f0b253505a3611fc6b3c875ed295418f56f568954db7b4449abc2b76",
+    "dual_constraint_2d/gym_adapter.py": "34463d35ae704f3e0850fdc768645b88244a6d0615cc46ee79274bf90ddf8e71",
+    "dual_constraint_2d/shield.py": "2bc942019d19eecdd81441f87cad9707cf6195b45f0e5f37081f3b3f93a5fe42",
+    "learning2d/evaluate_mode_ppo.py": "9e212919fddf72329fb2137f7a42d5207165504f877dbe7160d84ae920476e23",
+    "learning2d/mode_policy.py": "fd43e83cdc3da67663b078478266cc5dcd85189b5fee4a2538aff12efe701019"
+  },
+  "training_manifest_sha256": "79afc0a4bba64dda75cfd42c954e44323186f0419d2f0587b7db53ac97eb49e2",
+  "training_status_sha256": "4668699089b5deda7dcd306c2d11bdb6d36f3a6b8d403c4c31421d2196ae063d"
+}

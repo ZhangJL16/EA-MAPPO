@@ -1,0 +1,228 @@
+{
+  "files": [
+    {
+      "compressed": false,
+      "path": "training/manifest.json",
+      "source_sha256": "79afc0a4bba64dda75cfd42c954e44323186f0419d2f0587b7db53ac97eb49e2",
+      "stored_sha256": "79afc0a4bba64dda75cfd42c954e44323186f0419d2f0587b7db53ac97eb49e2"
+    },
+    {
+      "compressed": false,
+      "path": "training/status.json",
+      "source_sha256": "4668699089b5deda7dcd306c2d11bdb6d36f3a6b8d403c4c31421d2196ae063d",
+      "stored_sha256": "4668699089b5deda7dcd306c2d11bdb6d36f3a6b8d403c4c31421d2196ae063d"
+    },
+    {
+      "compressed": false,
+      "path": "training/migration.json",
+      "source_sha256": "40d59e2680f044877fd574abf995c8cdb240aa4af669aaa6018c011ff9df10a7",
+      "stored_sha256": "40d59e2680f044877fd574abf995c8cdb240aa4af669aaa6018c011ff9df10a7"
+    },
+    {
+      "compressed": false,
+      "path": "training/episodes.jsonl",
+      "source_sha256": "39e6ab9f529c77685612bf15d2c38ba87beb686ee2f69997ea0783bd7cb6bbfc",
+      "stored_sha256": "39e6ab9f529c77685612bf15d2c38ba87beb686ee2f69997ea0783bd7cb6bbfc"
+    },
+    {
+      "compressed": false,
+      "path": "training/model_000051200.zip",
+      "source_sha256": "c0967702bfe998c884191f8cdca75b53bac21ea12385a71bf7f6813029615efa",
+      "stored_sha256": "c0967702bfe998c884191f8cdca75b53bac21ea12385a71bf7f6813029615efa"
+    },
+    {
+      "compressed": false,
+      "path": "validation/map_032/manifest.json",
+      "source_sha256": "acb3ba89c6956bd8cb726081934bc1e49e0ce29c7376416213ff449aab836229",
+      "stored_sha256": "acb3ba89c6956bd8cb726081934bc1e49e0ce29c7376416213ff449aab836229"
+    },
+    {
+      "compressed": false,
+      "path": "validation/map_032/method_provenance.json",
+      "source_sha256": "766e28fd8f473d64328aab19a11bf93c817862b0165c1cb22008e7859f6b4087",
+      "stored_sha256": "766e28fd8f473d64328aab19a11bf93c817862b0165c1cb22008e7859f6b4087"
+    },
+    {
+      "compressed": false,
+      "path": "validation/map_032/summary.json",
+      "source_sha256": "9bb6a4c91c246201be8bcb5e0712827c9a38a0a380d28d4664c864107536acb6",
+      "stored_sha256": "9bb6a4c91c246201be8bcb5e0712827c9a38a0a380d28d4664c864107536acb6"
+    },
+    {
+      "compressed": true,
+      "path": "validation/map_032/events.jsonl.gz",
+      "source_sha256": "aca183e017f27417c3f932d8767047ba08275ac291e802e2325ab90c13d48c09",
+      "stored_sha256": "f5b773b238a993ea2f1a53efe9451d04c898ad1d406e1f1f69e8aaab7559e1e3"
+    },
+    {
+      "compressed": false,
+      "path": "validation/map_033/manifest.json",
+      "source_sha256": "9d5e17787eebbd5d25fb8ff8748091adbeaf3027e98d1117d4fba664e6857cae",
+      "stored_sha256": "9d5e17787eebbd5d25fb8ff8748091adbeaf3027e98d1117d4fba664e6857cae"
+    },
+    {
+      "compressed": false,
+      "path": "validation/map_033/method_provenance.json",
+      "source_sha256": "b29a81ed87e5c09a228cac105f42ce635c18dfd241a50218bda49ff4750e2476",
+      "stored_sha256": "b29a81ed87e5c09a228cac105f42ce635c18dfd241a50218bda49ff4750e2476"
+    },
+    {
+      "compressed": false,
+      "path": "validation/map_033/summary.json",
+      "source_sha256": "a4f31228994efc3f16474601fb5d2d86fe52db4fbfb1b9fb6fd5f7233880c45f",
+      "stored_sha256": "a4f31228994efc3f16474601fb5d2d86fe52db4fbfb1b9fb6fd5f7233880c45f"
+    },
+    {
+      "compressed": true,
+      "path": "validation/map_033/events.jsonl.gz",
+      "source_sha256": "d3fae54f3820a1ca53e9e019be6c53730a7d34300249270eb25d4b4d0e734251",
+      "stored_sha256": "7769a608c0b13df0a4896d48c6fd642b5859b0dbcc425b7f3a76c26a320dc2e3"
+    },
+    {
+      "compressed": false,
+      "path": "validation/map_034/manifest.json",
+      "source_sha256": "5ab6113b585b64dfa69fea1c9b55719d6a44f57c62596dc406e99f13d3ab9500",
+      "stored_sha256": "5ab6113b585b64dfa69fea1c9b55719d6a44f57c62596dc406e99f13d3ab9500"
+    },
+    {
+      "compressed": false,
+      "path": "validation/map_034/method_provenance.json",
+      "source_sha256": "8910c85d1dfc32f1c6083e9ba3365ac651c1c376b44b79fed1184939ac5ee960",
+      "stored_sha256": "8910c85d1dfc32f1c6083e9ba3365ac651c1c376b44b79fed1184939ac5ee960"
+    },
+    {
+      "compressed": false,
+      "path": "validation/map_034/summary.json",
+      "source_sha256": "2b07938d14398cc5f485c7624908e7c76c73d82f096589a52b2b370f1178ff36",
+      "stored_sha256": "2b07938d14398cc5f485c7624908e7c76c73d82f096589a52b2b370f1178ff36"
+    },
+    {
+      "compressed": true,
+      "path": "validation/map_034/events.jsonl.gz",
+      "source_sha256": "c630984b584d2f112f8aa41c3e36c0305de7578aba8cd64c0dd75a3d7bde0da3",
+      "stored_sha256": "5564dae4cc6e12ac74146eaa17d098ee99b513770b3c069717ea43ed44a322f6"
+    },
+    {
+      "compressed": false,
+      "path": "validation/map_035/manifest.json",
+      "source_sha256": "f36873ef3a39543e47651c682764af694c2138b4b794f3113da1e4e6be29ee63",
+      "stored_sha256": "f36873ef3a39543e47651c682764af694c2138b4b794f3113da1e4e6be29ee63"
+    },
+    {
+      "compressed": false,
+      "path": "validation/map_035/method_provenance.json",
+      "source_sha256": "481924502aae7ac07b72080cda1c89eaab6b25cceb8345c4a362088925b36000",
+      "stored_sha256": "481924502aae7ac07b72080cda1c89eaab6b25cceb8345c4a362088925b36000"
+    },
+    {
+      "compressed": false,
+      "path": "validation/map_035/summary.json",
+      "source_sha256": "3f64797490aef33ad0c17b4f7f8c7eb12d7ec1b4de5ce3abbb89376d158c08df",
+      "stored_sha256": "3f64797490aef33ad0c17b4f7f8c7eb12d7ec1b4de5ce3abbb89376d158c08df"
+    },
+    {
+      "compressed": true,
+      "path": "validation/map_035/events.jsonl.gz",
+      "source_sha256": "93a0f53569d88a27745f4956c6c0768218183151bfd40fc4424117a27c477993",
+      "stored_sha256": "ef245da0bf70ad341d7aa01cacf3a95e76ec9ae58465370d0d18eb6252434011"
+    },
+    {
+      "compressed": false,
+      "path": "validation/map_036/manifest.json",
+      "source_sha256": "ab1c5cdd006d5b7c787ce36f76d5263360f05f6c99ef405e0136b280f34e13a7",
+      "stored_sha256": "ab1c5cdd006d5b7c787ce36f76d5263360f05f6c99ef405e0136b280f34e13a7"
+    },
+    {
+      "compressed": false,
+      "path": "validation/map_036/method_provenance.json",
+      "source_sha256": "57e02af3673570cb83ea559fad54943d92521341f14f81445633bd94807ef91f",
+      "stored_sha256": "57e02af3673570cb83ea559fad54943d92521341f14f81445633bd94807ef91f"
+    },
+    {
+      "compressed": false,
+      "path": "validation/map_036/summary.json",
+      "source_sha256": "4b8e746fcd781589bbd4a3702a040c756ffea2e5b8fe603fbaf74816c4cb0bbb",
+      "stored_sha256": "4b8e746fcd781589bbd4a3702a040c756ffea2e5b8fe603fbaf74816c4cb0bbb"
+    },
+    {
+      "compressed": true,
+      "path": "validation/map_036/events.jsonl.gz",
+      "source_sha256": "29515fe411346f33ebe408bb639838eb4be80f6066906ca6ce89076b4f6052e1",
+      "stored_sha256": "054e5613beb3ba38505016f40a94448ebe3a2a5d4b1aeac92524ea0e515f40e3"
+    },
+    {
+      "compressed": false,
+      "path": "validation/map_037/manifest.json",
+      "source_sha256": "e5a0c21cb3601b0fe1ed02a871d87f7a2f54342dae79fe8254dffef0ed806f44",
+      "stored_sha256": "e5a0c21cb3601b0fe1ed02a871d87f7a2f54342dae79fe8254dffef0ed806f44"
+    },
+    {
+      "compressed": false,
+      "path": "validation/map_037/method_provenance.json",
+      "source_sha256": "cb34072d79435195e76c00fc4199ba22a8d2d7064ed88d34a00b5df178eb862e",
+      "stored_sha256": "cb34072d79435195e76c00fc4199ba22a8d2d7064ed88d34a00b5df178eb862e"
+    },
+    {
+      "compressed": false,
+      "path": "validation/map_037/summary.json",
+      "source_sha256": "8d0d8b9ed42f4b62809c21bf42c49a5a85d738b2f6cd38e9632e444764591748",
+      "stored_sha256": "8d0d8b9ed42f4b62809c21bf42c49a5a85d738b2f6cd38e9632e444764591748"
+    },
+    {
+      "compressed": true,
+      "path": "validation/map_037/events.jsonl.gz",
+      "source_sha256": "d1ad136c83567a7d96c2567628a15122d1f804f0a3375ddcccbf66ec19c92c2e",
+      "stored_sha256": "1b89d31f89fa5098e67ce7437c112be387031fffa3673ae3b18467049849fd0d"
+    },
+    {
+      "compressed": false,
+      "path": "validation/map_038/manifest.json",
+      "source_sha256": "fc9e1ba4a1fd7e14ba7a020780892a2f939ad9cec599100cf6c9d03b5e640d36",
+      "stored_sha256": "fc9e1ba4a1fd7e14ba7a020780892a2f939ad9cec599100cf6c9d03b5e640d36"
+    },
+    {
+      "compressed": false,
+      "path": "validation/map_038/method_provenance.json",
+      "source_sha256": "e3a221687cfed3f9f713ce72cfb327e906fd573e2176c950bd63ec2363d47ec3",
+      "stored_sha256": "e3a221687cfed3f9f713ce72cfb327e906fd573e2176c950bd63ec2363d47ec3"
+    },
+    {
+      "compressed": false,
+      "path": "validation/map_038/summary.json",
+      "source_sha256": "93f3ac0e0127e1c34edd5e8dd463ad955baf744db5bc36969c7cc23d35194acb",
+      "stored_sha256": "93f3ac0e0127e1c34edd5e8dd463ad955baf744db5bc36969c7cc23d35194acb"
+    },
+    {
+      "compressed": true,
+      "path": "validation/map_038/events.jsonl.gz",
+      "source_sha256": "9cc523eeb358321d2543dd1f3f74ebb7510c7576ef9b0d4dc633001f72c52d97",
+      "stored_sha256": "9b99a17c4a2812208e517750739dfbd677a3cc425e7fa476b80ab720d9d507af"
+    },
+    {
+      "compressed": false,
+      "path": "validation/map_039/manifest.json",
+      "source_sha256": "f8537b6bf2f4b53f337a5b4bb2bf8a62e755bbc1b03ce833cd808efd4443bc86",
+      "stored_sha256": "f8537b6bf2f4b53f337a5b4bb2bf8a62e755bbc1b03ce833cd808efd4443bc86"
+    },
+    {
+      "compressed": false,
+      "path": "validation/map_039/method_provenance.json",
+      "source_sha256": "e3decbeb7fa53be9c360a07a0aee5f1992560ebc3fccd48e324310b54e1f96c5",
+      "stored_sha256": "e3decbeb7fa53be9c360a07a0aee5f1992560ebc3fccd48e324310b54e1f96c5"
+    },
+    {
+      "compressed": false,
+      "path": "validation/map_039/summary.json",
+      "source_sha256": "4ca3071f00f1f75255583bb2f0aa3a086b012449fc7181b6ae99a5fd4a5fa495",
+      "stored_sha256": "4ca3071f00f1f75255583bb2f0aa3a086b012449fc7181b6ae99a5fd4a5fa495"
+    },
+    {
+      "compressed": true,
+      "path": "validation/map_039/events.jsonl.gz",
+      "source_sha256": "e0d1bd34f52a4f292ea64a717da7e42a1c242427a0e85a6918b84c4c713675a5",
+      "stored_sha256": "b3d0dabdff6d6dfd039104eb4d38fd7fe714cd95323392645243c2652b9913b4"
+    }
+  ],
+  "note": "Diagnostic only: fixed 600s horizon was incorrectly marked truncated in training",
+  "protocol": "mode_ppo_v2_seed101_auditable_bundle"
+}

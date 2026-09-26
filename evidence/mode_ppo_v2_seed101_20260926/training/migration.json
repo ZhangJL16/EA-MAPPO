@@ -1,0 +1,10 @@
+{
+  "copied_timesteps": 512,
+  "migration": "v1 checkpoint 512 to v2 horizon-close",
+  "new_manifest_sha256": "79afc0a4bba64dda75cfd42c954e44323186f0419d2f0587b7db53ac97eb49e2",
+  "old_manifest_sha256": "d1d32166f58e1725bc60072b1bbd61a989dc97b27fb16c7e60903cca937ebf64",
+  "old_model_sha256": "b3424f94700c9f15fa2bfbd64e781aa1472deab5f0ae3ffd0219bf53274798d8",
+  "old_status_sha256": "5eccee2d084da9030149aec1311f56172884317e49e9f769b5816b72bb472af0",
+  "reason": "old raw trainer can stall when less than one physics step remains after charging; no affected transition occurred before this checkpoint",
+  "resume_is_bitwise_equivalent": false
+}
