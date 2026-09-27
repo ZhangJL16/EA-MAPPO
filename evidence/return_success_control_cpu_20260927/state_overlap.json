@@ -1,0 +1,102 @@
+{
+  "by_lag": [
+    {
+      "features": {
+        "route_distance_to_station": {
+          "auc_larger_value_favors_success": 0.40664961636828645,
+          "median_success": 106.13986849784851,
+          "median_takeover": 107.92876482009888,
+          "same_map_equal": 0,
+          "same_map_success_higher": 11,
+          "same_map_takeover_higher": 21
+        },
+        "route_distance_to_target": {
+          "auc_larger_value_favors_success": 0.12148337595907928,
+          "median_success": 0.6178536685183644,
+          "median_takeover": 30.57543933391571,
+          "same_map_equal": 0,
+          "same_map_success_higher": 6,
+          "same_map_takeover_higher": 26
+        },
+        "soc": {
+          "auc_larger_value_favors_success": 0.9181585677749361,
+          "median_success": 0.6155336487686494,
+          "median_takeover": 0.44637303350272395,
+          "same_map_equal": 0,
+          "same_map_success_higher": 32,
+          "same_map_takeover_higher": 0
+        }
+      },
+      "lag_decisions": 5,
+      "same_map_pairs": 32,
+      "success_roots": 34,
+      "takeover_roots": 46
+    },
+    {
+      "features": {
+        "route_distance_to_station": {
+          "auc_larger_value_favors_success": 0.39118457300275483,
+          "median_success": 105.10038137435913,
+          "median_takeover": 108.20930600166321,
+          "same_map_equal": 0,
+          "same_map_success_higher": 11,
+          "same_map_takeover_higher": 19
+        },
+        "route_distance_to_target": {
+          "auc_larger_value_favors_success": 0.10330578512396695,
+          "median_success": 6.30425289273262,
+          "median_takeover": 38.145144283771515,
+          "same_map_equal": 0,
+          "same_map_success_higher": 5,
+          "same_map_takeover_higher": 25
+        },
+        "soc": {
+          "auc_larger_value_favors_success": 0.9173553719008265,
+          "median_success": 0.6473596246781639,
+          "median_takeover": 0.4793149894938575,
+          "same_map_equal": 0,
+          "same_map_success_higher": 30,
+          "same_map_takeover_higher": 0
+        }
+      },
+      "lag_decisions": 10,
+      "same_map_pairs": 30,
+      "success_roots": 33,
+      "takeover_roots": 44
+    },
+    {
+      "features": {
+        "route_distance_to_station": {
+          "auc_larger_value_favors_success": 0.3119047619047619,
+          "median_success": 90.66725373268127,
+          "median_takeover": 106.63723349571228,
+          "same_map_equal": 0,
+          "same_map_success_higher": 5,
+          "same_map_takeover_higher": 20
+        },
+        "route_distance_to_target": {
+          "auc_larger_value_favors_success": 0.1261904761904762,
+          "median_success": 27.68149971961975,
+          "median_takeover": 52.969151735305786,
+          "same_map_equal": 0,
+          "same_map_success_higher": 5,
+          "same_map_takeover_higher": 20
+        },
+        "soc": {
+          "auc_larger_value_favors_success": 0.9079365079365079,
+          "median_success": 0.6967934933038893,
+          "median_takeover": 0.5455641951070356,
+          "same_map_equal": 0,
+          "same_map_success_higher": 25,
+          "same_map_takeover_higher": 0
+        }
+      },
+      "lag_decisions": 20,
+      "same_map_pairs": 25,
+      "success_roots": 30,
+      "takeover_roots": 42
+    }
+  ],
+  "interpretation": "retrospective, outcome-conditioned descriptive comparison",
+  "protocol": "return_state_overlap_descriptive_v1"
+}
