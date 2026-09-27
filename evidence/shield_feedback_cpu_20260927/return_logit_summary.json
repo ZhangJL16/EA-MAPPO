@@ -1,0 +1,498 @@
+{
+  "jobs": 48,
+  "protocol": "paired_return_logits_on_archived_control_trajectories_v1",
+  "results": [
+    {
+      "feedback_argmax_return_all_flight": 0,
+      "feedback_argmax_return_at_takeover": 0,
+      "flight_states": 4594,
+      "fraction_takeovers_with_higher_feedback_p_return": 1,
+      "maps": [
+        {
+          "feedback_argmax_return_at_takeover": 0,
+          "flight_states": 422,
+          "map_id": 32,
+          "mean_p_return_control_at_takeover": 0.002586655334259073,
+          "mean_p_return_feedback_at_takeover": 0.12448298434416454,
+          "takeover_states": 15
+        },
+        {
+          "feedback_argmax_return_at_takeover": 0,
+          "flight_states": 581,
+          "map_id": 33,
+          "mean_p_return_control_at_takeover": 0.0023720719618722796,
+          "mean_p_return_feedback_at_takeover": 0.11653927030662696,
+          "takeover_states": 6
+        },
+        {
+          "feedback_argmax_return_at_takeover": 0,
+          "flight_states": 441,
+          "map_id": 34,
+          "mean_p_return_control_at_takeover": 0.002042363917765518,
+          "mean_p_return_feedback_at_takeover": 0.06982326954603195,
+          "takeover_states": 15
+        },
+        {
+          "feedback_argmax_return_at_takeover": 0,
+          "flight_states": 649,
+          "map_id": 35,
+          "mean_p_return_control_at_takeover": 0.0033729669715588293,
+          "mean_p_return_feedback_at_takeover": 0.08406635994712512,
+          "takeover_states": 6
+        },
+        {
+          "feedback_argmax_return_at_takeover": 0,
+          "flight_states": 556,
+          "map_id": 36,
+          "mean_p_return_control_at_takeover": 0.0018377356297735656,
+          "mean_p_return_feedback_at_takeover": 0.15652837923594884,
+          "takeover_states": 7
+        },
+        {
+          "feedback_argmax_return_at_takeover": 0,
+          "flight_states": 644,
+          "map_id": 37,
+          "mean_p_return_control_at_takeover": 0.00312894982441018,
+          "mean_p_return_feedback_at_takeover": 0.11519852032264073,
+          "takeover_states": 6
+        },
+        {
+          "feedback_argmax_return_at_takeover": 0,
+          "flight_states": 677,
+          "map_id": 38,
+          "mean_p_return_control_at_takeover": 0.0015681900937731068,
+          "mean_p_return_feedback_at_takeover": 0.12024367849032085,
+          "takeover_states": 6
+        },
+        {
+          "feedback_argmax_return_at_takeover": 0,
+          "flight_states": 624,
+          "map_id": 39,
+          "mean_p_return_control_at_takeover": 0.0027180649049114436,
+          "mean_p_return_feedback_at_takeover": 0.09662088565528393,
+          "takeover_states": 8
+        }
+      ],
+      "mean_p_return_control_at_takeover": 0.0024158989933008948,
+      "mean_p_return_feedback_at_takeover": 0.10723980467604555,
+      "median_energy_fraction_at_takeover": 0.5011740922927856,
+      "median_p_return_control_all_flight": 0.0020672521786764264,
+      "median_p_return_control_at_takeover": 0.0023196127731353045,
+      "median_p_return_feedback_all_flight": 0.11298970505595207,
+      "median_p_return_feedback_at_takeover": 0.09529745578765869,
+      "panel": "vectorized",
+      "seed": 101,
+      "takeover_states": 69
+    },
+    {
+      "feedback_argmax_return_all_flight": 0,
+      "feedback_argmax_return_at_takeover": 0,
+      "flight_states": 4295,
+      "fraction_takeovers_with_higher_feedback_p_return": 1,
+      "maps": [
+        {
+          "feedback_argmax_return_at_takeover": 0,
+          "flight_states": 452,
+          "map_id": 32,
+          "mean_p_return_control_at_takeover": 0.048083849561711155,
+          "mean_p_return_feedback_at_takeover": 0.1008936557918787,
+          "takeover_states": 12
+        },
+        {
+          "feedback_argmax_return_at_takeover": 0,
+          "flight_states": 559,
+          "map_id": 33,
+          "mean_p_return_control_at_takeover": 0.04151781701615879,
+          "mean_p_return_feedback_at_takeover": 0.11462003418377467,
+          "takeover_states": 7
+        },
+        {
+          "feedback_argmax_return_at_takeover": 0,
+          "flight_states": 503,
+          "map_id": 34,
+          "mean_p_return_control_at_takeover": 0.03578774444758892,
+          "mean_p_return_feedback_at_takeover": 0.10823659279516765,
+          "takeover_states": 7
+        },
+        {
+          "feedback_argmax_return_at_takeover": 0,
+          "flight_states": 546,
+          "map_id": 35,
+          "mean_p_return_control_at_takeover": 0.031620701774954796,
+          "mean_p_return_feedback_at_takeover": 0.09944488427468709,
+          "takeover_states": 7
+        },
+        {
+          "feedback_argmax_return_at_takeover": 0,
+          "flight_states": 566,
+          "map_id": 36,
+          "mean_p_return_control_at_takeover": 0.03122641984373331,
+          "mean_p_return_feedback_at_takeover": 0.09902969623605411,
+          "takeover_states": 6
+        },
+        {
+          "feedback_argmax_return_at_takeover": 0,
+          "flight_states": 550,
+          "map_id": 37,
+          "mean_p_return_control_at_takeover": 0.02191643292705218,
+          "mean_p_return_feedback_at_takeover": 0.10222743079066277,
+          "takeover_states": 6
+        },
+        {
+          "feedback_argmax_return_at_takeover": 0,
+          "flight_states": 575,
+          "map_id": 38,
+          "mean_p_return_control_at_takeover": 0.029340134623150032,
+          "mean_p_return_feedback_at_takeover": 0.10368997852007548,
+          "takeover_states": 6
+        },
+        {
+          "feedback_argmax_return_at_takeover": 0,
+          "flight_states": 544,
+          "map_id": 39,
+          "mean_p_return_control_at_takeover": 0.03518450818955898,
+          "mean_p_return_feedback_at_takeover": 0.10134025290608406,
+          "takeover_states": 6
+        }
+      ],
+      "mean_p_return_control_at_takeover": 0.035885877384428395,
+      "mean_p_return_feedback_at_takeover": 0.10358874735079314,
+      "median_energy_fraction_at_takeover": 0.4276539981365204,
+      "median_p_return_control_all_flight": 0.03205679729580879,
+      "median_p_return_control_at_takeover": 0.03148455545306206,
+      "median_p_return_feedback_all_flight": 0.10254666954278946,
+      "median_p_return_feedback_at_takeover": 0.10147083550691605,
+      "panel": "independent_seeds",
+      "seed": 102,
+      "takeover_states": 57
+    },
+    {
+      "feedback_argmax_return_all_flight": 0,
+      "feedback_argmax_return_at_takeover": 0,
+      "flight_states": 4477,
+      "fraction_takeovers_with_higher_feedback_p_return": 1,
+      "maps": [
+        {
+          "feedback_argmax_return_at_takeover": 0,
+          "flight_states": 496,
+          "map_id": 32,
+          "mean_p_return_control_at_takeover": 0.02076770504936576,
+          "mean_p_return_feedback_at_takeover": 0.09124438775082429,
+          "takeover_states": 12
+        },
+        {
+          "feedback_argmax_return_at_takeover": 0,
+          "flight_states": 576,
+          "map_id": 33,
+          "mean_p_return_control_at_takeover": 0.02022565094133218,
+          "mean_p_return_feedback_at_takeover": 0.09606945017973582,
+          "takeover_states": 6
+        },
+        {
+          "feedback_argmax_return_at_takeover": 0,
+          "flight_states": 544,
+          "map_id": 34,
+          "mean_p_return_control_at_takeover": 0.01893071085214615,
+          "mean_p_return_feedback_at_takeover": 0.09676949804027875,
+          "takeover_states": 6
+        },
+        {
+          "feedback_argmax_return_at_takeover": 0,
+          "flight_states": 562,
+          "map_id": 35,
+          "mean_p_return_control_at_takeover": 0.025783059808115166,
+          "mean_p_return_feedback_at_takeover": 0.09233676518003146,
+          "takeover_states": 6
+        },
+        {
+          "feedback_argmax_return_at_takeover": 0,
+          "flight_states": 541,
+          "map_id": 36,
+          "mean_p_return_control_at_takeover": 0.01660770255451401,
+          "mean_p_return_feedback_at_takeover": 0.09769686311483383,
+          "takeover_states": 6
+        },
+        {
+          "feedback_argmax_return_at_takeover": 0,
+          "flight_states": 555,
+          "map_id": 37,
+          "mean_p_return_control_at_takeover": 0.023316087511678536,
+          "mean_p_return_feedback_at_takeover": 0.09104028219978015,
+          "takeover_states": 6
+        },
+        {
+          "feedback_argmax_return_at_takeover": 0,
+          "flight_states": 659,
+          "map_id": 38,
+          "mean_p_return_control_at_takeover": 0.017112834689517815,
+          "mean_p_return_feedback_at_takeover": 0.08821149294575055,
+          "takeover_states": 6
+        },
+        {
+          "feedback_argmax_return_at_takeover": 0,
+          "flight_states": 544,
+          "map_id": 39,
+          "mean_p_return_control_at_takeover": 0.01736214601745208,
+          "mean_p_return_feedback_at_takeover": 0.0943866694966952,
+          "takeover_states": 6
+        }
+      ],
+      "mean_p_return_control_at_takeover": 0.020097066941498605,
+      "mean_p_return_feedback_at_takeover": 0.09322219962875049,
+      "median_energy_fraction_at_takeover": 0.43352770805358887,
+      "median_p_return_control_all_flight": 0.01831839606165886,
+      "median_p_return_control_at_takeover": 0.019811131060123444,
+      "median_p_return_feedback_all_flight": 0.09325451403856277,
+      "median_p_return_feedback_at_takeover": 0.09283067286014557,
+      "panel": "independent_seeds",
+      "seed": 103,
+      "takeover_states": 54
+    },
+    {
+      "feedback_argmax_return_all_flight": 0,
+      "feedback_argmax_return_at_takeover": 0,
+      "flight_states": 4480,
+      "fraction_takeovers_with_higher_feedback_p_return": 1,
+      "maps": [
+        {
+          "feedback_argmax_return_at_takeover": 0,
+          "flight_states": 550,
+          "map_id": 32,
+          "mean_p_return_control_at_takeover": 0.019735754653811454,
+          "mean_p_return_feedback_at_takeover": 0.19339291900396346,
+          "takeover_states": 10
+        },
+        {
+          "feedback_argmax_return_at_takeover": 0,
+          "flight_states": 567,
+          "map_id": 33,
+          "mean_p_return_control_at_takeover": 0.019494610838592052,
+          "mean_p_return_feedback_at_takeover": 0.2248821978767713,
+          "takeover_states": 6
+        },
+        {
+          "feedback_argmax_return_at_takeover": 0,
+          "flight_states": 553,
+          "map_id": 34,
+          "mean_p_return_control_at_takeover": 0.019987148853639763,
+          "mean_p_return_feedback_at_takeover": 0.20895124723513922,
+          "takeover_states": 6
+        },
+        {
+          "feedback_argmax_return_at_takeover": 0,
+          "flight_states": 570,
+          "map_id": 35,
+          "mean_p_return_control_at_takeover": 0.024874329566955566,
+          "mean_p_return_feedback_at_takeover": 0.18085522949695587,
+          "takeover_states": 6
+        },
+        {
+          "feedback_argmax_return_at_takeover": 0,
+          "flight_states": 565,
+          "map_id": 36,
+          "mean_p_return_control_at_takeover": 0.016282187774777412,
+          "mean_p_return_feedback_at_takeover": 0.22316070894400278,
+          "takeover_states": 6
+        },
+        {
+          "feedback_argmax_return_at_takeover": 0,
+          "flight_states": 576,
+          "map_id": 37,
+          "mean_p_return_control_at_takeover": 0.01787174151589473,
+          "mean_p_return_feedback_at_takeover": 0.2352906291683515,
+          "takeover_states": 6
+        },
+        {
+          "feedback_argmax_return_at_takeover": 0,
+          "flight_states": 552,
+          "map_id": 38,
+          "mean_p_return_control_at_takeover": 0.012232677234957615,
+          "mean_p_return_feedback_at_takeover": 0.2503917068243027,
+          "takeover_states": 6
+        },
+        {
+          "feedback_argmax_return_at_takeover": 0,
+          "flight_states": 547,
+          "map_id": 39,
+          "mean_p_return_control_at_takeover": 0.014795953873544931,
+          "mean_p_return_feedback_at_takeover": 0.2566648821036021,
+          "takeover_states": 6
+        }
+      ],
+      "mean_p_return_control_at_takeover": 0.018280566240159366,
+      "mean_p_return_feedback_at_takeover": 0.2195213230756613,
+      "median_energy_fraction_at_takeover": 0.414127916097641,
+      "median_p_return_control_all_flight": 0.017734122462570667,
+      "median_p_return_control_at_takeover": 0.019277485087513924,
+      "median_p_return_feedback_all_flight": 0.22431577742099762,
+      "median_p_return_feedback_at_takeover": 0.22328829020261765,
+      "panel": "independent_seeds",
+      "seed": 104,
+      "takeover_states": 52
+    },
+    {
+      "feedback_argmax_return_all_flight": 1038,
+      "feedback_argmax_return_at_takeover": 11,
+      "flight_states": 4513,
+      "fraction_takeovers_with_higher_feedback_p_return": 1,
+      "maps": [
+        {
+          "feedback_argmax_return_at_takeover": 0,
+          "flight_states": 518,
+          "map_id": 32,
+          "mean_p_return_control_at_takeover": 0.02989289117977023,
+          "mean_p_return_feedback_at_takeover": 0.14712258304158846,
+          "takeover_states": 12
+        },
+        {
+          "feedback_argmax_return_at_takeover": 1,
+          "flight_states": 576,
+          "map_id": 33,
+          "mean_p_return_control_at_takeover": 0.036015091153482594,
+          "mean_p_return_feedback_at_takeover": 0.09101686254143715,
+          "takeover_states": 6
+        },
+        {
+          "feedback_argmax_return_at_takeover": 0,
+          "flight_states": 544,
+          "map_id": 34,
+          "mean_p_return_control_at_takeover": 0.030893305627008278,
+          "mean_p_return_feedback_at_takeover": 0.10229740912715594,
+          "takeover_states": 6
+        },
+        {
+          "feedback_argmax_return_at_takeover": 0,
+          "flight_states": 567,
+          "map_id": 35,
+          "mean_p_return_control_at_takeover": 0.038227117930849396,
+          "mean_p_return_feedback_at_takeover": 0.10268935809532802,
+          "takeover_states": 6
+        },
+        {
+          "feedback_argmax_return_at_takeover": 6,
+          "flight_states": 541,
+          "map_id": 36,
+          "mean_p_return_control_at_takeover": 0.026456349529325962,
+          "mean_p_return_feedback_at_takeover": 0.16344651331504187,
+          "takeover_states": 6
+        },
+        {
+          "feedback_argmax_return_at_takeover": 4,
+          "flight_states": 583,
+          "map_id": 37,
+          "mean_p_return_control_at_takeover": 0.029420864768326283,
+          "mean_p_return_feedback_at_takeover": 0.16928078730901083,
+          "takeover_states": 6
+        },
+        {
+          "feedback_argmax_return_at_takeover": 0,
+          "flight_states": 644,
+          "map_id": 38,
+          "mean_p_return_control_at_takeover": 0.026545238060255844,
+          "mean_p_return_feedback_at_takeover": 0.13172051310539246,
+          "takeover_states": 6
+        },
+        {
+          "feedback_argmax_return_at_takeover": 0,
+          "flight_states": 540,
+          "map_id": 39,
+          "mean_p_return_control_at_takeover": 0.024702430702745914,
+          "mean_p_return_feedback_at_takeover": 0.16275117794672647,
+          "takeover_states": 6
+        }
+      ],
+      "mean_p_return_control_at_takeover": 0.030227353347948304,
+      "mean_p_return_feedback_at_takeover": 0.1352719763914744,
+      "median_energy_fraction_at_takeover": 0.4335291087627411,
+      "median_p_return_control_all_flight": 0.028910163789987564,
+      "median_p_return_control_at_takeover": 0.029690786264836788,
+      "median_p_return_feedback_all_flight": 0.15195569396018982,
+      "median_p_return_feedback_at_takeover": 0.15180373191833496,
+      "panel": "independent_seeds",
+      "seed": 105,
+      "takeover_states": 54
+    },
+    {
+      "feedback_argmax_return_all_flight": 0,
+      "feedback_argmax_return_at_takeover": 0,
+      "flight_states": 4504,
+      "fraction_takeovers_with_higher_feedback_p_return": 1,
+      "maps": [
+        {
+          "feedback_argmax_return_at_takeover": 0,
+          "flight_states": 523,
+          "map_id": 32,
+          "mean_p_return_control_at_takeover": 0.02121466863900423,
+          "mean_p_return_feedback_at_takeover": 0.04625512324273586,
+          "takeover_states": 10
+        },
+        {
+          "feedback_argmax_return_at_takeover": 0,
+          "flight_states": 576,
+          "map_id": 33,
+          "mean_p_return_control_at_takeover": 0.006759254611097276,
+          "mean_p_return_feedback_at_takeover": 0.03107350505888462,
+          "takeover_states": 6
+        },
+        {
+          "feedback_argmax_return_at_takeover": 0,
+          "flight_states": 554,
+          "map_id": 34,
+          "mean_p_return_control_at_takeover": 0.01689739463229974,
+          "mean_p_return_feedback_at_takeover": 0.042310599237680435,
+          "takeover_states": 6
+        },
+        {
+          "feedback_argmax_return_at_takeover": 0,
+          "flight_states": 556,
+          "map_id": 35,
+          "mean_p_return_control_at_takeover": 0.02287353885670503,
+          "mean_p_return_feedback_at_takeover": 0.042707256972789764,
+          "takeover_states": 6
+        },
+        {
+          "feedback_argmax_return_at_takeover": 0,
+          "flight_states": 541,
+          "map_id": 36,
+          "mean_p_return_control_at_takeover": 0.008998099636907378,
+          "mean_p_return_feedback_at_takeover": 0.048864797999461494,
+          "takeover_states": 6
+        },
+        {
+          "feedback_argmax_return_at_takeover": 0,
+          "flight_states": 553,
+          "map_id": 37,
+          "mean_p_return_control_at_takeover": 0.003883935200671355,
+          "mean_p_return_feedback_at_takeover": 0.04941872755686442,
+          "takeover_states": 6
+        },
+        {
+          "feedback_argmax_return_at_takeover": 0,
+          "flight_states": 661,
+          "map_id": 38,
+          "mean_p_return_control_at_takeover": 0.004996447047839562,
+          "mean_p_return_feedback_at_takeover": 0.03114950656890869,
+          "takeover_states": 6
+        },
+        {
+          "feedback_argmax_return_at_takeover": 0,
+          "flight_states": 540,
+          "map_id": 39,
+          "mean_p_return_control_at_takeover": 0.0035198949044570327,
+          "mean_p_return_feedback_at_takeover": 0.05021646929283937,
+          "takeover_states": 6
+        }
+      ],
+      "mean_p_return_control_at_takeover": 0.011917655302498203,
+      "mean_p_return_feedback_at_takeover": 0.043019161702921756,
+      "median_energy_fraction_at_takeover": 0.4335280805826187,
+      "median_p_return_control_all_flight": 0.008588039316236973,
+      "median_p_return_control_at_takeover": 0.008877626620233059,
+      "median_p_return_feedback_all_flight": 0.0385630764067173,
+      "median_p_return_feedback_at_takeover": 0.045764949172735214,
+      "panel": "independent_seeds",
+      "seed": 106,
+      "takeover_states": 52
+    }
+  ]
+}
