@@ -1,0 +1,121 @@
+{
+  "branches": {
+    "original_action": {
+      "base_shaped_reward": -0.23718440901709295,
+      "charge_events": 0,
+      "elapsed_s": 10.450000000000003,
+      "energy_spent": 14.661231510226353,
+      "events": [
+        "return_takeover",
+        "returning",
+        "returning",
+        "returning",
+        "returning",
+        "returning",
+        "returning",
+        "returning",
+        "returning",
+        "returning",
+        "returning",
+        "returning",
+        "returning",
+        "returning",
+        "returning",
+        "returning",
+        "returning",
+        "returning",
+        "returning",
+        "returning",
+        "docked"
+      ],
+      "extra_feedback_reward": -1.8,
+      "failure_reason": null,
+      "feedback_shaped_reward": -2.037184409017093,
+      "horizon_censored": false,
+      "policy_decisions": 1,
+      "post_energy": 0.26546623785352674,
+      "post_mode": "docked",
+      "post_time_s": 66.95,
+      "rejected_departures": 0,
+      "return_takeovers": 1,
+      "task_completed": 0
+    },
+    "voluntary_return": {
+      "base_shaped_reward": -0.23758519447357604,
+      "charge_events": 0,
+      "elapsed_s": 10.849999999999994,
+      "energy_spent": 14.871659007450468,
+      "events": [
+        "flight",
+        "flight",
+        "flight",
+        "flight",
+        "flight",
+        "return_takeover",
+        "returning",
+        "returning",
+        "returning",
+        "returning",
+        "returning",
+        "returning",
+        "returning",
+        "returning",
+        "returning",
+        "returning",
+        "returning",
+        "returning",
+        "returning",
+        "returning",
+        "returning",
+        "docked"
+      ],
+      "extra_feedback_reward": -1.8,
+      "failure_reason": null,
+      "feedback_shaped_reward": -2.037585194473576,
+      "horizon_censored": false,
+      "policy_decisions": 1,
+      "post_energy": 0.05503874062941172,
+      "post_mode": "docked",
+      "post_time_s": 67.35,
+      "rejected_departures": 0,
+      "return_takeovers": 1,
+      "task_completed": 0
+    }
+  },
+  "parent_pickle_sha256": "d204757ee096af9acca535bb4f5c8483fa0f8de23f3a8073a8824b3a644cffd5",
+  "protocol": "return_timing_real_state_branch_cpu_v1",
+  "root": {
+    "archived_action": 4,
+    "decision": 113,
+    "events_sha256": "a1c60874538788b01f30eed568a4dcda00be299b6a98625ac40426e1fda2b0e1",
+    "id": "first_takeover_vectorized_s101_m039_d00113",
+    "kind": "first_takeover",
+    "map_id": 39,
+    "model_sha256": "d2a1f131a3fc9a66c6e7fef6dccf5e60f2d764fb80559f328f390431d0873646",
+    "panel": "vectorized",
+    "seed": 101,
+    "source_condition": "control",
+    "summary_sha256": "122130f17523388d7a075a39ecad4e225e02c4028896cda8e94d79f6ef84bf04"
+  },
+  "roots_sha256": "09954a67d50c05f402c2976b3c75a08f1dea587ee1140225c1dc4ab0b08c655b",
+  "state": {
+    "capacity": 85.39121788182787,
+    "completed_targets": 1,
+    "energy": 14.92669774807988,
+    "position_xy": [
+      79.16187705436653,
+      85.30726352693006
+    ],
+    "route_distance_to_station": 53.34276556968689,
+    "route_distance_to_target": 0.6091296672821045,
+    "station_xy": [
+      41.73088692677872,
+      47.302376162690635
+    ],
+    "target_xy": [
+      79.34292919212496,
+      85.88886397121155
+    ],
+    "time_s": 56.5
+  }
+}
