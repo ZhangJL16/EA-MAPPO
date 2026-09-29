@@ -1,0 +1,1202 @@
+{
+  "date": "2026-09-22",
+  "collection_name": "英文文献",
+  "collection_key": "86GDSBUE",
+  "search_url": "https://app.undermind.ai/projects/e8dceead-a3eb-4789-aa94-992f328239fa?path=/Dynamic%20single%20UAV%20service%20with%20battery%20and%20recharge%20decisions",
+  "records": 170,
+  "pdf_downloaded_uploaded_and_hash_verified": 49,
+  "fulltext_unavailable": 121,
+  "metadata_note": "Imported from Undermind, tagged 待核验元数据. Publication dates and version relationships not independently verified.",
+  "items": [
+    {
+      "cite_key": "Ber91",
+      "zotero_key": "8BF5SX8F",
+      "title": "A Stochastic and Dynamic Vehicle Routing Problem in the Euclidean Plane",
+      "doi": "10.1287/opre.39.4.601",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Liu22c",
+      "zotero_key": "9ZT5JTBU",
+      "title": "Energy-Aware and Delay-Sensitive Management of a Drone Delivery System",
+      "doi": "10.1287/msom.2021.1056",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Pav09",
+      "zotero_key": "S9GMZKU6",
+      "title": "Adaptive and Distributed Algorithms for Vehicle Routing in a Stochastic and Dynamic Environment",
+      "doi": "10.1109/TAC.2010.2092850",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Enr05",
+      "zotero_key": "CAHE3S93",
+      "title": "UAV ROUTING IN A STOCHASTIC, TIME-VARYING ENVIRONMENT",
+      "doi": "10.3182/20050703-6-CZ-1902.02010",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Tho07",
+      "zotero_key": "RQQHM4TJ",
+      "title": "Waiting Strategies for Anticipating Service Requests from Known Customer Locations",
+      "doi": "10.1287/trsc.1060.0183",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Bul11",
+      "zotero_key": "G3HR52YW",
+      "title": "Dynamic Vehicle Routing for Robotic Systems",
+      "doi": "10.1109/JPROC.2011.2158181",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Ulm19",
+      "zotero_key": "HTV63EKX",
+      "title": "Offline-Online Approximate Dynamic Programming for Dynamic Vehicle Routing with Stochastic Requests",
+      "doi": "10.1287/TRSC.2017.0767",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Soe21",
+      "zotero_key": "EUKBYM98",
+      "title": "Stochastic dynamic vehicle routing in the light of prescriptive analytics: A review",
+      "doi": "10.1016/J.EJOR.2021.07.014",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Ber93b",
+      "zotero_key": "ZUV69ELT",
+      "title": "Stochastic and dynamic vehicle routing with general demand and interarrival time distributions",
+      "doi": "10.2307/1427801",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Enr09",
+      "zotero_key": "XT5BVDL3",
+      "title": "Stochastic and Dynamic Routing Problems for Multiple Uninhabited Aerial Vehicles",
+      "doi": "10.2514/1.41616",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Liu19c",
+      "zotero_key": "C9VK3XL4",
+      "title": "Dynamic Scheduling of a Battery-Operated Queue",
+      "doi": "10.2139/ssrn.3542316",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Kal15",
+      "zotero_key": "6R8WDIJH",
+      "title": "Maximizing the Efficiency of a UAV on Perimeter Patrol",
+      "doi": "10.2514/6.2015-0854",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Kul20",
+      "zotero_key": "Y839EMBM",
+      "title": "Dynamic Ride-Hailing with Electric Vehicles",
+      "doi": "10.1287/trsc.2021.1042",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Tas96",
+      "zotero_key": "Z3EP6W58",
+      "title": "Adaptive Routing on the Plane",
+      "doi": "10.1287/opre.44.5.823",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Ulm20",
+      "zotero_key": "AYQUCL9R",
+      "title": "On modeling stochastic dynamic vehicle routing problems",
+      "doi": "10.1016/J.EJTL.2020.100008",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Pil13",
+      "zotero_key": "266799LK",
+      "title": "A review of dynamic vehicle routing problems",
+      "doi": "10.1016/j.ejor.2012.08.015",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Alk20",
+      "zotero_key": "IC692YT3",
+      "title": "Approximate dynamic programming for planning a ride-hailing system using autonomous fleets of electric vehicles",
+      "doi": "10.1016/j.ejor.2020.01.033",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Rit16",
+      "zotero_key": "PDQERISI",
+      "title": "A survey on dynamic and stochastic vehicle routing problems",
+      "doi": "10.1080/00207543.2015.1043403",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Ghi08",
+      "zotero_key": "3Q6KBHX2",
+      "title": "Waiting Strategies for the Dynamic and Stochastic Traveling Salesman Problem",
+      "doi": "",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Ulm15",
+      "zotero_key": "7D79NRFM",
+      "title": "? ? ? ? ? ? ? ? ? ? ? ? ? ? ?",
+      "doi": "",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Bas22",
+      "zotero_key": "C3XW4I7Z",
+      "title": "Dynamic stochastic electric vehicle routing with safe reinforcement learning",
+      "doi": "10.1016/j.tre.2021.102496",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Bli20",
+      "zotero_key": "3HJZEZ8V",
+      "title": "Power-Constrained Trajectory optimization for Wireless UAV Relays with Random Requests",
+      "doi": "10.1109/ICC40277.2020.9149029",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Ulm18c",
+      "zotero_key": "NNVTXNFG",
+      "title": "Anticipation versus reactive reoptimization for dynamic vehicle routing with stochastic requests",
+      "doi": "10.1002/net.21861",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Ben07",
+      "zotero_key": "65XQ5YHV",
+      "title": "Waiting and Relocation Strategies in Online Stochastic Vehicle Routing",
+      "doi": "",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Ulm17c",
+      "zotero_key": "9YU55LWA",
+      "title": "Budgeting Time for Dynamic Vehicle Routing with Stochastic Customer Requests",
+      "doi": "10.1287/trsc.2016.0719",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Tho04",
+      "zotero_key": "89KILNYT",
+      "title": "Anticipatory Route Selection",
+      "doi": "10.1287/trsc.1030.0071",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Bot23",
+      "zotero_key": "GDZC3UC5",
+      "title": "Optimizing Task Waiting Times in Dynamic Vehicle Routing",
+      "doi": "10.1109/LRA.2023.3295251",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Tur20",
+      "zotero_key": "UDV3IGJS",
+      "title": "Dynamic pricing and fleet management for electric autonomous mobility on demand systems",
+      "doi": "10.1016/j.trc.2020.102829",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Bli19",
+      "zotero_key": "HJ4WAZLR",
+      "title": "Online Trajectory Optimization for Rotary-Wing UAVs in Wireless Networks",
+      "doi": "",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Ni23",
+      "zotero_key": "IX7AGVFS",
+      "title": "Mobility and Energy Management in Electric Vehicle Based Mobility-on-Demand Systems: Models and Solutions",
+      "doi": "10.1109/TITS.2022.3231435",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Bra05",
+      "zotero_key": "M2H47MFG",
+      "title": "Waiting Strategies for Dynamic Vehicle Routing",
+      "doi": "10.1287/trsc.1040.0095",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Ber93",
+      "zotero_key": "UVZNR42R",
+      "title": "Stochastic and Dynamic Vehicle Routing in the Euclidean Plane with Multiple Capacitated Vehicles",
+      "doi": "10.1287/opre.41.1.60",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Bop20",
+      "zotero_key": "EL4DT3TP",
+      "title": "Dynamic Vehicle Routing in Presence of Random Recalls",
+      "doi": "10.1109/LCSYS.2019.2921514",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Hil22",
+      "zotero_key": "A93BPEMZ",
+      "title": "Opportunities for reinforcement learning in stochastic dynamic vehicle routing",
+      "doi": "10.1016/j.cor.2022.106071",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Psa80",
+      "zotero_key": "FPZLN8RU",
+      "title": "A Dynamic Programming Solution to the Single Vehicle Many-to-Many Immediate Request Dial-a-Ride Problem",
+      "doi": "10.1287/TRSC.14.2.130",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Ghi12",
+      "zotero_key": "F9GCE6AK",
+      "title": "A Comparison of Anticipatory Algorithms for the Dynamic and Stochastic Traveling Salesman Problem",
+      "doi": "10.1287/trsc.1110.0374",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Zha22",
+      "zotero_key": "TBYCUCRV",
+      "title": "Dynamic vehicle routing with random requests: A literature review",
+      "doi": "10.1016/j.ijpe.2022.108751",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Don22",
+      "zotero_key": "XAP2PUZV",
+      "title": "Dynamic Vehicle Allocation Policies for Shared Autonomous Electric Fleets",
+      "doi": "10.1287/trsc.2021.1115",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Psa16",
+      "zotero_key": "5DHIN583",
+      "title": "Dynamic vehicle routing problems: Three decades and counting",
+      "doi": "10.1002/net.21628",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Bra17",
+      "zotero_key": "V4QRREAQ",
+      "title": "Spatial Information in Offline Approximate Dynamic Programming for Dynamic Vehicle Routing with Stochastic Requests",
+      "doi": "",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Ulm18",
+      "zotero_key": "LF37KCBZ",
+      "title": "Value function approximation for dynamic multi-period vehicle routing",
+      "doi": "10.1016/J.EJOR.2018.02.038",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Say20",
+      "zotero_key": "PFBUQIL7",
+      "title": "Non-myopic dynamic routing of electric taxis with battery swapping stations",
+      "doi": "10.1016/j.scs.2020.102113",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Yu13",
+      "zotero_key": "47DTWGPJ",
+      "title": "Persistent monitoring of events with stochastic arrivals at multiple stations",
+      "doi": "10.1109/ICRA.2014.6907705",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Shi22",
+      "zotero_key": "TV7QBSLN",
+      "title": "Dynamic Order Fulfillment in Last-Mile Drone Delivery under Demand Uncertainty",
+      "doi": "",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Hil21",
+      "zotero_key": "4VYNHFDW",
+      "title": "Where the Action is: Let's make Reinforcement Learning for Stochastic Dynamic Vehicle Routing Problems work!",
+      "doi": "",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Sav06",
+      "zotero_key": "L46BWADX",
+      "title": "On the Dubins Traveling Salesperson Problems: novel approximation algorithms",
+      "doi": "",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Lu02",
+      "zotero_key": "249BVJNL",
+      "title": "AN ASYMPTOTICALLY OPTIMAL ALGORITHM FOR THE DYNAMIC TRAVELING REPAIR PROBLEM",
+      "doi": "",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Liu19",
+      "zotero_key": "7S68E8IE",
+      "title": "An optimization-driven dynamic vehicle routing algorithm for on-demand meal delivery using drones",
+      "doi": "10.1016/J.COR.2019.05.024",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Don20",
+      "zotero_key": "N6BLRMXV",
+      "title": "Dynamic Vehicle Allocation and Charging Policies for Autonomous Electric Vehicle Sharing Systems",
+      "doi": "10.2139/ssrn.3595407",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Kul21",
+      "zotero_key": "7YE7YM5G",
+      "title": "Electric Vehicle Routing with Public Charging Stations",
+      "doi": "10.1287/TRSC.2020.1018",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Ben04",
+      "zotero_key": "XVEQX5T3",
+      "title": "Scenario-Based Planning for Partially Dynamic Vehicle Routing with Stochastic Customers",
+      "doi": "10.1287/opre.1040.0124",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Ich06",
+      "zotero_key": "S9F5GZ86",
+      "title": "Exploiting Knowledge About Future Demands for Real-Time Vehicle Dispatching",
+      "doi": "10.1287/trsc.1050.0114",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Kul18",
+      "zotero_key": "653H6T6V",
+      "title": "Dynamic Electric Vehicle Routing: Heuristics and Dual Bounds",
+      "doi": "",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Tan20",
+      "zotero_key": "PYXWDGAN",
+      "title": "Online operations of automated electric taxi fleets: An advisor-student reinforcement learning framework",
+      "doi": "10.1016/j.trc.2020.102844",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Ma21",
+      "zotero_key": "S8IZ8KHI",
+      "title": "Survey of charging management and infrastructure planning for electrified demand-responsive transport systems: Methodologies and recent developments",
+      "doi": "10.1186/s12544-022-00560-3",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Goo16",
+      "zotero_key": "LYPKX2EU",
+      "title": "Restocking-Based Rollout Policies for the Vehicle Routing Problem with Stochastic Demand and Duration Limits",
+      "doi": "10.1287/trsc.2015.0591",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Wan21",
+      "zotero_key": "DJ9EIFHP",
+      "title": "Chase or Wait: Dynamic UAV Deployment to Learn and Catch Time-Varying User Activities",
+      "doi": "10.1109/TMC.2021.3107027",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Sta23",
+      "zotero_key": "R724DK8G",
+      "title": "Routing Problems with Electric and Autonomous Vehicles: Review and Potential for Future Research",
+      "doi": "10.1007/s43069-023-00228-1",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Swe17",
+      "zotero_key": "ZHLQFN5J",
+      "title": "Adaptive Routing and Recharging Policies for Electric Vehicles",
+      "doi": "10.1287/trsc.2016.0724",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Pet19b",
+      "zotero_key": "6PRKSFEI",
+      "title": "Increasing performance of electric vehicles in ride-hailing services using deep reinforcement learning",
+      "doi": "",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Har95",
+      "zotero_key": "X3RFFJCZ",
+      "title": "Polling, Greedy and Horizon Servers on a Circle",
+      "doi": "10.1287/opre.43.1.177",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Kla16",
+      "zotero_key": "L93VNLKD",
+      "title": "The One-Dimensional Dynamic Dispatch Waves Problem",
+      "doi": "10.1287/trsc.2016.0682",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Kim19",
+      "zotero_key": "94392F29",
+      "title": "On systems of UAVs for persistent security presence: A generic network representation, MDP formulation and heuristics for task allocation",
+      "doi": "10.1109/ICUAS.2019.8797863",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Ulm18b",
+      "zotero_key": "DJ2FT994",
+      "title": "Same‐day delivery with heterogeneous fleets of drones and vehicles",
+      "doi": "10.1002/net.21855",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "She19",
+      "zotero_key": "5C77YWYK",
+      "title": "Optimization models for electric vehicle service operations: A literature review",
+      "doi": "10.1016/J.TRB.2019.08.006",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Sun13",
+      "zotero_key": "PWU8GEG7",
+      "title": "Algorithms for Routing an Unmanned Aerial Vehicle in the Presence of Refueling Depots",
+      "doi": "10.1109/TASE.2013.2279544",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Hva06",
+      "zotero_key": "ILHWA3TN",
+      "title": "Solving a Dynamic and Stochastic Vehicle Routing Problem with a Sample Scenario Hedging Heuristic",
+      "doi": "10.1287/trsc.1060.0166",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Mar23",
+      "zotero_key": "QP8LHUPQ",
+      "title": "Review of Stochastic Dynamic Vehicle Routing in the Evolving Urban Logistics Environment",
+      "doi": "10.3390/math12010028",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Kes20",
+      "zotero_key": "I6R9IIXL",
+      "title": "MAESTRO-X: Distributed Orchestration of Rotary-Wing UAV-Relay Swarms",
+      "doi": "10.1109/TCCN.2023.3248859",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Son18",
+      "zotero_key": "D5YUSN5F",
+      "title": "Persistent UAV delivery logistics: MILP formulation and efficient heuristic",
+      "doi": "10.1016/J.CIE.2018.05.013",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Min93",
+      "zotero_key": "KLWXJQBQ",
+      "title": "A Markov Decision Model and Decomposition Heuristic for Dynamic Vehicle Dispatching",
+      "doi": "10.1287/OPRE.41.1.77",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Pil11",
+      "zotero_key": "BD5C62FQ",
+      "title": "Dynamic Vehicle Routing Problems: State of the art and Prospects",
+      "doi": "",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Kes22",
+      "zotero_key": "AYBHXREK",
+      "title": "Multiscale Adaptive Scheduling and Path-Planning for Power-Constrained UAV-Relays via SMDPs",
+      "doi": "10.1109/IEEECONF56349.2022.10051942",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Ulm14",
+      "zotero_key": "9PJ4THQ9",
+      "title": "Anticipation of Stochastic Customer Requests in Vehicle Routing : Value Function Approximation based on a Dynamic Lookup-Table",
+      "doi": "",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Gri18",
+      "zotero_key": "SDUWN6Q8",
+      "title": "Drone delivery systems: job assignment and dimensioning",
+      "doi": "10.1007/s10514-018-9768-8",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Pav10",
+      "zotero_key": "XJMBNEQN",
+      "title": "Dynamic Vehicle Routing for Robotic Networks",
+      "doi": "",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Hur22",
+      "zotero_key": "HJUAQRUY",
+      "title": "Optimization of Mobile Robotic Relay Operation for Minimal Average Wait Time",
+      "doi": "10.1109/TWC.2022.3220786",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Ang21",
+      "zotero_key": "8WK3DZE9",
+      "title": "A dynamic and probabilistic orienteering problem",
+      "doi": "10.1016/J.COR.2021.105454",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Goo13",
+      "zotero_key": "AU96QVFY",
+      "title": "Rollout Policies for Dynamic Solutions to the Multivehicle Routing Problem with Stochastic Demand and Duration Limits",
+      "doi": "10.1287/opre.1120.1127",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Tse17",
+      "zotero_key": "K4PMDNJ6",
+      "title": "Autonomous Recharging and Flight Mission Planning for Battery-operated Autonomous Drones",
+      "doi": "",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Ber89",
+      "zotero_key": "CI8APRUE",
+      "title": "The dynamic traveling repairman problem",
+      "doi": "",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Bop10",
+      "zotero_key": "UVHTRC33",
+      "title": "Dynamic Vehicle Routing for Translating Demands: Stability Analysis and Receding-Horizon Policies",
+      "doi": "10.1109/TAC.2010.2049278",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Lin26d",
+      "zotero_key": "4LWRFKCS",
+      "title": "On-Demand Service Zone Design for Energy-Constrained Spatial Queueing Systems",
+      "doi": "10.48550/arXiv.2606.26765",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Pav10c",
+      "zotero_key": "D59NCRK2",
+      "title": "Fundamental performance limits and efficient polices for Transportation-On-Demand systems",
+      "doi": "10.1109/CDC.2010.5717552",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Kim18",
+      "zotero_key": "KMY63CMK",
+      "title": "Learning Based Framework for Joint Task Allocation and System Design in Stochastic Multi-UAV Systems",
+      "doi": "10.1109/ICUAS.2018.8453318",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Tan22",
+      "zotero_key": "AUAQLYV5",
+      "title": "Fleet Management and Charging Scheduling for Shared Mobility-on-Demand System: A Systematic Review",
+      "doi": "10.1109/OAJPE.2022.3215865",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Enr05b",
+      "zotero_key": "8Z2DEAU9",
+      "title": "On Multiple UAV Routing with Stochastic Targets: Performance Bounds and Algorithms",
+      "doi": "10.2514/6.2005-5830",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Smi08",
+      "zotero_key": "MMVHA3EL",
+      "title": "Dynamic Traveling Repairperson with Priority Demands",
+      "doi": "",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Nic16",
+      "zotero_key": "LRH7H7UV",
+      "title": "Electric Vehicle Routing With Mid-route Recharging And Uncertain Charging Station Availability",
+      "doi": "",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Cha20",
+      "zotero_key": "LYXIMM2W",
+      "title": "Online Trajectory and Radio Resource Optimization of Cache-Enabled UAV Wireless Networks With Content and Energy Recharging",
+      "doi": "10.1109/TSP.2020.2971457",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Fra21",
+      "zotero_key": "EDNXEHBT",
+      "title": "A framework for integrated dispatching and charging management of an autonomous electric vehicle ride-hailing fleet",
+      "doi": "10.1016/J.TRD.2021.102822",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Zha18",
+      "zotero_key": "89BHKJ95",
+      "title": "Dynamic Orienteering on a Network of Queues",
+      "doi": "10.1287/trsc.2017.0761",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Sai15",
+      "zotero_key": "GG4FWM95",
+      "title": "A Multistage Stochastic Programming Approach to the Dynamic and Stochastic VRPTW",
+      "doi": "10.1007/978-3-319-18008-3_25",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Aha22",
+      "zotero_key": "VFEAS5GP",
+      "title": "Cooperative Learning for Smart Charging of Shared Autonomous Vehicle Fleets",
+      "doi": "10.1287/trsc.2022.1187",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Das21",
+      "zotero_key": "GBI5WHAX",
+      "title": "Off-line approximate dynamic programming for the vehicle routing problem with stochastic customers and demands via decentralized decision-making",
+      "doi": "",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Spi04",
+      "zotero_key": "VF9L8NYI",
+      "title": "The Dynamic Assignment Problem",
+      "doi": "10.1287/trsc.1030.0073",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "She20",
+      "zotero_key": "CUR4WBG6",
+      "title": "Operating policies in multi-warehouse drone delivery systems",
+      "doi": "10.1080/00207543.2020.1756509",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Ulm17",
+      "zotero_key": "HX36FY26",
+      "title": "Route-Based Markov Decision Processes for Dynamic Vehicle Routing Problems",
+      "doi": "",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Fue26",
+      "zotero_key": "BGKGPMC7",
+      "title": "Queues with Rechargeable Servers",
+      "doi": "",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Aks16",
+      "zotero_key": "YHL8XHIN",
+      "title": "Dynamic routing of energy-aware vehicles with Temporal Logic Constraints",
+      "doi": "10.1109/ICRA.2016.7487481",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Yu21",
+      "zotero_key": "GKX3XA47",
+      "title": "Dynamic Optimal Approach for an Electric Taxi Fleet's Charging and Order-service Schemes",
+      "doi": "",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Nie03",
+      "zotero_key": "P5GXYX85",
+      "title": "Dynamic vehicle routing with stochastic requests",
+      "doi": "",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Das21b",
+      "zotero_key": "MYCUQJHB",
+      "title": "Off-line approximate dynamic programming for the vehicle routing problem with a highly variable customer basis and stochastic demands",
+      "doi": "10.2139/ssrn.4251159",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Asa21b",
+      "zotero_key": "9W5CX68T",
+      "title": "A Monotone Approximate Dynamic Programming Approach for the Stochastic Scheduling, Allocation, and Inventory Replenishment Problem: Applications to Drone and Electric Vehicle Battery Swap Stations",
+      "doi": "10.1287/trsc.2021.1108",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Wei23",
+      "zotero_key": "QD9E4RM8",
+      "title": "Dynamic Routing in Stochastic Urban Air Mobility Networks: A Markov Decision Process Approach",
+      "doi": "10.48550/arXiv.2305.07110",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Bi19",
+      "zotero_key": "NXJI6KZE",
+      "title": "Logistical Planning for Electric Vehicles Under Time-Dependent Stochastic Traffic",
+      "doi": "10.1109/TITS.2018.2883791",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Jai06",
+      "zotero_key": "45KY7UBW",
+      "title": "Online Routing Problems: Value of Advanced Information as Improved Competitive Ratios",
+      "doi": "10.1287/trsc.1060.0147",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Ulm13",
+      "zotero_key": "G8XZBKC5",
+      "title": "Modeling Customers in the Euclidean Plane for Routing Applications",
+      "doi": "",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Mis24b",
+      "zotero_key": "QG9WD6EV",
+      "title": "Deep Reinforcement Learning-Based Approach for a Single Vehicle Persistent Surveillance Problem with Fuel Constraints",
+      "doi": "10.48550/arXiv.2404.06423",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Liu23c",
+      "zotero_key": "RCUU36QL",
+      "title": "Routing battery-constrained delivery drones in a depot network: A business model and its optimization–simulation assessment",
+      "doi": "10.1016/j.trc.2023.104147",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Rei15",
+      "zotero_key": "WD8CDNCX",
+      "title": "Heavy Traffic Analysis of the Dynamic Stochastic Inventory-Routing Problem",
+      "doi": "10.1287/trsc.33.4.361",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Pav09b",
+      "zotero_key": "ZC73UZE5",
+      "title": "A Stochastic and Dynamic Vehicle Routing Problem with Time Windows and Customer Impatience",
+      "doi": "10.1007/s11036-008-0101-1",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Alk18",
+      "zotero_key": "NRWY9239",
+      "title": "Approximate Dynamic Programming for Planning a Ride-Sharing System using Autonomous Fleets of Electric Vehicles",
+      "doi": "",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Men17",
+      "zotero_key": "U7HG99KU",
+      "title": "Electric vehicle routing: state of the art and perspectives",
+      "doi": "",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Arc20",
+      "zotero_key": "MKDKVCFT",
+      "title": "Dynamic traveling salesman problem with stochastic release dates",
+      "doi": "10.1016/J.EJOR.2019.07.062",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Mat19",
+      "zotero_key": "HD4QGGN9",
+      "title": "Probabilistic Analysis of UAV Routing with Dynamically Arriving Targets",
+      "doi": "10.23919/fusion43075.2019.9011225",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Li23b",
+      "zotero_key": "CQYKUDNR",
+      "title": "Robust Service and Charging Plan for Dynamic Electric Demand-Responsive Transit Systems",
+      "doi": "10.1109/TITS.2023.3321745",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Ulm21",
+      "zotero_key": "L3I2BKB6",
+      "title": "The Restaurant Meal Delivery Problem: Dynamic Pickup and Delivery with Deadlines and Random Ready Times",
+      "doi": "10.1287/trsc.2020.1000",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Ulm16",
+      "zotero_key": "BM9DZ58Z",
+      "title": "Value Function Approximation-Based Limited Horizon Rollout Algorithms for Dynamic Multi-Period Routing",
+      "doi": "",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Dim17",
+      "zotero_key": "ETVK6LTL",
+      "title": "The Robot Routing Problem for Collecting Aggregate Stochastic Rewards",
+      "doi": "10.4230/LIPIcs.CONCUR.2017.13",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Tor14",
+      "zotero_key": "M5A524B9",
+      "title": "A Dynamic Traveling Salesman Problem with Stochastic Arc Costs",
+      "doi": "10.1287/opre.2014.1301",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Ulm15b",
+      "zotero_key": "XCP6LS6P",
+      "title": "Anticipatory Optimization for a Dynamic Multi-Period Routing Problem with Stochastic Customer Requests",
+      "doi": "",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Zal21",
+      "zotero_key": "6B4XVP4N",
+      "title": "Real Time Operation of High-Capacity Electric Vehicle Ridesharing Fleets",
+      "doi": "10.1016/j.trc.2021.103413",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Una22",
+      "zotero_key": "N44M4XTD",
+      "title": "Dynamic routing optimization with electric vehicles under stochastic battery depletion",
+      "doi": "10.1080/19427867.2022.2157365",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Ber96",
+      "zotero_key": "AIQKFV37",
+      "title": "A New Generation of Vehicle Routing Research: Robust Algorithms, Addressing Uncertainty",
+      "doi": "10.1287/OPRE.44.2.286",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Liu24e",
+      "zotero_key": "HKPPJSMG",
+      "title": "Optimal Charging Scheduling and Speed Control for Delay-Bounded Drone Delivery",
+      "doi": "10.1109/TVT.2024.3405022",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Soe16",
+      "zotero_key": "QN2CQINL",
+      "title": "Problem-Specific State Space Partitioning for Dynamic Vehicle Routing Problems",
+      "doi": "",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Yu19",
+      "zotero_key": "GM8CKCFB",
+      "title": "A Markov decision process approach to vacant taxi routing with e-hailing",
+      "doi": "10.1016/J.TRB.2018.12.013",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Pow12",
+      "zotero_key": "6CXKMA67",
+      "title": "Approximate dynamic programming in transportation and logistics: a unified framework",
+      "doi": "10.1007/s13676-012-0015-8",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Xu94",
+      "zotero_key": "VMN35HNC",
+      "title": "Optimal policies for stochastic and dynamic vehicle routing problems",
+      "doi": "",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Ni22",
+      "zotero_key": "ZRECKNL9",
+      "title": "Dynamic Pricing Mechanism Design for Electric Mobility-on-Demand Systems",
+      "doi": "10.1109/tits.2021.3103199",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Mer25",
+      "zotero_key": "2XXPEFFD",
+      "title": "Exhaustive-Serve-Longest Control for Multi-robot Scheduling Systems",
+      "doi": "10.48550/arXiv.2509.25556",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Asa20",
+      "zotero_key": "VYBRNTEE",
+      "title": "Persistent Aerial Monitoring under Unknown Stochastic Dynamics in Pick-up and Delivery Missions",
+      "doi": "10.2514/6.2021-1125",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Nas24",
+      "zotero_key": "4E79IRQZ",
+      "title": "Fault Tolerant Dynamic Task Assignment for UAV-based Search Teams",
+      "doi": "10.48550/arXiv.2408.10564",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Ira02",
+      "zotero_key": "NL8QMZSJ",
+      "title": "On-Line Algorithms for the Dynamic Traveling Repair Problem",
+      "doi": "10.1023/B:JOSH.0000019683.85186.57",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Cho16",
+      "zotero_key": "FCASUHEA",
+      "title": "Dynamic UAV-based traffic monitoring under uncertainty as a stochastic arc-inventory routing policy",
+      "doi": "10.1016/j.ijtst.2016.11.002",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Li23",
+      "zotero_key": "PC6SFQYF",
+      "title": "Joint Trajectory Planning, Application Placement, and Energy Renewal for UAV-Assisted MEC: A Triple-Learner-Based Approach",
+      "doi": "10.1109/JIOT.2023.3262687",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Hun21",
+      "zotero_key": "S82FQIBZ",
+      "title": "Optimal routing for electric vehicle charging systems with stochastic demand: A heavy traffic approximation approach",
+      "doi": "10.1016/J.EJOR.2021.06.058",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Mat15",
+      "zotero_key": "W4Q8UL3Q",
+      "title": "Multirobot Rendezvous Planning for Recharging in Persistent Tasks",
+      "doi": "10.1109/TRO.2014.2380593",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Son14",
+      "zotero_key": "T33YWCE2",
+      "title": "Towards real time scheduling for persistent UAV service: A rolling horizon MILP approach, RHTA and the STAH heuristic",
+      "doi": "10.1109/ICUAS.2014.6842292",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Ko25",
+      "zotero_key": "FY3UFU27",
+      "title": "On-Demand Urban Air Mobility Scheduling with Operational Considerations",
+      "doi": "10.2514/1.i011460",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Mei11",
+      "zotero_key": "XB3D8N8X",
+      "title": "Anticipatory Routing of a Service Vehicle",
+      "doi": "10.1007/978-1-4614-0505-4_7",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Say21",
+      "zotero_key": "KCSFWXEU",
+      "title": "Dynamic Inventory Routing and Pricing Problem with a Mixed Fleet of Electric and Conventional Urban Freight Vehicles",
+      "doi": "10.3390/SU13126703",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Enr09b",
+      "zotero_key": "LLWVL7G3",
+      "title": "Stochastic and Dynamic Routing Problems for Multiple UAVs",
+      "doi": "",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Alb25",
+      "zotero_key": "2RJKY4MM",
+      "title": "Optimizing UAV Task Allocation with Enhanced Battery Efficiency Using Semi-Markov Decision Processes",
+      "doi": "10.1007/s10846-025-02285-6",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Bli19b",
+      "zotero_key": "5M32J9GD",
+      "title": "Trajectory Optimization for Rotary-Wing UAVs in Wireless Networks with Random Requests",
+      "doi": "10.1109/GLOBECOM38437.2019.9013307",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Vu21",
+      "zotero_key": "N52IEVLF",
+      "title": "Optimal Recharging of Teams of Mobile Robots",
+      "doi": "10.1109/RTCSA52859.2021.00028",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Pav10b",
+      "zotero_key": "PWUCPJNG",
+      "title": "Dynamic vehicle routing with stochastic time constraints",
+      "doi": "10.1109/ROBOT.2010.5509222",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Bli20b",
+      "zotero_key": "S8B8H3RJ",
+      "title": "Adaptive Scheduling and Trajectory Design for Power-Constrained Wireless UAV Relays",
+      "doi": "",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Pei25",
+      "zotero_key": "RPUD8GNU",
+      "title": "A Branch-and-Price Algorithm for the Urban Aerial Delivery Problem With Energy Constraints",
+      "doi": "10.1109/TASE.2025.3553200",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Ikl22",
+      "zotero_key": "3YF6YMPL",
+      "title": "A Rolling Horizon Approach for the Dynamic Scheduling of Flying Taxis",
+      "doi": "10.5220/0011376500003332",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Han25b",
+      "zotero_key": "H6QUHU2K",
+      "title": "Dynamic UAV Task Allocation and Path Planning with Energy Management Using Adaptive PSO in Rolling Horizon Framework",
+      "doi": "10.3390/app15084220",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Kle20",
+      "zotero_key": "JJSBLSAG",
+      "title": "Rolling-Horizon Electric Vertical Takeoff and Landing Arrival Scheduling for On-Demand Urban Air Mobility",
+      "doi": "10.2514/1.i010776",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Men18",
+      "zotero_key": "JPJ8ICDN",
+      "title": "Multi-Agent Coverage Control with Energy Depletion and Repletion",
+      "doi": "10.1109/CDC.2018.8619594",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Zha13b",
+      "zotero_key": "XATU7DC7",
+      "title": "Single vehicle routing with stochastic demands : approximate dynamic programming",
+      "doi": "",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Alb24",
+      "zotero_key": "9PL8TA6D",
+      "title": "Enhancing Battery Efficiency Through Semi-Markov Decision Processes in Task Allocation for UAVs",
+      "doi": "10.1109/ICUAS60882.2024.10556988",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Ulm19b",
+      "zotero_key": "LQ2MJTMR",
+      "title": "Modeling Dynamic Vehicle Routing Problems : A Literature Review and Framework",
+      "doi": "",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Ulm19c",
+      "zotero_key": "WZHTSFPV",
+      "title": "On Modeling Dynamic Vehicle Routing Problems",
+      "doi": "",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Tur19",
+      "zotero_key": "I6U6C427",
+      "title": "Dynamic Pricing and Management for Electric Autonomous Mobility on Demand Systems Using Reinforcement Learning",
+      "doi": "",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Hu25d",
+      "zotero_key": "BGDF7YU7",
+      "title": "Optimizing autonomous electric taxi operations with integrated mobile charging services: An approximate dynamic programming approach",
+      "doi": "10.1016/j.apenergy.2024.124823",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Yu23b",
+      "zotero_key": "UWIHH3XF",
+      "title": "Coordinating matching, rebalancing and charging of electric ride-hailing fleet under hybrid requests",
+      "doi": "10.1016/j.trd.2023.103903",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Pav07b",
+      "zotero_key": "DRYS6RJH",
+      "title": "Decentralized algorithms for stochastic and dynamic vehicle routing with general demand distribution",
+      "doi": "10.1109/CDC.2007.4434989",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Wu23c",
+      "zotero_key": "J4ARIHDN",
+      "title": "Real-time vehicle relocation and staff rebalancing problem for electric and shared vehicle systems",
+      "doi": "10.1080/00207543.2023.2295484",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Pav07",
+      "zotero_key": "DWEG5D7J",
+      "title": "Decentralized vehicle routing in a stochastic and dynamic environment with customer impatience",
+      "doi": "10.4108/ICST.ROBOCOMM2007.2220",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Tal25",
+      "zotero_key": "P8L3JF79",
+      "title": "Ready, Bid, Go! On-Demand Delivery Using Fleets of Drones with Unknown, Heterogeneous Energy Storage Constraints",
+      "doi": "10.48550/arXiv.2504.08585",
+      "pdf_status": "downloaded"
+    },
+    {
+      "cite_key": "Vas25",
+      "zotero_key": "SH8834QX",
+      "title": "Optimal On-the-Fly Route Planning With Rich Transportation Requests",
+      "doi": "10.1109/TRO.2025.3577010",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Xia24b",
+      "zotero_key": "RQGW5FBE",
+      "title": "Delivery routing for electric vehicles with en-route mobile battery swapping",
+      "doi": "10.1016/j.tre.2024.103838",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Fut23",
+      "zotero_key": "SAPZUU82",
+      "title": "An online decision-making strategy for routing of electric vehicle fleets",
+      "doi": "10.2139/ssrn.4087063",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Sec00",
+      "zotero_key": "9P3YN9MC",
+      "title": "Comparing neuro-dynamic programming algorithms for the vehicle routing problem with stochastic demands",
+      "doi": "10.1016/S0305-0548(99)00146-X",
+      "pdf_status": "unavailable"
+    },
+    {
+      "cite_key": "Har19",
+      "zotero_key": "HDF4PUB7",
+      "title": "Efficient Computation of Optimal UAV Routes for Persistent Monitoring of Targets",
+      "doi": "10.1109/ICUAS.2019.8798167",
+      "pdf_status": "unavailable"
+    }
+  ]
+}

@@ -1,0 +1,1237 @@
+{
+  "date": "2026-09-22",
+  "collection": "英文文献",
+  "undermind_available": 96,
+  "undermind_new_downloads": 47,
+  "new_attachments_this_resume": 25,
+  "deduplicated_this_resume": 22,
+  "retained_papers": 99,
+  "verified_pdf_attachments": 101,
+  "trashed_papers": 71,
+  "permanently_deleted": 0,
+  "uploads": [
+    {
+      "cite_key": "Liu22c",
+      "path": "/tmp/undermind_zotero_import/undermind_new/Liu22c.pdf",
+      "md5": "e2fb8c477e09b190b48725371c039c12",
+      "status": "uploaded",
+      "attachment_key": "C5GISES2"
+    },
+    {
+      "cite_key": "Enr05",
+      "path": "/tmp/undermind_zotero_import/undermind_new/Enr05.pdf",
+      "md5": "f1f78bd211140b7754b3839e47aa781f",
+      "status": "uploaded",
+      "attachment_key": "JX9MB2GN"
+    },
+    {
+      "cite_key": "Enr09",
+      "path": "/tmp/undermind_zotero_import/undermind_new/Enr09.pdf",
+      "md5": "9201f519137cbf34c2b7a3f8c6c9e241",
+      "status": "uploaded",
+      "attachment_key": "5CPY7UJD"
+    },
+    {
+      "cite_key": "Alk20",
+      "path": "/tmp/undermind_zotero_import/undermind_new/Alk20.pdf",
+      "md5": "c1c10a11a4fa18df5c8014579bb18ecd",
+      "status": "existing_identical",
+      "attachment_key": "8ABFDJJV"
+    },
+    {
+      "cite_key": "Ulm18c",
+      "path": "/tmp/undermind_zotero_import/undermind_new/Ulm18c.pdf",
+      "md5": "7334841669338d6a9e2657f562158efd",
+      "status": "uploaded",
+      "attachment_key": "GUEIGZR7"
+    },
+    {
+      "cite_key": "Ni23",
+      "path": "/tmp/undermind_zotero_import/undermind_new/Ni23.pdf",
+      "md5": "3e1c8d43b218e5a09ac3dc82ffcc8fdc",
+      "status": "uploaded",
+      "attachment_key": "YK7FVM8L"
+    },
+    {
+      "cite_key": "Hil22",
+      "path": "/tmp/undermind_zotero_import/undermind_new/Hil22.pdf",
+      "md5": "dbd9d650d820a3d96f7f0b2f4c95d358",
+      "status": "existing_identical",
+      "attachment_key": "FD2TNZEN"
+    },
+    {
+      "cite_key": "Zha22",
+      "path": "/tmp/undermind_zotero_import/undermind_new/Zha22.pdf",
+      "md5": "4876a510c2c1281c7aa7902efc30ad0c",
+      "status": "existing_identical",
+      "attachment_key": "AJVMV7L8"
+    },
+    {
+      "cite_key": "Psa16",
+      "path": "/tmp/undermind_zotero_import/undermind_new/Psa16.pdf",
+      "md5": "cd4ecef0036846581157d365ab86068e",
+      "status": "uploaded",
+      "attachment_key": "Q9NHIDLK"
+    },
+    {
+      "cite_key": "Ulm18",
+      "path": "/tmp/undermind_zotero_import/undermind_new/Ulm18.pdf",
+      "md5": "d89774754805248bf649463089db7576",
+      "status": "existing_identical",
+      "attachment_key": "H9JEUEMP"
+    },
+    {
+      "cite_key": "Liu19",
+      "path": "/tmp/undermind_zotero_import/undermind_new/Liu19.pdf",
+      "md5": "b609ac2da540111ce03782233aa2302f",
+      "status": "existing_identical",
+      "attachment_key": "EXZKH7H7"
+    },
+    {
+      "cite_key": "Tan20",
+      "path": "/tmp/undermind_zotero_import/undermind_new/Tan20.pdf",
+      "md5": "aebd8846111678d7d03ca33b3106955a",
+      "status": "existing_identical",
+      "attachment_key": "49MBDUTD"
+    },
+    {
+      "cite_key": "Wan21",
+      "path": "/tmp/undermind_zotero_import/undermind_new/Wan21.pdf",
+      "md5": "bd6b325d0d6b8e6bd46270b5d7c4aaaf",
+      "status": "existing_identical",
+      "attachment_key": "KAA86MDH"
+    },
+    {
+      "cite_key": "Kim19",
+      "path": "/tmp/undermind_zotero_import/undermind_new/Kim19.pdf",
+      "md5": "7e72c253ed992db37f46d9f78dfe2634",
+      "status": "uploaded",
+      "attachment_key": "DDF4KMWP"
+    },
+    {
+      "cite_key": "She19",
+      "path": "/tmp/undermind_zotero_import/undermind_new/She19.pdf",
+      "md5": "723efd3e6eea5c33af7900137e59d004",
+      "status": "existing_identical",
+      "attachment_key": "KUTAKR6D"
+    },
+    {
+      "cite_key": "Son18",
+      "path": "/tmp/undermind_zotero_import/undermind_new/Son18.pdf",
+      "md5": "5c540ce9447d64725bc287e9820d9f48",
+      "status": "existing_identical",
+      "attachment_key": "S7RVZ6H4"
+    },
+    {
+      "cite_key": "Pil11",
+      "path": "/tmp/undermind_zotero_import/undermind_new/Pil11.pdf",
+      "md5": "f42ae7b2d5039311bd3286f6090e4c3d",
+      "status": "uploaded",
+      "attachment_key": "ED7SSEW3"
+    },
+    {
+      "cite_key": "Ber89",
+      "path": "/tmp/undermind_zotero_import/undermind_new/Ber89.pdf",
+      "md5": "98b8c4c3b74436493c9746634b981890",
+      "status": "uploaded",
+      "attachment_key": "U58D5NCU"
+    },
+    {
+      "cite_key": "Kim18",
+      "path": "/tmp/undermind_zotero_import/undermind_new/Kim18.pdf",
+      "md5": "0a58b34a33874d0ee981a563c961563a",
+      "status": "uploaded",
+      "attachment_key": "JKVNSTBT"
+    },
+    {
+      "cite_key": "Smi08",
+      "path": "/tmp/undermind_zotero_import/undermind_new/Smi08.pdf",
+      "md5": "4b21fe7671fda69f6f265c28e51ee50b",
+      "status": "existing_identical",
+      "attachment_key": "T2QCB53U"
+    },
+    {
+      "cite_key": "Cha20",
+      "path": "/tmp/undermind_zotero_import/undermind_new/Cha20.pdf",
+      "md5": "8e518bc7191173502a042ff2f7cfdc51",
+      "status": "uploaded",
+      "attachment_key": "R45C39Y6"
+    },
+    {
+      "cite_key": "Aks16",
+      "path": "/tmp/undermind_zotero_import/undermind_new/Aks16.pdf",
+      "md5": "a4410038e740db3544fa87fc57f234bd",
+      "status": "uploaded",
+      "attachment_key": "N6UTQ7NW"
+    },
+    {
+      "cite_key": "Yu21",
+      "path": "/tmp/undermind_zotero_import/undermind_new/Yu21.pdf",
+      "md5": "b345e72cc3b3e5e2fbce8e2a6c712d99",
+      "status": "uploaded",
+      "attachment_key": "CQDEUNFJ"
+    },
+    {
+      "cite_key": "Bi19",
+      "path": "/tmp/undermind_zotero_import/undermind_new/Bi19.pdf",
+      "md5": "c2824cfc5531e2b0059b87d503430d10",
+      "status": "uploaded",
+      "attachment_key": "UJG46NWA"
+    },
+    {
+      "cite_key": "Arc20",
+      "path": "/tmp/undermind_zotero_import/undermind_new/Arc20.pdf",
+      "md5": "7d752f16765e006bbdfeb089a60f68aa",
+      "status": "existing_identical",
+      "attachment_key": "KNMJ4LDX"
+    },
+    {
+      "cite_key": "Mat19",
+      "path": "/tmp/undermind_zotero_import/undermind_new/Mat19.pdf",
+      "md5": "a4d3274139df1cbdae0dc7fe129dea96",
+      "status": "uploaded",
+      "attachment_key": "FVTCVJDL"
+    },
+    {
+      "cite_key": "Li23b",
+      "path": "/tmp/undermind_zotero_import/undermind_new/Li23b.pdf",
+      "md5": "c9397a63cfe8b83ae8f8cc860fce0d59",
+      "status": "uploaded",
+      "attachment_key": "BMPNUAFB"
+    },
+    {
+      "cite_key": "Una22",
+      "path": "/tmp/undermind_zotero_import/undermind_new/Una22.pdf",
+      "md5": "ab1b762435c3602073254413ac6fb6b1",
+      "status": "existing_identical",
+      "attachment_key": "PCPBVZY8"
+    },
+    {
+      "cite_key": "Liu24e",
+      "path": "/tmp/undermind_zotero_import/undermind_new/Liu24e.pdf",
+      "md5": "9bae435c93e6743a8a113cbe67e87e6c",
+      "status": "uploaded",
+      "attachment_key": "5R56DX38"
+    },
+    {
+      "cite_key": "Yu19",
+      "path": "/tmp/undermind_zotero_import/undermind_new/Yu19.pdf",
+      "md5": "d9992d04fdaf91114f5af25d2678e312",
+      "status": "existing_identical",
+      "attachment_key": "AVUPJ98J"
+    },
+    {
+      "cite_key": "Ni22",
+      "path": "/tmp/undermind_zotero_import/undermind_new/Ni22.pdf",
+      "md5": "5756d2b05df346c573d93fb196def116",
+      "status": "existing_identical",
+      "attachment_key": "EVP6UMSF"
+    },
+    {
+      "cite_key": "Ira02",
+      "path": "/tmp/undermind_zotero_import/undermind_new/Ira02.pdf",
+      "md5": "98965ad71703ac4d34b654bbda11b924",
+      "status": "existing_identical",
+      "attachment_key": "K2NCX2FC"
+    },
+    {
+      "cite_key": "Li23",
+      "path": "/tmp/undermind_zotero_import/undermind_new/Li23.pdf",
+      "md5": "bdddfabc70c771bddb2fa22291748ab9",
+      "status": "uploaded",
+      "attachment_key": "ZDBFZ89H"
+    },
+    {
+      "cite_key": "Hun21",
+      "path": "/tmp/undermind_zotero_import/undermind_new/Hun21.pdf",
+      "md5": "30f8e66c343ec7e6e64fe4bf9bd16ca7",
+      "status": "existing_identical",
+      "attachment_key": "YTQPIP7B"
+    },
+    {
+      "cite_key": "Mat15",
+      "path": "/tmp/undermind_zotero_import/undermind_new/Mat15.pdf",
+      "md5": "707c8a8250e6e0f0a400407148519fa0",
+      "status": "uploaded",
+      "attachment_key": "N4JB6NSK"
+    },
+    {
+      "cite_key": "Son14",
+      "path": "/tmp/undermind_zotero_import/undermind_new/Son14.pdf",
+      "md5": "f418743505e1a184e4f8ec237601fce7",
+      "status": "uploaded",
+      "attachment_key": "CE38FJQE"
+    },
+    {
+      "cite_key": "Vu21",
+      "path": "/tmp/undermind_zotero_import/undermind_new/Vu21.pdf",
+      "md5": "3dd19600b977c0e72aea130dfeacb6cf",
+      "status": "uploaded",
+      "attachment_key": "LVQAIZD2"
+    },
+    {
+      "cite_key": "Pei25",
+      "path": "/tmp/undermind_zotero_import/undermind_new/Pei25.pdf",
+      "md5": "5ae4e69e3a555ba6a687e45b742f85b4",
+      "status": "existing_identical",
+      "attachment_key": "R5QVI9LW"
+    },
+    {
+      "cite_key": "Zha13b",
+      "path": "/tmp/undermind_zotero_import/undermind_new/Zha13b.pdf",
+      "md5": "f9535ba460b96aafc805a9955194d38c",
+      "status": "existing_identical",
+      "attachment_key": "PMP5QHHI"
+    },
+    {
+      "cite_key": "Alb24",
+      "path": "/tmp/undermind_zotero_import/undermind_new/Alb24.pdf",
+      "md5": "dc385dea7a9278a725dcd10f10ada969",
+      "status": "uploaded",
+      "attachment_key": "488P853I"
+    },
+    {
+      "cite_key": "Hu25d",
+      "path": "/tmp/undermind_zotero_import/undermind_new/Hu25d.pdf",
+      "md5": "893d4951298044882916d579e01edb4b",
+      "status": "existing_identical",
+      "attachment_key": "7XA9BL5W"
+    },
+    {
+      "cite_key": "Yu23b",
+      "path": "/tmp/undermind_zotero_import/undermind_new/Yu23b.pdf",
+      "md5": "0cba248f75625f45e108f68b078d66b4",
+      "status": "existing_identical",
+      "attachment_key": "97VBRJJI"
+    },
+    {
+      "cite_key": "Pav07b",
+      "path": "/tmp/undermind_zotero_import/undermind_new/Pav07b.pdf",
+      "md5": "7203747780e82b9868b85594ad0bd8da",
+      "status": "existing_identical",
+      "attachment_key": "KS85UXAM"
+    },
+    {
+      "cite_key": "Wu23c",
+      "path": "/tmp/undermind_zotero_import/undermind_new/Wu23c.pdf",
+      "md5": "d109dd1b3141a1033d034c984995bda5",
+      "status": "uploaded",
+      "attachment_key": "Q84A4ED9"
+    },
+    {
+      "cite_key": "Vas25",
+      "path": "/tmp/undermind_zotero_import/undermind_new/Vas25.pdf",
+      "md5": "77ceda4b7e1a858e4cb4349c86d6c0fc",
+      "status": "uploaded",
+      "attachment_key": "KK3GXWIR"
+    },
+    {
+      "cite_key": "Xia24b",
+      "path": "/tmp/undermind_zotero_import/undermind_new/Xia24b.pdf",
+      "md5": "62227a35dd1bf4e67731f943dbad30d5",
+      "status": "existing_identical",
+      "attachment_key": "Y4LZNTMU"
+    },
+    {
+      "cite_key": "Fut23",
+      "path": "/tmp/undermind_zotero_import/undermind_new/Fut23.pdf",
+      "md5": "420ecb63ced7fb00bc1e99148d4ab8b8",
+      "status": "uploaded",
+      "attachment_key": "UM9I3DJE"
+    }
+  ],
+  "trashed": [
+    {
+      "key": "9P3YN9MC",
+      "title": "Comparing neuro-dynamic programming algorithms for the vehicle routing problem with stochastic demands"
+    },
+    {
+      "key": "HDF4PUB7",
+      "title": "Efficient Computation of Optimal UAV Routes for Persistent Monitoring of Targets"
+    },
+    {
+      "key": "LQ2MJTMR",
+      "title": "Modeling Dynamic Vehicle Routing Problems : A Literature Review and Framework"
+    },
+    {
+      "key": "WZHTSFPV",
+      "title": "On Modeling Dynamic Vehicle Routing Problems"
+    },
+    {
+      "key": "H6QUHU2K",
+      "title": "Dynamic UAV Task Allocation and Path Planning with Energy Management Using Adaptive PSO in Rolling Horizon Framework"
+    },
+    {
+      "key": "KCSFWXEU",
+      "title": "Dynamic Inventory Routing and Pricing Problem with a Mixed Fleet of Electric and Conventional Urban Freight Vehicles"
+    },
+    {
+      "key": "PWUCPJNG",
+      "title": "Dynamic vehicle routing with stochastic time constraints"
+    },
+    {
+      "key": "S8B8H3RJ",
+      "title": "Adaptive Scheduling and Trajectory Design for Power-Constrained Wireless UAV Relays"
+    },
+    {
+      "key": "3YF6YMPL",
+      "title": "A Rolling Horizon Approach for the Dynamic Scheduling of Flying Taxis"
+    },
+    {
+      "key": "VYBRNTEE",
+      "title": "Persistent Aerial Monitoring under Unknown Stochastic Dynamics in Pick-up and Delivery Missions"
+    },
+    {
+      "key": "FY3UFU27",
+      "title": "On-Demand Urban Air Mobility Scheduling with Operational Considerations"
+    },
+    {
+      "key": "BM9DZ58Z",
+      "title": "Value Function Approximation-Based Limited Horizon Rollout Algorithms for Dynamic Multi-Period Routing"
+    },
+    {
+      "key": "XCP6LS6P",
+      "title": "Anticipatory Optimization for a Dynamic Multi-Period Routing Problem with Stochastic Customer Requests"
+    },
+    {
+      "key": "AIQKFV37",
+      "title": "A New Generation of Vehicle Routing Research: Robust Algorithms, Addressing Uncertainty"
+    },
+    {
+      "key": "QN2CQINL",
+      "title": "Problem-Specific State Space Partitioning for Dynamic Vehicle Routing Problems"
+    },
+    {
+      "key": "VMN35HNC",
+      "title": "Optimal policies for stochastic and dynamic vehicle routing problems"
+    },
+    {
+      "key": "45KY7UBW",
+      "title": "Online Routing Problems: Value of Advanced Information as Improved Competitive Ratios"
+    },
+    {
+      "key": "G8XZBKC5",
+      "title": "Modeling Customers in the Euclidean Plane for Routing Applications"
+    },
+    {
+      "key": "RCUU36QL",
+      "title": "Routing battery-constrained delivery drones in a depot network: A business model and its optimization–simulation assessment"
+    },
+    {
+      "key": "WD8CDNCX",
+      "title": "Heavy Traffic Analysis of the Dynamic Stochastic Inventory-Routing Problem"
+    },
+    {
+      "key": "ZC73UZE5",
+      "title": "A Stochastic and Dynamic Vehicle Routing Problem with Time Windows and Customer Impatience"
+    },
+    {
+      "key": "U7HG99KU",
+      "title": "Electric vehicle routing: state of the art and perspectives"
+    },
+    {
+      "key": "L3I2BKB6",
+      "title": "The Restaurant Meal Delivery Problem: Dynamic Pickup and Delivery with Deadlines and Random Ready Times"
+    },
+    {
+      "key": "VF9L8NYI",
+      "title": "The Dynamic Assignment Problem"
+    },
+    {
+      "key": "CUR4WBG6",
+      "title": "Operating policies in multi-warehouse drone delivery systems"
+    },
+    {
+      "key": "HX36FY26",
+      "title": "Route-Based Markov Decision Processes for Dynamic Vehicle Routing Problems"
+    },
+    {
+      "key": "P5GXYX85",
+      "title": "Dynamic vehicle routing with stochastic requests"
+    },
+    {
+      "key": "LRH7H7UV",
+      "title": "Electric Vehicle Routing With Mid-route Recharging And Uncertain Charging Station Availability"
+    },
+    {
+      "key": "EDNXEHBT",
+      "title": "A framework for integrated dispatching and charging management of an autonomous electric vehicle ride-hailing fleet"
+    },
+    {
+      "key": "89BHKJ95",
+      "title": "Dynamic Orienteering on a Network of Queues"
+    },
+    {
+      "key": "VFEAS5GP",
+      "title": "Cooperative Learning for Smart Charging of Shared Autonomous Vehicle Fleets"
+    },
+    {
+      "key": "GBI5WHAX",
+      "title": "Off-line approximate dynamic programming for the vehicle routing problem with stochastic customers and demands via decentralized decision-making"
+    },
+    {
+      "key": "8WK3DZE9",
+      "title": "A dynamic and probabilistic orienteering problem"
+    },
+    {
+      "key": "AU96QVFY",
+      "title": "Rollout Policies for Dynamic Solutions to the Multivehicle Routing Problem with Stochastic Demand and Duration Limits"
+    },
+    {
+      "key": "K4PMDNJ6",
+      "title": "Autonomous Recharging and Flight Mission Planning for Battery-operated Autonomous Drones"
+    },
+    {
+      "key": "UVHTRC33",
+      "title": "Dynamic Vehicle Routing for Translating Demands: Stability Analysis and Receding-Horizon Policies"
+    },
+    {
+      "key": "D59NCRK2",
+      "title": "Fundamental performance limits and efficient polices for Transportation-On-Demand systems"
+    },
+    {
+      "key": "8Z2DEAU9",
+      "title": "On Multiple UAV Routing with Stochastic Targets: Performance Bounds and Algorithms"
+    },
+    {
+      "key": "KLWXJQBQ",
+      "title": "A Markov Decision Model and Decomposition Heuristic for Dynamic Vehicle Dispatching"
+    },
+    {
+      "key": "9PJ4THQ9",
+      "title": "Anticipation of Stochastic Customer Requests in Vehicle Routing : Value Function Approximation based on a Dynamic Lookup-Table"
+    },
+    {
+      "key": "XJMBNEQN",
+      "title": "Dynamic Vehicle Routing for Robotic Networks"
+    },
+    {
+      "key": "LYPKX2EU",
+      "title": "Restocking-Based Rollout Policies for the Vehicle Routing Problem with Stochastic Demand and Duration Limits"
+    },
+    {
+      "key": "X3RFFJCZ",
+      "title": "Polling, Greedy and Horizon Servers on a Circle"
+    },
+    {
+      "key": "DJ2FT994",
+      "title": "Same‐day delivery with heterogeneous fleets of drones and vehicles"
+    },
+    {
+      "key": "ILHWA3TN",
+      "title": "Solving a Dynamic and Stochastic Vehicle Routing Problem with a Sample Scenario Hedging Heuristic"
+    },
+    {
+      "key": "XVEQX5T3",
+      "title": "Scenario-Based Planning for Partially Dynamic Vehicle Routing with Stochastic Customers"
+    },
+    {
+      "key": "S9F5GZ86",
+      "title": "Exploiting Knowledge About Future Demands for Real-Time Vehicle Dispatching"
+    },
+    {
+      "key": "653H6T6V",
+      "title": "Dynamic Electric Vehicle Routing: Heuristics and Dual Bounds"
+    },
+    {
+      "key": "V4QRREAQ",
+      "title": "Spatial Information in Offline Approximate Dynamic Programming for Dynamic Vehicle Routing with Stochastic Requests"
+    },
+    {
+      "key": "PFBUQIL7",
+      "title": "Non-myopic dynamic routing of electric taxis with battery swapping stations"
+    },
+    {
+      "key": "L46BWADX",
+      "title": "On the Dubins Traveling Salesperson Problems: novel approximation algorithms"
+    },
+    {
+      "key": "249BVJNL",
+      "title": "AN ASYMPTOTICALLY OPTIMAL ALGORITHM FOR THE DYNAMIC TRAVELING REPAIR PROBLEM"
+    },
+    {
+      "key": "N6BLRMXV",
+      "title": "Dynamic Vehicle Allocation and Charging Policies for Autonomous Electric Vehicle Sharing Systems"
+    },
+    {
+      "key": "EL4DT3TP",
+      "title": "Dynamic Vehicle Routing in Presence of Random Recalls"
+    },
+    {
+      "key": "FPZLN8RU",
+      "title": "A Dynamic Programming Solution to the Single Vehicle Many-to-Many Immediate Request Dial-a-Ride Problem"
+    },
+    {
+      "key": "F9GCE6AK",
+      "title": "A Comparison of Anticipatory Algorithms for the Dynamic and Stochastic Traveling Salesman Problem"
+    },
+    {
+      "key": "XAP2PUZV",
+      "title": "Dynamic Vehicle Allocation Policies for Shared Autonomous Electric Fleets"
+    },
+    {
+      "key": "7D79NRFM",
+      "title": "? ? ? ? ? ? ? ? ? ? ? ? ? ? ?"
+    },
+    {
+      "key": "C3XW4I7Z",
+      "title": "Dynamic stochastic electric vehicle routing with safe reinforcement learning"
+    },
+    {
+      "key": "65XQ5YHV",
+      "title": "Waiting and Relocation Strategies in Online Stochastic Vehicle Routing"
+    },
+    {
+      "key": "9YU55LWA",
+      "title": "Budgeting Time for Dynamic Vehicle Routing with Stochastic Customer Requests"
+    },
+    {
+      "key": "89KILNYT",
+      "title": "Anticipatory Route Selection"
+    },
+    {
+      "key": "HTV63EKX",
+      "title": "Offline-Online Approximate Dynamic Programming for Dynamic Vehicle Routing with Stochastic Requests"
+    },
+    {
+      "key": "EUKBYM98",
+      "title": "Stochastic dynamic vehicle routing in the light of prescriptive analytics: A review"
+    },
+    {
+      "key": "C9VK3XL4",
+      "title": "Dynamic Scheduling of a Battery-Operated Queue"
+    },
+    {
+      "key": "6R8WDIJH",
+      "title": "Maximizing the Efficiency of a UAV on Perimeter Patrol"
+    },
+    {
+      "key": "Z3EP6W58",
+      "title": "Adaptive Routing on the Plane"
+    },
+    {
+      "key": "AYQUCL9R",
+      "title": "On modeling stochastic dynamic vehicle routing problems"
+    },
+    {
+      "key": "3Q6KBHX2",
+      "title": "Waiting Strategies for the Dynamic and Stochastic Traveling Salesman Problem"
+    },
+    {
+      "key": "RQQHM4TJ",
+      "title": "Waiting Strategies for Anticipating Service Requests from Known Customer Locations"
+    },
+    {
+      "key": "G3HR52YW",
+      "title": "Dynamic Vehicle Routing for Robotic Systems"
+    }
+  ],
+  "retained": [
+    "RQGW5FBE",
+    "SAPZUU82",
+    "9PL8TA6D",
+    "I6U6C427",
+    "BGDF7YU7",
+    "UWIHH3XF",
+    "DRYS6RJH",
+    "J4ARIHDN",
+    "DWEG5D7J",
+    "P8L3JF79",
+    "SH8834QX",
+    "JJSBLSAG",
+    "JPJ8ICDN",
+    "XATU7DC7",
+    "XB3D8N8X",
+    "LLWVL7G3",
+    "2RJKY4MM",
+    "5M32J9GD",
+    "N52IEVLF",
+    "RPUD8GNU",
+    "ZRECKNL9",
+    "2XXPEFFD",
+    "4E79IRQZ",
+    "NL8QMZSJ",
+    "FCASUHEA",
+    "PC6SFQYF",
+    "S82FQIBZ",
+    "W4Q8UL3Q",
+    "T33YWCE2",
+    "ETVK6LTL",
+    "M5A524B9",
+    "6B4XVP4N",
+    "N44M4XTD",
+    "HKPPJSMG",
+    "GM8CKCFB",
+    "6CXKMA67",
+    "QG9WD6EV",
+    "NRWY9239",
+    "MKDKVCFT",
+    "HD4QGGN9",
+    "CQYKUDNR",
+    "BGKGPMC7",
+    "YHL8XHIN",
+    "GKX3XA47",
+    "MYCUQJHB",
+    "9W5CX68T",
+    "QD9E4RM8",
+    "NXJI6KZE",
+    "MMVHA3EL",
+    "LYXIMM2W",
+    "GG4FWM95",
+    "CI8APRUE",
+    "4LWRFKCS",
+    "KMY63CMK",
+    "AUAQLYV5",
+    "QP8LHUPQ",
+    "I6R9IIXL",
+    "D5YUSN5F",
+    "BD5C62FQ",
+    "AYBHXREK",
+    "SDUWN6Q8",
+    "HJUAQRUY",
+    "DJ9EIFHP",
+    "R724DK8G",
+    "ZHLQFN5J",
+    "6PRKSFEI",
+    "L93VNLKD",
+    "94392F29",
+    "5C77YWYK",
+    "PWU8GEG7",
+    "PYXWDGAN",
+    "S8IZ8KHI",
+    "7YE7YM5G",
+    "LF37KCBZ",
+    "47DTWGPJ",
+    "TV7QBSLN",
+    "4VYNHFDW",
+    "7S68E8IE",
+    "UVZNR42R",
+    "A93BPEMZ",
+    "TBYCUCRV",
+    "5DHIN583",
+    "3HJZEZ8V",
+    "NNVTXNFG",
+    "GDZC3UC5",
+    "UDV3IGJS",
+    "HJ4WAZLR",
+    "IX7AGVFS",
+    "M2H47MFG",
+    "ZUV69ELT",
+    "XT5BVDL3",
+    "Y839EMBM",
+    "266799LK",
+    "IC692YT3",
+    "PDQERISI",
+    "8BF5SX8F",
+    "9ZT5JTBU",
+    "S9GMZKU6",
+    "CAHE3S93"
+  ],
+  "attachments": [
+    {
+      "parent": "RQGW5FBE",
+      "attachment": "Y4LZNTMU",
+      "md5": "62227a35dd1bf4e67731f943dbad30d5"
+    },
+    {
+      "parent": "SAPZUU82",
+      "attachment": "UM9I3DJE",
+      "md5": "420ecb63ced7fb00bc1e99148d4ab8b8"
+    },
+    {
+      "parent": "9PL8TA6D",
+      "attachment": "488P853I",
+      "md5": "dc385dea7a9278a725dcd10f10ada969"
+    },
+    {
+      "parent": "I6U6C427",
+      "attachment": "768GCUKJ",
+      "md5": "ed9b3e817f40cb97e1885b8f0fd0c09b"
+    },
+    {
+      "parent": "BGDF7YU7",
+      "attachment": "7XA9BL5W",
+      "md5": "893d4951298044882916d579e01edb4b"
+    },
+    {
+      "parent": "UWIHH3XF",
+      "attachment": "97VBRJJI",
+      "md5": "0cba248f75625f45e108f68b078d66b4"
+    },
+    {
+      "parent": "DRYS6RJH",
+      "attachment": "KS85UXAM",
+      "md5": "7203747780e82b9868b85594ad0bd8da"
+    },
+    {
+      "parent": "J4ARIHDN",
+      "attachment": "Q84A4ED9",
+      "md5": "d109dd1b3141a1033d034c984995bda5"
+    },
+    {
+      "parent": "J4ARIHDN",
+      "attachment": "CQZR4B57",
+      "md5": "b7da968c453b21172c9625834344b5e7"
+    },
+    {
+      "parent": "DWEG5D7J",
+      "attachment": "LWAM2ZRP",
+      "md5": "713eed6ddab4e1212696f70dc49d1ac3"
+    },
+    {
+      "parent": "P8L3JF79",
+      "attachment": "TCF2E4EW",
+      "md5": "6fcfa8ca09d7d2e582c3be28a2833e5d"
+    },
+    {
+      "parent": "SH8834QX",
+      "attachment": "KK3GXWIR",
+      "md5": "77ceda4b7e1a858e4cb4349c86d6c0fc"
+    },
+    {
+      "parent": "JJSBLSAG",
+      "attachment": "KZ6J493X",
+      "md5": "a6e83c41360605dd3342c895b7eededa"
+    },
+    {
+      "parent": "JPJ8ICDN",
+      "attachment": "9ZFTF3MQ",
+      "md5": "a7b1547c5a29413b0dfc5d175b85be32"
+    },
+    {
+      "parent": "XATU7DC7",
+      "attachment": "PMP5QHHI",
+      "md5": "f9535ba460b96aafc805a9955194d38c"
+    },
+    {
+      "parent": "XB3D8N8X",
+      "attachment": "EJLVVL6T",
+      "md5": "a3c0a02ae2d4fe805f448db3ffb7bd54"
+    },
+    {
+      "parent": "LLWVL7G3",
+      "attachment": "KL39B7AS",
+      "md5": "9201f519137cbf34c2b7a3f8c6c9e241"
+    },
+    {
+      "parent": "2RJKY4MM",
+      "attachment": "TA3KZ4K3",
+      "md5": "ecf4a5d44371c1bc0350ec30c35dfdb2"
+    },
+    {
+      "parent": "5M32J9GD",
+      "attachment": "M6KQ89KP",
+      "md5": "ad2846b1155d5899a16b4d60e5988bfb"
+    },
+    {
+      "parent": "N52IEVLF",
+      "attachment": "LVQAIZD2",
+      "md5": "3dd19600b977c0e72aea130dfeacb6cf"
+    },
+    {
+      "parent": "RPUD8GNU",
+      "attachment": "R5QVI9LW",
+      "md5": "5ae4e69e3a555ba6a687e45b742f85b4"
+    },
+    {
+      "parent": "ZRECKNL9",
+      "attachment": "EVP6UMSF",
+      "md5": "5756d2b05df346c573d93fb196def116"
+    },
+    {
+      "parent": "2XXPEFFD",
+      "attachment": "R4YG3PKY",
+      "md5": "60ff477856b050802b49730f757351dd"
+    },
+    {
+      "parent": "4E79IRQZ",
+      "attachment": "HFGPGXKC",
+      "md5": "fa6ef098fa006997e231531ae1e8907b"
+    },
+    {
+      "parent": "NL8QMZSJ",
+      "attachment": "K2NCX2FC",
+      "md5": "98965ad71703ac4d34b654bbda11b924"
+    },
+    {
+      "parent": "FCASUHEA",
+      "attachment": "MGX5I9TE",
+      "md5": "a72923b39acc55247162364f05a3957a"
+    },
+    {
+      "parent": "PC6SFQYF",
+      "attachment": "ZDBFZ89H",
+      "md5": "bdddfabc70c771bddb2fa22291748ab9"
+    },
+    {
+      "parent": "S82FQIBZ",
+      "attachment": "YTQPIP7B",
+      "md5": "30f8e66c343ec7e6e64fe4bf9bd16ca7"
+    },
+    {
+      "parent": "W4Q8UL3Q",
+      "attachment": "N4JB6NSK",
+      "md5": "707c8a8250e6e0f0a400407148519fa0"
+    },
+    {
+      "parent": "T33YWCE2",
+      "attachment": "CE38FJQE",
+      "md5": "f418743505e1a184e4f8ec237601fce7"
+    },
+    {
+      "parent": "ETVK6LTL",
+      "attachment": "2DR4NKPY",
+      "md5": "c6cce3f0fc580050d7a6aa9a313802c7"
+    },
+    {
+      "parent": "M5A524B9",
+      "attachment": "QZJRN6IN",
+      "md5": "eca115e5b24505a78b69db362ca4323c"
+    },
+    {
+      "parent": "6B4XVP4N",
+      "attachment": "KFDGARGZ",
+      "md5": "aa965002978606a085f608e7efd0cac5"
+    },
+    {
+      "parent": "N44M4XTD",
+      "attachment": "PCPBVZY8",
+      "md5": "ab1b762435c3602073254413ac6fb6b1"
+    },
+    {
+      "parent": "HKPPJSMG",
+      "attachment": "5R56DX38",
+      "md5": "9bae435c93e6743a8a113cbe67e87e6c"
+    },
+    {
+      "parent": "GM8CKCFB",
+      "attachment": "AVUPJ98J",
+      "md5": "d9992d04fdaf91114f5af25d2678e312"
+    },
+    {
+      "parent": "6CXKMA67",
+      "attachment": "QLM22EKP",
+      "md5": "2f668b52cffe8a4fe0517063a843d7c2"
+    },
+    {
+      "parent": "QG9WD6EV",
+      "attachment": "PB7AQSS6",
+      "md5": "eaf942372bf6d4d7149e7b563aab80e9"
+    },
+    {
+      "parent": "NRWY9239",
+      "attachment": "LAJKTPJK",
+      "md5": "f7fb96c877d97161cd50cdec91b433a8"
+    },
+    {
+      "parent": "MKDKVCFT",
+      "attachment": "KNMJ4LDX",
+      "md5": "7d752f16765e006bbdfeb089a60f68aa"
+    },
+    {
+      "parent": "HD4QGGN9",
+      "attachment": "FVTCVJDL",
+      "md5": "a4d3274139df1cbdae0dc7fe129dea96"
+    },
+    {
+      "parent": "CQYKUDNR",
+      "attachment": "BMPNUAFB",
+      "md5": "c9397a63cfe8b83ae8f8cc860fce0d59"
+    },
+    {
+      "parent": "BGKGPMC7",
+      "attachment": "XFIJSI92",
+      "md5": "3f17718183951295befcca52a38c7ec4"
+    },
+    {
+      "parent": "YHL8XHIN",
+      "attachment": "N6UTQ7NW",
+      "md5": "a4410038e740db3544fa87fc57f234bd"
+    },
+    {
+      "parent": "GKX3XA47",
+      "attachment": "CQDEUNFJ",
+      "md5": "b345e72cc3b3e5e2fbce8e2a6c712d99"
+    },
+    {
+      "parent": "MYCUQJHB",
+      "attachment": "K59R7NRD",
+      "md5": "21f5968f0c1d7e712f48b8605f5a00af"
+    },
+    {
+      "parent": "9W5CX68T",
+      "attachment": "5TBSPRZI",
+      "md5": "04811abfa2f0006119f5375eb97ae250"
+    },
+    {
+      "parent": "QD9E4RM8",
+      "attachment": "WPG8NUTZ",
+      "md5": "7cb60538f4b571b51adee44e99407c71"
+    },
+    {
+      "parent": "NXJI6KZE",
+      "attachment": "UJG46NWA",
+      "md5": "c2824cfc5531e2b0059b87d503430d10"
+    },
+    {
+      "parent": "MMVHA3EL",
+      "attachment": "T2QCB53U",
+      "md5": "4b21fe7671fda69f6f265c28e51ee50b"
+    },
+    {
+      "parent": "LYXIMM2W",
+      "attachment": "R45C39Y6",
+      "md5": "8e518bc7191173502a042ff2f7cfdc51"
+    },
+    {
+      "parent": "GG4FWM95",
+      "attachment": "99XCCM2M",
+      "md5": "6af6cde7d60dc98b0f207e31b64b41fa"
+    },
+    {
+      "parent": "CI8APRUE",
+      "attachment": "U58D5NCU",
+      "md5": "98b8c4c3b74436493c9746634b981890"
+    },
+    {
+      "parent": "4LWRFKCS",
+      "attachment": "JYNKNDPA",
+      "md5": "56b1e57764e60ed17e741ae3eb805de3"
+    },
+    {
+      "parent": "KMY63CMK",
+      "attachment": "JKVNSTBT",
+      "md5": "0a58b34a33874d0ee981a563c961563a"
+    },
+    {
+      "parent": "AUAQLYV5",
+      "attachment": "M6PRAQKB",
+      "md5": "ce756767f10431ffc31ea0cdb23470ed"
+    },
+    {
+      "parent": "QP8LHUPQ",
+      "attachment": "9N2TFL4M",
+      "md5": "75e769fc59d7f286b1482aa25bfe01be"
+    },
+    {
+      "parent": "I6R9IIXL",
+      "attachment": "LUGPQJ3I",
+      "md5": "d34846ba0af26478356f51f57e5cc8af"
+    },
+    {
+      "parent": "D5YUSN5F",
+      "attachment": "S7RVZ6H4",
+      "md5": "5c540ce9447d64725bc287e9820d9f48"
+    },
+    {
+      "parent": "BD5C62FQ",
+      "attachment": "ED7SSEW3",
+      "md5": "f42ae7b2d5039311bd3286f6090e4c3d"
+    },
+    {
+      "parent": "AYBHXREK",
+      "attachment": "W8EX4DAI",
+      "md5": "58acf1749ade943363b70da649893e82"
+    },
+    {
+      "parent": "SDUWN6Q8",
+      "attachment": "Z73QBVUB",
+      "md5": "65a3053c7d5558d06b225d503ed06b09"
+    },
+    {
+      "parent": "HJUAQRUY",
+      "attachment": "GVRC7I7Q",
+      "md5": "f07fee417d42dffe34f94e5cdb57ff06"
+    },
+    {
+      "parent": "DJ9EIFHP",
+      "attachment": "KAA86MDH",
+      "md5": "bd6b325d0d6b8e6bd46270b5d7c4aaaf"
+    },
+    {
+      "parent": "R724DK8G",
+      "attachment": "A256XFTA",
+      "md5": "4c1112e3565ee40803c5047ae380e2bb"
+    },
+    {
+      "parent": "ZHLQFN5J",
+      "attachment": "JZ4N5NH3",
+      "md5": "dd2b8bdc8943da795a41db27657bdd3d"
+    },
+    {
+      "parent": "6PRKSFEI",
+      "attachment": "JPZPFYZQ",
+      "md5": "ccc0e4f8df962604cd591640a9e83780"
+    },
+    {
+      "parent": "L93VNLKD",
+      "attachment": "UVK6D9I4",
+      "md5": "a5d668b1902d2d81102c0f5c09a0f64a"
+    },
+    {
+      "parent": "94392F29",
+      "attachment": "DDF4KMWP",
+      "md5": "7e72c253ed992db37f46d9f78dfe2634"
+    },
+    {
+      "parent": "5C77YWYK",
+      "attachment": "KUTAKR6D",
+      "md5": "723efd3e6eea5c33af7900137e59d004"
+    },
+    {
+      "parent": "PWU8GEG7",
+      "attachment": "HPSBR568",
+      "md5": "0f48f93025515efb40436ea0b73e8894"
+    },
+    {
+      "parent": "PYXWDGAN",
+      "attachment": "49MBDUTD",
+      "md5": "aebd8846111678d7d03ca33b3106955a"
+    },
+    {
+      "parent": "S8IZ8KHI",
+      "attachment": "YWKDCKRQ",
+      "md5": "54d2e6aae35eeae3229b2eec9e930675"
+    },
+    {
+      "parent": "7YE7YM5G",
+      "attachment": "LTAT4RSA",
+      "md5": "f3af5ac6813b7f9dc04dfb3772285506"
+    },
+    {
+      "parent": "LF37KCBZ",
+      "attachment": "H9JEUEMP",
+      "md5": "d89774754805248bf649463089db7576"
+    },
+    {
+      "parent": "47DTWGPJ",
+      "attachment": "ZFG9P3LZ",
+      "md5": "fc2d9efa964461d26823ecc10be64c4c"
+    },
+    {
+      "parent": "TV7QBSLN",
+      "attachment": "MC8IW5SJ",
+      "md5": "8e33b9aa41ed21adb9f6a152fec25317"
+    },
+    {
+      "parent": "4VYNHFDW",
+      "attachment": "Q6XLVP7U",
+      "md5": "bb302710337c1a30368abea8847008fa"
+    },
+    {
+      "parent": "7S68E8IE",
+      "attachment": "EXZKH7H7",
+      "md5": "b609ac2da540111ce03782233aa2302f"
+    },
+    {
+      "parent": "UVZNR42R",
+      "attachment": "YIAN68C5",
+      "md5": "19551658fd2ab27e7678bee84e95310b"
+    },
+    {
+      "parent": "A93BPEMZ",
+      "attachment": "FD2TNZEN",
+      "md5": "dbd9d650d820a3d96f7f0b2f4c95d358"
+    },
+    {
+      "parent": "TBYCUCRV",
+      "attachment": "AJVMV7L8",
+      "md5": "4876a510c2c1281c7aa7902efc30ad0c"
+    },
+    {
+      "parent": "5DHIN583",
+      "attachment": "Q9NHIDLK",
+      "md5": "cd4ecef0036846581157d365ab86068e"
+    },
+    {
+      "parent": "5DHIN583",
+      "attachment": "6E8VU5FT",
+      "md5": "dc56871900268403e257f172566bf65c"
+    },
+    {
+      "parent": "3HJZEZ8V",
+      "attachment": "REZ5LC37",
+      "md5": "dd62aaf1ea734a2b6c145eec84b6e584"
+    },
+    {
+      "parent": "NNVTXNFG",
+      "attachment": "GUEIGZR7",
+      "md5": "7334841669338d6a9e2657f562158efd"
+    },
+    {
+      "parent": "GDZC3UC5",
+      "attachment": "I3D4AVIR",
+      "md5": "cb25260bd0d82277bc1a546ba10272dc"
+    },
+    {
+      "parent": "UDV3IGJS",
+      "attachment": "V3WVB4DV",
+      "md5": "ed9b3e817f40cb97e1885b8f0fd0c09b"
+    },
+    {
+      "parent": "HJ4WAZLR",
+      "attachment": "DYY7FASE",
+      "md5": "ad2846b1155d5899a16b4d60e5988bfb"
+    },
+    {
+      "parent": "IX7AGVFS",
+      "attachment": "YK7FVM8L",
+      "md5": "3e1c8d43b218e5a09ac3dc82ffcc8fdc"
+    },
+    {
+      "parent": "M2H47MFG",
+      "attachment": "37GDSWK3",
+      "md5": "dabb0c7c3e62799ce18e5412d31ea3ff"
+    },
+    {
+      "parent": "ZUV69ELT",
+      "attachment": "7FDHS3P3",
+      "md5": "d9e20570fb91d42e0dbed2167f05e7a2"
+    },
+    {
+      "parent": "XT5BVDL3",
+      "attachment": "5CPY7UJD",
+      "md5": "9201f519137cbf34c2b7a3f8c6c9e241"
+    },
+    {
+      "parent": "Y839EMBM",
+      "attachment": "XAXDMR9F",
+      "md5": "dac47d0138847c3833c5aa930a78e3f5"
+    },
+    {
+      "parent": "266799LK",
+      "attachment": "IJ6G42D4",
+      "md5": "6ed374b80e4a127f155c56412a392468"
+    },
+    {
+      "parent": "IC692YT3",
+      "attachment": "8ABFDJJV",
+      "md5": "c1c10a11a4fa18df5c8014579bb18ecd"
+    },
+    {
+      "parent": "PDQERISI",
+      "attachment": "IF98YIBF",
+      "md5": "0ad099abe73e3507d32209c3496dca09"
+    },
+    {
+      "parent": "8BF5SX8F",
+      "attachment": "CFH8QCKN",
+      "md5": "eb26aa9ae812b49a54acc82a5ba471a0"
+    },
+    {
+      "parent": "9ZT5JTBU",
+      "attachment": "C5GISES2",
+      "md5": "e2fb8c477e09b190b48725371c039c12"
+    },
+    {
+      "parent": "S9GMZKU6",
+      "attachment": "2ELZQM7Z",
+      "md5": "a1f9003f9c6c6574f4564180efd8e4d7"
+    },
+    {
+      "parent": "CAHE3S93",
+      "attachment": "JX9MB2GN",
+      "md5": "f1f78bd211140b7754b3839e47aa781f"
+    }
+  ]
+}

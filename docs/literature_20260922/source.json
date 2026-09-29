@@ -1,0 +1,65 @@
+{
+  "key": "WSSR9LMK",
+  "version": 7,
+  "itemType": "thesis",
+  "title": "无人机多目标按需服务飞控优化方法研究",
+  "abstractNote": "无人机已广泛应用于为低空经济领域中的目标对象提供按需服务,为满足复杂多目标任务的需求,关键在于飞控行动决策能力,因此无人机按需飞控方法是按需服务的重要研究内容。无人机飞控生态系统全流程(包含飞控前提、支撑和目的)存在避障危险、能量不足和价值损失的问题,限制了无人机飞控系统的效能。然而,飞控系统全流程优化会制约单一飞控方法的性能。因此,本文针对无人机飞控系统在平稳动态避障、周期最大化部署、自适应往返充电和价值优先级服务方面存在的需求问题,分别进行了深入研究。目前飞控需求如下所示:\n无人机间互为高速移动的障碍物,且运动轨迹具有非线性特性。现存动态避障方法存在紧急避险和飞行姿态不稳的问题。非平稳动态避障威胁到无人机飞行安全,因此提高无人机针对该类型障碍物的动态避障的稳定性至关重要。环境条件不支持充电,无人机仅凭机载能量提供持久服务。服务周期取决于集群部署至区域后剩能最小的无人机。通过最大化最小剩能的方式,在二维区间下满足规定实时覆盖率,实现周期最大化部署,兼顾公平性存在探究需求。环境条件支持往返充电,无人机可通过充电实现持久服务。现存往返充电方法存在中断当前服务及替换能耗的问题,而在维持当前服...",
+  "date": "2025-09-16",
+  "DOI": "10.27162/d.cnki.gjlin.2025.000511",
+  "url": "https://link.cnki.net/doi/10.27162/d.cnki.gjlin.2025.000511",
+  "accessDate": "2026-09-22T09:21:34Z",
+  "language": "zh",
+  "libraryCatalog": "CNKI",
+  "extra": "dbcode: CDFD\nMajor: 精密仪器及机械",
+  "thesisType": "博士学位论文",
+  "university": "吉林大学",
+  "creators": [
+    {
+      "name": "马海旭",
+      "creatorType": "author"
+    },
+    {
+      "name": "杨光",
+      "creatorType": "contributor"
+    }
+  ],
+  "tags": [
+    {
+      "tag": "按需飞控",
+      "type": 1
+    },
+    {
+      "tag": "平稳动态避障",
+      "type": 1
+    },
+    {
+      "tag": "往返充电",
+      "type": 1
+    },
+    {
+      "tag": "优先级服务",
+      "type": 1
+    },
+    {
+      "tag": "周期部署",
+      "type": 1
+    }
+  ],
+  "collections": [
+    "FPM3A23V"
+  ],
+  "relations": {},
+  "dateAdded": "2026-09-22T09:21:34Z",
+  "dateModified": "2026-09-22T09:21:34Z",
+  "collection": "博士论文",
+  "collection_key": "FPM3A23V",
+  "attachment_key": "2UEVPV4Q",
+  "pdf_path": "/mnt/c/Users/ZJL/Zotero default/storage/2UEVPV4Q/马海旭 - 2025 - 无人机多目标按需服务飞控优化方法研究.pdf",
+  "pdf_pages": 150,
+  "pdf_sha256": "2055c3faec127f02e1ef349eebea9e4381357b0d9d3c8bcfb0271e8a30132698",
+  "read_via": "Zotero local API metadata + returned local PDF enclosure",
+  "attachment_children_count": 0,
+  "pdf_cover_date": "2025-06",
+  "date_note": "Zotero/CNKI date is 2025-09-16; PDF cover is June 2025 and defense May 29, 2025.",
+  "project_commit": "21a1218"
+}

@@ -1,0 +1,125 @@
+# UnderMind 未获取全文清单
+
+170篇文献条目已导入 Zotero「英文文献」；49篇附有已核验文件哈希的PDF，下列121篇当前仅有文献记录。UnderMind未提供PDF不代表其他渠道一定无法获取。元数据尚未逐篇核验。
+
+- Liu22c — Energy-Aware and Delay-Sensitive Management of a Drone Delivery System — https://doi.org/10.1287/msom.2021.1056
+- Enr05 — UAV ROUTING IN A STOCHASTIC, TIME-VARYING ENVIRONMENT — https://doi.org/10.3182/20050703-6-CZ-1902.02010
+- Tho07 — Waiting Strategies for Anticipating Service Requests from Known Customer Locations — https://doi.org/10.1287/trsc.1060.0183
+- Bul11 — Dynamic Vehicle Routing for Robotic Systems — https://doi.org/10.1109/JPROC.2011.2158181
+- Ulm19 — Offline-Online Approximate Dynamic Programming for Dynamic Vehicle Routing with Stochastic Requests — https://doi.org/10.1287/TRSC.2017.0767
+- Soe21 — Stochastic dynamic vehicle routing in the light of prescriptive analytics: A review — https://doi.org/10.1016/J.EJOR.2021.07.014
+- Enr09 — Stochastic and Dynamic Routing Problems for Multiple Uninhabited Aerial Vehicles — https://doi.org/10.2514/1.41616
+- Liu19c — Dynamic Scheduling of a Battery-Operated Queue — https://doi.org/10.2139/ssrn.3542316
+- Kal15 — Maximizing the Efficiency of a UAV on Perimeter Patrol — https://doi.org/10.2514/6.2015-0854
+- Tas96 — Adaptive Routing on the Plane — https://doi.org/10.1287/opre.44.5.823
+- Ulm20 — On modeling stochastic dynamic vehicle routing problems — https://doi.org/10.1016/J.EJTL.2020.100008
+- Alk20 — Approximate dynamic programming for planning a ride-hailing system using autonomous fleets of electric vehicles — https://doi.org/10.1016/j.ejor.2020.01.033
+- Ghi08 — Waiting Strategies for the Dynamic and Stochastic Traveling Salesman Problem
+- Ulm15 — ? ? ? ? ? ? ? ? ? ? ? ? ? ? ?
+- Bas22 — Dynamic stochastic electric vehicle routing with safe reinforcement learning — https://doi.org/10.1016/j.tre.2021.102496
+- Ulm18c — Anticipation versus reactive reoptimization for dynamic vehicle routing with stochastic requests — https://doi.org/10.1002/net.21861
+- Ben07 — Waiting and Relocation Strategies in Online Stochastic Vehicle Routing
+- Ulm17c — Budgeting Time for Dynamic Vehicle Routing with Stochastic Customer Requests — https://doi.org/10.1287/trsc.2016.0719
+- Tho04 — Anticipatory Route Selection — https://doi.org/10.1287/trsc.1030.0071
+- Ni23 — Mobility and Energy Management in Electric Vehicle Based Mobility-on-Demand Systems: Models and Solutions — https://doi.org/10.1109/TITS.2022.3231435
+- Bop20 — Dynamic Vehicle Routing in Presence of Random Recalls — https://doi.org/10.1109/LCSYS.2019.2921514
+- Hil22 — Opportunities for reinforcement learning in stochastic dynamic vehicle routing — https://doi.org/10.1016/j.cor.2022.106071
+- Psa80 — A Dynamic Programming Solution to the Single Vehicle Many-to-Many Immediate Request Dial-a-Ride Problem — https://doi.org/10.1287/TRSC.14.2.130
+- Ghi12 — A Comparison of Anticipatory Algorithms for the Dynamic and Stochastic Traveling Salesman Problem — https://doi.org/10.1287/trsc.1110.0374
+- Zha22 — Dynamic vehicle routing with random requests: A literature review — https://doi.org/10.1016/j.ijpe.2022.108751
+- Don22 — Dynamic Vehicle Allocation Policies for Shared Autonomous Electric Fleets — https://doi.org/10.1287/trsc.2021.1115
+- Psa16 — Dynamic vehicle routing problems: Three decades and counting — https://doi.org/10.1002/net.21628
+- Bra17 — Spatial Information in Offline Approximate Dynamic Programming for Dynamic Vehicle Routing with Stochastic Requests
+- Ulm18 — Value function approximation for dynamic multi-period vehicle routing — https://doi.org/10.1016/J.EJOR.2018.02.038
+- Say20 — Non-myopic dynamic routing of electric taxis with battery swapping stations — https://doi.org/10.1016/j.scs.2020.102113
+- Sav06 — On the Dubins Traveling Salesperson Problems: novel approximation algorithms
+- Lu02 — AN ASYMPTOTICALLY OPTIMAL ALGORITHM FOR THE DYNAMIC TRAVELING REPAIR PROBLEM
+- Liu19 — An optimization-driven dynamic vehicle routing algorithm for on-demand meal delivery using drones — https://doi.org/10.1016/J.COR.2019.05.024
+- Don20 — Dynamic Vehicle Allocation and Charging Policies for Autonomous Electric Vehicle Sharing Systems — https://doi.org/10.2139/ssrn.3595407
+- Ben04 — Scenario-Based Planning for Partially Dynamic Vehicle Routing with Stochastic Customers — https://doi.org/10.1287/opre.1040.0124
+- Ich06 — Exploiting Knowledge About Future Demands for Real-Time Vehicle Dispatching — https://doi.org/10.1287/trsc.1050.0114
+- Kul18 — Dynamic Electric Vehicle Routing: Heuristics and Dual Bounds
+- Tan20 — Online operations of automated electric taxi fleets: An advisor-student reinforcement learning framework — https://doi.org/10.1016/j.trc.2020.102844
+- Goo16 — Restocking-Based Rollout Policies for the Vehicle Routing Problem with Stochastic Demand and Duration Limits — https://doi.org/10.1287/trsc.2015.0591
+- Wan21 — Chase or Wait: Dynamic UAV Deployment to Learn and Catch Time-Varying User Activities — https://doi.org/10.1109/TMC.2021.3107027
+- Har95 — Polling, Greedy and Horizon Servers on a Circle — https://doi.org/10.1287/opre.43.1.177
+- Kim19 — On systems of UAVs for persistent security presence: A generic network representation, MDP formulation and heuristics for task allocation — https://doi.org/10.1109/ICUAS.2019.8797863
+- Ulm18b — Same‐day delivery with heterogeneous fleets of drones and vehicles — https://doi.org/10.1002/net.21855
+- She19 — Optimization models for electric vehicle service operations: A literature review — https://doi.org/10.1016/J.TRB.2019.08.006
+- Hva06 — Solving a Dynamic and Stochastic Vehicle Routing Problem with a Sample Scenario Hedging Heuristic — https://doi.org/10.1287/trsc.1060.0166
+- Son18 — Persistent UAV delivery logistics: MILP formulation and efficient heuristic — https://doi.org/10.1016/J.CIE.2018.05.013
+- Min93 — A Markov Decision Model and Decomposition Heuristic for Dynamic Vehicle Dispatching — https://doi.org/10.1287/OPRE.41.1.77
+- Pil11 — Dynamic Vehicle Routing Problems: State of the art and Prospects
+- Ulm14 — Anticipation of Stochastic Customer Requests in Vehicle Routing : Value Function Approximation based on a Dynamic Lookup-Table
+- Pav10 — Dynamic Vehicle Routing for Robotic Networks
+- Ang21 — A dynamic and probabilistic orienteering problem — https://doi.org/10.1016/J.COR.2021.105454
+- Goo13 — Rollout Policies for Dynamic Solutions to the Multivehicle Routing Problem with Stochastic Demand and Duration Limits — https://doi.org/10.1287/opre.1120.1127
+- Tse17 — Autonomous Recharging and Flight Mission Planning for Battery-operated Autonomous Drones
+- Ber89 — The dynamic traveling repairman problem
+- Bop10 — Dynamic Vehicle Routing for Translating Demands: Stability Analysis and Receding-Horizon Policies — https://doi.org/10.1109/TAC.2010.2049278
+- Pav10c — Fundamental performance limits and efficient polices for Transportation-On-Demand systems — https://doi.org/10.1109/CDC.2010.5717552
+- Kim18 — Learning Based Framework for Joint Task Allocation and System Design in Stochastic Multi-UAV Systems — https://doi.org/10.1109/ICUAS.2018.8453318
+- Enr05b — On Multiple UAV Routing with Stochastic Targets: Performance Bounds and Algorithms — https://doi.org/10.2514/6.2005-5830
+- Smi08 — Dynamic Traveling Repairperson with Priority Demands
+- Nic16 — Electric Vehicle Routing With Mid-route Recharging And Uncertain Charging Station Availability
+- Cha20 — Online Trajectory and Radio Resource Optimization of Cache-Enabled UAV Wireless Networks With Content and Energy Recharging — https://doi.org/10.1109/TSP.2020.2971457
+- Fra21 — A framework for integrated dispatching and charging management of an autonomous electric vehicle ride-hailing fleet — https://doi.org/10.1016/J.TRD.2021.102822
+- Zha18 — Dynamic Orienteering on a Network of Queues — https://doi.org/10.1287/trsc.2017.0761
+- Aha22 — Cooperative Learning for Smart Charging of Shared Autonomous Vehicle Fleets — https://doi.org/10.1287/trsc.2022.1187
+- Das21 — Off-line approximate dynamic programming for the vehicle routing problem with stochastic customers and demands via decentralized decision-making
+- Spi04 — The Dynamic Assignment Problem — https://doi.org/10.1287/trsc.1030.0073
+- She20 — Operating policies in multi-warehouse drone delivery systems — https://doi.org/10.1080/00207543.2020.1756509
+- Ulm17 — Route-Based Markov Decision Processes for Dynamic Vehicle Routing Problems
+- Aks16 — Dynamic routing of energy-aware vehicles with Temporal Logic Constraints — https://doi.org/10.1109/ICRA.2016.7487481
+- Yu21 — Dynamic Optimal Approach for an Electric Taxi Fleet's Charging and Order-service Schemes
+- Nie03 — Dynamic vehicle routing with stochastic requests
+- Bi19 — Logistical Planning for Electric Vehicles Under Time-Dependent Stochastic Traffic — https://doi.org/10.1109/TITS.2018.2883791
+- Jai06 — Online Routing Problems: Value of Advanced Information as Improved Competitive Ratios — https://doi.org/10.1287/trsc.1060.0147
+- Ulm13 — Modeling Customers in the Euclidean Plane for Routing Applications
+- Liu23c — Routing battery-constrained delivery drones in a depot network: A business model and its optimization–simulation assessment — https://doi.org/10.1016/j.trc.2023.104147
+- Rei15 — Heavy Traffic Analysis of the Dynamic Stochastic Inventory-Routing Problem — https://doi.org/10.1287/trsc.33.4.361
+- Pav09b — A Stochastic and Dynamic Vehicle Routing Problem with Time Windows and Customer Impatience — https://doi.org/10.1007/s11036-008-0101-1
+- Men17 — Electric vehicle routing: state of the art and perspectives
+- Arc20 — Dynamic traveling salesman problem with stochastic release dates — https://doi.org/10.1016/J.EJOR.2019.07.062
+- Mat19 — Probabilistic Analysis of UAV Routing with Dynamically Arriving Targets — https://doi.org/10.23919/fusion43075.2019.9011225
+- Li23b — Robust Service and Charging Plan for Dynamic Electric Demand-Responsive Transit Systems — https://doi.org/10.1109/TITS.2023.3321745
+- Ulm21 — The Restaurant Meal Delivery Problem: Dynamic Pickup and Delivery with Deadlines and Random Ready Times — https://doi.org/10.1287/trsc.2020.1000
+- Ulm16 — Value Function Approximation-Based Limited Horizon Rollout Algorithms for Dynamic Multi-Period Routing
+- Ulm15b — Anticipatory Optimization for a Dynamic Multi-Period Routing Problem with Stochastic Customer Requests
+- Una22 — Dynamic routing optimization with electric vehicles under stochastic battery depletion — https://doi.org/10.1080/19427867.2022.2157365
+- Ber96 — A New Generation of Vehicle Routing Research: Robust Algorithms, Addressing Uncertainty — https://doi.org/10.1287/OPRE.44.2.286
+- Liu24e — Optimal Charging Scheduling and Speed Control for Delay-Bounded Drone Delivery — https://doi.org/10.1109/TVT.2024.3405022
+- Soe16 — Problem-Specific State Space Partitioning for Dynamic Vehicle Routing Problems
+- Yu19 — A Markov decision process approach to vacant taxi routing with e-hailing — https://doi.org/10.1016/J.TRB.2018.12.013
+- Xu94 — Optimal policies for stochastic and dynamic vehicle routing problems
+- Ni22 — Dynamic Pricing Mechanism Design for Electric Mobility-on-Demand Systems — https://doi.org/10.1109/tits.2021.3103199
+- Asa20 — Persistent Aerial Monitoring under Unknown Stochastic Dynamics in Pick-up and Delivery Missions — https://doi.org/10.2514/6.2021-1125
+- Ira02 — On-Line Algorithms for the Dynamic Traveling Repair Problem — https://doi.org/10.1023/B:JOSH.0000019683.85186.57
+- Li23 — Joint Trajectory Planning, Application Placement, and Energy Renewal for UAV-Assisted MEC: A Triple-Learner-Based Approach — https://doi.org/10.1109/JIOT.2023.3262687
+- Hun21 — Optimal routing for electric vehicle charging systems with stochastic demand: A heavy traffic approximation approach — https://doi.org/10.1016/J.EJOR.2021.06.058
+- Mat15 — Multirobot Rendezvous Planning for Recharging in Persistent Tasks — https://doi.org/10.1109/TRO.2014.2380593
+- Son14 — Towards real time scheduling for persistent UAV service: A rolling horizon MILP approach, RHTA and the STAH heuristic — https://doi.org/10.1109/ICUAS.2014.6842292
+- Ko25 — On-Demand Urban Air Mobility Scheduling with Operational Considerations — https://doi.org/10.2514/1.i011460
+- Mei11 — Anticipatory Routing of a Service Vehicle — https://doi.org/10.1007/978-1-4614-0505-4_7
+- Say21 — Dynamic Inventory Routing and Pricing Problem with a Mixed Fleet of Electric and Conventional Urban Freight Vehicles — https://doi.org/10.3390/SU13126703
+- Enr09b — Stochastic and Dynamic Routing Problems for Multiple UAVs
+- Vu21 — Optimal Recharging of Teams of Mobile Robots — https://doi.org/10.1109/RTCSA52859.2021.00028
+- Pav10b — Dynamic vehicle routing with stochastic time constraints — https://doi.org/10.1109/ROBOT.2010.5509222
+- Bli20b — Adaptive Scheduling and Trajectory Design for Power-Constrained Wireless UAV Relays
+- Pei25 — A Branch-and-Price Algorithm for the Urban Aerial Delivery Problem With Energy Constraints — https://doi.org/10.1109/TASE.2025.3553200
+- Ikl22 — A Rolling Horizon Approach for the Dynamic Scheduling of Flying Taxis — https://doi.org/10.5220/0011376500003332
+- Han25b — Dynamic UAV Task Allocation and Path Planning with Energy Management Using Adaptive PSO in Rolling Horizon Framework — https://doi.org/10.3390/app15084220
+- Kle20 — Rolling-Horizon Electric Vertical Takeoff and Landing Arrival Scheduling for On-Demand Urban Air Mobility — https://doi.org/10.2514/1.i010776
+- Zha13b — Single vehicle routing with stochastic demands : approximate dynamic programming
+- Alb24 — Enhancing Battery Efficiency Through Semi-Markov Decision Processes in Task Allocation for UAVs — https://doi.org/10.1109/ICUAS60882.2024.10556988
+- Ulm19b — Modeling Dynamic Vehicle Routing Problems : A Literature Review and Framework
+- Ulm19c — On Modeling Dynamic Vehicle Routing Problems
+- Hu25d — Optimizing autonomous electric taxi operations with integrated mobile charging services: An approximate dynamic programming approach — https://doi.org/10.1016/j.apenergy.2024.124823
+- Yu23b — Coordinating matching, rebalancing and charging of electric ride-hailing fleet under hybrid requests — https://doi.org/10.1016/j.trd.2023.103903
+- Pav07b — Decentralized algorithms for stochastic and dynamic vehicle routing with general demand distribution — https://doi.org/10.1109/CDC.2007.4434989
+- Wu23c — Real-time vehicle relocation and staff rebalancing problem for electric and shared vehicle systems — https://doi.org/10.1080/00207543.2023.2295484
+- Vas25 — Optimal On-the-Fly Route Planning With Rich Transportation Requests — https://doi.org/10.1109/TRO.2025.3577010
+- Xia24b — Delivery routing for electric vehicles with en-route mobile battery swapping — https://doi.org/10.1016/j.tre.2024.103838
+- Fut23 — An online decision-making strategy for routing of electric vehicle fleets — https://doi.org/10.2139/ssrn.4087063
+- Sec00 — Comparing neuro-dynamic programming algorithms for the vehicle routing problem with stochastic demands — https://doi.org/10.1016/S0305-0548(99)00146-X
+- Har19 — Efficient Computation of Optimal UAV Routes for Persistent Monitoring of Targets — https://doi.org/10.1109/ICUAS.2019.8798167

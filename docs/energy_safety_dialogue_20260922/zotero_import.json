@@ -1,0 +1,28 @@
+{
+  "collection": "7BA7MPRB",
+  "new_papers": [
+    {
+      "cite": "Fou23",
+      "item": "Y5WERCMZ",
+      "attachment": "6K6YJYP6",
+      "md5": "0f79e312fe930a3d16dacf9deba4211e"
+    },
+    {
+      "cite": "Fou21",
+      "item": "3CZEJ79A",
+      "attachment": "Y8N8RR2V",
+      "md5": "580cea047a7c94b5bfdbfd4fdffc6580"
+    },
+    {
+      "cite": "Not19",
+      "item": "Z5IAAH9M",
+      "attachment": "NWZN8QH9",
+      "md5": "ff83548571a75302bbc7306d4c1669a7"
+    }
+  ],
+  "existing_papers": [
+    "ZHLQFN5J",
+    "9ZT5JTBU",
+    "WSSR9LMK"
+  ]
+}

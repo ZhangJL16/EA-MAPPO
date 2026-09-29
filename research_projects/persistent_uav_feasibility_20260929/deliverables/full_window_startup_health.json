@@ -1,0 +1,25 @@
+{
+  "kind": "full_window_fixed_policy_screen_v1",
+  "planned_runs": 810,
+  "validated_runs": 20,
+  "complete": false,
+  "methods": [
+    "full_recharge_nearest",
+    "full_recharge_fifo",
+    "reserve_sjf"
+  ],
+  "seeds": [
+    1302609290,
+    1302609291,
+    1302609292,
+    1302609293,
+    1302609294,
+    1302609295,
+    1302609296,
+    1302609297,
+    1302609298,
+    1302609299
+  ],
+  "frozen_sha256": "a2b74f9ff84c83377ea081d0cda9610b635b739e6e178a0132bc1106c85f9f19",
+  "caveat": "Exploratory paired full-T screen, not 5% risk certification."
+}

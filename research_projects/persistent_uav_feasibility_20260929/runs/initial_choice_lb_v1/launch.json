@@ -1,0 +1,46 @@
+{
+  "interpretation": "resumable diagnostic; inspect only startup health",
+  "started_utc": "2026-09-29T08:41:49.550710+00:00",
+  "workers": [
+    {
+      "index": 0,
+      "log": "/home/zjl/mappo/research_projects/persistent_uav_feasibility_20260929/runs/initial_choice_lb_v1/logs/worker_00.log",
+      "pid": 8
+    },
+    {
+      "index": 1,
+      "log": "/home/zjl/mappo/research_projects/persistent_uav_feasibility_20260929/runs/initial_choice_lb_v1/logs/worker_01.log",
+      "pid": 9
+    },
+    {
+      "index": 2,
+      "log": "/home/zjl/mappo/research_projects/persistent_uav_feasibility_20260929/runs/initial_choice_lb_v1/logs/worker_02.log",
+      "pid": 10
+    },
+    {
+      "index": 3,
+      "log": "/home/zjl/mappo/research_projects/persistent_uav_feasibility_20260929/runs/initial_choice_lb_v1/logs/worker_03.log",
+      "pid": 11
+    },
+    {
+      "index": 4,
+      "log": "/home/zjl/mappo/research_projects/persistent_uav_feasibility_20260929/runs/initial_choice_lb_v1/logs/worker_04.log",
+      "pid": 12
+    },
+    {
+      "index": 5,
+      "log": "/home/zjl/mappo/research_projects/persistent_uav_feasibility_20260929/runs/initial_choice_lb_v1/logs/worker_05.log",
+      "pid": 13
+    },
+    {
+      "index": 6,
+      "log": "/home/zjl/mappo/research_projects/persistent_uav_feasibility_20260929/runs/initial_choice_lb_v1/logs/worker_06.log",
+      "pid": 14
+    },
+    {
+      "index": 7,
+      "log": "/home/zjl/mappo/research_projects/persistent_uav_feasibility_20260929/runs/initial_choice_lb_v1/logs/worker_07.log",
+      "pid": 15
+    }
+  ]
+}

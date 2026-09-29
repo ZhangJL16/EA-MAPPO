@@ -1,0 +1,8 @@
+{
+  "archive_sha256": "9012ea40b42ec3297ee4da4be3952b96028daa981758614e298b169834036c55",
+  "archive_bytes": 151917233,
+  "manifest_entries_checked": 1357,
+  "manifest_mismatches": 0,
+  "extracted_real_navigation_smoke": "pass",
+  "active_full_window_rows_included": false
+}

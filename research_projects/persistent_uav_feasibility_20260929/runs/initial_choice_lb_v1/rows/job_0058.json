@@ -1,0 +1,52 @@
+{
+  "all_legal_first_actions_deplete": false,
+  "branches": [
+    {
+      "collision_count": 0,
+      "completed": 1,
+      "endpoint_battery": 31.38974132277141,
+      "endpoint_time": 65.25000000000038,
+      "failure": null,
+      "outcome": "completed_first_service",
+      "policy_steps": 327,
+      "stream_sha256": "84cfbd9f27ad995c5996df387d18114db9512eda6a8ef8211897971d611c4aa7",
+      "task_id": 0
+    }
+  ],
+  "capacity": 45.852436563090905,
+  "contract_sha256": "dcc003f68e74665b07da14fe8c5d5216604f68e8f08cbec68c1ce4ed91f60217",
+  "initial_task_positions": [
+    [
+      1911.9371345456132,
+      1465.1717223538626,
+      34.581954480728776
+    ],
+    [
+      2205.0530596129656,
+      3185.8282268401504,
+      171.56689423858631
+    ],
+    [
+      1928.3328022669705,
+      1062.6946295314756,
+      125.69622038901211
+    ]
+  ],
+  "regime_ids": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "representative_regime": 0,
+  "seed": 1202609348,
+  "skipped_task_ids": [
+    1,
+    2
+  ]
+}

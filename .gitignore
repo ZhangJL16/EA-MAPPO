@@ -1,6 +1,5 @@
 # Python/cache
-# Preserved parent-workspace assets; inventory is tracked under docs/cleanup_20260920.
-/archive/parent_workspace_20260920/
+# Historical cleanup is recorded under docs/cleanup_20260920 and docs/cleanup_20260929.
 __pycache__/
 *.py[cod]
 *.pyo
@@ -60,6 +59,11 @@ saved_methods/
 
 # Local ARIS orchestration state is not a research artifact.
 .aris/
+
+# Current-route transfer bundle is larger than GitHub's ordinary file limit.
+# The live 810-job split is mutable; publish its validated raw rows only after completion.
+/research_projects/persistent_uav_feasibility_20260929/migration/*.tar.gz
+/research_projects/persistent_uav_feasibility_20260929/runs/full_window_pilot_v1/
 
 # Environment datasets generated or downloaded locally
 envs/stego/dataset/
